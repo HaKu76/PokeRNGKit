@@ -1,0 +1,118 @@
+name: Verify And Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Setup npm
+        run: npm install --global npm@12.0.2
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 6.0.6
+
+      - name: Cache Emscripten compiler cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.emscripten_cache
+          key: ${{ runner.os }}-emscripten-6.0.6-${{ hashFiles('wasm/**', 'scripts/wasm.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-emscripten-6.0.6-
+
+      - name: Install npm dependencies
+        run: npm ci --engine-strict
+
+      - name: Verify Wasm toolchain
+        run: npm run wasm:doctor
+
+      - name: Verify TypeScript application
+        run: npm run verify
+
+      - name: Verify native Core parity
+        run: npm run wasm:test:native
+
+      - name: Build Wasm and web application
+        run: npm run build
+        env:
+          BASE_PATH: ./
+
+      - name: Configure GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Upload portable deployment artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.CLOUDFLARE_PROJECT_NAME != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-dist
+          path: dist
+          if-no-files-found: error
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  deploy-cloudflare:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.CLOUDFLARE_PROJECT_NAME != ''
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-dist
+          path: dist
+
+      - name: Deploy Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=main

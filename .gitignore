@@ -8,6 +8,9 @@ dev-dist/
 .vite/
 *.local
 
+# Generated TypeScript build metadata
+node_modules/.tmp/
+
 # Tests and reports
 coverage/
 playwright-report/
@@ -21,8 +24,9 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 compile_commands.json
-wasm/build/
+wasm/build*/
 wasm/generated/
+public/wasm/
 
 # Environment files; keep an explicit template when one exists
 .env

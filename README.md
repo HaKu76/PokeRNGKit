@@ -1,26 +1,33 @@
-# PokeHero（工作名）
+# PokeRNGKit
 
-> 项目名称尚未确定。`PokeHero` 只是当前目录和私有 npm package 使用的工作标识，不代表最终英文名或商标决定；中文名同样未定。正式名称选定前不执行仓库、目录或包重命名。
-
-PokeHero 是面向宝可梦第三世代 RNG 研究与检索的浏览器工具。项目以
+PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集。项目英文工程名已确定，当前不设置中文名。项目以
 [Admiral-Fish/PokeFinder](https://github.com/Admiral-Fish/PokeFinder) 4.3.2 的算法与测试资料为上游参考，目标是在不牺牲结果正确性的前提下，提供 Web 原生、可离线、无需后端的使用体验。
 
 ## 项目状态
 
-**规划与技术验证准备中，尚无可用应用。** 当前仓库先建立需求、技术栈、许可证与工程约束；依赖元数据随后初始化，但本阶段不实现产品界面或业务代码。
+**阶段 1：第三世代 ID 乱数模块落地中。** 当前已具备 React/Vite 应用壳、`gen3id` Wasm 模块边界、TypeScript Worker Pool、ID 输入/筛选/结果表和 GitHub Pages 工作流。CMake 与 Ninja 由 npm 提供；本机尚未激活 Emscripten，因此完整 Wasm 构建和 Pages 实机验收待完成。
 
 - 目标范围：仅第三世代（Gen III）
+- 当前模块：ID Generator（XD/Colosseum、FireRed/LeafGreen/Emerald、Ruby/Sapphire）
 - 上游核验基线：PokeFinder 4.3.2
-- 当前里程碑：文档基线与 WebAssembly 技术验证准备
+- 当前里程碑：`gen3id` Worker + Wasm 技术验证
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
 
 ## 产品定位
 
-PokeHero 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代 Core 的已验证算法，通过 WebAssembly 在浏览器中运行，并用 React 构建适合桌面和移动浏览器的原生交互。所有计算、档案和设置都留在用户设备上。
+PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代 Core 的已验证算法，通过 WebAssembly 在浏览器中运行，并用 React 构建适合桌面和移动浏览器的原生交互。所有计算、档案和设置都留在用户设备上。
 
-MVP 包含：
+当前已落地的 ID 模块包含：
+
+- XD/Colosseum、FireRed/LeafGreen/Emerald、Ruby/Sapphire 三种第三世代 ID 生成模式
+- TID、SID、TSV 精确筛选
+- Initial Advances / Max Advances 分片计算
+- Web Worker Pool 并行调度、进度、取消和错误状态
+- 虚拟化结果表、数值排序和 CSV 导出
+
+后续 MVP 计划包含：
 
 - 三代档案的创建、编辑、选择与删除
 - Static Generator / Searcher
@@ -28,14 +35,14 @@ MVP 包含：
 - IV、性格、特性、性别、闪光、觉醒力量、遭遇槽等适用筛选项
 - 可排序结果表格、分批展示和 CSV 导出
 - 长任务的进度、取消和错误恢复
-- 简体中文与英文
+- 简体中文、英文与日文
 - PWA 安装与首次加载后的离线使用
 
-MVP 不包含 Egg、ID、GameCube、PokeSpot、Jirachi 及其他世代。这些能力只有在三代 Static/Wild 的正确性、性能与离线体验达标后才进入后续路线图。
+当前不包含 Egg、GameCube、PokeSpot、Jirachi 及其他世代。Static/Wild 将在 `gen3id` 的正确性、性能与离线流程验证后继续实现。
 
 ## 纯静态与隐私
 
-PokeHero 必须能够部署到 GitHub Pages、Cloudflare Pages 或任意等价静态文件托管服务：
+PokeRNGKit 必须能够部署到 GitHub Pages、Cloudflare Pages 或任意等价静态文件托管服务：
 
 - 不设置应用后端、账号系统或云端数据库。
 - RNG 计算由浏览器内 Web Worker 中的 WebAssembly 完成。
@@ -50,13 +57,14 @@ PokeHero 必须能够部署到 GitHub Pages、Cloudflare Pages 或任意等价�
 
 ```text
 React UI
-  |-- local UI state (React + Zustand)
-  |-- profiles (Dexie / IndexedDB)
+  |-- local UI state (React)
+  |-- profiles (IndexedDB，后续模块)
   |-- settings (localStorage)
   `-- typed messages
         `-- Web Worker
-              `-- Emscripten module
-                    `-- PokeFinder Gen III C++ Core + thin adapter
+              `-- Worker Pool
+                    `-- Emscripten gen3id module
+                          `-- PokeFinder Gen III C++ Core + thin adapter
 ```
 
 Wasm 模块只在 Worker 内实例化。搜索被拆成可让出事件循环的工作分片，Worker 以批次传输结果并在分片之间处理取消消息，因此不需要共享内存。界面层不直接依赖 C++ 类、Qt 类型或上游文件型 `ProfileLoader`。
@@ -65,18 +73,52 @@ Wasm 模块只在 Worker 内实例化。搜索被拆成可让出事件循环的�
 
 ## 开发入口
 
-当前仓库还没有应用骨架，以下命令是下一阶段初始化必须提供的稳定入口；在相应脚本加入 `package.json` 前，它们不可用：
+工程入口统一由 npm 提供。先安装 `.node-version` 指定的 Node.js，并让 npm 与 `packageManager` 字段一致。
+
+### 本地 UI 验收
+
+不安装 Emscripten 也可以启动界面预览：
 
 ```bash
 npm ci
+npm run dev:ui
+```
+
+打开 <http://127.0.0.1:5173/>。
+
+需要先构建静态文件再预览时使用：
+
+```bash
+npm run preview:ui
+```
+
+打开 <http://127.0.0.1:4173/>。
+
+UI 预览模式使用确定性样例数据，可以验收三种模式切换、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
+
+本地验收服务器固定绑定 `127.0.0.1`，只允许当前电脑访问。如果 Windows 首次运行 Node.js 时弹出防火墙网络放行或管理员密码提示，可以直接取消/不允许；不需要为本地验收创建公网或局域网放行规则。
+
+### 本地完整功能
+
+完整 Wasm 构建需要通过[官方 emsdk](https://emscripten.org/docs/getting_started/downloads.html)激活 Emscripten。CMake 与 Ninja 已由 npm 精确锁定并跨平台安装。`wasm:test:native` 另需本机 C++ 编译器，Windows 可使用 [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)，GitHub Actions 的 Ubuntu runner 已提供系统编译器。
+
+```bash
+npm install --global npm@12.0.2
+npm ci
+npm run wasm:doctor
 npm run dev
+npm run dev:ui
+npm run dev:web
 npm run build
+npm run build:ui
+npm run build:web
+npm run preview:ui
 npm test
-npm run test:e2e
 npm run lint
 npm run format:check
 npm run wasm:build
-npm run wasm:test
+npm run wasm:test:native
+npm run verify
 ```
 
 已确认的工具链基线：
@@ -84,59 +126,76 @@ npm run wasm:test
 - Node.js 24.19.0 LTS
 - npm 12.0.2
 - Emscripten 6.0.6（通过 emsdk 精确锁定）
-- CMake 3.31 或更高版本（上游 4.3.2 的最低声明）
+- CMake runtime 4.3.1（npm 精确锁定）
+- Ninja runtime 1.13.2（npm 精确锁定）
 
-前端依赖的兼容范围与精确锁定规则记录在 [docs/tech-stack.md](docs/tech-stack.md#版本基线与锁定策略)。
+前端依赖的兼容范围与精确锁定规则记录在 [docs/tech-stack.md](docs/tech-stack.md#4-当前版本与锁定策略)。
 
 ## 构建与测试
 
-初始化后的生产构建由 Vite 输出到 `dist/`。`npm run build` 必须先生成 release 模式 Wasm，再构建带内容哈希的 JS、CSS、Worker 和 `.wasm` 静态资源。
+`npm run build` 先生成 release 模式的 `public/wasm/gen3id.mjs` 与 `gen3id.wasm`，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
 
-测试分为五层：
+测试规划分为五层：
 
 1. C++/Wasm 与 PokeFinder 上游夹具的算法一致性测试。
 2. TypeScript 领域逻辑、消息协议、数据迁移和 CSV 的单元测试。
-3. React 组件与用户交互测试。
-4. Worker + 真实 Wasm + IndexedDB 的浏览器集成测试。
-5. Playwright 覆盖核心流程、静态子路径部署和离线重载。
+3. React 组件与用户交互测试（后续补充）。
+4. Worker + 真实 Wasm + IndexedDB 的浏览器集成测试（后续补充）。
+5. Playwright 覆盖核心流程、静态子路径部署和离线重载（Pages 预览稳定后引入）。
 
-首个技术验证必须先证明 Static/Wild 的固定输入结果与上游一致、长搜索可进度汇报并在 500 ms 内响应取消、GitHub Pages 子路径能够加载 Wasm，且离线重载可用。未通过该门槛前不扩展产品功能。
+首个技术验证先证明 `gen3id` 固定输入结果与上游一致、长范围计算可汇报进度并响应取消、GitHub Pages 能加载 Worker/Wasm，且离线重载可用。功能测试和最终验收由项目所有者执行；仓库记录命令、输入和结果，不代替人工验收结论。
 
 ## 部署
 
-CI/CD 计划使用 GitHub Actions：
+CI/CD 使用 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：
 
-1. 在固定 Node、npm 与 Emscripten 版本下安装依赖。
-2. 执行 lint、格式检查、单元测试、Wasm 一致性测试和生产构建。
-3. 对构建产物执行 Playwright 冒烟与离线测试。
-4. 将同一份 `dist/` 部署到 GitHub Pages；Cloudflare Pages 使用相同构建命令和产物目录。
+1. 在固定 Node、npm 与 Emscripten 版本下安装依赖；CMake/Ninja 由 `npm ci` 安装。
+2. 执行格式检查、lint、类型检查、TypeScript 单元测试、原生 Core 一致性测试和生产构建。
+3. 上传同一份 `dist/`，由独立 job 部署到 GitHub Pages。
+4. 配置 Cloudflare Secrets 与项目变量后，可将同一份 `dist/` 部署到 Cloudflare Pages；后续绑定 `hakuhiro.top` 下的正式域名。
 
-Vite 的 `base` 必须可配置，以同时支持自定义域名根路径和 `/PokeHero/` 形式的 GitHub Pages 项目路径。发布产物必须带许可证、上游署名和对应源码入口。
+当前首要目标是 GitHub Pages 测试部署。GitHub 仓库重命名为 `PokeRNGKit` 后，项目所有者提交并推送 `main`，Actions 会尝试启用 Pages、构建 Wasm 和站点，并部署到预计地址 <https://haku76.github.io/PokeRNGKit/>。如果仓库策略阻止自动启用，在 GitHub `Settings -> Pages -> Build and deployment` 中将 Source 设为 `GitHub Actions`，再重新运行工作流。
+
+生产构建使用相对资源路径，以同时支持 `/PokeRNGKit/` 测试路径和 Cloudflare 自定义域名根路径。Cloudflare 域名未确定前不硬编码 URL。`dist/legal/` 会包含 GPL 文本和上游记录，页面页脚同时提供源码入口。
+
+### 构建职责
+
+正式发布采用全自动构建：Git 仓库只保存源码、lockfile 和构建脚本，GitHub Actions 在固定工具链中生成 Wasm 与 `dist/`。不提交本地生成的 `public/wasm/`、`wasm/build/` 或 `dist/`，避免二进制与源码不同步、不同机器优化参数不一致，以及无法确认部署产物来源。
+
+本地编译保留为开发和应急能力。如果 Actions 暂时不可用，可在符合锁定版本的 Windows PowerShell 环境中运行：
+
+```powershell
+npm run verify:full
+$env:BASE_PATH = "./"
+npm run build:web
+```
+
+随后把完整 `dist/` 作为一个整体交给静态托管；不要只上传本地 `.wasm` 并与另一轮 Web 构建混用。GitHub Pages 当前仍以 Actions artifact 为唯一正式入口，CI 问题优先修复工作流，不切换到提交 `gh-pages` 分支或跟踪生成物。
 
 ## 路线图
 
-- **阶段 0：仓库基线** - README、需求、技术栈、忽略规则与许可证策略。
-- **阶段 1：工程骨架与技术验证** - React/Vite、CI、Emscripten、Worker 协议、上游夹具一致性和静态托管验证。
-- **阶段 2：应用基础** - 中英文应用壳、三代档案、IndexedDB 迁移和本地设置。
+- **阶段 0：仓库基线** - README、需求、技术栈、忽略规则与许可证策略（已完成）。
+- **阶段 1：第三世代 ID 模块** - React/Vite、`gen3id`、Worker Pool、三语界面、GitHub Pages 和上游一致性验证（进行中）。
+- **阶段 2：应用基础** - 三代档案、IndexedDB 迁移和本地设置。
 - **阶段 3：Static MVP** - Generator、Searcher、筛选、批量结果、排序、CSV、进度和取消。
 - **阶段 4：Wild MVP** - 遭遇数据、条件联动、Generator/Searcher 与全链路回归。
 - **阶段 5：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
-- **后续** - Egg、ID、GameCube、PokeSpot、Jirachi 等三代能力；是否支持其他世代另行决策。
+- **后续** - Egg、GameCube、PokeSpot、Jirachi 等三代能力；是否支持其他世代另行决策。
 
 ## 许可证、署名与源码分发
 
-PokeFinder 源码头声明可按 **GNU GPL v3 或更高版本**使用。PokeHero 计划作为包含其衍生和链接代码的整体，以 `GPL-3.0-or-later` 发布。正式导入上游代码前必须完成以下事项：
+PokeFinder 源码头声明可按 **GNU GPL v3 或更高版本**使用。PokeRNGKit 计划作为包含其衍生和链接代码的整体，以 `GPL-3.0-or-later` 发布。正式导入上游代码前必须完成以下事项：
 
 - 在仓库中保留完整 GPL 许可证文本、原作者版权声明和上游署名。
-- 记录采用的上游版本、提交或归档校验和，以及 PokeHero 的修改清单。
+- 记录采用的上游版本、提交或归档校验和，以及 PokeRNGKit 的修改清单。
 - 发布 `.wasm` 和部署站点时，同步提供构建该二进制所对应的完整源代码、构建脚本与安装说明。
-- 不以仅提供上游链接替代 PokeHero 自身修改源码的分发义务。
+- 不以仅提供上游链接替代 PokeRNGKit 自身修改源码的分发义务。
 - 审核所有第三方数据、图标、字体和素材的独立许可证，未经许可不复制游戏素材。
 
 本节是工程约束，不构成法律意见。首次公开发布前应完成一次 GPL 与素材来源审查。
 
 ## 免责声明
 
-PokeHero 是非官方、由社区开发的研究工具，与 Nintendo、Creatures Inc.、GAME FREAK inc.、The Pokemon Company 或其关联方没有隶属、授权或背书关系。
+PokeRNGKit 是非官方、由社区开发的研究工具，与 Nintendo、Creatures Inc.、GAME FREAK inc.、The Pokemon Company 或其关联方没有隶属、授权或背书关系。
 
 Pokemon、宝可梦及相关名称、角色和素材是其各自权利人的商标或版权作品。项目名称中的相关指代仅用于说明工具用途。除非取得明确许可，本项目不分发官方美术、精灵图、音频、Logo 或其他受保护素材。

@@ -1,318 +1,241 @@
-# PokeHero（工作名）产品需求
+# PokeRNGKit 产品需求
 
-> - 状态：阶段 0 基线
+> - 状态：阶段 1，第三世代 ID 乱数预览
 > - 更新日期：2026-08-11
->   品牌状态：英文名与中文名均待定；`PokeHero` 仅为当前工作标识
+> - 当前部署目标：GitHub Pages 测试环境
+> - 产品名称：PokeRNGKit；当前不设置中文名
 
-## 1. 背景
+## 1. 产品定义
 
-PokeHero（工作名）将 Admiral-Fish/PokeFinder 的第三世代 RNG 能力带到浏览器。当前只读分析基于 PokeFinder 4.3.2：Core 与 Qt 基本解耦，但线程/SIMD、Qt Form 中的业务规则，以及依赖本地文件的 `ProfileLoader` 不能直接照搬到静态 Web 环境。
+PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集。项目参考 [Admiral-Fish/PokeFinder](https://github.com/Admiral-Fish/PokeFinder) 4.3.2，将经过验证的 C++ Core 编译为 WebAssembly，并在 Web Worker 中完成计算。
 
-本文后续使用 `PokeHero` 仅作为技术与目录标识，不表示名称已经确认。正式英文名计划另行选择，中文名也不在本阶段预设。
+应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-产品采用 Web 原生界面，复用并移植经过验证的三代 C++ Core，通过 Emscripten 编译为 WebAssembly，在 Web Worker 内执行。应用无后端、无账号，能够部署到普通静态托管并在首次加载后离线运行。
+当前按功能模块逐个落地。第一个模块是 `gen3id`，完成并验证后再进入档案、Static 和 Wild。
 
-## 2. 术语
+## 2. 已确认边界
 
-- **档案（Profile）**：保存游戏版本、TID、SID、电池状态等会影响 RNG 计算的用户配置。
-- **Generator**：从已知种子和推进范围正向生成状态。
-- **Searcher**：从目标 IV 等约束反向搜索可能的种子或状态。
-- **Static**：固定或静态遭遇，包括由上游模板定义的礼物、定点、传说、游走等类别。
-- **Wild**：草丛、碎岩、冲浪和钓鱼等野生遭遇。
-- **上游一致性**：在相同版本、档案、方法、种子、推进和筛选条件下，PokeHero 的领域结果与 PokeFinder 4.3.2 测试基线一致。
+- 英文工程名为 PokeRNGKit，不设置中文名。
+- 第一阶段只覆盖第三世代，不扩展到其他世代。
+- 只使用 npm 管理 JavaScript 依赖和工程命令。
+- RNG Core 采用 C++ -> Emscripten -> Wasm，不在 TypeScript 中重写上游算法。
+- TypeScript 负责界面、校验、任务编排、Worker 协议、持久化和导出。
+- 基线不依赖 Wasm threads、`SharedArrayBuffer`、COOP/COEP 或跨源隔离。
+- 多核计算通过多个独立 Web Worker 和独立 Wasm 实例实现。
+- 界面只支持简体中文、英文和日文。
+- 功能测试与最终验收由项目所有者执行；自动检查只提供工程证据。
+- 本地必须提供不依赖 Emscripten 的 UI 预览模式，用于项目所有者验收界面与交互。
+- GitHub Pages 先作为测试环境，Cloudflare Pages 后续作为正式部署目标。
+- 正式域名将使用 `hakuhiro.top` 下的地址，具体主机名尚未决定，不得硬编码。
 
-## 3. 产品目标
+## 3. 目标用户与场景
 
-1. 为第三世代 RNG 用户提供无需下载安装桌面程序的可靠工具。
-2. 保留 PokeFinder 三代算法的可验证正确性，不在 TypeScript 中重新实现核心 RNG。
-3. 让计算、档案和偏好全部留在浏览器本地，不要求用户上传游戏或个人数据。
-4. 在 GitHub Pages、Cloudflare Pages 等普通静态托管上工作，不依赖特定响应头或服务器功能。
-5. 为后续三代功能保留清晰边界，但先把 Static/Wild 做完整。
+### 3.1 第三世代 ID 用户
 
-## 4. 非目标
+用户选择游戏模式，输入 Seed、TID 或日期时间及推进范围，生成每一帧对应的 TID、SID 和 TSV。
 
-MVP 明确不处理：
+### 3.2 大范围计算用户
 
-- 第一、二、四至九世代功能。
-- Egg、ID、GameCube、PokeSpot、Jirachi、PID to IV、Seed to Time 等非 Static/Wild 工作流。
-- 与模拟器、主机、存档文件或内存读取器的实时连接。
-- 用户账号、跨设备云同步、服务端计算、排行榜或社交功能。
+用户扩大推进范围后，计算在 Worker Pool 中运行。页面持续显示已处理状态数、结果数和进度；用户可以取消，界面主线程不能被长循环阻塞。
+
+### 3.3 筛选与导出用户
+
+用户使用 TID、SID、TSV 精确筛选缩小结果，在表格中排序，并将当前结果导出为 CSV。
+
+### 3.4 多语言与离线用户
+
+用户可以在简体中文、英文和日文之间切换。首次在线加载并缓存成功后，可以离线重新打开应用；用户理解清除站点数据会删除本地设置和后续档案数据。
+
+## 4. 当前功能需求：`gen3id`
+
+需求编号用于测试、Issue 和版本清单追踪。
+
+### 4.1 应用基础
+
+- **FR-APP-01** 应用打开后直接进入第三世代 ID 乱数工作区，不显示营销落地页。
+- **FR-APP-02** 应用应显示 Wasm 初始化、就绪、计算中、完成、取消和失败状态。
+- **FR-APP-03** Wasm 文件缺失、API 版本不匹配或 Worker 崩溃时，应显示可执行的错误提示，不得静默返回空结果。
+- **FR-APP-04** 刷新页面可以终止当前任务，但不能留下“仍在计算”的持久错误状态。
+- **FR-APP-05** 计算区域和结果区域应在桌面及移动视口下保持可读，结果表允许横向或纵向滚动。
+- **FR-APP-06** `ui` 构建模式应使用明确隔离的确定性样例引擎，使三种模式、筛选、进度、取消、结果、排序、CSV 和三语界面可以在本地验收。
+- **FR-APP-07** UI 预览必须持续显示非生产提示，不得宣称样例结果是 RNG 结果，也不得用于性能验收。
+- **FR-APP-08** 生产构建和 Pages 构建不得通过 URL、用户设置或运行时开关启用 UI 预览引擎。
+
+### 4.2 XD / 竞技场
+
+- **FR-ID-XD-01** 接受 `0x00000000..0xFFFFFFFF` 的 32 位十六进制 Seed。
+- **FR-ID-XD-02** 使用 PokeFinder `IDGenerator3::generateXDColo` 的结果语义。
+- **FR-ID-XD-03** 返回 Advances、TID、SID 和 TSV，顺序与推进顺序一致。
+
+### 4.3 火叶 / 绿宝石
+
+- **FR-ID-FRLGE-01** 接受 `0..65535` 的十进制 TID 输入。
+- **FR-ID-FRLGE-02** 使用 PokeFinder `IDGenerator3::generateFRLGE` 的结果语义。
+- **FR-ID-FRLGE-03** 输入 TID 在生成结果中保持对应的上游行为，不由界面推导另一套算法。
+
+### 4.4 红蓝宝石
+
+- **FR-ID-RS-01** 支持日期时间推导初始 Seed，也支持手动输入 `0x0000..0xFFFF` 的 16 位 Seed。
+- **FR-ID-RS-02** 启用“无电池”时使用第三世代红蓝宝石对应的固定 Seed 规则，并禁用无效的日期时间输入。
+- **FR-ID-RS-03** 使用 PokeFinder `IDGenerator3::generateRS` 的结果语义。
+- **FR-ID-RS-04** 日期时间推导限制在当前实现可验证的 `2000..2099` 年范围，非法时间不得启动任务。
+
+### 4.5 推进范围
+
+- **FR-ID-RANGE-01** Initial Advances 必须是 `0..4294967295` 的整数。
+- **FR-ID-RANGE-02** Max Advances 表示从初始帧起继续计算的最大偏移，包含起点，因此状态总数为 `Max Advances + 1`。
+- **FR-ID-RANGE-03** 当前单次任务最多处理 50,000,000 个状态；超出时在界面校验阶段拒绝。
+- **FR-ID-RANGE-04** TypeScript 将任务拆成不超过 100,000 个状态的分片；C ABI 同样拒绝更大的单次调用。
+- **FR-ID-RANGE-05** Initial Advances 与 Max Advances 相加不得溢出 32 位无符号整数。
+
+### 4.6 筛选
+
+- **FR-ID-FILTER-01** TID 和 SID 精确筛选接受 `0..65535`；TSV 精确筛选接受 `0..8191`。
+- **FR-ID-FILTER-02** 空输入表示不应用该筛选，不使用魔法数字表示“任意”。
+- **FR-ID-FILTER-03** 多个筛选条件按 AND 组合。
+- **FR-ID-FILTER-04** 任一输入无效时，不启动部分有效的任务，并保留用户输入以便修正。
+
+### 4.7 Worker 与取消
+
+- **FR-ID-TASK-01** Wasm 只能在 Web Worker 中实例化，React 主线程不得直接运行 C++ 生成循环。
+- **FR-ID-TASK-02** Worker 数量默认使用 `max(1, min(8, hardwareConcurrency - 1))`，并不得超过当前分片数。
+- **FR-ID-TASK-03** 每个 Worker 持有独立的 Wasm 实例，不共享线性内存。
+- **FR-ID-TASK-04** 批次通过可转移 `ArrayBuffer` 返回，避免逐行结构化克隆。
+- **FR-ID-TASK-05** 进度必须单调递增，并报告 processed states、total states、result count 和百分比。
+- **FR-ID-TASK-06** 用户取消时应终止当前 Worker Pool；已确认结果可以保留，迟到消息不得更新已取消任务。
+- **FR-ID-TASK-07** 取消响应以当前分片边界为基线，具体耗时在 Pages 实机测试后记录，不提前承诺固定毫秒值。
+
+### 4.8 结果与导出
+
+- **FR-ID-RESULT-01** 结果列包括 Advances、TID、SID 和 TSV。
+- **FR-ID-RESULT-02** 结果表按数值排序，不按本地化字符串排序。
+- **FR-ID-RESULT-03** 大结果集使用虚拟化渲染，行内容变化不能改变表格基本列宽和滚动容器尺寸。
+- **FR-ID-RESULT-04** 当前界面最多保留 250,000 条结果；达到上限时停止任务并明确提示。
+- **FR-ID-RESULT-05** CSV 使用当前排序后的数值结果，并写入 UTF-8 BOM 以改善常见表格软件兼容性。
+- **FR-ID-RESULT-06** 用户可以清空结果；清空操作不改变输入和筛选。
+
+### 4.9 国际化
+
+- **FR-I18N-01** 只提供 `zh`、`en`、`ja` 三种语言，不根据浏览器自动引入其他语言。
+- **FR-I18N-02** 语言选择保存在 `localStorage`，不存在或无效时默认使用简体中文。
+- **FR-I18N-03** 中文领域术语优先复用项目所有者维护的 PokeFinder 中文翻译。
+- **FR-I18N-04** Wasm 返回稳定数值，不返回本地化文案。
+
+### 4.10 PWA 与静态部署
+
+- **FR-DEPLOY-01** 同一份 `dist/` 应能运行在 GitHub Pages 仓库子路径和 Cloudflare 自定义域名根路径。
+- **FR-DEPLOY-02** JS、Worker、Wasm、manifest、图标和 Service Worker URL 不得依赖硬编码域名。
+- **FR-DEPLOY-03** 推送 `main` 后，GitHub Actions 应完成冻结安装、检查、原生一致性测试、Wasm 构建、Web 构建和 Pages 部署。
+- **FR-DEPLOY-04** Pull request 只执行验证和构建，不部署 Pages。
+- **FR-DEPLOY-05** 首次在线加载完成后，应验证离线重载；离线验收由项目所有者执行并记录浏览器版本。
+- **FR-DEPLOY-06** 部署产物应提供 GPL 文本、上游来源和 PokeRNGKit 源代码入口。
+
+## 5. 后续 MVP
+
+`gen3id` 通过正确性和 Pages 测试后，按以下顺序推进：
+
+1. 三代档案管理：Ruby、Sapphire、Emerald、FireRed、LeafGreen；IndexedDB 持久化。
+2. Static Generator / Searcher。
+3. Wild Generator / Searcher。
+4. 适用的 IV、性格、特性、性别、闪光、觉醒力量、遭遇槽、等级和 Pokemon 筛选。
+5. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
+
+Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估。Gen IV 及其他世代不属于当前承诺；如进入开发，按 `gen4id` 等独立模块命名和验证。
+
+## 6. 非目标
+
+- 后端、账号、云同步、服务端计算、遥测、广告或运行时 CDN。
+- 模拟器、主机、存档文件或进程内存的实时连接。
 - 对 PokeFinder Qt 界面的逐像素复刻。
-- 依赖 Wasm threads、`SharedArrayBuffer`、COOP/COEP 或 cross-origin isolation 的并行加速。
-- 分发未经许可的官方精灵图、音频、Logo 或其他游戏素材。
-
-## 5. 目标用户与场景
-
-### 5.1 第三世代 RNG 用户
-
-用户选择已有档案，输入种子、方法和推进范围，生成 Static 或 Wild 结果；使用 IV、性格等条件缩小结果，在表格中排序并导出 CSV。
-
-### 5.2 目标反查用户
-
-用户知道目标 IV 范围及其他约束，启动耗时搜索；界面持续显示进度和新增结果，用户可以随时取消，已产生的结果仍可查看或导出。
-
-### 5.3 多设备或离线用户
-
-用户在受支持浏览器中首次打开并安装 PWA，之后在无网络环境下继续使用。用户清楚档案只保存在当前浏览器，清除站点数据会删除档案。
-
-### 5.4 中英文用户
-
-用户可随时切换简体中文和英文；输入值、任务状态、错误信息、表头和 CSV 表头遵循当前语言，但数值语义和排序不受语言影响。
-
-## 6. 功能需求
-
-需求编号用于测试、Issue 和发布清单追踪。未标为“后续”的条目均属于 MVP。
-
-### 6.1 应用基础
-
-- **FR-APP-01** 应用应提供档案、Static、Wild 和设置入口，并支持浏览器前进、后退及可分享的非敏感页面 URL。
-- **FR-APP-02** 首次进入计算页且没有档案时，应引导用户创建档案，不应使用隐式默认 TID/SID 产生看似有效的结果。
-- **FR-APP-03** 应在全局可见位置切换简体中文和英文，并持久化选择。
-- **FR-APP-04** Wasm 初始化失败、Worker 崩溃、存储不可用或数据版本不兼容时，应显示可执行的恢复操作，不得静默失败。
-- **FR-APP-05** 页面刷新不应破坏已保存档案和设置；运行中的计算可以终止，但不得留下“仍在运行”的错误状态。
-
-### 6.2 三代档案
-
-- **FR-PROFILE-01** 用户可以创建、查看、编辑、复制、选择和删除档案；删除必须二次确认。
-- **FR-PROFILE-02** MVP 档案支持 Ruby、Sapphire、Emerald、FireRed 和 LeafGreen。XD/Colosseum 档案随 GameCube 功能后续加入。
-- **FR-PROFILE-03** 档案字段至少包括：稳定 ID、名称、游戏版本、TID、SID、Dead Battery、创建时间、更新时间和数据 schema 版本。
-- **FR-PROFILE-04** 名称去除首尾空白后必须非空；TID/SID 必须为 `0..65535` 的整数；Dead Battery 只在上游规则适用时参与计算。
-- **FR-PROFILE-05** 编辑档案后，所有新任务必须使用新快照；已运行任务不接受档案的隐式热更新。
-- **FR-PROFILE-06** 首次 schema 创建和后续迁移必须是事务性的。失败时保留可恢复的旧数据，不得部分覆盖。
-- **FR-PROFILE-07** 用户可以删除 PokeHero 在当前站点保存的全部档案与设置。
-- **FR-PROFILE-08（后续）** 档案 JSON 备份、导入和冲突合并在 MVP 后评估，不与结果 CSV 混用。
-
-### 6.3 Static Generator
-
-- **FR-STATIC-G-01** 用户选择档案、Method 1 或 Method 4、上游模板允许的 Static 类别和目标。
-- **FR-STATIC-G-02** 用户输入 32 位十六进制种子、Initial Advances、Max Advances 和 Offset；界面应同时提供明确格式提示与范围校验。
-- **FR-STATIC-G-03** 类别、目标、等级和方法必须按档案版本及上游模板联动；不适用选项不得提交给 Core。
-- **FR-STATIC-G-04** Generator 应按确定性顺序返回范围内结果，并可应用第 6.7 节中适用的筛选条件。
-- **FR-STATIC-G-05** 对上游标记的 bugged roamer 等特殊模板，应复现上游允许的方法和规则，不通过 UI 猜测修正算法。
-
-### 6.4 Static Searcher
-
-- **FR-STATIC-S-01** 用户选择档案、Method、Static 类别和目标，并至少提供六项 IV 的最小值/最大值。
-- **FR-STATIC-S-02** 每项 IV 范围必须为 `0..31` 且最小值不大于最大值；无有效范围时不得启动。
-- **FR-STATIC-S-03** 搜索在 Worker 内执行，启动后立即返回任务 ID；界面不得被长循环阻塞。
-- **FR-STATIC-S-04** 搜索应分批返回新增结果、单调递增的进度和最终汇总。
-- **FR-STATIC-S-05** 用户可以取消搜索；取消后不再接收新结果，保留已经确认的批次，并明确显示“已取消”而非“完成”。
-
-### 6.5 Wild Generator
-
-- **FR-WILD-G-01** 用户选择档案、Wild 1/Wild 2/Wild 4、Lead、遭遇类型和地点。
-- **FR-WILD-G-02** 遭遇类型至少覆盖 Grass、Rock Smash、Surfing、Old Rod、Good Rod 和 Super Rod；具体可用性由版本和遭遇数据决定。
-- **FR-WILD-G-03** 用户输入种子、Initial Advances、Max Advances 和 Offset，并可配置 Black Flute、Cleanse Tag、White Flute、Feebas Tile、Bike 等上游适用条件。
-- **FR-WILD-G-04** 地点、Pokemon、遭遇槽和等级范围必须随版本、遭遇类型和前置条件联动。
-- **FR-WILD-G-05** Generator 应返回对应遭遇状态，并应用适用的 Wild 筛选条件。
-
-### 6.6 Wild Searcher
-
-- **FR-WILD-S-01** 用户选择与 Wild Generator 等价的档案、方法、Lead、遭遇和地点上下文，并提供有效 IV 范围。
-- **FR-WILD-S-02** Pokemon、遭遇槽和等级筛选必须反映所选地点的真实遭遇表；“任意”不能被编码成一个具体槽位。
-- **FR-WILD-S-03** 搜索任务遵循与 Static Searcher 相同的 Worker、分批、进度、取消和错误语义。
-- **FR-WILD-S-04** Feebas Tile、Bike、道具与 Rock Smash 等条件只在上游规则适用时展示和提交。
-
-### 6.7 筛选
-
-- **FR-FILTER-01** 通用筛选至少包括六项 IV 范围、性格、特性、性别、闪光类型和觉醒力量类型。
-- **FR-FILTER-02** Wild 额外支持遭遇槽、等级和 Pokemon 筛选；Static 不显示无意义的遭遇槽与等级筛选。
-- **FR-FILTER-03** 支持“任意”或多选的筛选项必须在协议中表达为显式集合/空约束，不使用易混淆的魔法数字。
-- **FR-FILTER-04** 筛选校验失败时，应定位字段并保留用户输入；不得启动部分有效的任务。
-- **FR-FILTER-05** Generator 与同类 Searcher 之间可以显式复制适用设置和筛选，但不得自动覆盖用户另一侧未保存的输入。
-- **FR-FILTER-06** “Show Stats” 只影响派生列展示，不影响 RNG 结果集合。
-
-### 6.8 结果、排序与导出
-
-- **FR-RESULT-01** 公共结果列至少覆盖 Advances、PID、IVs、Nature、Ability、Gender、Shiny、Hidden Power；按工作流增加 Seed、Level、Encounter Slot、Pokemon 等字段。
-- **FR-RESULT-02** 表格应支持多列排序、显示/隐藏列和大量结果的虚拟化或等价性能方案。
-- **FR-RESULT-03** 排序使用原始数值或枚举码，不使用本地化后的显示字符串进行数值排序。
-- **FR-RESULT-04** 分批到达时不得改变已确认行的身份；相同请求的批次序号必须连续并可检测遗漏。
-- **FR-RESULT-05** CSV 导出默认包含当前结果全集和当前可见列顺序，并明确是否导出筛选后的子集。
-- **FR-RESULT-06** CSV 使用 UTF-8（带 BOM 以兼容常见表格软件）、RFC 4180 风格引号转义和稳定列顺序；十六进制与超过安全整数范围的值按文本导出，避免精度或前导零丢失。
-- **FR-RESULT-07** 空结果、已取消结果和失败任务的导出状态必须可区分。
-
-### 6.9 任务生命周期
-
-- **FR-TASK-01** MVP 每个计算 Worker 同一时间只执行一个任务；启动新任务前必须完成、取消或显式替换旧任务。
-- **FR-TASK-02** 状态机至少包含 `idle`、`initializing`、`running`、`cancelling`、`completed`、`cancelled` 和 `failed`。
-- **FR-TASK-03** 进度未知时显示不确定进度，已知时显示 `completed/total`；不得伪造百分比。
-- **FR-TASK-04** 取消操作必须幂等。完成与取消竞争时，以 Worker 发出的单一终态为准。
-- **FR-TASK-05** Worker 意外退出后允许重新初始化；旧请求 ID 的迟到消息必须被忽略。
-
-### 6.10 国际化与离线
-
-- **FR-I18N-01** 所有用户可见应用文本进入翻译资源，不在业务组件中硬编码双语条件。
-- **FR-I18N-02** Pokemon、地点、性格等领域词汇使用稳定 ID 与本地化字典映射；Wasm 不返回最终显示文案。
-- **FR-I18N-03** 缺失翻译在开发和 CI 中可检测；生产环境回退到英文并保留可诊断信息。
-- **FR-PWA-01** 应用可安装为 PWA，并缓存应用壳、Worker、Wasm、领域数据和双语资源。
-- **FR-PWA-02** 首次成功在线访问后，离线重载必须进入可用应用，已保存档案可读取，Static/Wild 核心流程可运行。
-- **FR-PWA-03** 更新使用内容哈希和原子缓存切换；运行中不强制刷新，新版本可用时由用户确认更新。
-- **FR-PWA-04** 不缓存第三方运行时资源，因为生产应用不得依赖运行时 CDN。
+- 为当前模块引入 React Router、全局状态框架、通用表单框架或大型 UI 组件库。
+- 依赖 `SharedArrayBuffer`、Wasm pthread 或静态托管无法保证的响应头。
+- 未经授权的官方精灵图、音乐、Logo 或其他游戏素材。
 
 ## 7. 非功能需求
 
 ### 7.1 正确性
 
-- **NFR-CORRECT-01** Static Generator/Searcher 与 Wild Generator/Searcher 的固定夹具必须逐字段匹配 PokeFinder 4.3.2 基线。
-- **NFR-CORRECT-02** 32/64 位整数跨 Wasm 边界时不得隐式转换为可能丢精度的 JavaScript `number`。
-- **NFR-CORRECT-03** 结果顺序、筛选和 CSV 在同一输入与版本下必须可复现。
+- C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致。
+- TypeScript 只负责输入规范化、分片和解码，不改变 Core 的 RNG 规则。
+- C ABI 和 Worker 协议必须带显式 API 版本；版本不匹配时拒绝运行。
+- 上游源码文件、版本、SHA-256、修改边界和许可证必须可追溯。
 
-### 7.2 性能与响应性
+### 7.2 性能与稳定性
 
-- **NFR-PERF-01** Wasm 初始化和搜索不得阻塞主线程超过一帧预算；重计算、序列化和批次拼装放在 Worker。
-- **NFR-PERF-02** 长任务运行时，输入、滚动和取消按钮保持可响应。
-- **NFR-PERF-03** 取消确认的 p95 目标不超过 500 ms；Worker 分片目标不超过 100 ms，最终数值由验证设备测量后调整。
-- **NFR-PERF-04** 约定夹具工作负载的 Wasm 单线程耗时不得超过同机 `-O3 -DSIMD=OFF` 原生基线的 3 倍，峰值内存不得超过 512 MiB。
-- **NFR-PERF-05** 结果按有界批次传输，主线程不得为一次任务无限保留重复副本。
+- 计算不得在 React 主线程执行。
+- 批次大小、Worker 数量、结果上限和任务上限必须有显式边界。
+- Worker 崩溃、Wasm 初始化失败和结果缓冲区异常不得产生看似有效的部分完成状态。
+- 性能结论必须记录设备、浏览器、Worker 数、范围和耗时，不以单一开发机推断所有用户环境。
 
-### 7.3 可靠性与兼容性
+### 7.3 隐私与数据
 
-- **NFR-REL-01** 刷新、Worker 崩溃、配额不足和数据库迁移失败均有确定恢复路径。
-- **NFR-REL-02** 生产资源使用内容哈希；Wasm JS 胶水、`.wasm`、Worker 和协议版本必须相互兼容。
-- **NFR-REL-03** 应用在静态站点子路径部署时，不得使用硬编码根路径。
-- **NFR-REL-04** 基线功能不依赖 `SharedArrayBuffer` 或跨源隔离。
+- 当前模块只在 `localStorage` 保存语言设置。
+- 后续档案保存在 IndexedDB，不放入 URL、日志或远端请求。
+- 应用不发送 TID、SID、Seed、筛选条件或结果。
+- 清除站点数据会删除设置、PWA 缓存和后续档案；项目没有服务器备份。
 
-### 7.4 可访问性与易用性
+### 7.4 可维护性
 
-- **NFR-A11Y-01** 目标符合 WCAG 2.2 AA：键盘可达、可见焦点、语义标签、错误关联、颜色对比和减少动画偏好。
-- **NFR-A11Y-02** 表格、进度和任务终态可被辅助技术理解；进度高频更新不得造成持续朗读干扰。
-- **NFR-A11Y-03** 桌面是高密度计算工作流的首要体验；移动端必须无内容遮挡并能完成核心流程，但不要求复制桌面列密度。
+- 每个 Wasm 功能使用独立目录、manifest、CMake target、C ABI 前缀和测试。
+- 一键入口保持为 `npm run build`，不同原生语言的工具链由模块构建驱动封装。
+- JavaScript 依赖通过 `package-lock.json` 复现；发布工具链使用精确版本。
+- 新依赖只有在对应功能开始实现且能减少实际复杂度时加入。
 
-### 7.5 安全与供应链
+## 8. 浏览器支持
 
-- **NFR-SEC-01** 不渲染未净化 HTML；导出 CSV 时防止以 `=`, `+`, `-`, `@` 开头的用户可控单元格被表格软件解释为公式。
-- **NFR-SEC-02** CI 使用 lockfile 的冻结安装，依赖升级通过独立变更和测试进入。
-- **NFR-SEC-03** 静态托管配置应支持严格 CSP；不引入 `eval` 型生产依赖或远程脚本。
-- **NFR-SEC-04** 发布保留 Software Bill of Materials 或等价依赖清单，并执行已知漏洞审查。
+目标是支持具备 ES modules、WebAssembly、Dedicated Worker、可转移 `ArrayBuffer`、Service Worker、Cache Storage、IndexedDB 和 `localStorage` 的当前稳定版桌面及移动浏览器。
 
-### 7.6 许可证与可追溯性
+优先验证：
 
-- **NFR-LIC-01** 所有采用的 PokeFinder 文件保留原始版权与 GPL 头部。
-- **NFR-LIC-02** 仓库记录上游版本、精确提交或归档校验和、导入范围和本地补丁。
-- **NFR-LIC-03** 每次发布 Wasm 时提供对应完整源码、构建脚本、许可证和上游署名入口。
-- **NFR-LIC-04** 所有领域数据与视觉素材必须有来源和许可记录。
+- Chromium 系：Chrome、Edge、Android Chrome。
+- Firefox 桌面版。
+- Safari / iOS Safari。
 
-## 8. 数据与隐私
+本阶段不声明已经通过具体浏览器版本。每次预览或发布应记录实际测试的浏览器完整版本、设备和结果；Service Worker 正式环境要求 HTTPS，本地允许 `localhost`。
 
-### 8.1 数据分类
+## 9. 验收标准
 
-| 数据                 | 存储位置           | 生命周期                            | 是否离开设备   |
-| -------------------- | ------------------ | ----------------------------------- | -------------- |
-| 三代档案             | IndexedDB          | 用户删除、站点数据被清除或迁移      | 否             |
-| 语言、表格等轻量偏好 | `localStorage`     | 用户重置或站点数据被清除            | 否             |
-| 当前表单和任务结果   | 内存               | 页面刷新、任务替换或显式清除        | 否             |
-| PWA 静态资源         | Cache Storage      | Service Worker 更新或站点数据被清除 | 仅从部署源下载 |
-| CSV                  | 用户选择的本地文件 | 由用户和操作系统管理                | 否             |
+### 9.1 工程门槛
 
-### 8.2 档案 schema 初稿
+以下项目全部通过后，`gen3id` 才能进入项目所有者验收：
 
-```ts
-interface Gen3ProfileRecord {
-  schemaVersion: 1;
-  id: string;
-  name: string;
-  game: "ruby" | "sapphire" | "emerald" | "fire-red" | "leaf-green";
-  tid: number;
-  sid: number;
-  deadBattery: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-```
+1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
+2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
+3. `npm run wasm:test:native` 通过 XD/竞技场、火叶/绿宝石、红蓝宝石固定夹具及错误边界。
+4. `npm run wasm:build` 生成 `gen3id.mjs` 与 `gen3id.wasm`。
+5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
+6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
+7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
 
-`id` 由浏览器生成且不承载业务含义。时间使用 ISO 8601 UTC 字符串。数据库升级必须通过 Dexie version/migration 完成，并以真实旧版本夹具测试。
+### 9.2 项目所有者验收
 
-### 8.3 隐私约束
+项目所有者至少检查：
 
-- 不提供登录、遥测、崩溃上传、广告或第三方跟踪。
-- 不请求游戏 ROM、存档、设备标识、联系人或位置权限。
-- 网络面板在生产离线缓存完成后，不应因普通计算向第三方发出请求。
-- 隐私说明必须告诉用户：本地存储不等于备份，隐私模式和浏览器清理策略可能删除数据。
+1. 三种模式各使用一组已知输入比对 PokeFinder 结果。
+2. TID、SID、TSV 单独及组合筛选。
+3. 大范围任务的进度、取消、页面响应和结果上限提示。
+4. 四列排序、CSV 内容和清空结果。
+5. 简体中文、英文、日文切换及刷新保留。
+6. GitHub Pages 在线加载、刷新、安装 PWA 和离线重载。
+7. 桌面与移动浏览器的布局和操作。
 
-## 9. 浏览器与平台支持
+界面布局、文案和交互可以先在 UI 预览模式验收；RNG 结果、Worker 性能和离线完整功能仍必须在真实 Wasm 构建中验收。
 
-浏览器采用滚动支持策略，避免文档中的固定主版本迅速失真：
+当前状态不得写成“已验收”，直到项目所有者明确记录结果。
 
-- **一级支持**：桌面 Chrome、Edge、Firefox 的当前和前一个稳定版本；Safari 当前和前一个主版本。
-- **二级支持**：当前 iOS Safari 和 Android Chrome，可完成核心流程，但长搜索性能和 PWA 安装入口受平台限制。
-- **不支持**：Internet Explorer、已停止安全更新的浏览器、禁用 WebAssembly/Worker/IndexedDB 的环境。
+## 10. 阶段划分
 
-CI 在每次发布时记录实际 Playwright Chromium/Firefox/WebKit 版本。Safari 特性以对应 WebKit 测试加真机冒烟确认。Service Worker 在生产要求 HTTPS，在本地开发允许 `localhost`。
+- **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
+- **阶段 1A：`gen3id` 工程实现** - React UI、Worker Pool、C++ bridge、上游最小 Core、三语和 Actions（已实现，待完整验证）。
+- **阶段 1B：GitHub Pages 测试** - CI Wasm 构建、Pages 部署、项目所有者功能/离线验收（当前优先）。
+- **阶段 2：三代档案** - IndexedDB schema、档案 CRUD、迁移和数据清除。
+- **阶段 3：`gen3static`** - Generator、Searcher、筛选、结果和一致性测试。
+- **阶段 4：`gen3wild`** - 遭遇数据、Generator、Searcher 和一致性测试。
+- **阶段 5：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
-不以 `SharedArrayBuffer` 是否可用作为支持条件。必要能力包括 WebAssembly、module Worker、IndexedDB、Service Worker、Cache Storage、文件下载和现代 ES modules。
+## 11. 未决事项
 
-## 10. 验收标准
-
-### 10.1 技术验证门槛
-
-阶段 1 只有全部满足以下条件才通过：
-
-1. 在 Emscripten 6.0.6、单线程、SIMD 关闭的配置下编译三代 Static/Wild 所需最小 Core 和适配层。
-2. Static Generator、Static Searcher、Wild Generator、Wild Searcher 的选定上游 JSON 夹具逐字段 100% 一致，且原生适配层与 Wasm 适配层共用同一输入/输出契约。
-3. Worker 完成 `init -> start -> progress/batch -> complete` 和 `start -> cancel -> cancelled` 流程；协议错误能返回稳定错误码。
-4. 长任务取消确认 p95 不超过 500 ms，页面交互在任务运行时无明显卡死。
-5. 在没有 COOP/COEP、`SharedArrayBuffer` 和 Wasm threads 的普通静态服务器上运行。
-6. GitHub Pages 风格 `/PokeHero/` 子路径能正确加载 JS、Worker 与 Wasm；首次在线访问后离线重载成功。
-7. 约定工作负载满足第 7.2 节性能门槛，并输出可复跑的测量报告。
-
-### 10.2 MVP 产品验收
-
-1. 用户可完成五个掌机版本档案的 CRUD、选择和全部本地数据删除。
-2. 四个 Static/Wild Generator/Searcher 工作流覆盖有效输入、无结果、部分结果、取消和错误状态。
-3. 所有适用筛选均由测试证明传入 Core 的值与界面选择一致。
-4. 结果表格可稳定处理分批追加、数值排序、列选择与 CSV 导出，CSV 精度和转义正确。
-5. 中英文覆盖率 100%，无原始翻译 key 泄漏到生产 UI。
-6. 一级浏览器通过核心 Playwright 套件；至少一台 Safari 真机和一台 Android Chrome 设备完成冒烟。
-7. PWA 离线验收通过，更新不会在运行中任务期间强制刷新。
-8. WCAG 2.2 AA 自动检查无高严重度问题，核心流程通过键盘人工验收。
-9. 发布页面包含 GPL 文本、上游署名、对应源码与构建说明，以及 Pokemon 商标/素材免责声明。
-
-## 11. 阶段划分
-
-### 阶段 0：文档与仓库基线
-
-- 完成 README、需求、技术栈、`.gitignore` 和许可证策略。
-- 核验上游版本、范围、测试资产与主要移植风险。
-- 确定工具链版本和依赖锁定规则。
-
-### 阶段 1：工程初始化与技术验证
-
-- 初始化 React/TypeScript/Vite、质量脚本和 CI。
-- 导入可追溯的最小 PokeFinder 三代 Core 源码及上游测试夹具。
-- 建立 CMake/Emscripten 构建、Wasm 边界和 Worker 协议。
-- 通过第 10.1 节全部门槛后再进入产品功能。
-
-### 阶段 2：应用基础与档案
-
-- 实现应用壳、路由、中英文、错误边界和本地设置。
-- 实现 IndexedDB schema、档案 CRUD、迁移与清除数据。
-- 建立组件测试、浏览器集成测试和可访问性基线。
-
-### 阶段 3：Static MVP
-
-- 实现 Generator/Searcher、联动规则、筛选、任务生命周期和结果表。
-- 完成 CSV、性能测量和上游一致性回归。
-
-### 阶段 4：Wild MVP
-
-- 导入并验证三代遭遇数据。
-- 实现遭遇类型、地点、Lead、道具、Feebas/Bike 等联动与 Generator/Searcher。
-- 扩充结果、浏览器和长任务回归。
-
-### 阶段 5：发布加固
-
-- 完成 PWA、离线、更新策略、静态子路径部署和移动端适配。
-- 完成许可证、署名、源码分发、素材来源和免责声明审查。
-- 通过第 10.2 节后发布首个 MVP。
-
-### 后续阶段
-
-按用户价值与上游依赖顺序评估 Egg、ID、GameCube、PokeSpot、Jirachi 等第三世代功能。支持其他世代不是既定承诺，需要新的需求与技术评审。
-
-## 12. 待验证事项
-
-- 在导入源码时补录 PokeFinder 4.3.2 的精确 commit/tag 或归档 SHA-256；仅写版本号不足以满足发布追溯。
-- 从 Qt Form 提取并形成可测试规则表，重点覆盖版本/方法/模板、Feebas、Rock Smash、Lead 和 dead battery 联动。
-- 使用真实夹具确定 Worker 分片大小、结果批次大小和表格虚拟化阈值。
-- 首次公开发布前确认英文名、中文名和视觉资产策略，并在一次受控变更中统一更新仓库、包名、PWA manifest、文案与法律页面。
+- Cloudflare Pages 正式项目名和 `hakuhiro.top` 下的主机名。
+- GitHub Pages 首次实机测试后的分片大小、默认 Worker 数和取消耗时基线。
+- 档案阶段是否引入 Dexie；在开始实现 IndexedDB schema 时作最终决定。
+- Pages 预览稳定后何时加入 Playwright 和 Testing Library。
