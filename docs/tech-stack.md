@@ -1,6 +1,6 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：阶段 4A，Wild Generator 合并工作区已接入独立 Wasm/Worker 并等待完整验证
+> - 状态：阶段 4A，Wild Generator 已接入独立 Wasm/Worker 并等待完整验证
 > - 更新日期：2026-08-11
 > - 当前范围：第三世代 ID、Static Generator/Searcher、Wild Generator 与存档信息
 > - 包管理器：npm
@@ -137,7 +137,7 @@ PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等�
 - `localStorage`：存档完整镜像、语言、主题和存档悬浮窗折叠状态。
 - Worker/Wasm：任务期间的临时计算状态。
 - 页面刷新：终止任务并重建 Worker，不持久化结果。
-- UI 预览：ID 与 Static 各自使用同一搜索接口的样例引擎，不读取或生成 Wasm；Wild 当前只提供界面构建，不生成样例结果。
+- UI 预览：ID、Static 与 Wild 各自使用同一搜索接口的确定性样例引擎，不读取或生成 Wasm；Wild 预览结果只用于界面交互验收。
 
 ### 6.2 存档 repository
 
@@ -196,7 +196,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 1。ID C ABI 为：
+当前 `gen3id` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 2。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -235,7 +235,7 @@ uint32 level
 uint32 natureShiny  # low 8 bits nature, remaining bits shiny type
 ```
 
-Wild C ABI 提供 `gen3wild_generate`，传入紧凑槽位数组、Seed、推进范围、Offset、Method、Lead、Encounter、遭遇率、版本特殊规则、TID/SID 和性格掩码。它返回连续 60 字节记录：
+Wild C ABI v2 提供 `gen3wild_generate`，传入紧凑槽位数组、Seed、推进范围、Offset、Method、Lead、Encounter、遭遇率、RSE/Feebas/Safari/Rock Smash 特殊规则、TID/SID，以及 Shiny、Gender、Ability、Nature、Hidden Power、Encounter Slot、Level 和六项 IV 范围筛选。它返回连续 60 字节记录：
 
 ```text
 uint32 advances / pid
@@ -249,6 +249,7 @@ uint32 encounterSlot / species / form
 
 - 只传递固定宽度整数、指针和长度，不暴露 C++ 对象、STL 或 Qt 类型。
 - 每次 C ABI 调用最多处理 100,000 个 Generator 状态或 Searcher IV 组合。
+- `gen3wild` API v2 的筛选在 C++/Wasm 内完成，Worker 不再复制第二套 RNG 筛选逻辑。
 - 返回缓冲区在下一次同 Worker 调用前有效，Worker 必须立即复制并转移。
 - 错误使用稳定数值码，TypeScript 负责转换为用户可见错误。
 - API 版本不匹配时停止初始化，不尝试兼容猜测。
@@ -440,11 +441,11 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 ## 13. 当前模块技术验证门槛
 
-当前 `gen3wild` Generator 合并工作区进入项目所有者验收前必须完成：
+当前 `gen3wild` Generator 进入项目所有者验收前必须完成：
 
 1. 原生夹具通过 Emerald Route 111、Method 1、Advances `0..9` 固定结果和错误边界。
 2. 固定 Seed 的槽位、物种、等级、PID、IV 与性格逐字段匹配 PokeFinder 4.3.2 基线。
-3. Emscripten 6.0.6 生成可加载的 `gen3wild.mjs` 与 `gen3wild.wasm`，API 握手为版本 1。
+3. Emscripten 6.0.6 生成可加载的 `gen3wild.mjs` 与 `gen3wild.wasm`，API 握手为版本 2。
 4. Wild Worker Pool 在多 Worker 下保持结果顺序、稳定进度和取消行为。
 5. 大范围任务运行时主线程仍能响应输入、模块切换和结果滚动。
 6. 简体中文、英文和日文可以切换，地点、遭遇类型、Method 和队首随存档版本正确联动。

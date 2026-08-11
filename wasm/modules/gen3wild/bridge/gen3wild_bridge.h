@@ -54,7 +54,26 @@ extern "C"
         std::uint32_t item,
         std::uint32_t tid,
         std::uint32_t sid,
-        std::uint32_t natureMask);
+        std::uint32_t shinyFilter,
+        std::uint32_t genderFilter,
+        std::uint32_t abilityFilter,
+        std::uint32_t natureMask,
+        std::uint32_t hiddenPowerMask,
+        std::uint32_t encounterSlotMask,
+        std::uint32_t levelMin,
+        std::uint32_t levelMax,
+        std::uint32_t hpMin,
+        std::uint32_t attackMin,
+        std::uint32_t defenseMin,
+        std::uint32_t specialAttackMin,
+        std::uint32_t specialDefenseMin,
+        std::uint32_t speedMin,
+        std::uint32_t hpMax,
+        std::uint32_t attackMax,
+        std::uint32_t defenseMax,
+        std::uint32_t specialAttackMax,
+        std::uint32_t specialDefenseMax,
+        std::uint32_t speedMax);
     std::uintptr_t gen3wild_result_ptr();
     std::uint32_t gen3wild_result_count();
     std::uint32_t gen3wild_last_error();

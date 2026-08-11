@@ -807,7 +807,9 @@ function App() {
             />
           ) : (
             <Gen3WildPanel
+              onOpenIvCalculator={() => setIvCalculatorExpanded(true)}
               profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
+              uiPreviewMode={uiPreviewMode}
             />
           )}
         </main>

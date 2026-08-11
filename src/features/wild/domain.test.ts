@@ -39,7 +39,18 @@ const request: Gen3WildRequest = {
       },
     ],
   },
-  filters: { natureMask: 0x1ff_ffff },
+  filters: {
+    shiny: "any",
+    gender: "any",
+    ability: "any",
+    natureMask: 0x1ff_ffff,
+    hiddenPowerMask: 0xffff,
+    encounterSlotMask: 0xfff,
+    levelMin: 1,
+    levelMax: 100,
+    ivMin: [0, 0, 0, 0, 0, 0],
+    ivMax: [31, 31, 31, 31, 31, 31],
+  },
 };
 
 describe("Gen3 wild domain", () => {
@@ -65,6 +76,48 @@ describe("Gen3 wild domain", () => {
         maxAdvances: 1,
       }),
     ).toContain("advanceRange");
+  });
+
+  it("validates every PokeFinder wild filter boundary", () => {
+    expect(
+      validateGen3WildRequest({
+        ...request,
+        filters: { ...request.filters, levelMin: 21, levelMax: 20 },
+      }),
+    ).toContain("level");
+    expect(
+      validateGen3WildRequest({
+        ...request,
+        filters: {
+          ...request.filters,
+          ivMin: [0, 0, 0, 0, 0, 32],
+        },
+      }),
+    ).toContain("iv5");
+    expect(
+      validateGen3WildRequest({
+        ...request,
+        filters: { ...request.filters, hiddenPowerMask: 0 },
+      }),
+    ).toContain("hiddenPower");
+    expect(
+      validateGen3WildRequest({
+        ...request,
+        filters: { ...request.filters, encounterSlotMask: 0 },
+      }),
+    ).toContain("encounterSlot");
+  });
+
+  it("matches the Gen III Personal type boundary used by the bridge", () => {
+    expect(
+      validateGen3WildRequest({
+        ...request,
+        area: {
+          ...request.area,
+          slots: [{ ...request.area.slots[0], type1: 17 }],
+        },
+      }),
+    ).toContain("slot");
   });
 
   it("decodes the fixed 60-byte Wasm record", () => {

@@ -1,6 +1,8 @@
 import type { Gen3GameVersion } from "../profiles/domain";
 import type { Gen3StaticCategory } from "./encounters";
 
+export { gen3HiddenPower } from "../shared/gen3HiddenPower";
+
 export const GEN3_STATIC_API_VERSION = 3;
 export const GEN3_STATIC_CHUNK_SIZE = 100_000;
 export const GEN3_STATIC_MAX_TOTAL_STATES = 50_000_000;
@@ -105,21 +107,6 @@ export function staticAbilityFilterToWasm(
   filter: Gen3StaticAbilityFilter,
 ): number {
   return { any: 0, first: 1, second: 2 }[filter];
-}
-
-const hiddenPowerIvOrder = [0, 1, 2, 5, 3, 4] as const;
-
-export function gen3HiddenPower(ivs: readonly number[]) {
-  let typeBits = 0;
-  let powerBits = 0;
-  hiddenPowerIvOrder.forEach((ivIndex, bit) => {
-    typeBits |= (ivs[ivIndex] & 1) << bit;
-    powerBits |= ((ivs[ivIndex] >> 1) & 1) << bit;
-  });
-  return {
-    type: Math.floor((typeBits * 15) / 63),
-    power: 30 + Math.floor((powerBits * 40) / 63),
-  };
 }
 
 export function validateGen3StaticRequest(

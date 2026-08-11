@@ -4,10 +4,13 @@ import {
   GEN3_WILD_API_VERSION,
   isRseVersion,
   packGen3WildSlots,
+  wildAbilityFilterToWasm,
   wildEncounterToWasm,
+  wildGenderFilterToWasm,
   wildItemToWasm,
   wildLeadToWasm,
   wildMethodToWasm,
+  wildShinyFilterToWasm,
 } from "../domain";
 import type { Gen3WildWorkerRequest, Gen3WildWorkerResponse } from "./messages";
 
@@ -35,7 +38,26 @@ interface Gen3WildEmscriptenModule {
     item: number,
     tid: number,
     sid: number,
+    shinyFilter: number,
+    genderFilter: number,
+    abilityFilter: number,
     natureMask: number,
+    hiddenPowerMask: number,
+    encounterSlotMask: number,
+    levelMin: number,
+    levelMax: number,
+    hpMin: number,
+    attackMin: number,
+    defenseMin: number,
+    specialAttackMin: number,
+    specialDefenseMin: number,
+    speedMin: number,
+    hpMax: number,
+    attackMax: number,
+    defenseMax: number,
+    specialAttackMax: number,
+    specialDefenseMax: number,
+    speedMax: number,
   ): number;
   _gen3wild_result_ptr(): number;
   _gen3wild_result_count(): number;
@@ -99,7 +121,16 @@ function run(message: Extract<Gen3WildWorkerRequest, { type: "run" }>) {
       wildItemToWasm(request.item),
       request.tid,
       request.sid,
+      wildShinyFilterToWasm(request.filters.shiny),
+      wildGenderFilterToWasm(request.filters.gender),
+      wildAbilityFilterToWasm(request.filters.ability),
       request.filters.natureMask,
+      request.filters.hiddenPowerMask,
+      request.filters.encounterSlotMask,
+      request.filters.levelMin,
+      request.filters.levelMax,
+      ...request.filters.ivMin,
+      ...request.filters.ivMax,
     );
     const errorCode = wasm._gen3wild_last_error();
     if (errorCode !== 0)

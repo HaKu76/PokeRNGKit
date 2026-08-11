@@ -23,7 +23,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maxStatesPerCall = 100000;
 
     enum ErrorCode : std::uint32_t
@@ -52,6 +52,28 @@ namespace
         Static = 28,
         Pressure = 32,
         LeadNone = 255,
+    };
+
+    enum ShinyFilter : std::uint32_t
+    {
+        ShinyAny = 0,
+        ShinyStar = 1,
+        ShinySquare = 2,
+        ShinyStarSquare = 3,
+    };
+
+    enum GenderFilter : std::uint32_t
+    {
+        GenderAny = 0,
+        GenderMale = 1,
+        GenderFemale = 2,
+    };
+
+    enum AbilityFilter : std::uint32_t
+    {
+        AbilityAny = 0,
+        AbilityFirst = 1,
+        AbilitySecond = 2,
     };
 
     thread_local std::vector<Gen3WildPackedState> results;
@@ -142,6 +164,44 @@ namespace
     {
         return ratio == 0 || ratio == 254 || ratio == 255;
     }
+
+    bool matchesShiny(std::uint8_t value, std::uint32_t filter)
+    {
+        return filter == ShinyAny || (filter & value) != 0;
+    }
+
+    bool matchesGender(std::uint8_t value, std::uint32_t filter)
+    {
+        return filter == GenderAny || (filter == GenderMale && value == 0)
+            || (filter == GenderFemale && value == 1);
+    }
+
+    bool matchesAbility(std::uint8_t value, std::uint32_t filter)
+    {
+        return filter == AbilityAny || (filter == AbilityFirst && value == 0)
+            || (filter == AbilitySecond && value == 1);
+    }
+
+    std::uint8_t hiddenPowerType(const std::array<std::uint8_t, 6> &ivs)
+    {
+        return static_cast<std::uint8_t>(
+            ((ivs[0] & 1) + 2 * (ivs[1] & 1) + 4 * (ivs[2] & 1) + 8 * (ivs[5] & 1)
+             + 16 * (ivs[3] & 1) + 32 * (ivs[4] & 1))
+            * 15 / 63);
+    }
+
+    bool matchesIvs(const std::array<std::uint8_t, 6> &ivs, const std::array<std::uint32_t, 6> &minimum,
+                    const std::array<std::uint32_t, 6> &maximum)
+    {
+        for (std::size_t index = 0; index < ivs.size(); index++)
+        {
+            if (ivs[index] < minimum[index] || ivs[index] > maximum[index])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 static_assert(sizeof(Gen3WildPackedSlot) == 24);
@@ -160,16 +220,39 @@ extern "C"
         std::uint32_t method, std::uint32_t lead, std::uint32_t encounter, std::uint32_t rate,
         std::uint32_t rse, std::uint32_t feebasTile, std::uint32_t feebasLocation,
         std::uint32_t safariZone, std::uint32_t bike, std::uint32_t item, std::uint32_t tid,
-        std::uint32_t sid, std::uint32_t natureMask)
+        std::uint32_t sid, std::uint32_t shinyFilter, std::uint32_t genderFilter,
+        std::uint32_t abilityFilter, std::uint32_t natureMask, std::uint32_t hiddenPowerMask,
+        std::uint32_t encounterSlotMask, std::uint32_t levelMin, std::uint32_t levelMax,
+        std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
+        std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
+        std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax,
+        std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax)
     {
         results.clear();
         lastError = ErrorCode::None;
         if (slots == nullptr || slotCount == 0 || slotCount > 12 || maxAdvances >= maxStatesPerCall
             || !validMethod(method) || !validLead(lead) || !validEncounter(encounter) || rate == 0 || rate > 255
-            || item > 3 || tid > 0xffff || sid > 0xffff || natureMask == 0 || natureMask > 0x1ffffff)
+            || rse > 1 || feebasTile > 1 || feebasLocation > 1 || safariZone > 1 || bike > 1
+            || item > 3 || tid > 0xffff || sid > 0xffff || shinyFilter > ShinyStarSquare
+            || genderFilter > GenderFemale || abilityFilter > AbilitySecond || natureMask == 0
+            || natureMask > 0x1ffffff || hiddenPowerMask == 0 || hiddenPowerMask > 0xffff
+            || encounterSlotMask == 0 || encounterSlotMask > 0xfff || levelMin == 0 || levelMax > 100
+            || levelMin > levelMax)
         {
             lastError = ErrorCode::InvalidInput;
             return 0;
+        }
+        const std::array<std::uint32_t, 6> ivMinimum
+            = { hpMin, attackMin, defenseMin, specialAttackMin, specialDefenseMin, speedMin };
+        const std::array<std::uint32_t, 6> ivMaximum
+            = { hpMax, attackMax, defenseMax, specialAttackMax, specialDefenseMax, speedMax };
+        for (std::size_t index = 0; index < ivMinimum.size(); index++)
+        {
+            if (ivMinimum[index] > 31 || ivMaximum[index] > 31 || ivMinimum[index] > ivMaximum[index])
+            {
+                lastError = ErrorCode::InvalidInput;
+                return 0;
+            }
         }
         if (static_cast<std::uint64_t>(initialAdvances) + offset + maxAdvances > 0xffffffffULL)
         {
@@ -180,7 +263,8 @@ extern "C"
         {
             const auto &slot = slots[index];
             if (slot.species == 0 || slot.species > 1025 || slot.form > 255 || slot.minLevel == 0
-                || slot.minLevel > slot.maxLevel || slot.maxLevel > 100 || slot.genderRatio > 255)
+                || slot.minLevel > slot.maxLevel || slot.maxLevel > 100 || slot.genderRatio > 255
+                || (slot.types & 0xff) > 16 || ((slot.types >> 8) & 0xff) > 16 || (slot.types >> 16) != 0)
             {
                 lastError = ErrorCode::InvalidInput;
                 return 0;
@@ -258,6 +342,10 @@ extern "C"
             {
                 continue;
             }
+            if ((encounterSlotMask & (1u << selectedSlot)) == 0)
+            {
+                continue;
+            }
 
             const auto &slot = slots[selectedSlot];
             const std::uint32_t levelRange = slot.maxLevel - slot.minLevel + 1;
@@ -271,6 +359,10 @@ extern "C"
                 levelRoll--;
             }
             const std::uint32_t level = slot.minLevel + levelRoll;
+            if (level < levelMin || level > levelMax)
+            {
+                continue;
+            }
 
             bool cuteCharm = false;
             if ((lead == CuteCharmF || lead == CuteCharmM) && !fixedGender(slot.genderRatio))
@@ -315,9 +407,20 @@ extern "C"
                 static_cast<std::uint8_t>((first >> 10) & 31), static_cast<std::uint8_t>((second >> 5) & 31),
                 static_cast<std::uint8_t>((second >> 10) & 31), static_cast<std::uint8_t>(second & 31),
             };
-            const std::uint32_t natureShiny = nature | (static_cast<std::uint32_t>(shiny(pid, trainerXor)) << 8);
+            const auto abilityValue = static_cast<std::uint8_t>(pid & 1);
+            const auto genderValue = gender(pid, slot.genderRatio);
+            const auto shinyValue = shiny(pid, trainerXor);
+            if (!matchesShiny(shinyValue, shinyFilter) || !matchesGender(genderValue, genderFilter)
+                || !matchesAbility(abilityValue, abilityFilter)
+                || (hiddenPowerMask & (1u << hiddenPowerType(ivs))) == 0
+                || !matchesIvs(ivs, ivMinimum, ivMaximum))
+            {
+                continue;
+            }
+            const std::uint32_t natureShiny
+                = nature | (static_cast<std::uint32_t>(shinyValue) << 8);
             results.push_back({ initialAdvances + count, pid, ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5],
-                                pid & 1, gender(pid, slot.genderRatio), level, natureShiny, selectedSlot,
+                                abilityValue, genderValue, level, natureShiny, selectedSlot,
                                 slot.species, slot.form });
         }
         return static_cast<std::uint32_t>(results.size());

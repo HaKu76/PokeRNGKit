@@ -1173,6 +1173,39 @@ h1 {
   gap: 10px;
   margin-top: 12px;
 }
+.wild-level-display,
+.wild-level-filter {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) 64px 64px;
+  align-items: center;
+  gap: 8px;
+}
+.wild-level-display {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.wild-level-filter {
+  margin-top: 15px;
+  border: 1px solid var(--line);
+  padding: 8px;
+  color: var(--text);
+  font-size: 11px;
+}
+.wild-level-display input,
+.wild-level-filter input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--control-bg);
+  color: var(--text);
+  padding: 6px;
+  text-align: center;
+}
+.wild-level-display input:disabled {
+  opacity: 0.65;
+}
 .iv-filter {
   margin-top: 15px;
   overflow: hidden;
@@ -1284,16 +1317,13 @@ h1 {
 }
 .wild-table-header,
 .wild-table-row {
-  grid-template-columns: 92px 92px 92px 92px 120px 180px 120px 92px;
-  min-width: 880px;
+  grid-template-columns:
+    100px 200px 72px 112px 90px 110px 170px repeat(6, 72px) 110px 80px
+    90px;
+  min-width: 1566px;
 }
-.wild-table-header span {
-  overflow: hidden;
-  padding: 0 10px;
-  color: var(--muted);
-  font-size: 9px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.wild-virtual-table {
+  min-width: 1566px;
 }
 .checkbox-field,
 .nature-check-grid label {

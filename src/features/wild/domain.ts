@@ -1,6 +1,6 @@
 import type { Gen3GameVersion } from "../profiles/domain";
 
-export const GEN3_WILD_API_VERSION = 1;
+export const GEN3_WILD_API_VERSION = 2;
 export const GEN3_WILD_CHUNK_SIZE = 100_000;
 export const GEN3_WILD_MAX_TOTAL_STATES = 50_000_000;
 export const GEN3_WILD_MAX_RESULTS = 250_000;
@@ -20,6 +20,9 @@ export type Gen3WildLead =
   | "static";
 export type Gen3WildItem =
   "none" | "black-flute" | "cleanse-tag" | "white-flute";
+export type Gen3WildShinyFilter = "any" | "star" | "square" | "star-square";
+export type Gen3WildGenderFilter = "any" | "male" | "female";
+export type Gen3WildAbilityFilter = "any" | "first" | "second";
 
 export interface Gen3WildSlot {
   species: number;
@@ -41,7 +44,16 @@ export interface Gen3WildArea {
 }
 
 export interface Gen3WildFilters {
+  shiny: Gen3WildShinyFilter;
+  gender: Gen3WildGenderFilter;
+  ability: Gen3WildAbilityFilter;
   natureMask: number;
+  hiddenPowerMask: number;
+  encounterSlotMask: number;
+  levelMin: number;
+  levelMax: number;
+  ivMin: [number, number, number, number, number, number];
+  ivMax: [number, number, number, number, number, number];
 }
 
 export interface Gen3WildRequest {
@@ -127,6 +139,18 @@ export function wildItemToWasm(item: Gen3WildItem) {
   }[item];
 }
 
+export function wildShinyFilterToWasm(filter: Gen3WildShinyFilter) {
+  return { any: 0, star: 1, square: 2, "star-square": 3 }[filter];
+}
+
+export function wildGenderFilterToWasm(filter: Gen3WildGenderFilter) {
+  return { any: 0, male: 1, female: 2 }[filter];
+}
+
+export function wildAbilityFilterToWasm(filter: Gen3WildAbilityFilter) {
+  return { any: 0, first: 1, second: 2 }[filter];
+}
+
 export function isRseVersion(version: Gen3GameVersion) {
   return version === "ruby" || version === "sapphire" || version === "emerald";
 }
@@ -150,6 +174,39 @@ export function validateGen3WildRequest(request: Gen3WildRequest) {
     errors.push("advanceRange");
   if (!uint16(request.tid)) errors.push("tid");
   if (!uint16(request.sid)) errors.push("sid");
+  if (!["method1", "method2", "method4"].includes(request.method))
+    errors.push("method");
+  if (
+    ![
+      "none",
+      "synchronize",
+      "cute-charm-f",
+      "cute-charm-m",
+      "pressure",
+      "hustle",
+      "vital-spirit",
+      "magnet-pull",
+      "static",
+    ].includes(request.lead)
+  )
+    errors.push("lead");
+  if (
+    ![
+      "land",
+      "surf",
+      "rock-smash",
+      "old-rod",
+      "good-rod",
+      "super-rod",
+    ].includes(request.area.encounter)
+  )
+    errors.push("encounter");
+  if (
+    !["none", "black-flute", "cleanse-tag", "white-flute"].includes(
+      request.item,
+    )
+  )
+    errors.push("item");
   if (
     !Number.isInteger(request.synchronizeNature) ||
     request.synchronizeNature < 0 ||
@@ -163,6 +220,42 @@ export function validateGen3WildRequest(request: Gen3WildRequest) {
   )
     errors.push("nature");
   if (
+    !Number.isInteger(request.filters.hiddenPowerMask) ||
+    request.filters.hiddenPowerMask < 1 ||
+    request.filters.hiddenPowerMask > 0xffff
+  )
+    errors.push("hiddenPower");
+  if (
+    !Number.isInteger(request.filters.encounterSlotMask) ||
+    request.filters.encounterSlotMask < 1 ||
+    request.filters.encounterSlotMask > 0xfff
+  )
+    errors.push("encounterSlot");
+  if (!["any", "star", "square", "star-square"].includes(request.filters.shiny))
+    errors.push("shiny");
+  if (!["any", "male", "female"].includes(request.filters.gender))
+    errors.push("gender");
+  if (!["any", "first", "second"].includes(request.filters.ability))
+    errors.push("ability");
+  if (
+    !Number.isInteger(request.filters.levelMin) ||
+    !Number.isInteger(request.filters.levelMax) ||
+    request.filters.levelMin < 1 ||
+    request.filters.levelMax > 100 ||
+    request.filters.levelMin > request.filters.levelMax
+  )
+    errors.push("level");
+  for (let index = 0; index < 6; index++) {
+    if (
+      !Number.isInteger(request.filters.ivMin[index]) ||
+      !Number.isInteger(request.filters.ivMax[index]) ||
+      request.filters.ivMin[index] < 0 ||
+      request.filters.ivMax[index] > 31 ||
+      request.filters.ivMin[index] > request.filters.ivMax[index]
+    )
+      errors.push(`iv${index}`);
+  }
+  if (
     !Number.isInteger(request.area.rate) ||
     request.area.rate < 1 ||
     request.area.rate > 255 ||
@@ -175,16 +268,22 @@ export function validateGen3WildRequest(request: Gen3WildRequest) {
       !Number.isInteger(slot.species) ||
       slot.species < 1 ||
       slot.species > 1025 ||
+      !Number.isInteger(slot.form) ||
+      slot.form < 0 ||
+      slot.form > 255 ||
       !Number.isInteger(slot.minLevel) ||
       slot.minLevel < 1 ||
       slot.minLevel > slot.maxLevel ||
       slot.maxLevel > 100 ||
+      !Number.isInteger(slot.genderRatio) ||
       slot.genderRatio < 0 ||
       slot.genderRatio > 255 ||
+      !Number.isInteger(slot.type1) ||
       slot.type1 < 0 ||
-      slot.type1 > 255 ||
+      slot.type1 > 16 ||
+      !Number.isInteger(slot.type2) ||
       slot.type2 < 0 ||
-      slot.type2 > 255
+      slot.type2 > 16
     )
       errors.push("slot");
   }

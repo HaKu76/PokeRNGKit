@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：阶段 4A，第三世代 Wild Generator 合并与验证
+> - 状态：阶段 4A，第三世代 Wild Generator 验证
 > - 更新日期：2026-08-11
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。`gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前合并第三世代 Wild Generator。Wild Searcher 仍在后续阶段。
+当前按 PokeFinder 功能模块逐个落地。`gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前验证第三世代 Wild Generator。Wild Searcher 仍在后续阶段。
 
 ## 2. 已确认边界
 
@@ -247,21 +247,22 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ### 8.3 筛选、Worker 与结果
 
-- **FR-WILD-FILTER-01** 当前增量提供 25 种性格多选；未选择或清除筛选时保留所有性格。
-- **FR-WILD-FILTER-02** 完整 Wild 筛选与 Wild Searcher 尚未实现，不得在界面、README、进度或发布说明中标记为完成。
+- **FR-WILD-FILTER-01** 提供 25 种性格、16 种觉醒力量和当前遭遇表槽位的多选；未选择或全选按 `Any` 处理。
+- **FR-WILD-FILTER-02** 提供 Shiny、Gender、Ability、Level 和六项 IV 闭区间筛选；“取消筛选”恢复完整掩码与范围。
+- **FR-WILD-FILTER-03** 选择 Pokémon 时同步 Encounter Slot 与等级范围；手动修改筛选仍可覆盖联动值。
 - **FR-WILD-TASK-01** `gen3wild` 使用独立 CMake target、C ABI 前缀、API 版本、Worker 文件和 Worker Pool，不在 React 主线程运行 RNG 循环。
 - **FR-WILD-TASK-02** 每个分片最多处理 100,000 个状态；Worker 数、结果上限、批次顺序、进度和取消遵循 ID/Static 的同一工程边界。
 - **FR-WILD-TASK-03** 结果使用 60 字节定长记录和 transferable `ArrayBuffer` 返回。
-- **FR-WILD-RESULT-01** 结果包含 Advances、Encounter Slot、Pokemon、Level、PID、六项 IV、Nature 与 Shiny。
+- **FR-WILD-RESULT-01** 结果包含 Advances、Encounter Slot、Pokemon、Level、PID、Shiny、Nature、Ability、六项 IV、Hidden Power、Power 与 Gender，共 16 列。
 - **FR-WILD-RESULT-02** Advances、处理数和结果数使用原始十进制数字，不添加本地化千位分隔符。
-- **FR-WILD-RESULT-03** 结果支持数值排序、虚拟化显示、清空和带 UTF-8 BOM 的 CSV。
+- **FR-WILD-RESULT-03** 结果支持数值排序、虚拟化显示、清空和带 UTF-8 BOM 的 CSV；结果达到 250,000 条时停止并提示。
 
 ## 9. 后续 MVP
 
 当前工作区通过工程检查与项目所有者验收后，按以下顺序推进：
 
 1. Wild Generator 的 Actions、Pages 和项目所有者验收。
-2. Wild Searcher，以及 IV、觉醒力量、特性、性别、闪光、遭遇槽、等级和 Pokemon 筛选。
+2. Wild Searcher；当前 Generator 筛选不应重复实现到 Searcher 之前的工作区。
 3. Tanoby Chamber form 数据、来源记录与固定夹具。
 4. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
@@ -358,7 +359,7 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 - **阶段 2A：`gen3static` Generator** - 独立 Wasm/Worker、Method 1/4、游走缺陷、筛选和结果（已进入 Git 基线，待项目所有者完整验收）。
 - **阶段 2B：Static Searcher** - 反向恢复、搜索协议、结果边界和上游一致性测试（已进入 Git 基线，待项目所有者完整验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 镜像、CRUD、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
-- **阶段 4A：`gen3wild` Generator** - 遭遇数据、独立 Wasm/Worker、特殊规则和一致性夹具（当前 PR 合并工作区已实现，待 Actions 与项目所有者验收）。
+- **阶段 4A：`gen3wild` Generator** - 遭遇数据、独立 Wasm/Worker、特殊规则、完整筛选和一致性夹具（已实现，待 Actions 与项目所有者验收）。
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整 Wild 筛选和独立任务协议。
 - **阶段 5：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 

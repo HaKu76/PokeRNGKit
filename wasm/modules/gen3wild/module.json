@@ -1,6 +1,6 @@
 {
   "id": "gen3wild",
-  "apiVersion": 1,
+  "apiVersion": 2,
   "target": "gen3wild",
   "artifacts": ["gen3wild.mjs", "gen3wild.wasm"],
   "source": "PokeFinder 4.3.2 Gen III WildGenerator3"

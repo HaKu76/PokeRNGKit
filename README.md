@@ -5,7 +5,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代 Wild Generator 合并与验证。** `gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前工作区正在整合 PR #1，并将 Wild Generator 从 React 主线程实现迁移到独立 `gen3wild` C++/Wasm/Worker Pool。真实 Wild Wasm、GitHub Pages 与项目所有者验收仍待完成。
+**当前里程碑：第三世代 Wild Generator 验证。** `gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前工作区已完成 `gen3wild` C++/Wasm/Worker Pool 实现。真实 Wild Wasm、GitHub Pages 与项目所有者验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
 - 已有模块：ID Generator、Static Generator/Searcher、三代存档信息、个体值计算器
@@ -39,12 +39,14 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - 觉醒属性、觉醒威力、能力值显示、取消筛选和 IV 组合键快捷设置
 - 独立 Generator/Searcher Worker Pool、进度、取消、虚拟化结果表、排序和 CSV
 
-当前 Wild Generator 合并工作区包含：
+当前 Wild Generator 包含：
 
 - Ruby、Sapphire、Emerald、FireRed 与 LeafGreen 的陆地、冲浪、碎岩和三种鱼竿遭遇表
 - Method 1、Method 2、Method 4，以及 Emerald 的同步、迷人身躯、等级修正和槽位修正队首规则
 - RSE 碎岩遭遇率修正、Route 119 丑丑鱼钓点和 Safari Zone 额外 RNG 推进
 - 当前全局掌机存档的版本、TID、SID 联动，以及性格多选筛选
+- Shiny、Gender、Ability、Nature、Hidden Power、Encounter Slot、Level 和六项 IV 范围筛选；支持“取消筛选”
+- Pokémon 联动的槽位/等级范围、IV 快捷键、能力值显示和 16 列结果表
 - 独立 `gen3wild` Wasm、Worker Pool、进度、取消、虚拟化结果表、排序和 CSV
 - PokeFinder Route 111 固定夹具；当前本机尚未编译运行，等待 Actions 验证
 
@@ -63,11 +65,8 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 后续 MVP 计划包含：
 
 - Wild Searcher
-- Wild 的 IV、特性、性别、闪光、觉醒力量、Pokemon、等级和遭遇槽等适用筛选项
-- 可排序结果表格、分批展示和 CSV 导出
-- 长任务的进度、取消和错误恢复
-- 简体中文、英文与日文
-- PWA 安装与首次加载后的离线使用
+- PWA 安装与首次加载后的离线使用加固
+- 浏览器矩阵、性能基线和可访问性补充
 
 当前不包含 Wild Searcher、Tanoby Chamber 未知图腾 form 规则、Egg、GameCube、PokeSpot、Jirachi 及其他世代。每个功能继续使用独立 Wasm 模块和验收记录，不把后续算法并入 `gen3id`、`gen3static` 或其他模块。
 
@@ -212,7 +211,7 @@ npm run build:web
 - **阶段 2A：第三世代 Static Generator** - `gen3static`、Method 1/4、游走缺陷、筛选和结果工作区（已进入 Git 基线，待项目所有者完整验收）。
 - **阶段 2B：Static Searcher** - 反向 IV 恢复、搜索边界、独立 Worker Pool 和结果工作区（已进入 Git 基线，待项目所有者完整验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 兜底、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
-- **阶段 4A：Wild Generator** - 遭遇数据、独立 `gen3wild` Wasm/Worker、特殊地点规则和固定夹具（当前 PR 合并工作区已实现，待 Actions 与项目所有者验收）。
+- **阶段 4A：Wild Generator** - 遭遇数据、独立 `gen3wild` Wasm/Worker、特殊地点规则、完整筛选和固定夹具（已实现，待 Actions 与项目所有者验收）。
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整筛选和独立任务协议。
 - **阶段 5：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
 - **后续** - Egg、GameCube、PokeSpot、Jirachi 等三代能力；是否支持其他世代另行决策。
