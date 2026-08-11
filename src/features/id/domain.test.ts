@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   calculateRsSeed,
   createId3Chunks,
+  decodeId3SearcherStates,
   decodeId3States,
   id3FilterFlags,
   parseHex,
   validateId3Request,
+  validateId3SearcherRequest,
   type Id3Request,
 } from "./domain";
 
@@ -70,5 +72,41 @@ describe("ID3 domain", () => {
         maxAdvances: 1,
       }),
     ).toContain("advanceRange");
+  });
+
+  it("validates the RS ID Searcher input widths", () => {
+    expect(
+      validateId3SearcherRequest({ mode: "sid", tid: 65535, input: 65535 }),
+    ).toEqual([]);
+    expect(
+      validateId3SearcherRequest({ mode: "sid", tid: 0, input: 65536 }),
+    ).toContain("sid");
+    expect(
+      validateId3SearcherRequest({ mode: "pid", tid: 0, input: 0xffffffff }),
+    ).toEqual([]);
+  });
+
+  it("decodes the 24-byte ID Searcher schema", () => {
+    const words = new Uint32Array([
+      0x05a0,
+      0,
+      48163 | (64377 << 16),
+      2283 | (2 << 16),
+      2000 | (1 << 16) | (1 << 24),
+      0,
+    ]);
+    expect(decodeId3SearcherStates(words.buffer)[0]).toEqual({
+      seed: 0x05a0,
+      frame: 0,
+      tid: 48163,
+      sid: 64377,
+      tsv: 2283,
+      shiny: 2,
+      year: 2000,
+      month: 1,
+      day: 1,
+      hour: 0,
+      minute: 0,
+    });
   });
 });

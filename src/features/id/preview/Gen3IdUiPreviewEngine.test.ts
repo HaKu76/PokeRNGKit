@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Id3Request } from "../domain";
 import { Gen3IdUiPreviewEngine } from "./Gen3IdUiPreviewEngine";
+import { Gen3IdSearcherUiPreviewEngine } from "./Gen3IdSearcherUiPreviewEngine";
 
 const request: Id3Request = {
   mode: "xd-colo",
@@ -48,5 +49,36 @@ describe("Gen3IdUiPreviewEngine", () => {
 
     expect(summary.cancelled).toBe(true);
     expect(summary.processedStates).toBeLessThan(summary.totalStates);
+  });
+});
+
+describe("Gen3IdSearcherUiPreviewEngine", () => {
+  it("returns the documented Ruby/Sapphire fixture", async () => {
+    const engine = new Gen3IdSearcherUiPreviewEngine(0);
+    const states: number[] = [];
+    const summary = await engine.search(
+      { mode: "sid", tid: 48163, input: 64377 },
+      { onBatch: (batch) => states.push(...batch.map((state) => state.seed)) },
+    );
+    expect(states).toEqual([0x05a0, 0xc19b]);
+    expect(summary.resultCount).toBe(2);
+  });
+
+  it("returns an empty result for an unmatched combination", async () => {
+    const engine = new Gen3IdSearcherUiPreviewEngine(0);
+    const summary = await engine.search({ mode: "sid", tid: 4, input: 0 });
+    expect(summary.resultCount).toBe(0);
+  });
+
+  it("previews square and star PID candidates", async () => {
+    const engine = new Gen3IdSearcherUiPreviewEngine(0);
+    const shiny: number[] = [];
+    const summary = await engine.search(
+      { mode: "pid", tid: 48163, input: 0x0000475a },
+      { onBatch: (batch) => shiny.push(...batch.map((state) => state.shiny)) },
+    );
+    expect(summary.resultCount).toBe(7);
+    expect(shiny).toContain(1);
+    expect(shiny).toContain(2);
   });
 });

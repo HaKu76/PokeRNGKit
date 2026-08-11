@@ -48,7 +48,7 @@
 7. 将大范围计算放在独立 Worker 内；多核使用多个单线程 Wasm 实例，不引入 `SharedArrayBuffer` 或 Wasm pthread。
 8. 增加与风险对应的 C++ 固定夹具、TypeScript 边界测试和 UI 预览测试。
 9. 更新对应 `docs/modules/<module>.md`、需求、技术方案和进度交接。
-10. 运行相关验证，区分本地自动检查、部署页面算法回归与项目所有者最终验收。
+10. 先取得项目所有者对具体命令或 URL 的明确授权，才运行相关验证；区分工程检查、部署页面算法回归与项目所有者最终验收。
 
 ## 4. Wasm 与 Worker 约束
 
@@ -76,7 +76,7 @@
 
 ## 6. 完成门槛
 
-模块交给项目所有者前至少执行：
+未经项目所有者明确授权，不得自行执行以下命令、算法回归、性能检查或 UI 预览。获得授权后按指定范围执行：
 
 ```bash
 npm run format:check
@@ -88,7 +88,7 @@ npm run verify
 git diff --check
 ```
 
-具备本地 C++ 与已激活 emsdk 时再运行 `npm run verify:full`。缺少工具链时如实记录“未运行”，由锁定工具链的 GitHub Actions 补齐，不得把前端构建成功写成真实 Wasm 已验证。项目所有者提供部署 URL 后，使用生产页面和已记录固定输入执行算法回归，并记录 URL、commit/Actions run、浏览器版本、预期与实际结果；`ui` 预览不能代替该步骤。
+具备本地 C++ 与已激活 emsdk 时，经授权再运行 `npm run verify:full`。缺少工具链时如实记录“未运行”，由锁定工具链的 GitHub Actions 补齐，不得把前端构建成功写成真实 Wasm 已验证。项目所有者明确授权部署 URL 后，使用生产页面和已记录固定输入执行算法回归，并记录 URL、commit/Actions run、浏览器版本、预期与实际结果；`ui` 预览不能代替该步骤。部署后的 UI 检查必须先向项目所有者报告，再共同完成验收，不得由 AI 单方面宣告通过。
 
 完成后只向项目所有者提供一个 GitHub Desktop 提交标题：
 

@@ -1,6 +1,6 @@
 # 第三世代 ID 乱数算法
 
-本文说明 `gen3id` 的计算边界。实现以 PokeFinder 4.3.2 的 `IDGenerator3` 和 `Utilities3::calcSeed` 为核验基线；TypeScript 只负责输入、分片、Worker 调度和结果解码。
+本文说明 `gen3id` Generator/Searcher 的计算边界。Generator 以 PokeFinder 4.3.2 的 `IDGenerator3` 和 `Utilities3::calcSeed` 为核验基线；红蓝宝石 ID Searcher 以 `HaKu76/RS-TID-SID-Frame-Finder_CHN` 为行为参考，并使用 PokeFinder 的 PokeRNG/PokeRNGR 参数独立实现。TypeScript 只负责输入、Worker 调度和结果解码。
 
 ## 1. 线性同余随机数
 
@@ -17,6 +17,8 @@ output16 = state[n + 1] >> 16
 | ------- | ------------ | ---------- | --------------------------- |
 | PokeRNG | `0x41C64E6D` | `0x6073`   | 火红/叶绿/绿宝石、红/蓝宝石 |
 | XDRNG   | `0x000343FD` | `0x269EC3` | XD/竞技场                   |
+
+Searcher 使用逆向生成器 PokeRNGR，参数为 multiplier `0xEEB9EB65`、addend `0x0A3561A1`。
 
 `Initial Advances` 先把初始状态推进指定次数。`Max Advances` 是包含起点的最大偏移，因此结果状态数为 `Max Advances + 1`。
 
@@ -52,6 +54,28 @@ TID = nextUShort()
 ```
 
 外层基准状态每个候选推进一次，因此候选帧同样是滑动窗口，而不是每行独立消耗两个随机数。
+
+### 4.1 红蓝宝石 ID Searcher
+
+Searcher 已知 TID 与 SID 时，枚举 SID 状态的低 16 位，找到满足下一次 PokeRNG 高 16 位等于 TID 的状态。随后先逆推到生成 SID 前的状态，再持续逆推，直到状态不大于 `0xFFFF`：
+
+```text
+SID state -> reverse once -> candidate frame state
+while state > 0xFFFF: state = PokeRNGR.next(), frame++
+initial Seed = state
+```
+
+恢复到的逆推次数就是 Generator 中同一 ID 组合的帧数。一个 TID/SID 组合可能有多组 Seed，也可能无解；无解时返回空结果。
+
+PID 模式先计算 PID 两半的异或值，再枚举八个可使该 PID 闪光的 SID：
+
+```text
+xor = PID.high XOR PID.low
+baseSID = (xor XOR TID) AND 0xFFF8
+candidateSID = baseSID .. baseSID + 7
+```
+
+当 `TID XOR SID` 等于 PID 两半异或值时显示“方块闪”，其余候选显示“星闪”。Searcher 只返回能映射到 2000 年第一组日期时间的 Seed，与参考程序当前枚举范围一致；无法映射日期的候选会被跳过，不访问空数组。
 
 ## 5. TSV
 
@@ -99,12 +123,24 @@ seed = ((value >> 16) XOR (value AND 0xFFFF)) AND 0xFFFF
 | TID / SID 筛选         | `0..65535`                                   | 空输入表示不筛选                         |
 | TSV 筛选               | `0..8191`                                    | 空输入表示不筛选                         |
 | R/S 日期时间           | `2000-01-01 00:00:00..2099-12-31 23:59:59`   | 当前 Web 控件精确到分钟                  |
+| Searcher TID / SID     | C# `uint.Parse`；游戏值 `0..65535`           | 5 位十进制；domain 同步校验              |
+| Searcher PID           | C# 十六进制 `uint.Parse`，`0..0xFFFFFFFF`    | 8 位十六进制；显示固定 `0x` 前缀         |
 
 Max Advances 包含起点，浏览器单次任务最多处理 50,000,000 个状态；每次 C ABI 调用最多 100,000 个状态。
+
+Searcher 控件文本核对自参考项目 `RNGRecovertest/Form1.Designer.cs`：`TID：`、`SID：`、`PID：`、`计算`，结果列为 Seed、帧数、TID、SID、TSV、异色、日期。原 WinForms 的 TID/SID 输入虽然使用 `uint.Parse`，Web 端按游戏与 C ABI 的 16 位类型收紧为 `0..65535`。
 
 ## 8. Web 执行边界
 
 TypeScript 把大范围拆成最多 100,000 个状态的分片，并交给多个独立 Worker/Wasm 实例。分片只改变任务调度，不改变初始状态、推进序号或 ID 生成顺序；结果按 `chunkIndex` 恢复为确定顺序。
+
+`gen3id` API v2 在原 `gen3id_generate` 之外增加 `gen3id_search`。Searcher 使用独立 `Gen3IdSearcherWorkerPool` 和单个 Worker；搜索规模最多为八个 SID 候选，无需分片或多 Worker。取消会终止 Worker，下一任务重新初始化。返回记录固定为 24 字节：
+
+```text
+uint32 seed / frame / tidSID / tsvShiny / yearMonthDay / hourMinute
+```
+
+日期字段由 Wasm 返回结构化整数，TypeScript 只负责显示与 CSV，不重复日期反查算法。
 
 ## 9. 验证入口
 
@@ -112,6 +148,16 @@ TypeScript 把大范围拆成最多 100,000 个状态的分片，并交给多个
 - TypeScript 边界测试：`src/features/id/domain.test.ts`
 - 输入规范化：`src/input.test.ts`
 - 上游来源与校验和：`third_party/pokefinder/UPSTREAM.md`
+
+Searcher 固定夹具：
+
+```text
+TID 48163 + SID 64377
+-> Seed 05A0, Frame 0, 2000-01-01 00:00
+-> Seed C19B, Frame 36724, 2000-02-02 22:03
+
+TID 4 + SID 0 -> 0 results
+```
 
 运行：
 

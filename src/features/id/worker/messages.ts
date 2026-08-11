@@ -1,4 +1,9 @@
-import type { Id3Chunk, Id3Filters, Id3Mode } from "../domain";
+import type {
+  Id3Chunk,
+  Id3Filters,
+  Id3Mode,
+  Id3SearcherRequest,
+} from "../domain";
 
 export interface Id3WorkerInitMessage {
   type: "init";
@@ -14,7 +19,14 @@ export interface Id3WorkerRunMessage {
   filters: Id3Filters;
 }
 
-export type Id3WorkerRequest = Id3WorkerInitMessage | Id3WorkerRunMessage;
+export interface Id3WorkerSearchMessage {
+  type: "search";
+  taskId: string;
+  request: Id3SearcherRequest;
+}
+
+export type Id3WorkerRequest =
+  Id3WorkerInitMessage | Id3WorkerRunMessage | Id3WorkerSearchMessage;
 
 export interface Id3WorkerReadyMessage {
   type: "ready";
@@ -31,6 +43,14 @@ export interface Id3WorkerBatchMessage {
   buffer: ArrayBuffer;
 }
 
+export interface Id3WorkerSearchBatchMessage {
+  type: "search-batch";
+  taskId: string;
+  resultCount: number;
+  elapsedMs: number;
+  buffer: ArrayBuffer;
+}
+
 export interface Id3WorkerErrorMessage {
   type: "error";
   taskId?: string;
@@ -40,4 +60,7 @@ export interface Id3WorkerErrorMessage {
 }
 
 export type Id3WorkerResponse =
-  Id3WorkerReadyMessage | Id3WorkerBatchMessage | Id3WorkerErrorMessage;
+  | Id3WorkerReadyMessage
+  | Id3WorkerBatchMessage
+  | Id3WorkerSearchBatchMessage
+  | Id3WorkerErrorMessage;

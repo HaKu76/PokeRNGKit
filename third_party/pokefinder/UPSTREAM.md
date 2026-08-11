@@ -66,6 +66,23 @@ D145C24D2CA64AECF86A1BC4EEE80909F15AB1B9A81C9F004702DA6FD31D5AEC  Test/Gen3/Wild
 
 PokeFinder 将 `Core/Resources/EncounterTables` 声明为 [Admiral-Fish/EncounterTableGenerator](https://github.com/Admiral-Fish/EncounterTableGenerator) 子模块。当前本地 4.3.2 归档未包含该子模块内容；PR #1 的 `gen3Data.ts` 与生成脚本尚未记录所用子模块的精确 revision。补齐 revision、生成命令和数据许可证记录前，不把全地点数据描述为已完成来源审计。
 
+## 红蓝宝石 ID 帧检索行为参考
+
+- 参考项目：[HaKu76/RS-TID-SID-Frame-Finder_CHN](https://github.com/HaKu76/RS-TID-SID-Frame-Finder_CHN)
+- 本地核验来源：`C:\Users\Hakuhiro\Desktop\RS-TID-SID-Frame-Finder_CHN-master`
+- 用途：核对 TID/SID 与 TID/PID 两种输入、PokeRNGR 逆推、2000 年日期枚举、TSV 和星闪/方块闪显示行为
+- 集成边界：不复制或编译 C# / WinForms 文件；`gen3id` bridge 使用现有 GPL-3.0-or-later PokeFinder LCRNG 参数独立实现浏览器算法
+
+本地归档没有 `.git` 元数据或许可证文件，因此仅记录为行为参考，不 vendoring 到构建输入。参考文件 SHA-256：
+
+```text
+3259874852D66483DE1FC638615D2BB0A21CC82EC5C9E3F2D9A4FD44FE4517C1  README.md
+0C34EEF2D8D692027A676DADBB7DF50D1D9CE94D10EC5EDFD29EC4D0CC87794A  RNGRecovertest/Form1.cs
+61155FE0F71FBA836C752E4C7CA31E6DA8B3B1801A1EB92CB0DA156493C2AE5B  RNGRecovertest/PokeRNGR.cs
+A4A0464C50D2BF7F633EDF164EF91CC92DFDAEE15A9099045ABBE8BC328585BE  RNGRecovertest/Form1.Designer.cs
+FE6A55570119A253DBD69946D86648E25910687D3B851CD92D4213548C028BE2  RNGRecovertest/RNGRecovertest.csproj
+```
+
 ## PokeRNGKit 修改
 
 当前 vendored 文件未修改。PokeRNGKit 通过独立的 `wasm/modules/gen3id/bridge/gen3id_bridge.cpp` 提供 ID C ABI；`wasm/modules/gen3static/bridge/gen3static_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `StaticGenerator3.cpp` 与 `Utilities.hpp` 的规则提供 Static C ABI、筛选和二进制结果布局；`wasm/modules/gen3wild/bridge/gen3wild_bridge.cpp` 复用同一 LCRNG，并按 Wild Generator、Encounter Area 与 Encounter Slot 规则提供独立 Wild C ABI。

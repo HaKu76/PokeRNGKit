@@ -11,6 +11,7 @@ import {
   type Id3Request,
   type Id3State,
 } from "./features/id/domain";
+import { Gen3IdSearcherPanel } from "./features/id/Gen3IdSearcherPanel";
 import { Gen3IdUiPreviewEngine } from "./features/id/preview/Gen3IdUiPreviewEngine";
 import type {
   Id3SearchEngine,
@@ -64,6 +65,10 @@ function App() {
     [],
   );
   const [mode, setMode] = useState<Id3Mode>("xd-colo");
+  const [idOperation, setIdOperation] = useState<"generator" | "searcher">(
+    "generator",
+  );
+  const [idSearcherRunning, setIdSearcherRunning] = useState(false);
   const [xdSeed, setXdSeed] = useState("");
   const [frlgTid, setFrlgTid] = useState("0");
   const [rsSeed, setRsSeed] = useState("");
@@ -427,7 +432,32 @@ function App() {
 
           {activeModule === "id" ? (
             <>
-              <form className="control-grid" onSubmit={generate}>
+              <div className="operation-tabs" role="tablist">
+                {(["generator", "searcher"] as const).map((entry) => (
+                  <button
+                    aria-selected={idOperation === entry}
+                    className={idOperation === entry ? "active" : ""}
+                    disabled={status === "calculating" || idSearcherRunning}
+                    key={entry}
+                    onClick={() => setIdOperation(entry)}
+                    role="tab"
+                    type="button"
+                  >
+                    {t(entry)}
+                  </button>
+                ))}
+              </div>
+              {idOperation === "searcher" && (
+                <Gen3IdSearcherPanel
+                  onRunningChange={setIdSearcherRunning}
+                  uiPreviewMode={uiPreviewMode}
+                />
+              )}
+              <form
+                className="control-grid"
+                hidden={idOperation !== "generator"}
+                onSubmit={generate}
+              >
                 <section className="panel input-panel">
                   <div className="panel-heading">
                     <div>
@@ -674,7 +704,10 @@ function App() {
                 </section>
               </form>
 
-              <section className="panel results-panel">
+              <section
+                className="panel results-panel"
+                hidden={idOperation !== "generator"}
+              >
                 <div className="results-heading">
                   <div className="panel-heading compact">
                     <div>

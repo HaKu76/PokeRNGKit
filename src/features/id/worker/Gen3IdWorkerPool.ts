@@ -91,6 +91,11 @@ class Id3WorkerClient {
       return;
     }
 
+    if (message.type !== "batch") {
+      this.fail(new Error("ID3 Worker returned an unexpected batch."));
+      return;
+    }
+
     if (!this.pending || this.pending.taskId !== message.taskId) {
       this.fail(new Error("ID3 Worker returned a batch for an unknown task."));
       return;

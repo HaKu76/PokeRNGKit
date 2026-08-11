@@ -29,6 +29,23 @@ namespace
             assert(states[i].tsv == expected[i].tsv);
         }
     }
+
+    void verifySearchState(const Id3PackedSearchState &state, std::uint32_t seed, std::uint32_t frame,
+                           std::uint16_t tid, std::uint16_t sid, std::uint16_t tsv, std::uint8_t shiny,
+                           std::uint8_t month, std::uint8_t day, std::uint8_t hour, std::uint8_t minute)
+    {
+        assert(state.seed == seed);
+        assert(state.frame == frame);
+        assert((state.tidSID & 0xffff) == tid);
+        assert((state.tidSID >> 16) == sid);
+        assert((state.tsvShiny & 0xffff) == tsv);
+        assert((state.tsvShiny >> 16) == shiny);
+        assert((state.yearMonthDay & 0xffff) == 2000);
+        assert(((state.yearMonthDay >> 16) & 0xff) == month);
+        assert((state.yearMonthDay >> 24) == day);
+        assert((state.hourMinute & 0xff) == hour);
+        assert(((state.hourMinute >> 8) & 0xff) == minute);
+    }
 }
 
 int main()
@@ -53,4 +70,23 @@ int main()
     assert(gen3id_generate(static_cast<std::uint32_t>(Id3Mode::FRLGE), 0, 0, 9, FilterSID, 0, 59774, 0) == 1);
     assert(gen3id_generate(99, 0, 0, 0, 0, 0, 0, 0) == 0);
     assert(gen3id_last_error() == 1);
+
+    auto count = gen3id_search(static_cast<std::uint32_t>(Id3SearchMode::SID), 48163, 64377);
+    assert(gen3id_last_error() == 0);
+    assert(count == 2);
+    auto *searchStates = reinterpret_cast<const Id3PackedSearchState *>(gen3id_result_ptr());
+    verifySearchState(searchStates[0], 0x05a0, 0, 48163, 64377, 2283, 0, 1, 1, 0, 0);
+    verifySearchState(searchStates[1], 0xc19b, 36724, 48163, 64377, 2283, 0, 2, 2, 22, 3);
+
+    count = gen3id_search(static_cast<std::uint32_t>(Id3SearchMode::PID), 48163, 0x0000475a);
+    assert(gen3id_last_error() == 0);
+    assert(count == 7);
+    searchStates = reinterpret_cast<const Id3PackedSearchState *>(gen3id_result_ptr());
+    verifySearchState(searchStates[0], 0x05a0, 0, 48163, 64377, 2283, 2, 1, 1, 0, 0);
+    assert((searchStates[2].tsvShiny >> 16) == 1);
+
+    assert(gen3id_search(static_cast<std::uint32_t>(Id3SearchMode::SID), 4, 0) == 0);
+    assert(gen3id_result_count() == 0);
+    assert(gen3id_search(static_cast<std::uint32_t>(Id3SearchMode::SID), 0x10000, 0) == 0);
+    assert(gen3id_last_error() == 2);
 }

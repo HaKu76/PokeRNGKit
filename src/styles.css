@@ -1035,6 +1035,58 @@ h1 {
   color: var(--text);
   box-shadow: inset 0 -2px 0 var(--amber);
 }
+
+.id-searcher-form {
+  max-width: 620px;
+  margin-bottom: 14px;
+}
+.id-searcher-mode {
+  align-self: end;
+  min-height: 39px;
+}
+.prefixed-input {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--control-bg);
+}
+.prefixed-input > span {
+  padding-left: 11px;
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+.field .prefixed-input input {
+  border: 0;
+}
+.id-searcher-table-wrap {
+  min-height: 260px;
+  overflow: auto;
+}
+.id-searcher-table {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  color: var(--text);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+}
+.id-searcher-table th,
+.id-searcher-table td {
+  height: 42px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line-soft);
+  padding: 0 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+.id-searcher-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 9px;
+}
 .static-panel {
   min-width: 0;
   padding: 18px;

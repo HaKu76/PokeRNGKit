@@ -1,7 +1,7 @@
 {
   "id": "gen3id",
-  "apiVersion": 1,
+  "apiVersion": 2,
   "target": "gen3id",
   "artifacts": ["gen3id.mjs", "gen3id.wasm"],
-  "source": "PokeFinder 4.3.2 Gen III IDGenerator3"
+  "source": "PokeFinder 4.3.2 Gen III IDGenerator3 and RS ID frame recovery"
 }

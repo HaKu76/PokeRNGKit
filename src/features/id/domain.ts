@@ -1,9 +1,10 @@
-export const ID3_API_VERSION = 1;
+export const ID3_API_VERSION = 2;
 export const ID3_CHUNK_SIZE = 100_000;
 export const ID3_MAX_TOTAL_STATES = 50_000_000;
 export const ID3_MAX_RESULTS = 250_000;
 
 export type Id3Mode = "xd-colo" | "fr-lg" | "rs";
+export type Id3SearcherMode = "sid" | "pid";
 
 export interface Id3Filters {
   tid?: number;
@@ -33,6 +34,26 @@ export interface Id3Chunk {
   stateCount: number;
 }
 
+export interface Id3SearcherRequest {
+  mode: Id3SearcherMode;
+  tid: number;
+  input: number;
+}
+
+export interface Id3SearcherState {
+  seed: number;
+  frame: number;
+  tid: number;
+  sid: number;
+  tsv: number;
+  shiny: 0 | 1 | 2;
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+}
+
 export function id3ModeToWasm(mode: Id3Mode): number {
   switch (mode) {
     case "xd-colo":
@@ -42,6 +63,10 @@ export function id3ModeToWasm(mode: Id3Mode): number {
     case "rs":
       return 2;
   }
+}
+
+export function id3SearcherModeToWasm(mode: Id3SearcherMode): number {
+  return mode === "sid" ? 0 : 1;
 }
 
 export function id3FilterFlags(filters: Id3Filters): number {
@@ -95,6 +120,25 @@ export function validateId3Request(request: Id3Request): string[] {
   return errors;
 }
 
+export function validateId3SearcherRequest(
+  request: Id3SearcherRequest,
+): string[] {
+  const errors: string[] = [];
+  const isUint16 = (value: number) =>
+    Number.isInteger(value) && value >= 0 && value <= 0xffff;
+  const isUint32 = (value: number) =>
+    Number.isInteger(value) && value >= 0 && value <= 0xffff_ffff;
+
+  if (!isUint16(request.tid)) errors.push("tid");
+  if (
+    (request.mode === "sid" && !isUint16(request.input)) ||
+    (request.mode === "pid" && !isUint32(request.input))
+  ) {
+    errors.push(request.mode);
+  }
+  return errors;
+}
+
 export function createId3Chunks(
   request: Id3Request,
   chunkSize = ID3_CHUNK_SIZE,
@@ -144,6 +188,41 @@ export function decodeId3States(buffer: ArrayBuffer): Id3State[] {
       tid: tidSid & 0xffff,
       sid: tidSid >>> 16,
       tsv: words[source + 2],
+    };
+  }
+  return states;
+}
+
+export function decodeId3SearcherStates(
+  buffer: ArrayBuffer,
+): Id3SearcherState[] {
+  const words = new Uint32Array(buffer);
+  if (words.length % 6 !== 0) {
+    throw new RangeError("Invalid ID3 Searcher result buffer length.");
+  }
+
+  const states = new Array<Id3SearcherState>(words.length / 6);
+  for (
+    let source = 0, target = 0;
+    source < words.length;
+    source += 6, target++
+  ) {
+    const tidSid = words[source + 2];
+    const tsvShiny = words[source + 3];
+    const yearMonthDay = words[source + 4];
+    const hourMinute = words[source + 5];
+    states[target] = {
+      seed: words[source],
+      frame: words[source + 1],
+      tid: tidSid & 0xffff,
+      sid: tidSid >>> 16,
+      tsv: tsvShiny & 0xffff,
+      shiny: (tsvShiny >>> 16) as 0 | 1 | 2,
+      year: yearMonthDay & 0xffff,
+      month: (yearMonthDay >>> 16) & 0xff,
+      day: yearMonthDay >>> 24,
+      hour: hourMinute & 0xff,
+      minute: (hourMinute >>> 8) & 0xff,
     };
   }
   return states;

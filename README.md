@@ -5,10 +5,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代 Wild Generator/Searcher 验证。** `gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前工作区已完成 `gen3wild` Generator/Searcher 的 C++/Wasm/Worker Pool 实现。真实 Wild Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
+**当前里程碑：第三世代功能集成验证。** 当前工作区为 `gen3id` 增加红蓝宝石 ID Searcher，可通过 TID/SID 或 TID/PID 反查 Seed、帧数、日期、TSV 和异色类型。真实 Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
-- 已有模块：ID Generator、Static Generator/Searcher、三代存档信息、个体值计算器
+- 已有模块：ID Generator/Searcher、Static Generator/Searcher、Wild Generator/Searcher、三代存档信息、个体值计算器
 - 当前模块：Wild Generator/Searcher；实现尚未提交，真实 Wasm 待 Actions 验证
 - 上游核验基线：PokeFinder 4.3.2
 - 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
@@ -127,7 +127,7 @@ npm run preview:ui
 
 打开 <http://127.0.0.1:4173/>。
 
-UI 预览模式使用确定性样例数据，可以验收 ID 三种模式、Static Generator/Searcher、Wild Generator/Searcher、存档信息、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
+UI 预览模式使用确定性样例数据，可以验收 ID Generator/Searcher、Static Generator/Searcher、Wild Generator/Searcher、存档信息、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
 
 本地验收服务器固定绑定 `127.0.0.1`，只允许当前电脑访问。如果 Windows 首次运行 Node.js 时弹出防火墙网络放行或管理员密码提示，可以直接取消/不允许；不需要为本地验收创建公网或局域网放行规则。
 
@@ -208,7 +208,7 @@ npm run build:web
 ## 路线图
 
 - **阶段 0：仓库基线** - README、需求、技术栈、忽略规则与许可证策略（已完成）。
-- **阶段 1：第三世代 ID Generator** - `gen3id`、Worker Pool、三语界面和上游一致性夹具（已实现，待部署回归与最终验收）。
+- **阶段 1：第三世代 ID Generator/Searcher** - `gen3id` API v2、独立 Worker、三语界面、红蓝宝石 ID 反查和一致性夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 2A：第三世代 Static Generator** - `gen3static`、Method 1/4、游走缺陷、筛选和结果工作区（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2B：Static Searcher** - 反向 IV 恢复、搜索边界、独立 Worker Pool 和结果工作区（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 兜底、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。

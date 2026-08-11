@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：阶段 4B，第三世代 Wild Generator/Searcher 验证
+> - 状态：第三世代 ID Generator/Searcher、Static 与 Wild 集成验证
 > - 更新日期：2026-08-11
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。`gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前工作区实现并验证第三世代 Wild Generator/Searcher。
+当前按 PokeFinder 功能模块逐个落地。Static/Wild Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前工作区为 `gen3id` 集成红蓝宝石 ID Searcher。
 
 ## 2. 已确认边界
 
@@ -92,6 +92,17 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-ID-RS-02** 启用“无电池”时使用第三世代红蓝宝石对应的固定 Seed 规则，并禁用无效的日期时间输入。
 - **FR-ID-RS-03** 使用 PokeFinder `IDGenerator3::generateRS` 的结果语义。
 - **FR-ID-RS-04** 日期时间推导限制在当前实现可验证的 `2000..2099` 年范围，非法时间不得启动任务。
+
+#### 4.4.1 红蓝宝石 ID Searcher
+
+- **FR-ID-SEARCH-01** ID 工作区提供 Generator/Searcher 标签；计算期间禁止切换操作。
+- **FR-ID-SEARCH-02** SID 模式接受十进制 TID 与 SID，范围均为 `0..65535`。
+- **FR-ID-SEARCH-03** PID 模式接受十进制 TID 与八位十六进制 PID，并枚举八个可使目标 PID 闪光的 SID。
+- **FR-ID-SEARCH-04** 结果显示 Seed、帧数、TID、SID、TSV、异色和日期；帧数不得添加千位分隔符。
+- **FR-ID-SEARCH-05** 日期范围与参考程序一致，当前只返回 2000 年内每个 Seed 的第一组日期时间。
+- **FR-ID-SEARCH-06** 无可用 Seed 或日期的组合返回空结果，不得访问空集合或显示伪造结果。
+- **FR-ID-SEARCH-07** Searcher 在独立 Worker 中调用 `gen3id_search`；取消通过终止 Worker 生效，React 主线程不执行反向 RNG。
+- **FR-ID-SEARCH-08** 简体中文控件复用参考程序的 `TID：`、`SID：`、`PID：`、`计算`、`帧数`、`异色`和`日期`文本。
 
 ### 4.5 推进范围
 
@@ -338,7 +349,7 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
-3. `npm run wasm:test:native` 通过 ID 三种模式、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher 及错误边界。
+3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher 及错误边界。
 4. `npm run wasm:build` 生成 `gen3id`、`gen3static` 与 `gen3wild` 的 MJS/Wasm 产物。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
@@ -348,14 +359,15 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 
 项目所有者使用 GitHub Desktop 提交并完成 GitHub Pages 部署，再把实际 URL 交给 Codex。Codex 至少检查：
 
-1. ID 三种模式各使用一组已知输入比对 PokeFinder 结果。
-2. Static Generator/Searcher 的 Method 1、Method 4 与 Latios/Latias 游走缺陷各使用已知输入比对。
-3. ID 的 TID、SID、TSV 筛选，以及 Static 的 IV、性格、特性、性别、闪光筛选。
-4. 大范围任务的进度、取消、页面响应和结果上限提示。
-5. ID、Static 与 Wild Generator/Searcher 的结果排序、CSV 内容、清空结果和移动端横向滚动。
-6. Wild Generator/Searcher 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
-7. GitHub Pages 在线加载三个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
-8. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
+1. ID Generator 三种模式各使用一组已知输入比对 PokeFinder 结果。
+2. RS ID Searcher 使用 TID `48163`、SID `64377` 和 PID `0000475A` 核对 Seed、帧数、日期、TSV 与异色。
+3. Static Generator/Searcher 的 Method 1、Method 4 与 Latios/Latias 游走缺陷各使用已知输入比对。
+4. ID 的 TID、SID、TSV 筛选，以及 Static 的 IV、性格、特性、性别、闪光筛选。
+5. 大范围任务的进度、取消、页面响应和结果上限提示。
+6. ID、Static 与 Wild Generator/Searcher 的结果排序、CSV 内容、清空结果和移动端横向滚动。
+7. Wild Generator/Searcher 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
+8. GitHub Pages 在线加载三个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
+9. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
 
 算法回归必须使用真实生产 Wasm，不能使用 `ui` 预览模式。无法从部署页面确认的原生夹具、移动设备性能或离线安装行为必须明确列为未覆盖。
 
@@ -370,7 +382,7 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 ## 14. 阶段划分
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
-- **阶段 1：`gen3id` Generator** - React UI、Worker Pool、C++ bridge、上游最小 Core、三语和 Actions（已实现，待部署回归与最终验收）。
+- **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 2A：`gen3static` Generator** - 独立 Wasm/Worker、Method 1/4、游走缺陷、筛选和结果（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2B：Static Searcher** - 反向恢复、搜索协议、结果边界和上游一致性测试（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 镜像、CRUD、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。

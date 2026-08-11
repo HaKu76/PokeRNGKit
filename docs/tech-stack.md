@@ -1,6 +1,6 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：阶段 4B，Wild Generator/Searcher 已接入独立 Wasm/Worker 并等待完整验证
+> - 状态：`gen3id` Generator/Searcher、Static 与 Wild 已接入独立 Wasm/Worker；真实 Wasm 与部署回归待完成
 > - 更新日期：2026-08-11
 > - 当前范围：第三世代 ID、Static Generator/Searcher、Wild Generator/Searcher 与存档信息
 > - 包管理器：npm
@@ -39,7 +39,7 @@ React UI
   |-- virtualized result table / CSV
   |-- ui mode -> deterministic preview engine
   `-- production -> module-specific Worker Pool
-        |-- Gen3IdWorkerPool -> gen3id.mjs + gen3id.wasm
+        |-- Gen3IdWorkerPool / Gen3IdSearcherWorkerPool -> gen3id.mjs + gen3id.wasm
         |-- Gen3StaticWorkerPool ---------+
         |-- Gen3StaticSearcherWorkerPool -+-> gen3static.mjs + gen3static.wasm
         |-- Gen3WildWorkerPool ---------+
@@ -201,7 +201,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 3。ID C ABI 为：
+当前 `gen3id` API 版本为 2，`gen3static` API 版本为 3，`gen3wild` API 版本为 3。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -215,6 +215,7 @@ uint32_t gen3id_generate(
   uint32_t sid,
   uint32_t tsv
 );
+uint32_t gen3id_search(uint32_t mode, uint32_t tid, uint32_t input);
 uintptr_t gen3id_result_ptr();
 uint32_t gen3id_result_count();
 uint32_t gen3id_last_error();
@@ -227,6 +228,19 @@ uint32 advances
 uint32 tidSID      # low 16 bits TID, high 16 bits SID
 uint32 tsv
 ```
+
+`gen3id_search` 的 `mode` 区分 SID/PID 输入，返回连续 24 字节记录：
+
+```text
+uint32 seed
+uint32 frame
+uint32 tidSID
+uint32 tsvShiny
+uint32 yearMonthDay
+uint32 hourMinute
+```
+
+Searcher 只使用一个独立 Worker/Wasm 实例；取消时终止并重建该 Worker，不与 Generator Worker Pool 共享任务状态。
 
 Static C ABI 使用同一结果生命周期，并提供 `gen3static_generate` 与 `gen3static_search`。Generator 传入 Seed、推进范围、Offset、Method、预设属性、TID/SID 和筛选；Searcher 传入 IV 组合 `startIndex`、`stateCount`、Method、预设属性、TID/SID 和筛选。两者都返回连续 48 字节记录：
 
