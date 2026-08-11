@@ -3,9 +3,9 @@
 > - 最近更新：2026-08-11
 > - 当前阶段：阶段 1B，GitHub Pages 测试部署
 > - 当前模块：`gen3id`，第三世代 ID 乱数
-> - Git 基线：`39c41c5 init: 仓库初始化`
-> - 工作区状态：本阶段实现尚未提交，由项目所有者检查后提交和推送
-> - 部署状态：GitHub Pages 尚未完成首次部署
+> - Git 基线：`b94f331 feat: 实现第三世代 ID 乱数模块`
+> - 工作区状态：Wasm 工具链检测修复尚未提交
+> - 部署状态：GitHub Actions 首次构建在工具链检测阶段失败，Pages 尚未部署
 
 ## 1. 文档用途
 
@@ -41,10 +41,11 @@
 ### 3.1 仓库基线
 
 - 已完成首个提交 `39c41c5 init: 仓库初始化`。
+- 已完成模块提交 `b94f331 feat: 实现第三世代 ID 乱数模块` 并推送 `main`。
 - 已建立 README、需求、技术方案、进度交接、GPLv3 许可证和 `.gitignore`。
 - 已建立项目级 `hakuhiro-project-style` Skill。
 - 已将正式工程名统一为 PokeRNGKit，产品代码、PWA、npm/CMake 标识和文档已同步更新。
-- 当前远端仍为 `https://github.com/HaKu76/PokeHero.git`，当前分支为 `main`；仓库和本地目录尚未随品牌改名，由项目所有者在提交前后统一处理。
+- GitHub 仓库已更名为 `HaKu76/PokeRNGKit`，当前分支为 `main`。本地 `origin` 仍记录旧 URL `https://github.com/HaKu76/PokeHero.git` 并通过 GitHub 重定向工作；项目所有者后续在 GitHub Desktop 更新远端 URL。本地目录名不影响构建。
 
 ### 3.2 React 应用
 
@@ -149,6 +150,8 @@ Cloudflare job 已保留为可选路径；没有配置 `CLOUDFLARE_PROJECT_NAME`
 - `npx npm@12.0.2 ci --ignore-scripts`：按新 lockfile 安装 476 个包；当前 Node 版本产生预期的 engine 警告
 - `npm ls --all`：完整依赖树通过
 - `npm audit`：0 个已知漏洞
+- 修复后 `npm run verify`：格式、lint、类型、7 个测试与 Web/PWA 生产构建通过
+- `npm run wasm:doctor` 探测协议：使用临时 emsdk 命令替身时 5 项检查全部通过；该结果只验证命令编排，不代表实际 Emscripten 编译通过
 
 以上是工程检查，不代表项目所有者功能验收。
 
@@ -167,6 +170,7 @@ Cloudflare job 已保留为可选路径；没有配置 `CLOUDFLARE_PROJECT_NAME`
 
 ### 4.3 尚未验证
 
+- GitHub Actions 运行 `31462848222` 在 `npm run wasm:doctor` 失败：npm 的 Linux CMake/Ninja 二进制缺少可执行位，`emcmake --version` 探测也会产生误判。当前工作区已修复两处问题，等待下一次 Actions 验证。
 - Emscripten 实际生成 `gen3id.mjs` 与 `gen3id.wasm`。
 - 原生 C++ 固定夹具通过。
 - GitHub Pages 首次构建和部署。
@@ -200,15 +204,13 @@ UI 预览可以检查模式切换、输入、筛选、进度、取消、表格�
 
 ### 5.2 项目所有者提交
 
-首次部署前，在 GitHub 仓库设置中将仓库名改为 `PokeRNGKit`，并在 GitHub Desktop 的仓库设置中确认远端地址更新为 `https://github.com/HaKu76/PokeRNGKit.git`。本地目录名不影响构建，可在关闭开发工具后按需改名。
-
-使用 GitHub Desktop 检查本阶段 diff 后提交：
+使用 GitHub Desktop 检查本次工具链修复后提交：
 
 ```text
-feat: 实现第三世代 ID 乱数模块
+fix: 修复 Wasm 工具链检测
 ```
 
-随后通过 GitHub Desktop 推送 `main`。当前会话不代为提交或 push。
+随后通过 GitHub Desktop 推送 `main`，触发下一次 `Verify And Deploy`。当前会话不代为提交或 push。
 
 ### 5.3 GitHub Pages
 
@@ -266,6 +268,7 @@ https://haku76.github.io/PokeRNGKit/
 ## 8. 已知风险
 
 - CI 是首次实际 Emscripten 构建，可能暴露 Linux 路径、CMake 或 Emscripten 6.0.6 参数问题。
+- Actions 运行 `31462848222` 提示 `actions/cache@v4`、`actions/checkout@v4`、`actions/setup-node@v4` 和 `mymindstorm/setup-emsdk@v14` 仍以 Node.js 20 runtime 构建并被 runner 强制使用 Node.js 24。该警告不是本次失败原因，待核实各 action 的稳定新版后统一升级。
 - `glob@11.1.0` 有上游弃用提示，来源为 `vite-plugin-pwa -> workbox-build`；当前审计为 0 个漏洞，等待上游升级，不使用未经验证的 override。
 - 多 Worker 会复制 Wasm 内存；低内存移动设备可能需要降低 Worker 数。
 - 取消依赖分片边界和 Worker 终止，实际延迟需要 Pages 实测。

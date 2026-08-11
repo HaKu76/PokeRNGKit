@@ -1,5 +1,5 @@
 import { access, readFile } from "node:fs/promises";
-import { constants } from "node:fs";
+import { chmodSync, constants, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -16,11 +16,21 @@ const buildRoot = path.join(wasmRoot, "build");
 const require = createRequire(import.meta.url);
 
 function runtimeCommand(packageName, executableName) {
+  let command;
   try {
-    return require(packageName)(executableName);
+    command = require(packageName)(executableName);
   } catch {
     return executableName;
   }
+
+  if (process.platform !== "win32") {
+    const mode = statSync(command).mode & 0o777;
+    if ((mode & 0o111) === 0) {
+      chmodSync(command, mode | 0o111);
+    }
+  }
+
+  return command;
 }
 
 const cmakeCommand = runtimeCommand("cmake-runtime", "cmake");
@@ -90,7 +100,7 @@ async function doctor() {
     ["CMake", cmakeCommand, ["--version"]],
     ["Ninja", ninjaCommand, ["--version"]],
     ["Emscripten", executable("emcc"), ["--version"]],
-    ["emcmake", executable("emcmake"), ["--version"]],
+    ["emcmake", executable("emcmake"), [cmakeCommand, "--version"]],
   ];
 
   const missing = [];

@@ -331,7 +331,7 @@ npm ci --engine-strict
 npm run wasm:doctor
 ```
 
-CMake 和 Ninja 来自 npm。Emscripten 必须使用[官方 emsdk](https://emscripten.org/docs/getting_started/downloads.html)安装和激活；npm registry 中同名旧包不作为 Windows 或 CI 工具链。
+CMake 和 Ninja 来自 npm。`scripts/wasm.mjs` 解析对应平台的原生二进制，并在 POSIX 环境补齐 npm 发布包可能缺失的可执行位。Emscripten 必须使用[官方 emsdk](https://emscripten.org/docs/getting_started/downloads.html)安装和激活；npm registry 中同名旧包不作为 Windows 或 CI 工具链。
 
 `npm run wasm:test:native` 还需要平台 C++ 编译器：Windows 可安装 [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) 的 C++ 工作负载，Linux 使用 GCC 或 Clang。GitHub Actions 的 Ubuntu runner 提供系统编译器；该编译器只用于原生夹具，公开 Wasm 产物仍由精确锁定的 Emscripten 生成。
 
