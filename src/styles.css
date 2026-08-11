@@ -66,6 +66,9 @@
 * {
   box-sizing: border-box;
 }
+[hidden] {
+  display: none !important;
+}
 body {
   margin: 0;
   min-width: 320px;
@@ -604,31 +607,43 @@ h1 {
 .floating-tools {
   position: fixed;
   z-index: 30;
-  right: 18px;
+  right: 14px;
   bottom: 18px;
   display: flex;
+  flex-direction: column;
   align-items: flex-end;
-  gap: 10px;
+  gap: 8px;
   max-width: calc(100vw - 36px);
 }
 .profile-display {
-  width: min(300px, calc(100vw - 36px));
+  width: min(340px, calc(100vw - 36px));
   border: 1px solid var(--line);
-  border-top: 3px solid var(--brand);
-  border-radius: 5px;
+  border-right: 3px solid var(--brand);
+  border-radius: 4px;
   background: var(--surface);
   box-shadow: 0 12px 34px rgba(9, 10, 24, 0.25);
+  transition:
+    width 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
 .profile-display.collapsed {
-  width: min(220px, calc(100vw - 36px));
+  width: min(128px, calc(100vw - 36px));
 }
 .profile-float-heading {
-  min-height: 38px;
+  width: 100%;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  border: 0;
   border-bottom: 1px solid var(--line);
-  padding-left: 12px;
+  background: transparent;
+  color: var(--text);
+  padding: 0 0 0 12px;
+  text-align: left;
+  cursor: pointer;
 }
 .profile-float-title {
   min-width: 0;
@@ -640,7 +655,7 @@ h1 {
   flex: 0 0 auto;
   color: var(--text);
   font-size: 11px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 .profile-float-title span {
@@ -651,16 +666,30 @@ h1 {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.profile-float-heading button {
-  flex: 0 0 38px;
-  width: 38px;
-  min-height: 37px;
-  border-width: 0 0 0 1px;
-  padding: 0;
-  font-size: 18px;
-}
 .profile-display.collapsed .profile-float-heading {
   border-bottom: 0;
+}
+.profile-display.collapsed .profile-float-title > span {
+  display: none;
+}
+.floating-tool-trigger-icon {
+  flex: 0 0 43px;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  border-left: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+}
+.profile-float-heading:hover,
+.floating-tool-heading:hover {
+  background: var(--surface-2);
+}
+.profile-float-heading:focus-visible,
+.floating-tool-heading:focus-visible {
+  outline: 2px solid var(--brand-strong);
+  outline-offset: 2px;
 }
 .profile-float-body {
   display: grid;
@@ -674,7 +703,7 @@ h1 {
   font-size: 11px;
 }
 .profile-display select,
-.profile-display button,
+.profile-float-body > button,
 .profile-actions button {
   min-height: 36px;
   border: 1px solid var(--line);
@@ -683,7 +712,7 @@ h1 {
   padding: 7px 10px;
 }
 .profile-display select:focus,
-.profile-display button:hover,
+.profile-float-body > button:hover,
 .profile-actions button:hover:not(:disabled) {
   border-color: var(--brand-strong);
 }
@@ -723,45 +752,60 @@ h1 {
   max-height: calc(100vh - 92px);
   overflow: auto;
   border: 1px solid var(--line);
-  border-top: 3px solid var(--teal);
-  border-radius: 5px;
+  border-right: 3px solid var(--teal);
+  border-radius: 4px;
   background: var(--surface);
   box-shadow: 0 12px 34px rgba(9, 10, 24, 0.25);
+  transition:
+    width 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
 .iv-calculator-display.collapsed {
-  width: 76px;
+  width: 128px;
   overflow: hidden;
 }
 .floating-tool-heading {
-  min-height: 38px;
+  width: 100%;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  border: 0;
   border-bottom: 1px solid var(--line);
-  padding-left: 12px;
+  background: transparent;
+  color: var(--text);
+  padding: 0 0 0 12px;
+  text-align: left;
+  cursor: pointer;
 }
 .iv-calculator-display.collapsed .floating-tool-heading {
   border-bottom: 0;
 }
 .floating-tool-heading strong {
+  min-width: 0;
   overflow: hidden;
   color: var(--text);
   font-size: 11px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
 }
-.floating-tool-heading button {
-  flex: 0 0 38px;
-  width: 38px;
-  min-height: 37px;
-  border-width: 0 0 0 1px;
-  border-color: var(--line);
-  background: var(--control-bg);
-  color: var(--text);
-  padding: 0;
-  font-size: 18px;
+.profile-display:not(.collapsed),
+.iv-calculator-display:not(.collapsed) {
+  animation: floating-tool-open 180ms ease-out;
+}
+@keyframes floating-tool-open {
+  from {
+    opacity: 0.7;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 .iv-calculator-body {
   display: grid;
@@ -1007,10 +1051,10 @@ h1 {
   display: grid;
   align-items: start;
   grid-template-columns:
-    minmax(250px, 0.8fr) minmax(240px, 0.72fr)
-    minmax(390px, 1.28fr);
-  gap: 14px;
-  margin-bottom: 14px;
+    minmax(196px, 0.82fr) minmax(190px, 0.78fr)
+    minmax(300px, 1.3fr);
+  gap: 8px;
+  margin-bottom: 8px;
 }
 .operation-tabs {
   display: inline-grid;
@@ -1089,12 +1133,41 @@ h1 {
 }
 .static-panel {
   min-width: 0;
-  padding: 18px;
+  padding: 11px;
+}
+.static-panel .panel-heading {
+  padding-bottom: 8px;
+}
+.static-panel .panel-heading > div {
+  gap: 7px;
+}
+.static-panel .panel-heading h2 {
+  font-size: 12px;
 }
 .static-form-stack {
   display: grid;
-  gap: 15px;
-  margin-top: 17px;
+  gap: 8px;
+  margin-top: 9px;
+}
+.static-panel .field {
+  gap: 4px;
+}
+.static-panel .field input,
+.static-panel .field select {
+  min-height: 32px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+.static-panel .field > span,
+.static-panel .toggle-field span {
+  font-size: 11px;
+}
+.static-panel .panel-actions {
+  margin-top: 10px;
+}
+.static-panel .panel-actions button {
+  min-height: 32px;
+  padding: 6px 10px;
 }
 .static-method-tabs {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1106,7 +1179,7 @@ h1 {
 .compact-field-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 7px;
 }
 .static-encounter-meta {
   display: grid;
@@ -1119,7 +1192,7 @@ h1 {
 }
 .static-encounter-meta > div {
   min-width: 0;
-  padding: 10px;
+  padding: 7px 8px;
   background: var(--control-bg);
 }
 .static-encounter-meta span,
@@ -1136,7 +1209,7 @@ h1 {
   text-transform: uppercase;
 }
 .static-encounter-meta strong {
-  margin-top: 5px;
+  margin-top: 3px;
   color: var(--text);
   font-family: ui-monospace, monospace;
   font-size: 12px;
@@ -1144,7 +1217,7 @@ h1 {
 }
 .inline-notice {
   border-left: 2px solid var(--amber);
-  padding: 9px 10px;
+  padding: 7px 8px;
   background: var(--amber-soft);
   color: var(--amber);
   font-size: 10px;
@@ -1153,14 +1226,14 @@ h1 {
 .static-filter-selects {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 11px;
-  margin-top: 17px;
+  gap: 7px;
+  margin-top: 9px;
 }
 .multi-check-field {
   position: relative;
 }
 .multi-check-trigger {
-  min-height: 39px;
+  min-height: 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1168,7 +1241,8 @@ h1 {
   border: 1px solid var(--line);
   background: var(--control-bg);
   color: var(--text);
-  padding: 9px 11px;
+  padding: 6px 8px;
+  font-size: 12px;
   text-align: left;
 }
 .multi-check-trigger > span:first-child {
@@ -1214,16 +1288,16 @@ h1 {
   opacity: 0.45;
 }
 .disable-filters {
-  margin-top: 15px;
+  margin-top: 9px;
   border-top: 1px solid var(--line);
-  padding-top: 12px;
+  padding-top: 8px;
 }
 .filter-tool-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 8px;
 }
 .wild-level-display,
 .wild-level-filter {
@@ -1259,7 +1333,7 @@ h1 {
   opacity: 0.65;
 }
 .iv-filter {
-  margin-top: 15px;
+  margin-top: 9px;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 3px;
@@ -1267,11 +1341,11 @@ h1 {
 .iv-filter-header,
 .iv-filter-row {
   display: grid;
-  grid-template-columns: minmax(90px, 1fr) 64px 64px;
+  grid-template-columns: minmax(72px, 1fr) 52px 52px;
   align-items: center;
-  gap: 8px;
-  min-height: 38px;
-  padding: 5px 8px;
+  gap: 5px;
+  min-height: 31px;
+  padding: 3px 6px;
 }
 .iv-filter-header {
   background: var(--surface-2);
@@ -1291,7 +1365,8 @@ h1 {
   border: 1px solid var(--line);
   background: var(--control-bg);
   color: var(--text);
-  padding: 6px;
+  min-height: 26px;
+  padding: 4px;
   text-align: center;
 }
 .iv-shortcut {
@@ -1574,7 +1649,7 @@ h1 {
     grid-template-columns: 1fr;
   }
   .floating-tools {
-    flex-direction: column;
+    gap: 7px;
   }
 }
 
@@ -1638,23 +1713,23 @@ h1 {
     padding: 10px 16px;
   }
   .floating-tools {
-    left: 10px;
+    left: auto;
     right: 10px;
     bottom: 10px;
-    max-width: none;
+    max-width: calc(100vw - 20px);
   }
   .profile-display {
-    width: min(300px, calc(100vw - 20px));
+    width: min(340px, calc(100vw - 20px));
   }
   .profile-display.collapsed {
-    width: min(220px, calc(100vw - 20px));
+    width: 128px;
   }
   .iv-calculator-display {
     width: 100%;
     max-height: calc(100vh - 78px);
   }
   .iv-calculator-display.collapsed {
-    width: 76px;
+    width: 128px;
   }
   .calculator-settings-grid,
   .calculator-output-grid {
@@ -1678,5 +1753,16 @@ h1 {
   .alert {
     margin-left: 16px;
     margin-right: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-display,
+  .iv-calculator-display {
+    transition: none;
+  }
+  .profile-display:not(.collapsed),
+  .iv-calculator-display:not(.collapsed) {
+    animation: none;
   }
 }

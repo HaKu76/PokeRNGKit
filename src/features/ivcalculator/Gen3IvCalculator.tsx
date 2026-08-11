@@ -177,19 +177,20 @@ export function Gen3IvCalculator({
       className={`iv-calculator-display${expanded ? "" : " collapsed"}`}
       ref={panelRef}
     >
-      <div className="floating-tool-heading">
+      <button
+        aria-controls="gen3-iv-calculator-body"
+        aria-expanded={expanded}
+        aria-label={t(expanded ? "collapse" : "ivCalculator")}
+        className="floating-tool-heading"
+        onClick={() => onExpandedChange(!expanded)}
+        title={t(expanded ? "collapse" : "ivCalculator")}
+        type="button"
+      >
         <strong>{expanded ? t("ivCalculator") : "IV"}</strong>
-        <button
-          aria-controls="gen3-iv-calculator-body"
-          aria-expanded={expanded}
-          aria-label={t(expanded ? "collapse" : "expand")}
-          onClick={() => onExpandedChange(!expanded)}
-          title={t(expanded ? "collapse" : "ivCalculator")}
-          type="button"
-        >
-          <span aria-hidden="true">{expanded ? "−" : "+"}</span>
-        </button>
-      </div>
+        <span aria-hidden="true" className="floating-tool-trigger-icon">
+          {expanded ? "×" : "+"}
+        </span>
+      </button>
       {expanded && (
         <div className="iv-calculator-body" id="gen3-iv-calculator-body">
           <div className="calculator-settings-grid">

@@ -1,12 +1,12 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：第三世代 ID Searcher 集成验证
+> - 当前阶段：第三世代生产页面回归与 Static UI 紧凑化
 > - 当前模块：`gen3id`、`gen3static`、`gen3wild`、`profiles`、`ivcalculator`
 > - Git 基线：`7b3383d feat: 实现第三世代野生检索器`
-> - 工作区状态：红蓝宝石 ID Searcher 与配套文档仍有未提交修改；Codex 不暂存、不提交、不 push
+> - 工作区状态：红蓝宝石 ID Searcher、右侧悬浮工具列与配套文档仍有未提交修改；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
-> - 验收状态：待项目所有者授权测试或部署 URL；任何检查只提供工程证据，UI 需与项目所有者共同验收
+> - 验收状态：ID Searcher 与 Static Searcher 固定夹具已在项目所有者授权的 GitHub Pages 页面回归；本地 UI 修复待部署后共同验收
 
 ## 1. 恢复入口
 
@@ -35,6 +35,7 @@
 - 界面只支持简体中文、英文和日文；有上游简中翻译时逐字复用，没有时保留英文。
 - 正式 Wasm 与站点产物由 GitHub Actions 自动生成，不提交 `public/wasm/`、`wasm/build/` 或 `dist/`。
 - 未获项目所有者明确授权时，Codex 不运行测试、构建、算法回归、性能检查或浏览器检查。获得具体命令或 URL 授权后，检查结果只作为工程证据；部署后的 UI 由 Codex 报告结果并与项目所有者共同验收。
+- 算法结果的验收只能在 GitHub Actions 部署完成、项目所有者提供实际站点 URL 并明确授权后进行。原生夹具、本地 Wasm、UI 预览和 Actions 状态不构成算法验收。
 - Codex 不自动暂存、提交、push、部署或发布，只提供 GitHub Desktop 操作说明和一条提交标题。
 
 ## 3. Git 与部署状态
@@ -60,6 +61,7 @@
 - `gen3wild`：Generator/Searcher、掌机遭遇数据、特殊地点规则、完整筛选、Worker Pool、排序和 CSV。
 - `profiles`：IndexedDB 主存储、localStorage 镜像、新建、编辑、复制、删除、选择、JSON 导入导出和全部清除。
 - `ivcalculator`：第三世代物种、性格、觉醒力量、多行能力值交集和下一级提示。
+- 右侧悬浮工具列：存档信息和个体值计算器按固定纵向按钮列收起，展开后向左延展；点击页面空白不会收起存档信息。
 
 ## 5. 当前未提交工作区：红蓝宝石 ID Searcher
 
@@ -97,11 +99,21 @@
 
 当前终端实际为 Node.js `24.13.0`、npm `11.6.2`，低于仓库锁定的 Node.js `24.19.0`、npm `12.0.2`。上述前端检查已通过，但原生/Wasm 和发布结论必须以锁定工具链的 Actions 为准。
 
-## 7. 下一步
+右侧悬浮工具列的本轮实现尚未运行任何检查；等待项目所有者指定授权的 UI 检查范围后再执行。
 
-1. 项目所有者在 GitHub Desktop 审查未提交修改并创建提交：`feat: 集成红蓝宝石 ID 帧检索`。
-2. 推送后，项目所有者决定是否授权 Codex 读取 Actions 结果和测试生产 Wasm。
-3. 如授权部署 UI 检查，项目所有者提供 URL；Codex 使用 TID `48163`、SID `64377` 和 PID `0000475A` 报告页面实际结果，再与项目所有者共同验收。
+## 7. 2026-08-12 生产页面回归
+
+- 验证站点：`https://haku76.github.io/PokeRNGKit/`。项目所有者已明确授权本轮在该生产页面检查算法和界面；未运行本地算法验收、构建或测试。
+- 已验证：Gen III ID Searcher 输入 TID `48163`、SID `64377`，返回 `05A0 / Frame 0 / TSV 2283` 与 `C19B / Frame 36724 / TSV 2283`；输入 TID `48163`、PID `0000475A` 返回 7 条，其中 2 条方块闪、5 条星闪。
+- 已验证：Gen III Static Searcher 在 Emerald 的“传说 / 固拉多 / Method 4 / 六项 IV 31 / 其余筛选任意”夹具返回 4 条候选，符合 `docs/modules/gen3static.md` 的固定夹具预期；结果首列为 Seed。
+- 发现：ID 切换至 Searcher 后，Generator 表单和结果仍显示。原因是 `.control-grid` 的 `display: grid` 覆盖浏览器默认的 `[hidden]` 样式。本地已在 `src/styles.css` 强制遵循 `[hidden]`，待部署页面复核。
+- 优化：本地已压缩 `static-control-grid` 的最小列宽、间距、内边距、控件高度和 IV 行高，参考上游 `Form/Gen3/Static3.ui` 的 `spacing=6`、`margin=11`。当前生产站点仍是旧 CSS，必须在下一次部署后与项目所有者共同验收。
+
+## 8. 下一步
+
+1. 项目所有者在 GitHub Desktop 审查未提交修改并创建提交：`fix: 修复第三世代检索界面与定点布局`。
+2. 推送后等待 GitHub Actions 部署，再由项目所有者提供更新后的站点 URL；本轮本地 UI 修复必须在新产物上复核。
+3. UI 复核重点：ID Searcher 不再显示 Generator；Static 三栏在桌面和侧栏展开状态下不横向溢出，控件密度接近 PokeFinder。
 4. 项目所有者决定是否授权移动端、PWA、离线和性能检查的范围。
 5. 两阶段验收通过后再决定 Tanoby Chamber 数据或发布加固；第四世代仍等待项目所有者指定具体模块。
 

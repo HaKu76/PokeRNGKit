@@ -88,7 +88,9 @@ npm run verify
 git diff --check
 ```
 
-具备本地 C++ 与已激活 emsdk 时，经授权再运行 `npm run verify:full`。缺少工具链时如实记录“未运行”，由锁定工具链的 GitHub Actions 补齐，不得把前端构建成功写成真实 Wasm 已验证。项目所有者明确授权部署 URL 后，使用生产页面和已记录固定输入执行算法回归，并记录 URL、commit/Actions run、浏览器版本、预期与实际结果；`ui` 预览不能代替该步骤。部署后的 UI 检查必须先向项目所有者报告，再共同完成验收，不得由 AI 单方面宣告通过。
+具备本地 C++ 与已激活 emsdk 时，经授权再运行 `npm run verify:full`。缺少工具链时如实记录“未运行”，由锁定工具链的 GitHub Actions 补齐，不得把前端构建成功写成真实 Wasm 已验证。
+
+算法结果验收只有一个入口：GitHub Actions 完成部署后，项目所有者提供实际站点 URL 并明确授权回归。AI 只能在该生产页面使用已记录固定输入回归，并记录 URL、commit/Actions run、浏览器版本、预期与实际结果。原生夹具、本地 Wasm 构建、UI 预览与 Actions 状态都只是工程证据，不能单独验收算法结果。部署后的 UI 检查必须先向项目所有者报告，再共同完成验收，不得由 AI 单方面宣告通过。
 
 完成后只向项目所有者提供一个 GitHub Desktop 提交标题：
 
