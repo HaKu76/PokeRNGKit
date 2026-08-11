@@ -146,9 +146,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-STATIC-INPUT-01** Seed 接受 `0x00000000..0xFFFFFFFF` 的 32 位十六进制值。
 - **FR-STATIC-INPUT-02** Initial Advances、Max Advances 和 Offset 接受 32 位无符号整数，三者相加不得溢出。
 - **FR-STATIC-INPUT-03** Max Advances 包含起点，单次任务最多处理 50,000,000 个状态。
-- **FR-STATIC-INPUT-04** 当前提供 Mewtwo、Rayquaza、Regirock、Regice、Registeel、Deoxys、Latios、Latias 首批预设。
-- **FR-STATIC-INPUT-05** 预设必须显式提供物种编号、等级、性别阈值和游走缺陷标记，不从远端接口加载。
+- **FR-STATIC-INPUT-04** 提供 PokeFinder 第三世代掌机 Static 的 67 条模板，并按 8 个上游分类组织。
+- **FR-STATIC-INPUT-05** 模板必须显式提供适用版本、物种编号、形态、等级、性别阈值和游走缺陷标记，不从远端接口加载。
 - **FR-STATIC-INPUT-06** 接受 `0..65535` 的 TID 与 SID，用于闪光判断。
+- **FR-STATIC-INPUT-07** 分类和宝可梦独立选择，候选随当前 Ruby、Sapphire、Fire Red、Leaf Green 或 Emerald 存档版本变化。
 
 ### 5.2 Method 与生成规则
 
@@ -161,9 +162,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 ### 5.3 筛选
 
 - **FR-STATIC-FILTER-01** 支持六项 IV 的最小值和最大值，范围为 `0..31`，最小值不得大于最大值。
-- **FR-STATIC-FILTER-02** 支持性格、特性槽、性别和闪光筛选，多个条件按 AND 组合。
+- **FR-STATIC-FILTER-02** 性格与觉醒力量支持多选；特性槽、性别和异色使用上游选项，多个条件按 AND 组合。
 - **FR-STATIC-FILTER-03** “任意”使用显式协议值，不使用看似有效的游戏属性作为魔法值。
 - **FR-STATIC-FILTER-04** 筛选只移除生成后的状态，不改变 RNG 推进与候选顺序。
+- **FR-STATIC-FILTER-05** 异色仅提供 `Any / Star / Square / Star-Square`；性别筛选不提供无性别项；特性仅提供 `Any / 0 / 1`。
 
 ### 5.4 Worker 与结果
 
@@ -191,6 +193,9 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-STATIC-UI-03** Generator 提供 PokeFinder 的“取消筛选”；Searcher 始终使用有效 IV 范围。
 - **FR-STATIC-UI-04** IV 名称按钮支持 PokeFinder 组合键：单击恢复 `0..31`、Ctrl 为 `31..31`、Alt 为 `30..31`、Ctrl+Alt 为 `0..0`。
 - **FR-STATIC-UI-05** 空 Seed 按上游无符号数输入行为解析为 `0`。
+- **FR-STATIC-UI-06** Method 使用下拉框；Bugged Roamer 隐藏 Method 4 并强制 Method 1。
+- **FR-STATIC-UI-07** “显示能力值”使用当前物种、等级、性格与 IV 计算六项能力值，不改变排序使用的原始结果。
+- **FR-STATIC-UI-08** Advances、处理数和结果数使用原始十进制数字显示，不添加本地化千位分隔符。
 
 ## 6. 当前应用基础：第三世代存档信息
 
@@ -204,19 +209,29 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-PROFILE-08** 应用全局以右下角小型悬浮窗显示当前存档摘要；首次默认收起，用户展开或收起后记住本机状态。
 - **FR-PROFILE-09** 没有选择时使用 `- / Emerald / 12345 / 54321` 临时默认值，不自动创建持久记录。
 - **FR-PROFILE-10** 应用不上传、记录或写入 URL 中的存档内容。
+- **FR-PROFILE-11** 存档悬浮窗展开后点击外部页面区域自动收起；打开管理器时不得关闭或中断管理弹窗。
 
-## 7. 后续 MVP
+## 7. 当前应用基础：第三世代个体值计算器
+
+- **FR-IVCALC-01** 固定使用第三世代 `Emerald/RS/FRLG` 能力值规则，并提供 `1..386` 物种和 Deoxys 形态。
+- **FR-IVCALC-02** 支持性格、可选觉醒力量及一行或多行等级与六项能力值观测。
+- **FR-IVCALC-03** 每项枚举 `0..31` 并对多行结果取交集；无候选时显示上游“无效值”。
+- **FR-IVCALC-04** 输入范围与 PokeFinder `IVCalculator.cpp::addEntry` 的 SpinBox 保持一致。
+- **FR-IVCALC-05** 返回每项候选 IV 和上游 `IVChecker::nextLevel` 对应的下一级提示。
+- **FR-IVCALC-06** 计算器作为全局默认收起的悬浮工具，在 ID 与 Static 工作区均可打开。
+- **FR-IVCALC-07** 该工具不得发起远端请求；其轻量确定性计算可以在 TypeScript 主线程同步完成。
+
+## 8. 后续 MVP
 
 当前工作区通过工程检查与项目所有者验收后，按以下顺序推进：
 
-1. 补齐并按存档版本过滤 Static encounter presets。
-2. Wild Generator / Searcher。
-3. 遭遇槽、等级和 Pokemon 等 Wild 适用筛选。
-4. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
+1. Wild Generator / Searcher。
+2. 遭遇槽、等级和 Pokemon 等 Wild 适用筛选。
+3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
 Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估。Gen IV 及其他世代不属于当前承诺；如进入开发，按 `gen4id` 等独立模块命名和验证。
 
-## 8. 非目标
+## 9. 非目标
 
 - 后端、账号、云同步、服务端计算、遥测、广告或运行时 CDN。
 - 模拟器、主机、存档文件或进程内存的实时连接。
@@ -225,37 +240,37 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 - 依赖 `SharedArrayBuffer`、Wasm pthread 或静态托管无法保证的响应头。
 - 未经授权的官方精灵图、音乐、Logo 或其他游戏素材。
 
-## 9. 非功能需求
+## 10. 非功能需求
 
-### 9.1 正确性
+### 10.1 正确性
 
 - `gen3id` 与 `gen3static` C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致。
 - TypeScript 只负责输入规范化、分片和解码，不改变 Core 的 RNG 规则。
 - C ABI 和 Worker 协议必须带显式 API 版本；版本不匹配时拒绝运行。
 - 上游源码文件、版本、SHA-256、修改边界和许可证必须可追溯。
 
-### 9.2 性能与稳定性
+### 10.2 性能与稳定性
 
 - 计算不得在 React 主线程执行。
 - 批次大小、Worker 数量、结果上限和任务上限必须有显式边界。
 - Worker 崩溃、Wasm 初始化失败和结果缓冲区异常不得产生看似有效的部分完成状态。
 - 性能结论必须记录设备、浏览器、Worker 数、范围和耗时，不以单一开发机推断所有用户环境。
 
-### 9.3 隐私与数据
+### 10.3 隐私与数据
 
 - IndexedDB 保存存档信息，localStorage 保存存档镜像、语言、主题和悬浮窗折叠状态。
 - 存档信息不放入 URL、日志或远端请求。
 - 应用不发送 TID、SID、Seed、筛选条件或结果。
 - 清除站点数据会删除设置、PWA 缓存和存档信息；项目没有服务器备份。
 
-### 9.4 可维护性
+### 10.4 可维护性
 
 - 每个 Wasm 功能使用独立目录、manifest、CMake target、C ABI 前缀和测试。
 - 一键入口保持为 `npm run build`，不同原生语言的工具链由模块构建驱动封装。
 - JavaScript 依赖通过 `package-lock.json` 复现；发布工具链使用精确版本。
 - 新依赖只有在对应功能开始实现且能减少实际复杂度时加入。
 
-## 10. 浏览器支持
+## 11. 浏览器支持
 
 目标是支持具备 ES modules、WebAssembly、Dedicated Worker、可转移 `ArrayBuffer`、Service Worker、Cache Storage、IndexedDB 和 `localStorage` 的当前稳定版桌面及移动浏览器。
 
@@ -267,9 +282,9 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 
 本阶段不声明已经通过具体浏览器版本。每次预览或发布应记录实际测试的浏览器完整版本、设备和结果；Service Worker 正式环境要求 HTTPS，本地允许 `localhost`。
 
-## 11. 验收标准
+## 12. 验收标准
 
-### 11.1 工程门槛
+### 12.1 工程门槛
 
 以下项目全部通过后，当前模块才能进入项目所有者验收：
 
@@ -281,7 +296,7 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
 
-### 11.2 项目所有者验收
+### 12.2 项目所有者验收
 
 项目所有者至少检查：
 
@@ -299,7 +314,7 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 
 当前状态不得写成“已验收”，直到项目所有者明确记录结果。
 
-## 12. 阶段划分
+## 13. 阶段划分
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator** - React UI、Worker Pool、C++ bridge、上游最小 Core、三语和 Actions（已实现，待项目所有者完整验收）。
@@ -309,7 +324,7 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 - **阶段 4：`gen3wild`** - 遭遇数据、Generator、Searcher 和一致性测试。
 - **阶段 5：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
-## 13. 未决事项
+## 14. 未决事项
 
 - Cloudflare Pages 正式项目名和 `hakuhiro.top` 下的主机名。
 - GitHub Pages 实机测试后的 ID/Static 分片大小、默认 Worker 数和取消耗时基线。

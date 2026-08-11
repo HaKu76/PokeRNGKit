@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { GEN3_STATIC_TEMPLATES, type Gen3StaticRequest } from "../domain";
+import type { Gen3StaticRequest } from "../domain";
+import { GEN3_STATIC_TEMPLATES } from "../encounters";
 import { Gen3StaticUiPreviewEngine } from "./Gen3StaticUiPreviewEngine";
 
 const request: Gen3StaticRequest = {
@@ -15,7 +16,8 @@ const request: Gen3StaticRequest = {
     shiny: "any",
     gender: "any",
     ability: "any",
-    nature: -1,
+    natureMask: 0x1ff_ffff,
+    hiddenPowerMask: 0xffff,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
   },

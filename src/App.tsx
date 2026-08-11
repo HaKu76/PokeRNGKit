@@ -18,6 +18,7 @@ import type {
   Id3SearchSummary,
 } from "./features/id/search";
 import { Gen3IdWorkerPool } from "./features/id/worker/Gen3IdWorkerPool";
+import { Gen3IvCalculator } from "./features/ivcalculator/Gen3IvCalculator";
 import { Gen3ProfileControls } from "./features/profiles/Gen3ProfileControls";
 import { gen3StaticProfileOrDefault } from "./features/profiles/domain";
 import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
@@ -55,6 +56,7 @@ function App() {
   const profiles = useGen3Profiles();
   const [activeModule, setActiveModule] = useState<ActiveModule>("id");
   const [moduleRailOpen, setModuleRailOpen] = useState(false);
+  const [ivCalculatorExpanded, setIvCalculatorExpanded] = useState(false);
   const searchEngine = useMemo<Id3SearchEngine>(
     () =>
       uiPreviewMode ? new Gen3IdUiPreviewEngine() : new Gen3IdWorkerPool(),
@@ -645,10 +647,6 @@ function App() {
                       <small>DEC / 0 - 8191</small>
                     </label>
                   </div>
-                  <div className="filter-rule">
-                    <span />
-                    {t("noFilter")}
-                  </div>
                 </section>
               </form>
 
@@ -665,8 +663,7 @@ function App() {
                   </div>
                   <div className="result-actions">
                     <span className="result-count">
-                      {results.length.toLocaleString()} /{" "}
-                      {progress.totalStates.toLocaleString()}
+                      {String(results.length)} / {String(progress.totalStates)}
                     </span>
                     <button
                       className="secondary-action"
@@ -698,11 +695,11 @@ function App() {
                 <div className="metrics-row">
                   <span>
                     {t("processed")}{" "}
-                    <strong>{progress.processedStates.toLocaleString()}</strong>
+                    <strong>{String(progress.processedStates)}</strong>
                   </span>
                   <span>
                     {t("results")}{" "}
-                    <strong>{progress.resultCount.toLocaleString()}</strong>
+                    <strong>{String(progress.resultCount)}</strong>
                   </span>
                   <span>
                     {t("workers")}{" "}
@@ -766,7 +763,7 @@ function App() {
                               transform: `translateY(${virtualRow.start + 38}px)`,
                             }}
                           >
-                            <span>{state.advances.toLocaleString()}</span>
+                            <span>{String(state.advances)}</span>
                             <span>{state.tid.toString().padStart(5, "0")}</span>
                             <span>{state.sid.toString().padStart(5, "0")}</span>
                             <span>{state.tsv.toString().padStart(4, "0")}</span>
@@ -780,16 +777,23 @@ function App() {
             </>
           ) : (
             <Gen3StaticPanel
+              onOpenIvCalculator={() => setIvCalculatorExpanded(true)}
               profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
               uiPreviewMode={uiPreviewMode}
             />
           )}
         </main>
       </div>
-      <Gen3ProfileControls
-        compatibleVersions={activeModule === "static" ? "handheld" : "all"}
-        controller={profiles}
-      />
+      <div className="floating-tools">
+        <Gen3IvCalculator
+          expanded={ivCalculatorExpanded}
+          onExpandedChange={setIvCalculatorExpanded}
+        />
+        <Gen3ProfileControls
+          compatibleVersions={activeModule === "static" ? "handheld" : "all"}
+          controller={profiles}
+        />
+      </div>
       <footer className="legal-footer">
         <span>{t("upstream")}</span>
         <a

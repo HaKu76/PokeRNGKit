@@ -120,7 +120,16 @@ Searcher 结果第一列是 Seed；Generator 结果第一列是 Advances。两�
 
 ## 9. 筛选与快捷设置
 
-IV、性格、特性、性别和闪光筛选在 C++ bridge 中执行，不会改变 RNG 序列或候选 Seed。Generator 的“取消筛选”将全部筛选替换为显式任意范围；Searcher 必须保留 IV 范围，因为它定义反向搜索空间。
+IV、性格、觉醒力量、特性、性别和异色筛选在 C++ bridge 中执行，不会改变 RNG 序列或候选 Seed。`gen3static` API 3 使用 25 位性格掩码和 16 位觉醒力量掩码；界面没有勾选或全部勾选时均按 PokeFinder `CheckList` 的 `Any` 语义提交完整掩码。
+
+筛选控件已逐项对照 `Filter.ui` 与 `CheckList.cpp`：
+
+- 性格和觉醒力量为多选。
+- 异色只有 `Any`、`Star`、`Square`、`Star/Square`。
+- 性别只有 `Any`、`Male`、`Female`；无性别只作为结果值显示，不是筛选项。
+- 特性只有 `Any`、`0`、`1`。
+- `Show Stats` 在结果表的六项 IV 与按物种、等级、性格计算的能力值之间切换。
+- Generator 的“取消筛选”将全部筛选替换为显式任意范围；Searcher 必须保留 IV 范围，因为它定义反向搜索空间。
 
 IV 名称按钮复用 PokeFinder `Filter.cpp` 行为：
 
@@ -157,9 +166,10 @@ power     = 30 + floor(powerBits * 40 / 63)
 | Offset           | `Advance32Bit`，`0..4294967295`，10 位十进制 | 只保留十进制                             |
 | TID / SID        | `TIDSID`，`0..65535`，5 位十进制             | 从当前存档信息读取                       |
 | IV min / max     | `0..31`                                      | 最小值不得大于最大值                     |
-| Nature           | 任意或 `0..24`                               | 稳定协议值 `-1` 表示任意                 |
+| Nature           | `CheckList`，25 项多选                       | API 3 使用 25 位掩码；空选择按完整掩码   |
+| Hidden Power     | `CheckList`，16 项多选                       | API 3 使用 16 位掩码；空选择按完整掩码   |
 
-Generator 还要求 `Initial Advances + Offset + Max Advances <= 0xFFFFFFFF`。Searcher 的 IV 组合总数不得超过 50,000,000。每次 C ABI 调用最多处理 100,000 个状态或 IV 组合。
+Generator 还要求 `Initial Advances + Offset + Max Advances <= 0xFFFFFFFF`。Searcher 的 IV 组合总数不得超过 50,000,000；Web 初始值为六项 `31..31`，保证首次检索可以运行，用户仍可按上游范围规则扩大搜索空间。每次 C ABI 调用最多处理 100,000 个状态或 IV 组合。
 
 ## 12. 结果与固定夹具
 
@@ -175,7 +185,9 @@ Nature index:  15
 
 Searcher 的 Groudon、Method 4、`31/31/31/31/31/31` 固定夹具恢复 4 个候选结果。
 
-当前界面内置 Mewtwo、Rayquaza、Regirock、Regice、Registeel、Deoxys、Latios、Latias 首批预设。它们只提供物种、等级、性别阈值和游走缺陷参数，不包含官方美术素材。完整 PokeFinder encounter 表与按存档版本过滤仍是后续工作，不能把首批预设描述成完整定点数据。
+当前界面包含 PokeFinder 第三世代掌机 Static 的 67 条模板，按 `Starters / Fossils / Gifts / Game Corner / Stationary / Legends / Events / Roamers` 八类组织。分类与宝可梦为独立下拉框，并按当前存档的 Ruby、Sapphire、FireRed、LeafGreen 或 Emerald 版本过滤：Game Corner 只在 FRLG 显示，Events 在 Ruby/Sapphire 隐藏。Bugged Roamer 隐藏 Method 4 并强制 Method 1。
+
+模板数据包含版本、物种、形态、等级和游走缺陷标志，性别阈值来自 `personal_rsefrlg.bin`。物种名称与 Deoxys 形态使用上游简体中文、英文和日文资源；不包含官方美术素材。
 
 ## 13. Web 执行边界
 
@@ -191,8 +203,13 @@ Worker Pool、批次排序、进度、取消和 250,000 条结果上限属于浏
 - `Core/Gen3/Searchers/StaticSearcher3.cpp`
 - `Core/RNG/LCRNGReverse.hpp`
 - `Form/Gen3/Static3.cpp`
+- `Form/Gen3/Static3.ui`
 - `Form/Controls/Filter.cpp`
+- `Form/Controls/Filter.ui`
+- `Form/Controls/CheckList.cpp`
 - `Form/Controls/TextBox.cpp`
+- `Core/Resources/Embed/embed_gen3.py`
+- `Core/Resources/Embed/embed_personal.py`
 
 仓库验证入口：
 

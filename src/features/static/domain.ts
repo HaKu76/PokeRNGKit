@@ -1,95 +1,33 @@
-export const GEN3_STATIC_API_VERSION = 2;
+import type { Gen3GameVersion } from "../profiles/domain";
+import type { Gen3StaticCategory } from "./encounters";
+
+export const GEN3_STATIC_API_VERSION = 3;
 export const GEN3_STATIC_CHUNK_SIZE = 100_000;
 export const GEN3_STATIC_MAX_TOTAL_STATES = 50_000_000;
 export const GEN3_STATIC_MAX_RESULTS = 250_000;
 
 export type Gen3StaticMethod = "method1" | "method4";
-export type Gen3StaticShinyFilter =
-  "any" | "none" | "shiny" | "star" | "square";
-export type Gen3StaticGenderFilter = "any" | "male" | "female" | "genderless";
+export type Gen3StaticShinyFilter = "any" | "star" | "square" | "star-square";
+export type Gen3StaticGenderFilter = "any" | "male" | "female";
 export type Gen3StaticAbilityFilter = "any" | "first" | "second";
 
 export interface Gen3StaticTemplate {
   id: string;
-  category: "legends" | "events" | "roamers";
+  category: Gen3StaticCategory;
+  versions: Gen3GameVersion[];
   species: number;
+  form: number;
   level: number;
   genderRatio: number;
   buggedRoamer: boolean;
 }
 
-export const GEN3_STATIC_TEMPLATES: Gen3StaticTemplate[] = [
-  {
-    id: "mewtwo",
-    category: "legends",
-    species: 150,
-    level: 70,
-    genderRatio: 255,
-    buggedRoamer: false,
-  },
-  {
-    id: "rayquaza",
-    category: "legends",
-    species: 384,
-    level: 70,
-    genderRatio: 255,
-    buggedRoamer: false,
-  },
-  {
-    id: "regirock",
-    category: "legends",
-    species: 377,
-    level: 40,
-    genderRatio: 255,
-    buggedRoamer: false,
-  },
-  {
-    id: "regice",
-    category: "legends",
-    species: 378,
-    level: 40,
-    genderRatio: 255,
-    buggedRoamer: false,
-  },
-  {
-    id: "registeel",
-    category: "legends",
-    species: 379,
-    level: 40,
-    genderRatio: 255,
-    buggedRoamer: false,
-  },
-  {
-    id: "deoxys",
-    category: "events",
-    species: 386,
-    level: 30,
-    genderRatio: 255,
-    buggedRoamer: false,
-  },
-  {
-    id: "latios",
-    category: "roamers",
-    species: 381,
-    level: 40,
-    genderRatio: 0,
-    buggedRoamer: true,
-  },
-  {
-    id: "latias",
-    category: "roamers",
-    species: 380,
-    level: 40,
-    genderRatio: 254,
-    buggedRoamer: true,
-  },
-];
-
 export interface Gen3StaticFilters {
   shiny: Gen3StaticShinyFilter;
   gender: Gen3StaticGenderFilter;
   ability: Gen3StaticAbilityFilter;
-  nature: number;
+  natureMask: number;
+  hiddenPowerMask: number;
   ivMin: [number, number, number, number, number, number];
   ivMax: [number, number, number, number, number, number];
 }
@@ -154,13 +92,13 @@ export function staticMethodToWasm(method: Gen3StaticMethod): number {
 }
 
 export function staticShinyFilterToWasm(filter: Gen3StaticShinyFilter): number {
-  return { any: 0, none: 1, shiny: 2, star: 3, square: 4 }[filter];
+  return { any: 0, star: 1, square: 2, "star-square": 3 }[filter];
 }
 
 export function staticGenderFilterToWasm(
   filter: Gen3StaticGenderFilter,
 ): number {
-  return { any: 0, male: 1, female: 2, genderless: 3 }[filter];
+  return { any: 0, male: 1, female: 2 }[filter];
 }
 
 export function staticAbilityFilterToWasm(
@@ -231,8 +169,20 @@ export function validateGen3StaticRequest(
   ) {
     errors.push("genderRatio");
   }
-  if (request.filters.nature < -1 || request.filters.nature > 24)
+  if (
+    !Number.isInteger(request.filters.natureMask) ||
+    request.filters.natureMask < 1 ||
+    request.filters.natureMask > 0x1ff_ffff
+  ) {
     errors.push("nature");
+  }
+  if (
+    !Number.isInteger(request.filters.hiddenPowerMask) ||
+    request.filters.hiddenPowerMask < 1 ||
+    request.filters.hiddenPowerMask > 0xffff
+  ) {
+    errors.push("hiddenPower");
+  }
   for (let index = 0; index < 6; index++) {
     if (
       !Number.isInteger(request.filters.ivMin[index]) ||

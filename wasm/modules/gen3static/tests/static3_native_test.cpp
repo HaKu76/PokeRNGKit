@@ -5,9 +5,9 @@
 
 int main()
 {
-    assert(gen3static_api_version() == 2);
+    assert(gen3static_api_version() == 3);
 
-    const auto count = gen3static_generate(0x12345678, 0, 0, 0, 1, 150, 70, 255, 0, 0, 0, 0, 0, 0, 25,
+    const auto count = gen3static_generate(0x12345678, 0, 0, 0, 1, 150, 70, 255, 0, 0, 0, 0, 0, 0, 0x1ffffff, 0xffff,
                                            0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31);
     assert(count == 1);
     assert(gen3static_result_count() == 1);
@@ -26,7 +26,7 @@ int main()
     assert((state->natureShiny & 0xff) == 15);
     assert((state->natureShiny >> 8) == 0);
 
-    const auto method4Count = gen3static_generate(0x12345678, 0, 0, 0, 4, 150, 70, 255, 0, 0, 0, 0, 0, 0, 25,
+    const auto method4Count = gen3static_generate(0x12345678, 0, 0, 0, 4, 150, 70, 255, 0, 0, 0, 0, 0, 0, 0x1ffffff, 0xffff,
                                                   0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31);
     assert(method4Count == 1);
     state = reinterpret_cast<const Gen3StaticPackedState *>(gen3static_result_ptr());
@@ -34,7 +34,7 @@ int main()
     assert(state->specialDefense == 9);
     assert(state->speed == 4);
 
-    const auto roamerCount = gen3static_generate(0x12345678, 0, 0, 0, 1, 381, 40, 0, 1, 0, 0, 0, 0, 0, 25,
+    const auto roamerCount = gen3static_generate(0x12345678, 0, 0, 0, 1, 381, 40, 0, 1, 0, 0, 0, 0, 0, 0x1ffffff, 0xffff,
                                                  0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31);
     assert(roamerCount == 1);
     state = reinterpret_cast<const Gen3StaticPackedState *>(gen3static_result_ptr());
@@ -45,14 +45,18 @@ int main()
     assert(state->specialDefense == 0);
     assert(state->speed == 0);
 
-    assert(gen3static_generate(0, 0, 0, 0, 1, 150, 70, 255, 0, 0, 0, 0, 0, 0, 25,
+    assert(gen3static_generate(0, 0, 0, 0, 1, 150, 70, 255, 0, 0, 0, 0, 0, 0, 0x1ffffff, 0xffff,
                                32, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31)
            == 0);
     assert(gen3static_last_error() == 1);
 
-    const auto searchCount = gen3static_search(0, 1, 4, 383, 45, 255, 0, 12345, 54321, 0, 0, 0, 25,
+    const auto searchCount = gen3static_search(0, 1, 4, 383, 45, 255, 0, 12345, 54321, 0, 0, 0, 0x1ffffff, 0xffff,
                                                31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31);
     assert(searchCount == 4);
     assert(gen3static_result_count() == 4);
+
+    const auto filtered = gen3static_generate(0x12345678, 0, 0, 0, 1, 150, 70, 255, 0, 0, 0, 0, 0, 0,
+                                              1u << 15, 1u << 11, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31);
+    assert(filtered == 1);
     return 0;
 }

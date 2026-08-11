@@ -1,10 +1,10 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-11
-> - 当前阶段：阶段 2B / 3，Static Searcher 与第三世代存档信息
-> - 当前模块：`gen3static`、`profiles`
+> - 当前阶段：阶段 2B / 3，Static Searcher 与第三世代应用基础补全
+> - 当前模块：`gen3static`、`profiles`、`ivcalculator`
 > - Git 基线：`a5c47ba feat: 实现第三世代定点乱数模块`
-> - 工作区状态：Static Searcher、存档信息、主题、输入限制和文档尚未提交
+> - 工作区状态：Static Searcher、完整定点模板、筛选、存档信息、个体值计算器和文档尚未提交
 > - 部署状态：本轮工作区尚未推送，GitHub Pages 与真实 Wasm 待 Actions 验证
 > - 人工验收：待项目所有者执行
 
@@ -16,7 +16,7 @@
 2. [README](../README.md)：产品定位、构建、部署、隐私和许可证。
 3. [产品需求](requirements.md)：当前范围和验收标准。
 4. [技术方案](tech-stack.md)：版本、Wasm、Worker、持久化和 CI/CD。
-5. [Gen 3 ID](modules/gen3id.md)、[Gen 3 Static](modules/gen3static.md)与[Gen 3 Profiles](modules/gen3profiles.md)。
+5. [Gen 3 ID](modules/gen3id.md)、[Gen 3 Static](modules/gen3static.md)、[Gen 3 Profiles](modules/gen3profiles.md)与[Gen 3 IV Calculator](modules/gen3ivcalculator.md)。
 6. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)：文档、提交、构建和发布说明。
 
 聊天记录不是项目状态的单一事实来源。功能、依赖、工具链、构建、部署或阻塞发生变化后更新本文。
@@ -76,7 +76,7 @@
 
 ### 5.1 Static Searcher
 
-- `gen3static` API 从 1 提升到 2，C++、TypeScript、Worker 和 `module.json` 已同步。
+- `gen3static` API 从 1 提升到 3，C++、TypeScript、Worker 和 `module.json` 已同步。
 - C ABI 新增 `gen3static_search`，按 PokeFinder Method 1/4 反向恢复 IV 对应 Seed。
 - Searcher 按 IV 笛卡尔积稳定分片，使用独立 `Gen3StaticSearcherWorkerPool`。
 - 原生夹具增加 Groudon、Method 4、全 31 IV 恢复 4 个候选结果断言。
@@ -87,9 +87,13 @@
 - Seed 空输入按上游解析为 `0`。
 - Seed、Advances、Offset、TID/SID 和 IV 输入限制已在 HTML、规范化函数和 domain 校验中对齐。
 - 新增“取消筛选”与 PokeFinder IV 组合键快捷设置。
-- 结果新增觉醒属性与觉醒威力，移除不需要的 Level 列。
+- 性格和觉醒力量改为多选；异色、性别和特性选项与 PokeFinder 保持一致。
+- 结果新增觉醒属性、觉醒威力和“显示能力值”，移除不需要的 Level 列。
+- 分类与宝可梦改为独立下拉框，67 条掌机 Static 模板按当前存档版本过滤。
+- Game Corner 仅对 FireRed/LeafGreen 显示；Events 在 Ruby/Sapphire 隐藏；Bugged Roamer 强制 Method 1。
+- Method 改为下拉框；Searcher 初始 IV 范围为六项 `31..31`，首次检索不会超过任务上限。
+- Advances、进度和结果数量使用原始十进制数字，不添加千位分隔符。
 - 修复结果标题下方由虚拟行偏移造成的空白行。
-- 当前首批预设仍不是完整 PokeFinder encounter 表，且未按当前存档版本过滤；这是提交后的第一个 Static 数据任务。
 
 ### 5.3 第三世代存档信息
 
@@ -99,14 +103,24 @@
 - 应用全局右下角显示小型悬浮窗；首次默认收起，用户状态写入 localStorage。
 - ID 工作区可查看全部三代存档；Static 工作区只列当前兼容的掌机版本，避免把 XD/Colosseum 存档用于掌机定点计算。
 - 管理器仍保留 XD/Colosseum 记录，为后续对应模块保留数据。
+- 存档悬浮窗展开后点击页面空白区域自动收起；管理器打开时保持不变。
 
-### 5.4 界面与文档
+### 5.4 第三世代个体值计算器
+
+- 新增全局默认收起的个体值计算器，在 ID 与 Static 工作区均可使用。
+- 支持第三世代物种、Deoxys 形态、性格、觉醒力量、多行能力值、候选 IV 与下一级提示。
+- 未指定性格时按 PokeFinder 记录命中 IV 的最小值与最大值，并返回两者之间的连续范围。
+- 轻量确定性反推使用 TypeScript；大范围 RNG 计算仍只在 C++/Wasm Worker 中执行。
+- 移动端悬浮窗限制在视口内，七列输入区独立横向滚动。
+- 算法与输入上限见 [Gen 3 IV Calculator](modules/gen3ivcalculator.md)。
+
+### 5.5 界面与文档
 
 - 使用博客来源的浅色/深色调色板，主题写入 localStorage。
 - 左侧模块导航改为默认收起的覆盖式抽屉，支持遮罩、Escape 和选择后关闭。
 - 站点继续使用系统默认字体和现有 `public/favicon.ico`。
 - 新增根 `AGENTS.md`、[AI 开发一致性指南](ai-development.md)和[Gen 3 Profiles](modules/gen3profiles.md)。
-- ID/Static 模块文档补充上游输入限制与核对文件。
+- ID/Static 模块文档补充上游输入限制与核对文件；新增[Gen 3 IV Calculator](modules/gen3ivcalculator.md)算法说明。
 
 ## 6. 当前验证状态
 
@@ -116,14 +130,17 @@
 
 - `npm run format`。
 - `npm run typecheck`。
-- `npm test`：8 个测试文件、25 项测试通过。
+- `npm test`：9 个测试文件、30 项测试通过。
 - `npm run build:ui`：Vite UI 模式构建成功，同时生成 ID 与 Static Worker bundle。
 - `npm run dev:ui`：`http://127.0.0.1:5173/` 返回 HTTP 200。
-- `npm run verify`：格式、lint、类型、25 项测试与生产 Web/PWA 构建通过；PWA precache 11 个条目。
+- `npm run verify`：格式、lint、类型、30 项测试与生产 Web/PWA 构建通过；PWA precache 11 个条目。
 - `npm ls --depth=0`：顶层依赖树完整。
 - Markdown 本地链接：13 个文件检查通过，无缺失目标。
-- `gen3static` API：manifest、TypeScript、C++ 与原生夹具均为版本 2。
+- `gen3static` API：manifest、TypeScript、C++ 与原生夹具均为版本 3。
 - 过期阶段描述扫描与 `git diff --check` 通过。
+- 浏览器 UI 冒烟：Static Searcher 使用默认六项 `31..31` 完成检索并显示 1 条预览结果；性格可同时选择“固执”和“爽朗”。
+- 浏览器 UI 冒烟：存档悬浮窗点击外部区域后收起；个体值计算器在等级 100、勤奋性格的妙蛙种子样例中反推出六项 `31`。
+- 移动端 UI 冒烟：375 px 视口中个体值计算器保持在页面边界内，七列输入区可独立横向滚动。
 
 这些结果是在全局存档悬浮窗和模块抽屉改为默认收起后重新运行，仍不代表项目所有者验收或真实 Wasm 已通过。
 
@@ -147,12 +164,11 @@
 
 严格按以下顺序执行：
 
-1. 项目所有者打开 `http://127.0.0.1:5173/`，验收模块抽屉、全局存档悬浮窗、CRUD、导入导出、清除和 Static Generator/Searcher 交互。
+1. 项目所有者打开 `http://127.0.0.1:5173/`，验收模块抽屉、全局存档悬浮窗、CRUD、导入导出、清除、个体值计算器和 Static Generator/Searcher 交互。
 2. 使用 GitHub Desktop 提交当前工作区；提交标题由最终 diff 生成。
 3. 推送 `main`，确认 Actions 原生夹具、Emscripten Wasm、生产构建和 GitHub Pages 全部通过。
 4. 记录项目所有者使用的浏览器版本、已知输入和验收结果。
-5. 修复验收问题后，补齐 Static encounter presets 并按存档版本过滤。
-6. Static 数据范围通过后，再开始 `gen3wild` Generator/Searcher。
+5. 修复验收或 Actions 发现的问题；全部通过后开始 `gen3wild` Generator/Searcher。
 
 ## 8. 不要提前做
 
@@ -171,7 +187,7 @@
 - 多 Worker 会复制 Wasm 线性内存，低内存移动设备可能需要降低 Worker 数。
 - 取消通过终止 Worker 生效，实际延迟需要 Pages 实测。
 - Searcher IV 范围最多 50,000,000 组合，宽范围仍可能产生大量候选并先触发 250,000 条结果上限。
-- Static 首批预设不是完整 encounter 表；增加预设时必须核验版本、物种、等级、性别阈值和游走缺陷。
+- 67 条 Static 模板已导入，但仍需要项目所有者按版本分批核验分类、物种、等级、性别阈值和游走缺陷。
 - localStorage 镜像提高 IndexedDB 故障恢复能力，但用户清除站点数据后仍无法恢复未导出的存档信息。
 - PWA 旧缓存可能造成 UI/Wasm API 短暂错配；API 握手会拒绝运行，但更新体验仍需实测。
 - 如果源码仓库不是公开可访问，公开 Pages 不能只链接私有仓库来履行对应源码提供义务。
@@ -214,12 +230,12 @@ npm run wasm:build
 ```text
 PokeRNGKit 不设置中文名，只用 npm，当前只做 Gen III。
 HEAD a5c47ba 已包含 gen3id 与 Static Generator。
-当前未提交工作区实现 Static Searcher、觉醒力量、输入限制、主题、
-第三世代存档信息和全局默认收起悬浮窗。
+当前未提交工作区实现 Static Searcher、67 条版本联动模板、多选筛选、
+能力值显示、第三世代存档信息和全局个体值计算器。
 生产算法使用 C++/Emscripten Wasm，仅在独立 Worker 中运行；
 多核使用多个单线程 Wasm 实例，不依赖 SharedArrayBuffer。
 先阅读 AGENTS.md、docs/ai-development.md 和 docs/progress.md，
-完成验证与项目所有者验收后再补 Static encounter presets，最后开始 Wild。
+完成验证与项目所有者验收后开始 gen3wild Generator/Searcher。
 ```
 
 ## 11. 维护规则

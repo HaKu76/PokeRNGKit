@@ -23,7 +23,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 2;
+    constexpr std::uint32_t apiVersion = 3;
     constexpr std::uint32_t maxStatesPerCall = 100000;
 
     enum ErrorCode : std::uint32_t
@@ -65,27 +65,13 @@ namespace
 
     bool matchesShiny(std::uint8_t shiny, std::uint32_t filter)
     {
-        switch (filter)
-        {
-        case ShinyAny:
-            return true;
-        case ShinyNone:
-            return shiny == 0;
-        case ShinyAnyShiny:
-            return shiny != 0;
-        case ShinyStar:
-            return shiny == 1;
-        case ShinySquare:
-            return shiny == 2;
-        default:
-            return false;
-        }
+        return filter == ShinyAny || (filter & shiny) != 0;
     }
 
     bool matchesGender(std::uint8_t gender, std::uint32_t filter)
     {
         return filter == GenderAny || (filter == GenderMale && gender == 0) || (filter == GenderFemale && gender == 1)
-            || (filter == Genderless && gender == 2);
+            ;
     }
 
     bool matchesAbility(std::uint8_t ability, std::uint32_t filter)
@@ -105,6 +91,21 @@ namespace
             }
         }
         return true;
+    }
+
+    std::uint8_t hiddenPowerType(const std::array<std::uint8_t, 6> &ivs)
+    {
+        return static_cast<std::uint8_t>(
+            ((ivs[0] & 1) + 2 * (ivs[1] & 1) + 4 * (ivs[2] & 1) + 8 * (ivs[5] & 1)
+             + 16 * (ivs[3] & 1) + 32 * (ivs[4] & 1))
+            * 15 / 63);
+    }
+
+    bool matchesStateFilters(const std::array<std::uint8_t, 6> &ivs, std::uint8_t nature,
+                             std::uint32_t natureFilter, std::uint32_t hiddenPowerFilter)
+    {
+        return (natureFilter & (1u << nature)) != 0
+            && (hiddenPowerFilter & (1u << hiddenPowerType(ivs))) != 0;
     }
 
     struct RecoverySeeds
@@ -216,6 +217,7 @@ extern "C"
         std::uint32_t method, std::uint32_t species, std::uint32_t level, std::uint32_t genderRatio,
         std::uint32_t buggedRoamer, std::uint32_t tid, std::uint32_t sid, std::uint32_t shinyFilter,
         std::uint32_t genderFilter, std::uint32_t abilityFilter, std::uint32_t natureFilter,
+        std::uint32_t hiddenPowerFilter,
         std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin, std::uint32_t specialAttackMin,
         std::uint32_t specialDefenseMin, std::uint32_t speedMin, std::uint32_t hpMax, std::uint32_t attackMax,
         std::uint32_t defenseMax, std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax,
@@ -228,17 +230,12 @@ extern "C"
             || genderRatio > 255 || tid > 0xffff || sid > 0xffff
             || (method != static_cast<std::uint32_t>(Gen3StaticMethod::Method1)
                 && method != static_cast<std::uint32_t>(Gen3StaticMethod::Method4))
-            || shinyFilter > ShinySquare || genderFilter > Genderless || abilityFilter > AbilitySecond
-            || natureFilter > 25)
+            || shinyFilter > ShinyStarSquare || genderFilter > GenderFemale || abilityFilter > AbilitySecond
+            || natureFilter == 0 || natureFilter > 0x1ffffff || hiddenPowerFilter == 0 || hiddenPowerFilter > 0xffff)
         {
             lastError = ErrorCode::InvalidInput;
             return 0;
         }
-        if (natureFilter == 25)
-        {
-            natureFilter = 0xffffffff;
-        }
-
         const std::array<std::uint32_t, 6> ivMin = { hpMin, attackMin, defenseMin, specialAttackMin, specialDefenseMin, speedMin };
         const std::array<std::uint32_t, 6> ivMax = { hpMax, attackMax, defenseMax, specialAttackMax, specialDefenseMax, speedMax };
         for (std::size_t index = 0; index < ivMin.size(); index++)
@@ -280,7 +277,8 @@ extern "C"
             const std::uint8_t nature = static_cast<std::uint8_t>(pid % 25);
             const std::uint8_t shiny = getShiny(pid, tsv);
             if (!matchesShiny(shiny, shinyFilter) || !matchesGender(gender, genderFilter)
-                || !matchesAbility(ability, abilityFilter) || (natureFilter != 0xffffffff && nature != natureFilter)
+                || !matchesAbility(ability, abilityFilter)
+                || !matchesStateFilters(ivs, nature, natureFilter, hiddenPowerFilter)
                 || !matchesIv(ivs, ivMin, ivMax))
             {
                 continue;
@@ -297,7 +295,8 @@ extern "C"
         std::uint32_t startIndex, std::uint32_t stateCount, std::uint32_t method, std::uint32_t species,
         std::uint32_t level, std::uint32_t genderRatio, std::uint32_t buggedRoamer, std::uint32_t tid,
         std::uint32_t sid, std::uint32_t shinyFilter, std::uint32_t genderFilter, std::uint32_t abilityFilter,
-        std::uint32_t natureFilter, std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
+        std::uint32_t natureFilter, std::uint32_t hiddenPowerFilter, std::uint32_t hpMin,
+        std::uint32_t attackMin, std::uint32_t defenseMin,
         std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
         std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax, std::uint32_t specialAttackMax,
         std::uint32_t specialDefenseMax, std::uint32_t speedMax)
@@ -308,17 +307,12 @@ extern "C"
             || level > 100 || genderRatio > 255 || tid > 0xffff || sid > 0xffff
             || (method != static_cast<std::uint32_t>(Gen3StaticMethod::Method1)
                 && method != static_cast<std::uint32_t>(Gen3StaticMethod::Method4))
-            || shinyFilter > ShinySquare || genderFilter > Genderless || abilityFilter > AbilitySecond
-            || natureFilter > 25)
+            || shinyFilter > ShinyStarSquare || genderFilter > GenderFemale || abilityFilter > AbilitySecond
+            || natureFilter == 0 || natureFilter > 0x1ffffff || hiddenPowerFilter == 0 || hiddenPowerFilter > 0xffff)
         {
             lastError = ErrorCode::InvalidInput;
             return 0;
         }
-        if (natureFilter == 25)
-        {
-            natureFilter = 0xffffffff;
-        }
-
         const std::array<std::uint32_t, 6> minimum
             = { hpMin, attackMin, defenseMin, specialAttackMin, specialDefenseMin, speedMin };
         const std::array<std::uint32_t, 6> maximum
@@ -356,16 +350,16 @@ extern "C"
                 const std::uint8_t ability = static_cast<std::uint8_t>(pid & 1);
                 const std::uint8_t gender = getGender(pid, genderRatio);
                 const std::uint8_t shiny = getShiny(pid, tsv);
-                if (!matchesShiny(shiny, shinyFilter) || !matchesGender(gender, genderFilter)
-                    || !matchesAbility(ability, abilityFilter)
-                    || (natureFilter != 0xffffffff && nature != natureFilter))
-                {
-                    continue;
-                }
                 const std::array<std::uint8_t, 6> displayedIvs = buggedRoamer
                     ? std::array<std::uint8_t, 6> { recoveredIvs[0], static_cast<std::uint8_t>(recoveredIvs[1] & 7),
                                                    0, 0, 0, 0 }
                     : recoveredIvs;
+                if (!matchesShiny(shiny, shinyFilter) || !matchesGender(gender, genderFilter)
+                    || !matchesAbility(ability, abilityFilter)
+                    || !matchesStateFilters(displayedIvs, nature, natureFilter, hiddenPowerFilter))
+                {
+                    continue;
+                }
                 results.push_back({ rng.next(), pid, displayedIvs[0], displayedIvs[1], displayedIvs[2],
                                     displayedIvs[3], displayedIvs[4], displayedIvs[5], ability, gender, level,
                                     static_cast<std::uint32_t>(nature) | (static_cast<std::uint32_t>(shiny) << 8) });

@@ -12,10 +12,9 @@ enum class Gen3StaticMethod : std::uint32_t
 enum Gen3StaticShinyFilter : std::uint32_t
 {
     ShinyAny = 0,
-    ShinyNone = 1,
-    ShinyAnyShiny = 2,
-    ShinyStar = 3,
-    ShinySquare = 4,
+    ShinyStar = 1,
+    ShinySquare = 2,
+    ShinyStarSquare = 3,
 };
 
 enum Gen3StaticGenderFilter : std::uint32_t
@@ -23,7 +22,6 @@ enum Gen3StaticGenderFilter : std::uint32_t
     GenderAny = 0,
     GenderMale = 1,
     GenderFemale = 2,
-    Genderless = 3,
 };
 
 enum Gen3StaticAbilityFilter : std::uint32_t
@@ -68,6 +66,7 @@ extern "C"
         std::uint32_t genderFilter,
         std::uint32_t abilityFilter,
         std::uint32_t natureFilter,
+        std::uint32_t hiddenPowerFilter,
         std::uint32_t hpMin,
         std::uint32_t attackMin,
         std::uint32_t defenseMin,
@@ -94,6 +93,7 @@ extern "C"
         std::uint32_t genderFilter,
         std::uint32_t abilityFilter,
         std::uint32_t natureFilter,
+        std::uint32_t hiddenPowerFilter,
         std::uint32_t hpMin,
         std::uint32_t attackMin,
         std::uint32_t defenseMin,

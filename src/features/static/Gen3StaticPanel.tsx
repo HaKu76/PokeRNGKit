@@ -10,10 +10,13 @@ import {
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import type { Gen3Profile } from "../profiles/domain";
+import { getGen3Personal } from "../shared/gen3Personal";
+import { getGen3SpeciesName } from "../shared/gen3Species";
+import { computeGen3Stats } from "../shared/gen3Stats";
 import {
-  GEN3_STATIC_TEMPLATES,
   gen3HiddenPower,
   gen3StaticSearcherCombinationCount,
+  GEN3_STATIC_MAX_TOTAL_STATES,
   validateGen3StaticRequest,
   validateGen3StaticSearcherRequest,
   type Gen3StaticAbilityFilter,
@@ -26,16 +29,21 @@ import {
   type Gen3StaticShinyFilter,
   type Gen3StaticState,
 } from "./domain";
-import { Gen3StaticUiPreviewEngine } from "./preview/Gen3StaticUiPreviewEngine";
+import {
+  gen3StaticCategoriesForVersion,
+  gen3StaticTemplatesForVersion,
+  type Gen3StaticCategory,
+} from "./encounters";
 import { Gen3StaticSearcherUiPreviewEngine } from "./preview/Gen3StaticSearcherUiPreviewEngine";
+import { Gen3StaticUiPreviewEngine } from "./preview/Gen3StaticUiPreviewEngine";
 import type {
   Gen3StaticSearchEngine,
   Gen3StaticSearchProgress,
   Gen3StaticSearchSummary,
 } from "./search";
 import type { Gen3StaticSearcherEngine } from "./searcher";
-import { Gen3StaticWorkerPool } from "./worker/Gen3StaticWorkerPool";
 import { Gen3StaticSearcherWorkerPool } from "./worker/Gen3StaticSearcherWorkerPool";
+import { Gen3StaticWorkerPool } from "./worker/Gen3StaticWorkerPool";
 
 type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
 type StaticOperation = "generator" | "searcher";
@@ -53,12 +61,30 @@ type StaticSortKey =
   | "hiddenPower"
   | "hiddenPowerStrength";
 type StaticResultState = Gen3StaticState | Gen3StaticSearcherState;
+type IvTextValues = [string, string, string, string, string, string];
+
+interface IvRanges {
+  min: IvTextValues;
+  max: IvTextValues;
+}
 
 interface Gen3StaticPanelProps {
   profile: Gen3Profile;
   uiPreviewMode: boolean;
+  onOpenIvCalculator(): void;
 }
 
+interface MultiCheckSelectProps {
+  disabled?: boolean;
+  label: string;
+  anyLabel: string;
+  mask: number;
+  onChange(mask: number): void;
+  options: readonly { label: string; value: number }[];
+}
+
+const NATURE_MASK_ALL = 0x1ff_ffff;
+const HIDDEN_POWER_MASK_ALL = 0xffff;
 const ivKeys: IvKey[] = [
   "hp",
   "attack",
@@ -112,31 +138,90 @@ const hiddenPowerKeys = [
   "powerDragon",
   "powerDark",
 ] as const;
-const templateNameKeys: Record<string, string> = {
-  mewtwo: "pokemonMewtwo",
-  rayquaza: "pokemonRayquaza",
-  regirock: "pokemonRegirock",
-  regice: "pokemonRegice",
-  registeel: "pokemonRegisteel",
-  deoxys: "pokemonDeoxys",
-  latios: "pokemonLatios",
-  latias: "pokemonLatias",
-};
 const commonStaticColumns: Array<{ key: StaticSortKey; label: string }> = [
   { key: "pid", label: "rowPid" },
+  { key: "shiny", label: "shiny" },
+  { key: "nature", label: "nature" },
+  { key: "ability", label: "ability" },
   { key: "hp", label: "ivHp" },
   { key: "attack", label: "ivAttack" },
   { key: "defense", label: "ivDefense" },
   { key: "specialAttack", label: "ivSpecialAttack" },
   { key: "specialDefense", label: "ivSpecialDefense" },
   { key: "speed", label: "ivSpeed" },
-  { key: "ability", label: "ability" },
-  { key: "gender", label: "gender" },
-  { key: "nature", label: "nature" },
-  { key: "shiny", label: "shiny" },
-  { key: "hiddenPower", label: "hiddenPower" },
+  { key: "hiddenPower", label: "hiddenPowerType" },
   { key: "hiddenPowerStrength", label: "hiddenPowerStrength" },
+  { key: "gender", label: "gender" },
 ];
+
+function MultiCheckSelect({
+  anyLabel,
+  disabled,
+  label,
+  mask,
+  onChange,
+  options,
+}: MultiCheckSelectProps) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const fullMask = options.reduce(
+    (value, option) => value | (1 << option.value),
+    0,
+  );
+  const selected = options.filter(
+    (option) => (mask & (1 << option.value)) !== 0,
+  );
+  const summary =
+    mask === 0 || mask === fullMask
+      ? anyLabel
+      : selected.map((option) => option.label).join(", ");
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () =>
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, [open]);
+
+  return (
+    <div className="field multi-check-field" ref={rootRef}>
+      <span>{label}</span>
+      <button
+        aria-expanded={open}
+        className="multi-check-trigger"
+        disabled={disabled}
+        onClick={() => setOpen((current) => !current)}
+        type="button"
+      >
+        <span>{summary}</span>
+        <span aria-hidden="true">▾</span>
+      </button>
+      {open && (
+        <div className="multi-check-menu">
+          {options.map((option) => (
+            <label key={option.value}>
+              <input
+                checked={(mask & (1 << option.value)) !== 0}
+                onChange={(event) =>
+                  onChange(
+                    event.target.checked
+                      ? mask | (1 << option.value)
+                      : mask & ~(1 << option.value),
+                  )
+                }
+                type="checkbox"
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function staticColumns(operation: StaticOperation) {
   return [
@@ -164,23 +249,16 @@ function formatHex(value: number, width: number): string {
   return value.toString(16).toUpperCase().padStart(width, "0");
 }
 
-function stateValue(state: StaticResultState, key: StaticSortKey): number {
-  const ivIndex = ivKeys.indexOf(key as IvKey);
-  if (ivIndex >= 0) return state.ivs[ivIndex];
-  if (key === "advances") return "advances" in state ? state.advances : 0;
-  if (key === "seed") return "seed" in state ? state.seed : 0;
-  if (key === "hiddenPower") return gen3HiddenPower(state.ivs).type;
-  if (key === "hiddenPowerStrength") return gen3HiddenPower(state.ivs).power;
-  return state[
-    key as keyof Omit<Gen3StaticState, "advances" | "ivs">
-  ] as number;
+function ivLabelKey(key: IvKey) {
+  return `iv${key.charAt(0).toUpperCase()}${key.slice(1)}`;
 }
 
 export function Gen3StaticPanel({
+  onOpenIvCalculator,
   profile,
   uiPreviewMode,
 }: Gen3StaticPanelProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const generatorEngine = useMemo<Gen3StaticSearchEngine>(
     () =>
       uiPreviewMode
@@ -196,7 +274,8 @@ export function Gen3StaticPanel({
     [uiPreviewMode],
   );
   const [operation, setOperation] = useState<StaticOperation>("generator");
-  const [template, setTemplate] = useState(GEN3_STATIC_TEMPLATES[0]);
+  const [category, setCategory] = useState<Gen3StaticCategory>("starters");
+  const [templateId, setTemplateId] = useState("");
   const [method, setMethod] = useState<Gen3StaticMethod>("method1");
   const [seed, setSeed] = useState("");
   const [initialAdvances, setInitialAdvances] = useState("0");
@@ -206,9 +285,19 @@ export function Gen3StaticPanel({
   const [shiny, setShiny] = useState<Gen3StaticShinyFilter>("any");
   const [gender, setGender] = useState<Gen3StaticGenderFilter>("any");
   const [ability, setAbility] = useState<Gen3StaticAbilityFilter>("any");
-  const [nature, setNature] = useState("-1");
-  const [ivMin, setIvMin] = useState(["0", "0", "0", "0", "0", "0"]);
-  const [ivMax, setIvMax] = useState(["31", "31", "31", "31", "31", "31"]);
+  const [natureMask, setNatureMask] = useState(0);
+  const [hiddenPowerMask, setHiddenPowerMask] = useState(0);
+  const [showStats, setShowStats] = useState(false);
+  const [ivRanges, setIvRanges] = useState<Record<StaticOperation, IvRanges>>({
+    generator: {
+      min: ["0", "0", "0", "0", "0", "0"],
+      max: ["31", "31", "31", "31", "31", "31"],
+    },
+    searcher: {
+      min: ["31", "31", "31", "31", "31", "31"],
+      max: ["31", "31", "31", "31", "31", "31"],
+    },
+  });
   const [results, setResults] = useState<StaticResultState[]>([]);
   const [progress, setProgress] = useState<Gen3StaticSearchProgress>({
     processedStates: 0,
@@ -225,6 +314,31 @@ export function Gen3StaticPanel({
   }>({ key: "advances", direction: "asc" });
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const categories = useMemo(
+    () => gen3StaticCategoriesForVersion(profile.version),
+    [profile.version],
+  );
+  const activeCategory = categories.includes(category)
+    ? category
+    : categories[0];
+  const templates = useMemo(
+    () => gen3StaticTemplatesForVersion(profile.version, activeCategory),
+    [activeCategory, profile.version],
+  );
+  const template =
+    templates.find((entry) => entry.id === templateId) ?? templates[0];
+  const columns = useMemo(() => staticColumns(operation), [operation]);
+  const natureOptions = natureKeys.map((key, value) => ({
+    label: t(key),
+    value,
+  }));
+  const hiddenPowerOptions = hiddenPowerKeys.map((key, value) => ({
+    label: t(key),
+    value,
+  }));
+  const activeIvRanges = ivRanges[operation];
+  const personal = getGen3Personal(template.species, template.form);
+
   useEffect(
     () => () => {
       generatorEngine.dispose();
@@ -233,13 +347,57 @@ export function Gen3StaticPanel({
     [generatorEngine, searcherEngine],
   );
   useEffect(() => {
-    if (profile.deadBattery) setSeed("5a0");
+    if (profile.deadBattery) setSeed("5A0");
   }, [profile]);
+  useEffect(() => {
+    if (category !== activeCategory) setCategory(activeCategory);
+  }, [activeCategory, category]);
+  useEffect(() => {
+    if (template.id !== templateId) setTemplateId(template.id);
+    if (template.buggedRoamer) setMethod("method1");
+  }, [template, templateId]);
 
-  const columns = useMemo(() => staticColumns(operation), [operation]);
+  const stateValue = (state: StaticResultState, key: StaticSortKey): number => {
+    const ivIndex = ivKeys.indexOf(key as IvKey);
+    if (ivIndex >= 0) {
+      return showStats
+        ? computeGen3Stats(
+            personal.stats,
+            state.ivs,
+            state.nature,
+            state.level,
+          )[ivIndex]
+        : state.ivs[ivIndex];
+    }
+    if (key === "advances") return "advances" in state ? state.advances : 0;
+    if (key === "seed") return "seed" in state ? state.seed : 0;
+    if (key === "hiddenPower") return gen3HiddenPower(state.ivs).type;
+    if (key === "hiddenPowerStrength") return gen3HiddenPower(state.ivs).power;
+    return state[
+      key as keyof Omit<Gen3StaticState, "advances" | "ivs">
+    ] as number;
+  };
 
-  const changeOperation = (nextOperation: StaticOperation) => {
-    if (status === "calculating" || operation === nextOperation) return;
+  const sortedResults = useMemo(() => {
+    const multiplier = sort.direction === "asc" ? 1 : -1;
+    return [...results].sort(
+      (left, right) =>
+        (stateValue(left, sort.key) - stateValue(right, sort.key)) * multiplier,
+    );
+    // The selected encounter and display mode change the derived stat columns.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [personal, results, showStats, sort]);
+
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const rowVirtualizer = useVirtualizer({
+    count: sortedResults.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 42,
+    overscan: 12,
+  });
+
+  const resetRunState = (nextOperation: StaticOperation) => {
     setOperation(nextOperation);
     setResults([]);
     setSummary(undefined);
@@ -257,39 +415,16 @@ export function Gen3StaticPanel({
     });
   };
 
-  const sortedResults = useMemo(() => {
-    const multiplier = sort.direction === "asc" ? 1 : -1;
-    return [...results].sort(
-      (left, right) =>
-        (stateValue(left, sort.key) - stateValue(right, sort.key)) * multiplier,
-    );
-  }, [results, sort]);
-
-  // TanStack Virtual exposes an imperative virtualizer object by design.
-  // eslint-disable-next-line react-hooks/incompatible-library
-  const rowVirtualizer = useVirtualizer({
-    count: sortedResults.length,
-    getScrollElement: () => scrollRef.current,
-    estimateSize: () => 42,
-    overscan: 12,
-  });
-
-  const selectTemplate = (templateId: string) => {
-    const nextTemplate = GEN3_STATIC_TEMPLATES.find(
-      (entry) => entry.id === templateId,
-    );
-    if (!nextTemplate) return;
-    setTemplate(nextTemplate);
-    if (nextTemplate.buggedRoamer) setMethod("method1");
-  };
-
   const updateIv = (kind: "min" | "max", index: number, value: string) => {
-    const setter = kind === "min" ? setIvMin : setIvMax;
-    setter((current) =>
-      current.map((entry, currentIndex) =>
-        currentIndex === index ? value : entry,
-      ),
-    );
+    setIvRanges((current) => ({
+      ...current,
+      [operation]: {
+        ...current[operation],
+        [kind]: current[operation][kind].map((entry, currentIndex) =>
+          currentIndex === index ? value : entry,
+        ) as IvTextValues,
+      },
+    }));
   };
 
   const applyIvShortcut = (index: number, event: MouseEvent) => {
@@ -301,72 +436,58 @@ export function Gen3StaticPanel({
           : event.altKey
             ? ["30", "31"]
             : ["0", "31"];
-    updateIv("min", index, minimum);
-    updateIv("max", index, maximum);
+    setIvRanges((current) => ({
+      ...current,
+      [operation]: {
+        min: current[operation].min.map((entry, currentIndex) =>
+          currentIndex === index ? minimum : entry,
+        ) as IvTextValues,
+        max: current[operation].max.map((entry, currentIndex) =>
+          currentIndex === index ? maximum : entry,
+        ) as IvTextValues,
+      },
+    }));
   };
 
-  const readFilters = (disabled = false): Gen3StaticFilters =>
-    disabled
-      ? {
-          shiny: "any",
-          gender: "any",
-          ability: "any",
-          nature: -1,
-          ivMin: [0, 0, 0, 0, 0, 0],
-          ivMax: [31, 31, 31, 31, 31, 31],
-        }
-      : {
-          shiny,
-          gender,
-          ability,
-          nature: Number.parseInt(nature, 10),
-          ivMin: ivMin.map((value) => parseDecimal(value) ?? Number.NaN) as [
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-          ],
-          ivMax: ivMax.map((value) => parseDecimal(value) ?? Number.NaN) as [
-            number,
-            number,
-            number,
-            number,
-            number,
-            number,
-          ],
-        };
+  const readFilters = (disabled = false): Gen3StaticFilters => ({
+    shiny: disabled ? "any" : shiny,
+    gender: disabled ? "any" : gender,
+    ability: disabled ? "any" : ability,
+    natureMask: disabled ? NATURE_MASK_ALL : natureMask || NATURE_MASK_ALL,
+    hiddenPowerMask: disabled
+      ? HIDDEN_POWER_MASK_ALL
+      : hiddenPowerMask || HIDDEN_POWER_MASK_ALL,
+    ivMin: (disabled
+      ? [0, 0, 0, 0, 0, 0]
+      : activeIvRanges.min.map(
+          (value) => parseDecimal(value) ?? Number.NaN,
+        )) as Gen3StaticFilters["ivMin"],
+    ivMax: (disabled
+      ? [31, 31, 31, 31, 31, 31]
+      : activeIvRanges.max.map(
+          (value) => parseDecimal(value) ?? Number.NaN,
+        )) as Gen3StaticFilters["ivMax"],
+  });
 
-  const readRequest = (): Gen3StaticRequest | undefined => {
-    const request: Gen3StaticRequest = {
-      seed: parseHex(seed) ?? Number.NaN,
-      initialAdvances: parseDecimal(initialAdvances) ?? Number.NaN,
-      maxAdvances: parseDecimal(maxAdvances) ?? Number.NaN,
-      offset: parseDecimal(offset) ?? Number.NaN,
-      method,
-      template,
-      tid: profile.tid,
-      sid: profile.sid,
-      filters: readFilters(filtersDisabled),
-    };
-    return validateGen3StaticRequest(request).length === 0
-      ? request
-      : undefined;
-  };
+  const readRequest = (): Gen3StaticRequest => ({
+    seed: parseHex(seed) ?? Number.NaN,
+    initialAdvances: parseDecimal(initialAdvances) ?? Number.NaN,
+    maxAdvances: parseDecimal(maxAdvances) ?? Number.NaN,
+    offset: parseDecimal(offset) ?? Number.NaN,
+    method,
+    template,
+    tid: profile.tid,
+    sid: profile.sid,
+    filters: readFilters(filtersDisabled),
+  });
 
-  const readSearcherRequest = (): Gen3StaticSearcherRequest | undefined => {
-    const request: Gen3StaticSearcherRequest = {
-      method,
-      template,
-      tid: profile.tid,
-      sid: profile.sid,
-      filters: readFilters(),
-    };
-    return validateGen3StaticSearcherRequest(request).length === 0
-      ? request
-      : undefined;
-  };
+  const readSearcherRequest = (): Gen3StaticSearcherRequest => ({
+    method,
+    template,
+    tid: profile.tid,
+    sid: profile.sid,
+    filters: readFilters(),
+  });
 
   const runCalculation = async (event: FormEvent) => {
     event.preventDefault();
@@ -375,8 +496,20 @@ export function Gen3StaticPanel({
       operation === "generator" ? readRequest() : undefined;
     const searcherRequest =
       operation === "searcher" ? readSearcherRequest() : undefined;
-    if (!generatorRequest && !searcherRequest) {
-      setError(t("invalidStaticInput"));
+    const validationErrors = generatorRequest
+      ? validateGen3StaticRequest(generatorRequest)
+      : validateGen3StaticSearcherRequest(searcherRequest!);
+    if (validationErrors.length > 0) {
+      setError(
+        validationErrors.includes("searchRange")
+          ? t("staticSearchRangeTooLarge", {
+              count: String(
+                gen3StaticSearcherCombinationCount(searcherRequest!),
+              ),
+              limit: String(GEN3_STATIC_MAX_TOTAL_STATES),
+            })
+          : t("invalidStaticInput"),
+      );
       setStatus("failed");
       return;
     }
@@ -412,23 +545,34 @@ export function Gen3StaticPanel({
     }
   };
 
-  const displayGender = (value: number) =>
-    t(value === 0 ? "male" : value === 1 ? "female" : "genderless");
-  const displayAbility = (value: number) =>
-    t(value === 0 ? "abilityFirst" : "abilitySecond");
-  const displayShiny = (value: number) =>
-    t(value === 0 ? "shinyNone" : value === 1 ? "shinyStar" : "shinySquare");
-
   const displayStateValue = (state: StaticResultState, key: StaticSortKey) => {
-    if (key === "pid" || key === "seed")
+    if (key === "pid" || key === "seed") {
       return formatHex(stateValue(state, key), 8);
-    if (key === "gender") return displayGender(state.gender);
-    if (key === "ability") return displayAbility(state.ability);
+    }
+    if (key === "gender") {
+      return t(
+        state.gender === 0
+          ? "male"
+          : state.gender === 1
+            ? "female"
+            : "genderless",
+      );
+    }
+    if (key === "ability") return String(state.ability);
     if (key === "nature") return t(natureKeys[state.nature]);
-    if (key === "shiny") return displayShiny(state.shiny);
-    if (key === "hiddenPower")
+    if (key === "shiny") {
+      return t(
+        state.shiny === 0
+          ? "no"
+          : state.shiny === 1
+            ? "shinyStar"
+            : "shinySquare",
+      );
+    }
+    if (key === "hiddenPower") {
       return t(hiddenPowerKeys[gen3HiddenPower(state.ivs).type]);
-    return stateValue(state, key).toLocaleString();
+    }
+    return String(stateValue(state, key));
   };
 
   const exportCsv = () => {
@@ -450,17 +594,6 @@ export function Gen3StaticPanel({
     URL.revokeObjectURL(url);
   };
 
-  const toggleSort = (key: StaticSortKey) => {
-    setSort((current) =>
-      current.key === key
-        ? {
-            key,
-            direction: current.direction === "asc" ? "desc" : "asc",
-          }
-        : { key, direction: "asc" },
-    );
-  };
-
   const statusLabel = {
     ready: t("ready"),
     calculating: t("calculating"),
@@ -476,27 +609,23 @@ export function Gen3StaticPanel({
         className="operation-tabs"
         role="tablist"
       >
-        <button
-          aria-selected={operation === "generator"}
-          className={operation === "generator" ? "active" : ""}
-          disabled={status === "calculating"}
-          onClick={() => changeOperation("generator")}
-          role="tab"
-          type="button"
-        >
-          {t("generator")}
-        </button>
-        <button
-          aria-selected={operation === "searcher"}
-          className={operation === "searcher" ? "active" : ""}
-          disabled={status === "calculating"}
-          onClick={() => changeOperation("searcher")}
-          role="tab"
-          type="button"
-        >
-          {t("searcher")}
-        </button>
+        {(["generator", "searcher"] as const).map((entry) => (
+          <button
+            aria-selected={operation === entry}
+            className={operation === entry ? "active" : ""}
+            disabled={status === "calculating"}
+            key={entry}
+            onClick={() => {
+              if (operation !== entry) resetRunState(entry);
+            }}
+            role="tab"
+            type="button"
+          >
+            {t(entry)}
+          </button>
+        ))}
       </div>
+
       <form className="static-control-grid" onSubmit={runCalculation}>
         <section className="panel static-panel static-rng-panel">
           <div className="panel-heading">
@@ -507,29 +636,20 @@ export function Gen3StaticPanel({
             <span className="panel-note">PokeFinder / Static3</span>
           </div>
           <div className="static-form-stack">
-            <div className="mode-tabs static-method-tabs" role="tablist">
-              <button
-                className={
-                  method === "method1" ? "mode-tab active" : "mode-tab"
+            <label className="field">
+              <span>{t("method")}</span>
+              <select
+                onChange={(event) =>
+                  setMethod(event.target.value as Gen3StaticMethod)
                 }
-                onClick={() => setMethod("method1")}
-                role="tab"
-                type="button"
+                value={method}
               >
-                {t("method1")}
-              </button>
-              <button
-                className={
-                  method === "method4" ? "mode-tab active" : "mode-tab"
-                }
-                disabled={template.buggedRoamer}
-                onClick={() => setMethod("method4")}
-                role="tab"
-                type="button"
-              >
-                {t("method4")}
-              </button>
-            </div>
+                <option value="method1">{t("method1")}</option>
+                {!template.buggedRoamer && (
+                  <option value="method4">{t("method4")}</option>
+                )}
+              </select>
+            </label>
             {operation === "generator" && (
               <>
                 <label className="field">
@@ -629,33 +749,44 @@ export function Gen3StaticPanel({
               <span className="panel-index">02</span>
               <h2>{t("settings")}</h2>
             </div>
-            <span className="panel-note">Profile / Encounter</span>
+            <span className="panel-note">
+              {t("game")} / {t("pokemon")}
+            </span>
           </div>
           <div className="static-form-stack">
             <label className="field">
+              <span>{t("category")}</span>
+              <select
+                onChange={(event) =>
+                  setCategory(event.target.value as Gen3StaticCategory)
+                }
+                value={activeCategory}
+              >
+                {categories.map((entry) => (
+                  <option key={entry} value={entry}>
+                    {t(entry)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field">
               <span>{t("pokemon")}</span>
               <select
-                onChange={(event) => selectTemplate(event.target.value)}
+                onChange={(event) => setTemplateId(event.target.value)}
                 value={template.id}
               >
-                {(["legends", "events", "roamers"] as const).map((category) => (
-                  <optgroup key={category} label={t(category)}>
-                    {GEN3_STATIC_TEMPLATES.filter(
-                      (entry) => entry.category === category,
-                    ).map((entry) => (
-                      <option key={entry.id} value={entry.id}>
-                        {t(templateNameKeys[entry.id])}
-                      </option>
-                    ))}
-                  </optgroup>
+                {templates.map((entry) => (
+                  <option key={entry.id} value={entry.id}>
+                    {getGen3SpeciesName(
+                      i18n.language,
+                      entry.species,
+                      entry.form,
+                    )}
+                  </option>
                 ))}
               </select>
             </label>
             <div className="static-encounter-meta">
-              <div>
-                <span>{t("category")}</span>
-                <strong>{t(template.category)}</strong>
-              </div>
               <div>
                 <span>{t("level")}</span>
                 <strong>{template.level}</strong>
@@ -677,27 +808,27 @@ export function Gen3StaticPanel({
               <span className="panel-index">03</span>
               <h2>{t("filters")}</h2>
             </div>
-            <span className="panel-note">AND / range</span>
+            <span className="panel-note">PokeFinder / Filter</span>
           </div>
           <fieldset
             className="filter-controls"
             disabled={operation === "generator" && filtersDisabled}
           >
             <div className="static-filter-selects">
-              <label className="field">
-                <span>{t("nature")}</span>
-                <select
-                  onChange={(event) => setNature(event.target.value)}
-                  value={nature}
-                >
-                  <option value="-1">{t("any")}</option>
-                  {natureKeys.map((key, index) => (
-                    <option key={key} value={index}>
-                      {t(key)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <MultiCheckSelect
+                anyLabel={t("any")}
+                label={t("nature")}
+                mask={natureMask}
+                onChange={setNatureMask}
+                options={natureOptions}
+              />
+              <MultiCheckSelect
+                anyLabel={t("any")}
+                label={t("hiddenPower")}
+                mask={hiddenPowerMask}
+                onChange={setHiddenPowerMask}
+                options={hiddenPowerOptions}
+              />
               <label className="field">
                 <span>{t("shiny")}</span>
                 <select
@@ -707,10 +838,9 @@ export function Gen3StaticPanel({
                   value={shiny}
                 >
                   <option value="any">{t("any")}</option>
-                  <option value="none">{t("shinyNone")}</option>
-                  <option value="shiny">{t("shinyAny")}</option>
                   <option value="star">{t("shinyStar")}</option>
                   <option value="square">{t("shinySquare")}</option>
+                  <option value="star-square">{t("shinyStarSquare")}</option>
                 </select>
               </label>
               <label className="field">
@@ -724,7 +854,6 @@ export function Gen3StaticPanel({
                   <option value="any">{t("any")}</option>
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
-                  <option value="genderless">{t("genderless")}</option>
                 </select>
               </label>
               <label className="field">
@@ -736,8 +865,8 @@ export function Gen3StaticPanel({
                   value={ability}
                 >
                   <option value="any">{t("any")}</option>
-                  <option value="first">{t("abilityFirst")}</option>
-                  <option value="second">{t("abilitySecond")}</option>
+                  <option value="first">0</option>
+                  <option value="second">1</option>
                 </select>
               </label>
             </div>
@@ -755,40 +884,41 @@ export function Gen3StaticPanel({
                     title={t("ivShortcutHint")}
                     type="button"
                   >
-                    {t(`iv${key.charAt(0).toUpperCase()}${key.slice(1)}`)}
+                    {t(ivLabelKey(key))}
                   </button>
-                  <input
-                    aria-label={`${t(`iv${key.charAt(0).toUpperCase()}${key.slice(1)}`)} ${t("minimum")}`}
-                    inputMode="numeric"
-                    max="31"
-                    min="0"
-                    onChange={(event) =>
-                      updateIv(
-                        "min",
-                        index,
-                        normalizeDecimalInput(event.target.value, 31, 2),
-                      )
-                    }
-                    type="number"
-                    value={ivMin[index]}
-                  />
-                  <input
-                    aria-label={`${t(`iv${key.charAt(0).toUpperCase()}${key.slice(1)}`)} ${t("maximum")}`}
-                    inputMode="numeric"
-                    max="31"
-                    min="0"
-                    onChange={(event) =>
-                      updateIv(
-                        "max",
-                        index,
-                        normalizeDecimalInput(event.target.value, 31, 2),
-                      )
-                    }
-                    type="number"
-                    value={ivMax[index]}
-                  />
+                  {(["min", "max"] as const).map((kind) => (
+                    <input
+                      aria-label={`${t(ivLabelKey(key))} ${t(kind === "min" ? "minimum" : "maximum")}`}
+                      inputMode="numeric"
+                      key={kind}
+                      max="31"
+                      min="0"
+                      onChange={(event) =>
+                        updateIv(
+                          kind,
+                          index,
+                          normalizeDecimalInput(event.target.value, 31, 2),
+                        )
+                      }
+                      type="number"
+                      value={activeIvRanges[kind][index]}
+                    />
+                  ))}
                 </div>
               ))}
+            </div>
+            <div className="filter-tool-row">
+              <label className="toggle-field">
+                <input
+                  checked={showStats}
+                  onChange={(event) => setShowStats(event.target.checked)}
+                  type="checkbox"
+                />
+                <span>{t("showStats")}</span>
+              </label>
+              <button onClick={onOpenIvCalculator} type="button">
+                {t("ivCalculator")}
+              </button>
             </div>
           </fieldset>
           {operation === "generator" && (
@@ -815,8 +945,7 @@ export function Gen3StaticPanel({
           </div>
           <div className="result-actions">
             <span className="result-count">
-              {results.length.toLocaleString()} /{" "}
-              {progress.totalStates.toLocaleString()}
+              {String(results.length)} / {String(progress.totalStates)}
             </span>
             <button
               className="secondary-action"
@@ -846,12 +975,10 @@ export function Gen3StaticPanel({
         </div>
         <div className="metrics-row">
           <span>
-            {t("processed")}{" "}
-            <strong>{progress.processedStates.toLocaleString()}</strong>
+            {t("processed")} <strong>{String(progress.processedStates)}</strong>
           </span>
           <span>
-            {t("results")}{" "}
-            <strong>{progress.resultCount.toLocaleString()}</strong>
+            {t("results")} <strong>{String(progress.resultCount)}</strong>
           </span>
           <span>
             {t("workers")} <strong>{summary?.workerCount ?? "-"}</strong>
@@ -888,14 +1015,24 @@ export function Gen3StaticPanel({
                 {columns.map((column) => (
                   <button
                     key={column.key}
-                    onClick={() => toggleSort(column.key)}
+                    onClick={() =>
+                      setSort((current) =>
+                        current.key === column.key
+                          ? {
+                              key: column.key,
+                              direction:
+                                current.direction === "asc" ? "desc" : "asc",
+                            }
+                          : { key: column.key, direction: "asc" },
+                      )
+                    }
                     type="button"
                   >
                     {t(column.label)}
                     {sort.key === column.key
                       ? sort.direction === "asc"
-                        ? " +"
-                        : " -"
+                        ? " ↑"
+                        : " ↓"
                       : ""}
                   </button>
                 ))}

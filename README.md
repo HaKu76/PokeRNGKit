@@ -5,13 +5,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代 Static Searcher 与存档信息基础。** `gen3id` 和 Static Generator 已进入 Git 基线；当前工作区新增 Static Searcher、觉醒力量、输入限制对齐、三代存档信息、本地备份和右下角悬浮窗。真实 Wasm 浏览器集成、GitHub Pages 与项目所有者验收仍待完成。
+**当前里程碑：第三世代 Static Generator / Searcher 功能补全。** `gen3id` 和 Static Generator 已进入 Git 基线；当前工作区补全 Static Searcher、67 条版本联动定点模板、多选筛选、能力值显示、三代存档信息和全局个体值计算器。真实 Wasm 浏览器集成、GitHub Pages 与项目所有者验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
 - 已有模块：ID Generator（XD/Colosseum、FireRed/LeafGreen/Emerald、Ruby/Sapphire）
 - 当前模块：Static Generator / Searcher 与三代存档信息
 - 上游核验基线：PokeFinder 4.3.2
-- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
@@ -31,12 +31,12 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 
 当前 Static 工作区包含：
 
-- Mewtwo、Rayquaza、Regirock、Regice、Registeel、Deoxys、Latios、Latias 首批预设
+- PokeFinder 第三世代掌机 Static 的 67 条模板，按 8 类组织并随当前存档版本过滤
 - Method 1、Method 4 与 Latios/Latias 游走 IV 缺陷
 - Seed、Initial Advances、Max Advances、Offset、TID、SID
-- IV、性格、特性、性别和闪光筛选
+- IV、性格多选、觉醒力量多选、特性、性别和异色筛选
 - Static Searcher 的 IV 组合枚举与反向 Seed 恢复
-- 觉醒属性、觉醒威力、取消筛选和 IV 组合键快捷设置
+- 觉醒属性、觉醒威力、能力值显示、取消筛选和 IV 组合键快捷设置
 - 独立 Generator/Searcher Worker Pool、进度、取消、虚拟化结果表、排序和 CSV
 
 当前三代存档信息基础包含：
@@ -45,6 +45,9 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - IndexedDB 主存储与 localStorage 镜像兜底
 - JSON 导入、导出与同时清除两处缓存
 - 全局右下角小型悬浮窗、默认收起、折叠状态记忆和当前存档摘要
+- 点击悬浮窗以外区域自动收起，不中断存档信息管理器
+
+全局个体值计算器对齐 PokeFinder `IVChecker` 与 `Nature`，支持第三世代物种、性格、觉醒力量、多行能力值交集和下一级提示。该轻量确定性工具使用 TypeScript；大范围 RNG 计算仍只在 C++/Wasm Worker 中执行。
 
 应用左侧模块导航使用默认收起的覆盖式抽屉，避免在桌面和移动视口持续占用计算工作区宽度。
 

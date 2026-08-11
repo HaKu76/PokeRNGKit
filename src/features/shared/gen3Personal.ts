@@ -1,0 +1,35 @@
+export interface Gen3PersonalInfo {
+  stats: [number, number, number, number, number, number];
+  genderRatio: number;
+}
+
+// PokeFinder 4.3.2 personal_rsefrlg.bin, records 0..389.
+// Each compact record stores HP/Atk/Def/SpA/SpD/Spe/Gender.
+const encodedPersonal =
+  "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";
+
+function decodeBytes(encoded: string) {
+  return Uint8Array.from(atob(encoded), (character) => character.charCodeAt(0));
+}
+
+const personal = decodeBytes(encodedPersonal);
+
+export function getGen3Personal(species: number, form = 0): Gen3PersonalInfo {
+  if (!Number.isInteger(species) || species < 1 || species > 386) {
+    throw new RangeError("Generation III species must be between 1 and 386.");
+  }
+  const record = species === 386 && form > 0 ? species + form : species;
+  if (record > 389) throw new RangeError("Invalid Generation III form.");
+  const offset = record * 7;
+  return {
+    stats: [
+      personal[offset],
+      personal[offset + 1],
+      personal[offset + 2],
+      personal[offset + 3],
+      personal[offset + 4],
+      personal[offset + 5],
+    ],
+    genderRatio: personal[offset + 6],
+  };
+}

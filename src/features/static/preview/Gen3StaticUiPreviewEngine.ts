@@ -1,4 +1,5 @@
 import {
+  gen3HiddenPower,
   GEN3_STATIC_MAX_RESULTS,
   type Gen3StaticRequest,
   type Gen3StaticState,
@@ -61,15 +62,13 @@ function matches(request: Gen3StaticRequest, state: Gen3StaticState) {
   const { filters } = request;
   const shinyMatch =
     filters.shiny === "any" ||
-    (filters.shiny === "none" && state.shiny === 0) ||
-    (filters.shiny === "shiny" && state.shiny !== 0) ||
     (filters.shiny === "star" && state.shiny === 1) ||
-    (filters.shiny === "square" && state.shiny === 2);
+    (filters.shiny === "square" && state.shiny === 2) ||
+    (filters.shiny === "star-square" && state.shiny !== 0);
   const genderMatch =
     filters.gender === "any" ||
     (filters.gender === "male" && state.gender === 0) ||
-    (filters.gender === "female" && state.gender === 1) ||
-    (filters.gender === "genderless" && state.gender === 2);
+    (filters.gender === "female" && state.gender === 1);
   const abilityMatch =
     filters.ability === "any" ||
     (filters.ability === "first" && state.ability === 0) ||
@@ -78,7 +77,8 @@ function matches(request: Gen3StaticRequest, state: Gen3StaticState) {
     shinyMatch &&
     genderMatch &&
     abilityMatch &&
-    (filters.nature < 0 || state.nature === filters.nature) &&
+    (filters.natureMask & (1 << state.nature)) !== 0 &&
+    (filters.hiddenPowerMask & (1 << gen3HiddenPower(state.ivs).type)) !== 0 &&
     state.ivs.every(
       (value, index) =>
         value >= filters.ivMin[index] && value <= filters.ivMax[index],

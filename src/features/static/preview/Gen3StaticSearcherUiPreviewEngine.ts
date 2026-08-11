@@ -1,4 +1,5 @@
 import {
+  gen3HiddenPower,
   gen3StaticSearcherCombinationCount,
   GEN3_STATIC_MAX_RESULTS,
   type Gen3StaticSearcherRequest,
@@ -72,15 +73,17 @@ function matches(
   const { filters } = request;
   return (
     (filters.shiny === "any" ||
-      (filters.shiny === "none" && state.shiny === 0)) &&
+      (filters.shiny === "star" && state.shiny === 1) ||
+      (filters.shiny === "square" && state.shiny === 2) ||
+      (filters.shiny === "star-square" && state.shiny !== 0)) &&
     (filters.gender === "any" ||
       (filters.gender === "male" && state.gender === 0) ||
-      (filters.gender === "female" && state.gender === 1) ||
-      (filters.gender === "genderless" && state.gender === 2)) &&
+      (filters.gender === "female" && state.gender === 1)) &&
     (filters.ability === "any" ||
       (filters.ability === "first" && state.ability === 0) ||
       (filters.ability === "second" && state.ability === 1)) &&
-    (filters.nature < 0 || filters.nature === state.nature)
+    (filters.natureMask & (1 << state.nature)) !== 0 &&
+    (filters.hiddenPowerMask & (1 << gen3HiddenPower(state.ivs).type)) !== 0
   );
 }
 

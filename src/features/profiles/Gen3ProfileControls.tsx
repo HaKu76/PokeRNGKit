@@ -1,6 +1,7 @@
 import {
   type ChangeEvent,
   type FormEvent,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -356,6 +357,7 @@ export function Gen3ProfileControls({
   const { t } = useTranslation();
   const [managerOpen, setManagerOpen] = useState(false);
   const [expanded, setExpanded] = useState(initialProfilePanelExpanded);
+  const panelRef = useRef<HTMLElement>(null);
   const profiles = useMemo(
     () =>
       controller.profiles.filter((profile) =>
@@ -369,11 +371,28 @@ export function Gen3ProfileControls({
     profiles.find((profile) => profile.id === controller.selectedProfileId) ??
     DEFAULT_GEN3_PROFILE;
 
+  useEffect(() => {
+    if (!expanded || managerOpen) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (panelRef.current?.contains(event.target as Node)) return;
+      setExpanded(false);
+      try {
+        localStorage.setItem(PROFILE_PANEL_EXPANDED_KEY, "false");
+      } catch {
+        // The panel remains usable when storage is unavailable.
+      }
+    };
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () =>
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, [expanded, managerOpen]);
+
   return (
     <>
       <aside
         aria-label={t("profile")}
         className={`profile-display${expanded ? "" : " collapsed"}`}
+        ref={panelRef}
       >
         <div className="profile-float-heading">
           <div className="profile-float-title">

@@ -5,11 +5,15 @@ import {
   decodeGen3StaticStates,
   gen3StaticSearcherCombinationCount,
   gen3HiddenPower,
-  GEN3_STATIC_TEMPLATES,
   validateGen3StaticRequest,
   type Gen3StaticRequest,
   type Gen3StaticSearcherRequest,
 } from "./domain";
+import {
+  GEN3_STATIC_TEMPLATES,
+  gen3StaticCategoriesForVersion,
+  gen3StaticTemplatesForVersion,
+} from "./encounters";
 
 const request: Gen3StaticRequest = {
   seed: 0x12345678,
@@ -24,7 +28,8 @@ const request: Gen3StaticRequest = {
     shiny: "any",
     gender: "any",
     ability: "any",
-    nature: -1,
+    natureMask: 0x1ff_ffff,
+    hiddenPowerMask: 0xffff,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
   },
@@ -132,5 +137,17 @@ describe("Gen3 Static domain", () => {
       type: 15,
       power: 70,
     });
+  });
+
+  it("filters all upstream handheld encounters by profile version", () => {
+    expect(GEN3_STATIC_TEMPLATES).toHaveLength(67);
+    expect(gen3StaticCategoriesForVersion("ruby")).not.toContain("gameCorner");
+    expect(gen3StaticCategoriesForVersion("ruby")).not.toContain("events");
+    expect(gen3StaticCategoriesForVersion("firered")).toContain("gameCorner");
+    expect(
+      gen3StaticTemplatesForVersion("leafgreen", "events").every((entry) =>
+        entry.versions.includes("leafgreen"),
+      ),
+    ).toBe(true);
   });
 });
