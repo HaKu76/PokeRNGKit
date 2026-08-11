@@ -5,6 +5,8 @@ import {
   GEN3_WILD_MAX_RESULTS,
   type Gen3WildChunk,
   type Gen3WildRequest,
+  type Gen3WildSearcherChunk,
+  type Gen3WildSearcherRequest,
 } from "../domain";
 import type {
   Gen3WildSearchEngine,
@@ -23,7 +25,7 @@ interface PendingChunk {
   reject(error: Error): void;
 }
 
-class Gen3WildWorkerClient {
+export class Gen3WildWorkerClient {
   private readonly worker: Worker;
   private readonly ready: Promise<void>;
   private pending?: PendingChunk;
@@ -53,6 +55,20 @@ class Gen3WildWorkerClient {
     return new Promise<Gen3WildWorkerBatchMessage>((resolve, reject) => {
       this.pending = { taskId, resolve, reject };
       this.post({ type: "run", taskId, request, chunk });
+    });
+  }
+
+  async search(
+    taskId: string,
+    request: Gen3WildSearcherRequest,
+    chunk: Gen3WildSearcherChunk,
+  ) {
+    await this.ready;
+    if (this.pending)
+      throw new Error("Gen3 wild Worker received overlapping chunks.");
+    return new Promise<Gen3WildWorkerBatchMessage>((resolve, reject) => {
+      this.pending = { taskId, resolve, reject };
+      this.post({ type: "search", taskId, request, chunk });
     });
   }
 

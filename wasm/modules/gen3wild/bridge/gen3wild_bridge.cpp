@@ -11,6 +11,7 @@
 #include "gen3wild_bridge.h"
 
 #include <Core/RNG/LCRNG.hpp>
+#include <algorithm>
 #include <array>
 #include <vector>
 
@@ -23,8 +24,9 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 2;
+    constexpr std::uint32_t apiVersion = 3;
     constexpr std::uint32_t maxStatesPerCall = 100000;
+    constexpr std::uint32_t maxResultsPerCall = 250000;
 
     enum ErrorCode : std::uint32_t
     {
@@ -201,6 +203,127 @@ namespace
             }
         }
         return true;
+    }
+
+    struct RecoverySeeds
+    {
+        std::uint32_t count = 0;
+        std::array<std::uint32_t, 6> seeds {};
+    };
+
+    RecoverySeeds recoverMethod1(const std::array<std::uint8_t, 6> &ivs)
+    {
+        constexpr std::uint32_t lag0 = 0x6134;
+        constexpr std::uint32_t lag1 = 0xC907;
+        constexpr std::uint32_t lower = 0x64833CB0;
+        constexpr std::uint32_t upper = 0x6483CBBC;
+        const std::uint32_t first
+            = static_cast<std::uint32_t>((ivs[0] | (ivs[1] << 5) | (ivs[2] << 10)) << 16);
+        const std::uint32_t second
+            = static_cast<std::uint32_t>((ivs[5] | (ivs[3] << 5) | (ivs[4] << 10)) << 16);
+        const std::uint64_t tmp = ((PokeRNG::getMult() * first - second) >> 16) * static_cast<std::uint64_t>(lag1);
+        const std::uint32_t low = static_cast<std::uint32_t>(((tmp + lower) >> 15) * lag0);
+        const std::uint32_t middle = low + lag0;
+        const std::uint32_t high = static_cast<std::uint32_t>(((tmp + upper) >> 15) * lag0);
+
+        RecoverySeeds recovered;
+        const auto recover = [&](std::uint32_t start) {
+            for (std::uint32_t lowerBits = start % lag1; lowerBits < 0x10000; lowerBits += lag1)
+            {
+                const std::uint32_t seed = first | lowerBits;
+                PokeRNG rng(seed);
+                if ((rng.next() & 0x7fff0000) == second)
+                {
+                    recovered.seeds[recovered.count++] = seed;
+                    recovered.seeds[recovered.count++] = seed ^ 0x80000000;
+                }
+            }
+        };
+        recover(low);
+        recover(middle);
+        if (middle != high)
+        {
+            recover(high);
+        }
+        return recovered;
+    }
+
+    RecoverySeeds recoverMethod4(const std::array<std::uint8_t, 6> &ivs)
+    {
+        constexpr std::uint32_t lag0 = 0x6C31;
+        constexpr std::uint32_t lag1 = 0x2E90;
+        constexpr std::uint32_t lower = 0x4B8CE21D;
+        constexpr std::uint32_t upper = 0x4B8D08D7;
+        constexpr std::uint32_t mult = PokeRNGR::getMult() * PokeRNGR::getMult();
+        const std::uint32_t first
+            = static_cast<std::uint32_t>((ivs[0] | (ivs[1] << 5) | (ivs[2] << 10)) << 16);
+        const std::uint32_t second
+            = static_cast<std::uint32_t>((ivs[5] | (ivs[3] << 5) | (ivs[4] << 10)) << 16);
+        const std::uint32_t temporary = ((first - second * mult) >> 16) * lag0;
+        const std::uint32_t low = (temporary + lower) >> 15;
+        const std::uint32_t high = (temporary + upper) >> 15;
+
+        RecoverySeeds recovered;
+        const auto recover = [&](std::uint32_t start) {
+            for (std::uint32_t lowerBits = (start * lag1) % lag0; lowerBits < 0x10000; lowerBits += lag0)
+            {
+                const std::uint32_t seed = second | lowerBits;
+                PokeRNGR rng(seed, 2);
+                if ((rng.getSeed() & 0x7fff0000) == first)
+                {
+                    recovered.seeds[recovered.count++] = rng.getSeed();
+                    recovered.seeds[recovered.count++] = rng.getSeed() ^ 0x80000000;
+                }
+            }
+        };
+        recover(low);
+        if (low != high)
+        {
+            recover(high);
+        }
+        return recovered;
+    }
+
+    std::array<std::uint8_t, 6> ivsAtIndex(std::uint64_t index,
+                                           const std::array<std::uint32_t, 6> &minimum,
+                                           const std::array<std::uint32_t, 6> &maximum)
+    {
+        std::array<std::uint8_t, 6> ivs {};
+        for (int stat = 5; stat >= 0; stat--)
+        {
+            const std::uint32_t size = maximum[stat] - minimum[stat] + 1;
+            ivs[stat] = static_cast<std::uint8_t>(minimum[stat] + index % size);
+            index /= size;
+        }
+        return ivs;
+    }
+
+    std::uint8_t calculateLevel(const Gen3WildPackedSlot &slot, std::uint16_t value)
+    {
+        return static_cast<std::uint8_t>(slot.minLevel + value % (slot.maxLevel - slot.minLevel + 1));
+    }
+
+    std::uint8_t calculatePressureLevel(const Gen3WildPackedSlot &slot, std::uint16_t value, bool force)
+    {
+        if (force)
+        {
+            return static_cast<std::uint8_t>(slot.maxLevel);
+        }
+        std::uint32_t level = value % (slot.maxLevel - slot.minLevel + 1);
+        if (level != 0)
+        {
+            level--;
+        }
+        return static_cast<std::uint8_t>(slot.minLevel + level);
+    }
+
+    bool cuteCharmGender(const Gen3WildPackedSlot &slot, std::uint32_t pid, std::uint32_t lead)
+    {
+        if (fixedGender(slot.genderRatio))
+        {
+            return false;
+        }
+        return lead == CuteCharmF ? (pid & 0xff) >= slot.genderRatio : (pid & 0xff) < slot.genderRatio;
     }
 }
 
@@ -422,6 +545,324 @@ extern "C"
             results.push_back({ initialAdvances + count, pid, ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5],
                                 abilityValue, genderValue, level, natureShiny, selectedSlot,
                                 slot.species, slot.form });
+        }
+        return static_cast<std::uint32_t>(results.size());
+    }
+
+    POKERNGKIT_KEEPALIVE std::uint32_t gen3wild_search(
+        const Gen3WildPackedSlot *slots, std::uint32_t slotCount, std::uint32_t startIndex,
+        std::uint32_t stateCount, std::uint32_t method, std::uint32_t lead, std::uint32_t encounter,
+        std::uint32_t rate, std::uint32_t rse, std::uint32_t feebasTile, std::uint32_t feebasLocation,
+        std::uint32_t safariZone, std::uint32_t bike, std::uint32_t item, std::uint32_t tid,
+        std::uint32_t sid, std::uint32_t shinyFilter, std::uint32_t genderFilter,
+        std::uint32_t abilityFilter, std::uint32_t natureMask, std::uint32_t hiddenPowerMask,
+        std::uint32_t encounterSlotMask, std::uint32_t levelMin, std::uint32_t levelMax,
+        std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
+        std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
+        std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax,
+        std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax)
+    {
+        results.clear();
+        lastError = ErrorCode::None;
+        if (slots == nullptr || slotCount == 0 || slotCount > 12 || stateCount == 0
+            || stateCount > maxStatesPerCall || !validMethod(method) || !validLead(lead)
+            || (lead > 0 && lead <= SynchronizeEnd) || !validEncounter(encounter) || rate == 0 || rate > 255
+            || rse > 1 || feebasTile > 1 || feebasLocation > 1 || safariZone > 1 || bike > 1
+            || item > 3 || tid > 0xffff || sid > 0xffff || shinyFilter > ShinyStarSquare
+            || genderFilter > GenderFemale || abilityFilter > AbilitySecond || natureMask == 0
+            || natureMask > 0x1ffffff || hiddenPowerMask == 0 || hiddenPowerMask > 0xffff
+            || encounterSlotMask == 0 || encounterSlotMask > 0xfff || levelMin == 0 || levelMax > 100
+            || levelMin > levelMax)
+        {
+            lastError = ErrorCode::InvalidInput;
+            return 0;
+        }
+        const std::array<std::uint32_t, 6> minimum
+            = { hpMin, attackMin, defenseMin, specialAttackMin, specialDefenseMin, speedMin };
+        const std::array<std::uint32_t, 6> maximum
+            = { hpMax, attackMax, defenseMax, specialAttackMax, specialDefenseMax, speedMax };
+        std::uint64_t totalStates = 1;
+        for (std::size_t index = 0; index < minimum.size(); index++)
+        {
+            if (minimum[index] > 31 || maximum[index] > 31 || minimum[index] > maximum[index])
+            {
+                lastError = ErrorCode::InvalidInput;
+                return 0;
+            }
+            totalStates *= maximum[index] - minimum[index] + 1;
+        }
+        if (static_cast<std::uint64_t>(startIndex) + stateCount > totalStates)
+        {
+            lastError = ErrorCode::InvalidInput;
+            return 0;
+        }
+        for (std::uint32_t index = 0; index < slotCount; index++)
+        {
+            const auto &slot = slots[index];
+            if (slot.species == 0 || slot.species > 1025 || slot.form > 255 || slot.minLevel == 0
+                || slot.minLevel > slot.maxLevel || slot.maxLevel > 100 || slot.genderRatio > 255
+                || (slot.types & 0xff) > 16 || ((slot.types >> 8) & 0xff) > 16 || (slot.types >> 16) != 0)
+            {
+                lastError = ErrorCode::InvalidInput;
+                return 0;
+            }
+        }
+
+        std::array<std::uint8_t, 12> modifiedSlots {};
+        std::uint32_t modifiedCount = 0;
+        const std::uint32_t modifiedType = lead == MagnetPull ? 8 : lead == Static ? 12 : 255;
+        if (modifiedType != 255)
+        {
+            for (std::uint32_t index = 0; index < slotCount; index++)
+            {
+                const std::uint32_t types = slots[index].types;
+                if ((types & 0xff) == modifiedType || ((types >> 8) & 0xff) == modifiedType)
+                {
+                    modifiedSlots[modifiedCount++] = static_cast<std::uint8_t>(index);
+                }
+            }
+            if (modifiedCount == slotCount)
+            {
+                modifiedCount = 0;
+            }
+        }
+
+        std::uint32_t encounterRate = 0;
+        if (rse != 0 && encounter == RockSmash)
+        {
+            encounterRate = rate * 16;
+            if (bike != 0)
+            {
+                encounterRate = encounterRate * 80 / 100;
+            }
+            if (item == 1)
+            {
+                encounterRate /= 2;
+            }
+            else if (item == 2)
+            {
+                encounterRate = encounterRate * 2 / 3;
+            }
+            else if (item == 3)
+            {
+                encounterRate += encounterRate / 2;
+            }
+        }
+        const bool feebas = feebasLocation != 0
+            && (encounter == OldRod || encounter == GoodRod || encounter == SuperRod);
+        const bool safari = safariZone != 0;
+        const bool ivAdvance = method == 2;
+        const std::uint16_t trainerXor = static_cast<std::uint16_t>(tid ^ sid);
+        results.reserve(std::min<std::size_t>(static_cast<std::size_t>(stateCount) * 20, maxResultsPerCall));
+
+        for (std::uint32_t offset = 0; offset < stateCount; offset++)
+        {
+            const auto ivs = ivsAtIndex(static_cast<std::uint64_t>(startIndex) + offset, minimum, maximum);
+            if ((hiddenPowerMask & (1u << hiddenPowerType(ivs))) == 0)
+            {
+                continue;
+            }
+            const RecoverySeeds recovered = method == 4 ? recoverMethod4(ivs) : recoverMethod1(ivs);
+            for (std::uint32_t recoveredIndex = 0; recoveredIndex < recovered.count; recoveredIndex++)
+            {
+                PokeRNGR rng(recovered.seeds[recoveredIndex]);
+                if (ivAdvance)
+                {
+                    rng.next();
+                }
+                std::uint32_t pid = static_cast<std::uint32_t>(rng.nextUShort()) << 16;
+                pid |= rng.nextUShort();
+                const std::uint8_t nature = static_cast<std::uint8_t>(pid % 25);
+                if ((natureMask & (1u << nature)) == 0)
+                {
+                    continue;
+                }
+
+                std::uint16_t nextRng = rng.nextUShort();
+                std::uint16_t nextRng2 = rng.nextUShort();
+                do
+                {
+                    bool cuteCharmFlag = false;
+                    std::array<std::uint8_t, 4> selectedSlots {};
+                    bool force = false;
+                    std::array<std::uint16_t, 2> levelRandom {};
+                    std::array<PokeRNGR, 4> tests = { rng, rng, rng, rng };
+                    std::array<bool, 4> valid {};
+
+                    const auto chooseFeebasOrNormal = [&](std::uint32_t first, std::uint32_t second) {
+                        if (feebas)
+                        {
+                            if (feebasTile != 0)
+                            {
+                                if (tests[first].nextUShort(100) < 50)
+                                {
+                                    selectedSlots[first] = encounter == OldRod ? 2 : encounter == GoodRod ? 3 : 5;
+                                    valid[first] = selectedSlots[first] < slotCount
+                                        && (encounterSlotMask & (1u << selectedSlots[first])) != 0;
+                                }
+                                const std::uint8_t random = tests[second].nextUShort(100);
+                                if (tests[second].nextUShort(100) >= 50)
+                                {
+                                    selectedSlots[second] = encounterSlot(encounter, random);
+                                    valid[second] = selectedSlots[second] < slotCount
+                                        && (encounterSlotMask & (1u << selectedSlots[second])) != 0;
+                                }
+                            }
+                            else
+                            {
+                                tests[first].next();
+                                selectedSlots[first] = encounterSlot(encounter, tests[first].nextUShort(100));
+                                valid[first] = selectedSlots[first] < slotCount
+                                    && (encounterSlotMask & (1u << selectedSlots[first])) != 0;
+                            }
+                        }
+                        else
+                        {
+                            selectedSlots[first] = encounterSlot(encounter, tests[first].nextUShort(100));
+                            valid[first] = selectedSlots[first] < slotCount
+                                && (encounterSlotMask & (1u << selectedSlots[first])) != 0;
+                        }
+                    };
+
+                    if (lead == LeadNone)
+                    {
+                        if (nextRng % 25 == nature)
+                        {
+                            levelRandom[0] = safari ? tests[0].nextUShort() : nextRng2;
+                            chooseFeebasOrNormal(0, 1);
+                        }
+                    }
+                    else if (lead == CuteCharmF || lead == CuteCharmM)
+                    {
+                        if (nextRng % 25 == nature)
+                        {
+                            cuteCharmFlag = nextRng2 % 3 > 0;
+                            if (safari)
+                            {
+                                tests[0].next();
+                            }
+                            levelRandom[0] = tests[0].nextUShort();
+                            chooseFeebasOrNormal(0, 1);
+                        }
+                    }
+                    else if (lead == 0)
+                    {
+                        if ((nextRng & 1) == 0)
+                        {
+                            levelRandom[0] = safari ? tests[0].nextUShort() : nextRng2;
+                            chooseFeebasOrNormal(0, 1);
+                        }
+                        if ((nextRng2 & 1) == 1 && nextRng % 25 == nature)
+                        {
+                            if (safari)
+                            {
+                                tests[1].next();
+                            }
+                            levelRandom[1] = tests[2].nextUShort();
+                            if (feebas && feebasTile != 0)
+                            {
+                                if (tests[2].nextUShort(100) < 50)
+                                {
+                                    selectedSlots[2] = encounter == OldRod ? 2 : encounter == GoodRod ? 3 : 5;
+                                    valid[2] = selectedSlots[2] < slotCount
+                                        && (encounterSlotMask & (1u << selectedSlots[2])) != 0;
+                                }
+                                tests[3].next();
+                                const std::uint8_t random = tests[3].nextUShort(100);
+                                if (tests[3].nextUShort(100) >= 50)
+                                {
+                                    selectedSlots[3] = encounterSlot(encounter, random);
+                                    valid[3] = selectedSlots[3] < slotCount
+                                        && (encounterSlotMask & (1u << selectedSlots[3])) != 0;
+                                }
+                            }
+                            else if (feebas)
+                            {
+                                tests[2].next();
+                                selectedSlots[2] = encounterSlot(encounter, tests[2].nextUShort(100));
+                                valid[2] = selectedSlots[2] < slotCount
+                                    && (encounterSlotMask & (1u << selectedSlots[2])) != 0;
+                            }
+                            else
+                            {
+                                selectedSlots[2] = encounterSlot(encounter, tests[2].nextUShort(100));
+                                valid[2] = selectedSlots[2] < slotCount
+                                    && (encounterSlotMask & (1u << selectedSlots[2])) != 0;
+                            }
+                        }
+                    }
+                    else if (lead == MagnetPull || lead == Static)
+                    {
+                        if (nextRng % 25 == nature)
+                        {
+                            levelRandom[0] = safari ? tests[0].nextUShort() : nextRng2;
+                            const std::uint16_t random = tests[0].nextUShort();
+                            if (tests[0].nextUShort(2) == 0 && modifiedCount != 0)
+                            {
+                                selectedSlots[0] = modifiedSlots[random % modifiedCount];
+                            }
+                            else
+                            {
+                                selectedSlots[0] = encounterSlot(encounter, random % 100);
+                            }
+                            valid[0] = selectedSlots[0] < slotCount
+                                && (encounterSlotMask & (1u << selectedSlots[0])) != 0;
+                        }
+                    }
+                    else if (lead == Pressure)
+                    {
+                        if (nextRng % 25 == nature)
+                        {
+                            force = ((safari ? tests[0].nextUShort() : nextRng2) & 1) == 0;
+                            levelRandom[0] = tests[0].nextUShort();
+                            chooseFeebasOrNormal(0, 1);
+                        }
+                    }
+
+                    for (std::size_t index = 0; index < valid.size(); index++)
+                    {
+                        if (!valid[index]
+                            || (encounterRate != 0 && tests[index].nextUShort(2880) >= encounterRate))
+                        {
+                            continue;
+                        }
+                        const auto &slot = slots[selectedSlots[index]];
+                        if (cuteCharmFlag && !cuteCharmGender(slot, pid, lead))
+                        {
+                            continue;
+                        }
+                        const std::uint8_t level = lead == Pressure
+                            ? calculatePressureLevel(slot, levelRandom[index >> 1], force)
+                            : calculateLevel(slot, levelRandom[index >> 1]);
+                        const std::uint8_t abilityValue = static_cast<std::uint8_t>(pid & 1);
+                        const std::uint8_t genderValue = gender(pid, slot.genderRatio);
+                        const std::uint8_t shinyValue = shiny(pid, trainerXor);
+                        if (level < levelMin || level > levelMax || !matchesShiny(shinyValue, shinyFilter)
+                            || !matchesGender(genderValue, genderFilter)
+                            || !matchesAbility(abilityValue, abilityFilter))
+                        {
+                            continue;
+                        }
+                        const std::uint32_t natureShiny
+                            = nature | (static_cast<std::uint32_t>(shinyValue) << 8);
+                        results.push_back({ tests[index].next(), pid, ivs[0], ivs[1], ivs[2], ivs[3], ivs[4],
+                                            ivs[5], abilityValue, genderValue, level, natureShiny,
+                                            selectedSlots[index], slot.species, slot.form });
+                        if (results.size() >= maxResultsPerCall)
+                        {
+                            return static_cast<std::uint32_t>(results.size());
+                        }
+                    }
+
+                    const std::uint32_t huntPid = (static_cast<std::uint32_t>(nextRng) << 16) | nextRng2;
+                    if (huntPid % 25 == nature)
+                    {
+                        break;
+                    }
+                    nextRng = rng.nextUShort();
+                    nextRng2 = rng.nextUShort();
+                } while (true);
+            }
         }
         return static_cast<std::uint32_t>(results.size());
     }

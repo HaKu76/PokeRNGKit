@@ -33,11 +33,23 @@ namespace
             encounterSlots, levelMin, levelMax, ivMin[0], ivMin[1], ivMin[2], ivMin[3],
             ivMin[4], ivMin[5], ivMax[0], ivMax[1], ivMax[2], ivMax[3], ivMax[4], ivMax[5]);
     }
+
+    std::uint32_t search(const std::array<Gen3WildPackedSlot, 12> &slots,
+                         std::uint32_t method = 1, std::uint32_t lead = 255,
+                         std::uint32_t encounter = 0, std::uint32_t rate = 10,
+                         bool bike = false, std::uint32_t item = 0)
+    {
+        return gen3wild_search(
+            slots.data(), slots.size(), 0, 1, method, lead, encounter, rate,
+            1, 0, 0, 0, bike ? 1 : 0, item, 12345, 54321, 0, 0, 0,
+            allNatures, allHiddenPowers, allSlots, 1, 100,
+            31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31);
+    }
 }
 
 int main()
 {
-    assert(gen3wild_api_version() == 2);
+    assert(gen3wild_api_version() == 3);
     const std::array<Gen3WildPackedSlot, 12> slots = {
         Gen3WildPackedSlot { 27, 0, 20, 20, 127, 4 | (4 << 8) },
         Gen3WildPackedSlot { 328, 0, 20, 20, 127, 4 | (4 << 8) },
@@ -80,5 +92,22 @@ int main()
                     { 0, 0, 0, 0, 0, 0 }, { 31, 31, 31, 31, 31, 31 }, 100000)
            == 0);
     assert(gen3wild_last_error() == 1);
+
+    assert(search(slots) == 20);
+    state = reinterpret_cast<const Gen3WildPackedState *>(gen3wild_result_ptr());
+    assert(state->hp == 31);
+    assert(state->attack == 31);
+    assert(state->defense == 31);
+    assert(state->specialAttack == 31);
+    assert(state->specialDefense == 31);
+    assert(state->speed == 31);
+    assert(gen3wild_generate(
+               slots.data(), slots.size(), state->advances, 0, 0, 0, 1, 255, 0, 10,
+               1, 0, 0, 0, 0, 0, 12345, 54321, 0, 0, 0, allNatures,
+               allHiddenPowers, allSlots, 1, 100, 31, 31, 31, 31, 31, 31,
+               31, 31, 31, 31, 31, 31)
+           == 1);
+    assert(search(slots, 2, 0) == 54);
+    assert(search(slots, 4, 25) == 4);
     return 0;
 }

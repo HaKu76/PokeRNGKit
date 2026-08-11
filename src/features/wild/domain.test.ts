@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
   createGen3WildChunks,
+  createGen3WildSearcherChunks,
   decodeGen3WildStates,
+  decodeGen3WildSearcherStates,
+  gen3WildSearcherCombinationCount,
   isGen3WildTanobyChamber,
   validateGen3WildRequest,
+  validateGen3WildSearcherRequest,
   type Gen3WildRequest,
+  type Gen3WildSearcherRequest,
 } from "./domain";
 
 const request: Gen3WildRequest = {
@@ -160,5 +165,41 @@ describe("Gen3 wild domain", () => {
       isGen3WildTanobyChamber("Seven Island Tanoby Ruins Monean Chamber"),
     ).toBe(true);
     expect(isGen3WildTanobyChamber("Seven Island Tanoby Ruins")).toBe(false);
+  });
+
+  it("chunks the searcher IV Cartesian product in deterministic order", () => {
+    const searcher: Gen3WildSearcherRequest = {
+      method: request.method,
+      lead: request.lead,
+      feebasTile: request.feebasTile,
+      bike: request.bike,
+      item: request.item,
+      version: request.version,
+      tid: request.tid,
+      sid: request.sid,
+      area: request.area,
+      filters: {
+        ...request.filters,
+        ivMin: [30, 31, 31, 31, 31, 30],
+        ivMax: [31, 31, 31, 31, 31, 31],
+      },
+    };
+    expect(gen3WildSearcherCombinationCount(searcher)).toBe(4);
+    expect(createGen3WildSearcherChunks(searcher, 3)).toEqual([
+      { index: 0, startIndex: 0, stateCount: 3 },
+      { index: 1, startIndex: 3, stateCount: 1 },
+    ]);
+    expect(validateGen3WildSearcherRequest(searcher)).toEqual([]);
+  });
+
+  it("decodes the first searcher result word as Seed", () => {
+    const words = new Uint32Array([
+      0x12345678, 0x87654321, 31, 30, 29, 28, 27, 26, 1, 0, 20, 17, 3, 328, 0,
+    ]);
+    expect(decodeGen3WildSearcherStates(words.buffer)[0]).toMatchObject({
+      seed: 0x12345678,
+      pid: 0x87654321,
+      ivs: [31, 30, 29, 28, 27, 26],
+    });
   });
 });

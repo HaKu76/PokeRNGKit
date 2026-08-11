@@ -18,8 +18,11 @@ import { getGen3SpeciesName } from "../shared/gen3Species";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import {
   GEN3_WILD_MAX_RESULTS,
+  GEN3_WILD_MAX_TOTAL_STATES,
+  gen3WildSearcherCombinationCount,
   isGen3WildTanobyChamber,
   validateGen3WildRequest,
+  validateGen3WildSearcherRequest,
   type Gen3WildAbilityFilter,
   type Gen3WildArea,
   type Gen3WildEncounter,
@@ -29,24 +32,31 @@ import {
   type Gen3WildLead,
   type Gen3WildMethod,
   type Gen3WildRequest,
+  type Gen3WildSearcherRequest,
+  type Gen3WildSearcherState,
   type Gen3WildShinyFilter,
   type Gen3WildState,
 } from "./domain";
 import { GEN3_ENCOUNTERS, GEN3_PERSONAL } from "./gen3Data";
 import { Gen3WildUiPreviewEngine } from "./preview/Gen3WildUiPreviewEngine";
+import { Gen3WildSearcherUiPreviewEngine } from "./preview/Gen3WildSearcherUiPreviewEngine";
 import type {
   Gen3WildSearchEngine,
   Gen3WildSearchProgress,
   Gen3WildSearchSummary,
 } from "./search";
+import type { Gen3WildSearcherEngine } from "./searcher";
+import { Gen3WildSearcherWorkerPool } from "./worker/Gen3WildSearcherWorkerPool";
 import { Gen3WildWorkerPool } from "./worker/Gen3WildWorkerPool";
 
 type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
 type DataGame = "ruby" | "sapphire" | "emerald" | "fire-red" | "leaf-green";
+type WildOperation = "generator" | "searcher";
 type IvKey =
   "hp" | "attack" | "defense" | "specialAttack" | "specialDefense" | "speed";
 type SortKey =
   | "advances"
+  | "seed"
   | "slot"
   | "level"
   | "pid"
@@ -58,6 +68,8 @@ type SortKey =
   | "power"
   | "gender";
 type IvTextValues = [string, string, string, string, string, string];
+type IvRanges = { min: IvTextValues; max: IvTextValues };
+type WildResultState = Gen3WildState | Gen3WildSearcherState;
 type RawLocation = {
   readonly name: string;
   readonly encounters: readonly {
@@ -146,8 +158,10 @@ const encounterLabels: Record<Gen3WildEncounter, string> = {
   "good-rod": "wildGoodRod",
   "super-rod": "wildSuperRod",
 };
-const columns: Array<{ key: SortKey; label: string }> = [
-  { key: "advances", label: "rowAdvance" },
+const resultColumns: Array<{
+  key: Exclude<SortKey, "advances" | "seed">;
+  label: string;
+}> = [
   { key: "slot", label: "wildResultSlot" },
   { key: "level", label: "level" },
   { key: "pid", label: "rowPid" },
@@ -164,6 +178,17 @@ const columns: Array<{ key: SortKey; label: string }> = [
   { key: "power", label: "hiddenPowerStrength" },
   { key: "gender", label: "gender" },
 ];
+
+function wildColumns(
+  operation: WildOperation,
+): Array<{ key: SortKey; label: string }> {
+  return [
+    operation === "generator"
+      ? { key: "advances", label: "rowAdvance" }
+      : { key: "seed", label: "seed" },
+    ...resultColumns,
+  ];
+}
 const gameData = GEN3_ENCOUNTERS as unknown as Record<
   DataGame,
   readonly RawLocation[]
@@ -316,12 +341,20 @@ export function Gen3WildPanel({
   uiPreviewMode,
 }: Gen3WildPanelProps) {
   const { t, i18n } = useTranslation();
-  const engine = useMemo<Gen3WildSearchEngine>(
+  const generatorEngine = useMemo<Gen3WildSearchEngine>(
     () =>
       uiPreviewMode ? new Gen3WildUiPreviewEngine() : new Gen3WildWorkerPool(),
     [uiPreviewMode],
   );
+  const searcherEngine = useMemo<Gen3WildSearcherEngine>(
+    () =>
+      uiPreviewMode
+        ? new Gen3WildSearcherUiPreviewEngine()
+        : new Gen3WildSearcherWorkerPool(),
+    [uiPreviewMode],
+  );
   const tableRef = useRef<HTMLDivElement>(null);
+  const [operation, setOperation] = useState<WildOperation>("generator");
   const [encounter, setEncounter] = useState<Gen3WildEncounter>("land");
   const [locationIndex, setLocationIndex] = useState(0);
   const [selectedSpecies, setSelectedSpecies] = useState(0);
@@ -344,24 +377,18 @@ export function Gen3WildPanel({
   const [encounterSlotMask, setEncounterSlotMask] = useState(0);
   const [levelMin, setLevelMin] = useState("1");
   const [levelMax, setLevelMax] = useState("100");
-  const [ivMin, setIvMin] = useState<IvTextValues>([
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-    "0",
-  ]);
-  const [ivMax, setIvMax] = useState<IvTextValues>([
-    "31",
-    "31",
-    "31",
-    "31",
-    "31",
-    "31",
-  ]);
+  const [ivRanges, setIvRanges] = useState<Record<WildOperation, IvRanges>>({
+    generator: {
+      min: ["0", "0", "0", "0", "0", "0"],
+      max: ["31", "31", "31", "31", "31", "31"],
+    },
+    searcher: {
+      min: ["31", "31", "31", "31", "31", "31"],
+      max: ["31", "31", "31", "31", "31", "31"],
+    },
+  });
   const [showStats, setShowStats] = useState(false);
-  const [results, setResults] = useState<Gen3WildState[]>([]);
+  const [results, setResults] = useState<WildResultState[]>([]);
   const [progress, setProgress] = useState<Gen3WildSearchProgress>({
     processedStates: 0,
     totalStates: 0,
@@ -420,6 +447,8 @@ export function Gen3WildPanel({
       profile.version === "emerald");
   const leadAvailable = profile.version === "emerald";
   const fullEncounterSlotMask = area ? (1 << area.slots.length) - 1 : 0;
+  const columns = useMemo(() => wildColumns(operation), [operation]);
+  const activeIvRanges = ivRanges[operation];
   const natureOptions = natureKeys.map((key, value) => ({
     label: t(key),
     value,
@@ -433,7 +462,7 @@ export function Gen3WildPanel({
     value,
   }));
 
-  const stateValue = (state: Gen3WildState, key: SortKey): number => {
+  const stateValue = (state: WildResultState, key: SortKey): number => {
     const ivIndex = ivKeys.indexOf(key as IvKey);
     if (ivIndex >= 0) {
       return showStats
@@ -446,9 +475,13 @@ export function Gen3WildPanel({
         : state.ivs[ivIndex];
     }
     if (key === "slot") return state.encounterSlot;
+    if (key === "advances") return "advances" in state ? state.advances : 0;
+    if (key === "seed") return "seed" in state ? state.seed : 0;
     if (key === "hiddenPower") return gen3HiddenPower(state.ivs).type;
     if (key === "power") return gen3HiddenPower(state.ivs).power;
-    return state[key as keyof Gen3WildState] as number;
+    return state[
+      key as "level" | "pid" | "shiny" | "nature" | "ability" | "gender"
+    ];
   };
   const sortedResults = useMemo(() => {
     const multiplier = sort.direction === "asc" ? 1 : -1;
@@ -468,7 +501,13 @@ export function Gen3WildPanel({
     overscan: 12,
   });
 
-  useEffect(() => () => engine.dispose(), [engine]);
+  useEffect(
+    () => () => {
+      generatorEngine.dispose();
+      searcherEngine.dispose();
+    },
+    [generatorEngine, searcherEngine],
+  );
   useEffect(() => {
     setLocationIndex(0);
     setFeebasTile(false);
@@ -514,13 +553,15 @@ export function Gen3WildPanel({
   };
 
   const updateIv = (kind: "min" | "max", index: number, value: string) => {
-    const setter = kind === "min" ? setIvMin : setIvMax;
-    setter(
-      (current) =>
-        current.map((entry, currentIndex) =>
+    setIvRanges((current) => ({
+      ...current,
+      [operation]: {
+        ...current[operation],
+        [kind]: current[operation][kind].map((entry, currentIndex) =>
           currentIndex === index ? value : entry,
         ) as IvTextValues,
-    );
+      },
+    }));
   };
 
   const applyIvShortcut = (index: number, event: MouseEvent) => {
@@ -532,22 +573,21 @@ export function Gen3WildPanel({
           : event.altKey
             ? ["30", "31"]
             : ["0", "31"];
-    setIvMin(
-      (current) =>
-        current.map((entry, currentIndex) =>
+    setIvRanges((current) => ({
+      ...current,
+      [operation]: {
+        min: current[operation].min.map((entry, currentIndex) =>
           currentIndex === index ? minimum : entry,
         ) as IvTextValues,
-    );
-    setIvMax(
-      (current) =>
-        current.map((entry, currentIndex) =>
+        max: current[operation].max.map((entry, currentIndex) =>
           currentIndex === index ? maximum : entry,
         ) as IvTextValues,
-    );
+      },
+    }));
   };
 
-  const readFilters = (): Gen3WildFilters =>
-    filtersDisabled
+  const readFilters = (disabled = false): Gen3WildFilters =>
+    disabled
       ? {
           shiny: "any",
           gender: "any",
@@ -569,10 +609,10 @@ export function Gen3WildPanel({
           encounterSlotMask: encounterSlotMask || fullEncounterSlotMask,
           levelMin: parseDecimal(levelMin) ?? Number.NaN,
           levelMax: parseDecimal(levelMax) ?? Number.NaN,
-          ivMin: ivMin.map(
+          ivMin: activeIvRanges.min.map(
             (value) => parseDecimal(value) ?? Number.NaN,
           ) as Gen3WildFilters["ivMin"],
-          ivMax: ivMax.map(
+          ivMax: activeIvRanges.max.map(
             (value) => parseDecimal(value) ?? Number.NaN,
           ) as Gen3WildFilters["ivMax"],
         };
@@ -580,14 +620,9 @@ export function Gen3WildPanel({
   const run = async (event: FormEvent) => {
     event.preventDefault();
     if (!area || status === "calculating") return;
-    const request: Gen3WildRequest = {
-      seed: parseHex(seed) ?? Number.NaN,
-      initialAdvances: parseDecimal(initialAdvances) ?? Number.NaN,
-      maxAdvances: parseDecimal(maxAdvances) ?? Number.NaN,
-      offset: parseDecimal(offset) ?? Number.NaN,
+    const shared = {
       method,
       lead: leadAvailable ? lead : "none",
-      synchronizeNature,
       feebasTile: feebasAvailable && feebasTile,
       bike: rockOptions && bike,
       item: rockOptions ? item : "none",
@@ -595,10 +630,38 @@ export function Gen3WildPanel({
       tid: profile.tid,
       sid: profile.sid,
       area,
-      filters: readFilters(),
-    };
-    if (validateGen3WildRequest(request).length > 0) {
-      setError(t("invalidWildInput"));
+    } satisfies Omit<Gen3WildSearcherRequest, "filters">;
+    const generatorRequest: Gen3WildRequest | undefined =
+      operation === "generator"
+        ? {
+            ...shared,
+            seed: parseHex(seed) ?? Number.NaN,
+            initialAdvances: parseDecimal(initialAdvances) ?? Number.NaN,
+            maxAdvances: parseDecimal(maxAdvances) ?? Number.NaN,
+            offset: parseDecimal(offset) ?? Number.NaN,
+            synchronizeNature,
+            filters: readFilters(filtersDisabled),
+          }
+        : undefined;
+    const searcherRequest: Gen3WildSearcherRequest | undefined =
+      operation === "searcher"
+        ? {
+            ...shared,
+            filters: readFilters(),
+          }
+        : undefined;
+    const validationErrors = generatorRequest
+      ? validateGen3WildRequest(generatorRequest)
+      : validateGen3WildSearcherRequest(searcherRequest!);
+    if (validationErrors.length > 0) {
+      setError(
+        validationErrors.includes("searchRange")
+          ? t("wildSearchRangeTooLarge", {
+              count: String(gen3WildSearcherCombinationCount(searcherRequest!)),
+              limit: String(GEN3_WILD_MAX_TOTAL_STATES),
+            })
+          : t("invalidWildInput"),
+      );
       setStatus("failed");
       return;
     }
@@ -607,17 +670,25 @@ export function Gen3WildPanel({
     setSummary(undefined);
     setProgress({
       processedStates: 0,
-      totalStates: request.maxAdvances + 1,
+      totalStates: generatorRequest
+        ? generatorRequest.maxAdvances + 1
+        : gen3WildSearcherCombinationCount(searcherRequest!),
       resultCount: 0,
       percent: 0,
     });
     setStatus("calculating");
     try {
-      const nextSummary = await engine.search(request, {
-        maxResults: GEN3_WILD_MAX_RESULTS,
-        onBatch: (batch) => setResults((current) => current.concat(batch)),
-        onProgress: setProgress,
-      });
+      const nextSummary = generatorRequest
+        ? await generatorEngine.search(generatorRequest, {
+            maxResults: GEN3_WILD_MAX_RESULTS,
+            onBatch: (batch) => setResults((current) => current.concat(batch)),
+            onProgress: setProgress,
+          })
+        : await searcherEngine.search(searcherRequest!, {
+            maxResults: GEN3_WILD_MAX_RESULTS,
+            onBatch: (batch) => setResults((current) => current.concat(batch)),
+            onProgress: setProgress,
+          });
       setSummary(nextSummary);
       setStatus(nextSummary.cancelled ? "cancelled" : "completed");
     } catch (caught) {
@@ -631,8 +702,28 @@ export function Gen3WildPanel({
     }
   };
 
-  const displayStateValue = (state: Gen3WildState, key: SortKey) => {
-    if (key === "advances") return String(state.advances);
+  const resetRunState = (nextOperation: WildOperation) => {
+    setOperation(nextOperation);
+    setResults([]);
+    setSummary(undefined);
+    setProgress({
+      processedStates: 0,
+      totalStates: 0,
+      resultCount: 0,
+      percent: 0,
+    });
+    setStatus("ready");
+    setError("");
+    setSort({
+      key: nextOperation === "generator" ? "advances" : "seed",
+      direction: "asc",
+    });
+  };
+
+  const displayStateValue = (state: WildResultState, key: SortKey) => {
+    if (key === "advances")
+      return String("advances" in state ? state.advances : 0);
+    if (key === "seed") return formatHex("seed" in state ? state.seed : 0, 8);
     if (key === "slot")
       return `${state.encounterSlot}: ${getGen3SpeciesName(i18n.language, state.species, state.form)}`;
     if (key === "pid") return formatHex(state.pid, 8);
@@ -698,10 +789,33 @@ export function Gen3WildPanel({
     failed: t("failed"),
   }[status];
   const leadValue =
-    lead === "synchronize" ? `synchronize-${synchronizeNature}` : lead;
+    lead === "synchronize" && operation === "generator"
+      ? `synchronize-${synchronizeNature}`
+      : lead;
 
   return (
     <>
+      <div
+        aria-label={t("wildEngine")}
+        className="operation-tabs"
+        role="tablist"
+      >
+        {(["generator", "searcher"] as WildOperation[]).map((entry) => (
+          <button
+            aria-selected={operation === entry}
+            className={operation === entry ? "active" : ""}
+            disabled={status === "calculating"}
+            key={entry}
+            onClick={() => {
+              if (operation !== entry) resetRunState(entry);
+            }}
+            role="tab"
+            type="button"
+          >
+            {t(entry)}
+          </button>
+        ))}
+      </div>
       <form className="static-control-grid" onSubmit={run}>
         <section className="panel static-panel static-rng-panel">
           <div className="panel-heading">
@@ -709,7 +823,7 @@ export function Gen3WildPanel({
               <span className="panel-index">01</span>
               <h2>{t("rngInfo")}</h2>
             </div>
-            <span className="panel-note">Gen III / Wild API 2</span>
+            <span className="panel-note">Gen III / Wild API 3</span>
           </div>
           <div className="static-form-stack">
             <label className="field">
@@ -758,71 +872,87 @@ export function Gen3WildPanel({
                       <option value="static">{t("wildStatic")}</option>
                     )}
                   </optgroup>
-                  <optgroup label={t("wildSynchronize")}>
-                    {natureKeys.map((key, index) => (
-                      <option key={key} value={`synchronize-${index}`}>
-                        {t(key)}
-                      </option>
-                    ))}
-                  </optgroup>
+                  {operation === "generator" ? (
+                    <optgroup label={t("wildSynchronize")}>
+                      {natureKeys.map((key, index) => (
+                        <option key={key} value={`synchronize-${index}`}>
+                          {t(key)}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ) : (
+                    <option value="synchronize">{t("wildSynchronize")}</option>
+                  )}
                 </select>
               </label>
             )}
-            <label className="field">
-              <span>{t("seed")}</span>
-              <input
-                maxLength={8}
-                value={seed}
-                onChange={(event) =>
-                  setSeed(normalizeHexInput(event.target.value, 8))
-                }
-              />
-            </label>
-            <div className="compact-field-row">
-              <label className="field">
-                <span>{t("initialAdvances")}</span>
-                <input
-                  inputMode="numeric"
-                  maxLength={10}
-                  value={initialAdvances}
-                  onChange={(event) =>
-                    setInitialAdvances(
-                      normalizeDecimalInput(
-                        event.target.value,
-                        0xffff_ffff,
-                        10,
-                      ),
-                    )
-                  }
-                />
-              </label>
-              <label className="field">
-                <span>{t("maxAdvances")}</span>
-                <input
-                  inputMode="numeric"
-                  maxLength={10}
-                  value={maxAdvances}
-                  onChange={(event) =>
-                    setMaxAdvances(
-                      normalizeDecimalInput(event.target.value, 49_999_999, 10),
-                    )
-                  }
-                />
-              </label>
-            </div>
-            <label className="field">
-              <span>{t("offset")}</span>
-              <input
-                inputMode="numeric"
-                maxLength={10}
-                value={offset}
-                onChange={(event) =>
-                  setOffset(
-                    normalizeDecimalInput(event.target.value, 0xffff_ffff, 10),
-                  )
-                }
-              />
-            </label>
+            {operation === "generator" && (
+              <>
+                <label className="field">
+                  <span>{t("seed")}</span>
+                  <input
+                    maxLength={8}
+                    value={seed}
+                    onChange={(event) =>
+                      setSeed(normalizeHexInput(event.target.value, 8))
+                    }
+                  />
+                </label>
+                <div className="compact-field-row">
+                  <label className="field">
+                    <span>{t("initialAdvances")}</span>
+                    <input
+                      inputMode="numeric"
+                      maxLength={10}
+                      value={initialAdvances}
+                      onChange={(event) =>
+                        setInitialAdvances(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            0xffff_ffff,
+                            10,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("maxAdvances")}</span>
+                    <input
+                      inputMode="numeric"
+                      maxLength={10}
+                      value={maxAdvances}
+                      onChange={(event) =>
+                        setMaxAdvances(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            49_999_999,
+                            10,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                </div>
+                <label className="field">
+                  <span>{t("offset")}</span>
+                  <input
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={offset}
+                    onChange={(event) =>
+                      setOffset(
+                        normalizeDecimalInput(
+                          event.target.value,
+                          0xffff_ffff,
+                          10,
+                        ),
+                      )
+                    }
+                  />
+                </label>
+              </>
+            )}
           </div>
           <div className="panel-actions">
             <button
@@ -830,12 +960,16 @@ export function Gen3WildPanel({
               disabled={status === "calculating"}
               type="submit"
             >
-              {t("generate")}
+              {t(operation === "generator" ? "generate" : "search")}
             </button>
             {status === "calculating" && (
               <button
                 className="secondary-action"
-                onClick={() => engine.cancel()}
+                onClick={() =>
+                  operation === "generator"
+                    ? generatorEngine.cancel()
+                    : searcherEngine.cancel()
+                }
                 type="button"
               >
                 {t("cancel")}
@@ -957,7 +1091,10 @@ export function Gen3WildPanel({
             </div>
             <span className="panel-note">PokeFinder / Filter</span>
           </div>
-          <fieldset className="filter-controls" disabled={filtersDisabled}>
+          <fieldset
+            className="filter-controls"
+            disabled={operation === "generator" && filtersDisabled}
+          >
             <div className="static-filter-selects wild-filter-selects">
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -1078,7 +1215,7 @@ export function Gen3WildPanel({
                       )
                     }
                     type="number"
-                    value={ivMin[index]}
+                    value={activeIvRanges.min[index]}
                   />
                   <input
                     aria-label={`${t(ivLabelKey(key))} ${t("maximum")}`}
@@ -1093,7 +1230,7 @@ export function Gen3WildPanel({
                       )
                     }
                     type="number"
-                    value={ivMax[index]}
+                    value={activeIvRanges.max[index]}
                   />
                 </div>
               ))}
@@ -1112,14 +1249,16 @@ export function Gen3WildPanel({
               </button>
             </div>
           </fieldset>
-          <label className="toggle-field disable-filters">
-            <input
-              checked={filtersDisabled}
-              onChange={(event) => setFiltersDisabled(event.target.checked)}
-              type="checkbox"
-            />
-            <span>{t("disableFilters")}</span>
-          </label>
+          {operation === "generator" && (
+            <label className="toggle-field disable-filters">
+              <input
+                checked={filtersDisabled}
+                onChange={(event) => setFiltersDisabled(event.target.checked)}
+                type="checkbox"
+              />
+              <span>{t("disableFilters")}</span>
+            </label>
+          )}
         </section>
       </form>
 
@@ -1225,7 +1364,7 @@ export function Gen3WildPanel({
                 return (
                   <div
                     className="static-table-row wild-table-row"
-                    key={`${state.advances}-${state.pid}-${virtualRow.index}`}
+                    key={`${"advances" in state ? state.advances : state.seed}-${state.pid}-${virtualRow.index}`}
                     style={{
                       transform: `translateY(${virtualRow.start + 38}px)`,
                     }}

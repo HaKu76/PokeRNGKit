@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：阶段 4A，第三世代 Wild Generator 验证
+> - 状态：阶段 4B，第三世代 Wild Generator/Searcher 验证
 > - 更新日期：2026-08-11
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。`gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前验证第三世代 Wild Generator。Wild Searcher 仍在后续阶段。
+当前按 PokeFinder 功能模块逐个落地。`gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前工作区实现并验证第三世代 Wild Generator/Searcher。
 
 ## 2. 已确认边界
 
@@ -23,7 +23,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - 基线不依赖 Wasm threads、`SharedArrayBuffer`、COOP/COEP 或跨源隔离。
 - 多核计算通过多个独立 Web Worker 和独立 Wasm 实例实现。
 - 界面只支持简体中文、英文和日文。
-- 功能测试与最终验收由项目所有者执行；自动检查只提供工程证据。
+- 项目所有者负责提交和部署并提供实际 URL；Codex 在部署页面执行算法与功能回归，项目所有者保留界面、设备和正式发布的最终验收。
 - 本地必须提供不依赖 Emscripten 的 UI 预览模式，用于项目所有者验收界面与交互。
 - GitHub Pages 先作为测试环境，Cloudflare Pages 后续作为正式部署目标。
 - 正式域名将使用 `hakuhiro.top` 下的地址，具体主机名尚未决定，不得硬编码。
@@ -56,7 +56,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ### 3.7 第三世代野生乱数用户
 
-用户从当前掌机存档对应版本的遭遇表中选择遭遇类型和地点，输入 Seed、推进范围、Method、队首和特殊地点条件，生成野生宝可梦的槽位、等级、PID、IV、性格与闪光状态。大范围计算必须在独立 `gen3wild` Worker Pool 中运行。
+用户从当前掌机存档对应版本的遭遇表中选择遭遇类型和地点，输入 Seed、推进范围、Method、队首和特殊地点条件，生成野生宝可梦的槽位、等级、PID、IV、性格与闪光状态；也可以输入目标 IV 范围，反向检索满足同一遭遇规则和筛选的候选 Seed。两种大范围计算都必须在独立 `gen3wild` Worker Pool 中运行。
 
 ## 4. 当前功能需求：`gen3id`
 
@@ -225,7 +225,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-IVCALC-06** 计算器作为全局默认收起的悬浮工具，在 ID 与 Static 工作区均可打开。
 - **FR-IVCALC-07** 该工具不得发起远端请求；其轻量确定性计算可以在 TypeScript 主线程同步完成。
 
-## 8. 当前功能需求：`gen3wild` Generator
+## 8. 当前功能需求：`gen3wild` Generator/Searcher
 
 ### 8.1 输入与数据
 
@@ -251,22 +251,32 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-WILD-FILTER-02** 提供 Shiny、Gender、Ability、Level 和六项 IV 闭区间筛选；“取消筛选”恢复完整掩码与范围。
 - **FR-WILD-FILTER-03** 选择 Pokémon 时同步 Encounter Slot 与等级范围；手动修改筛选仍可覆盖联动值。
 - **FR-WILD-TASK-01** `gen3wild` 使用独立 CMake target、C ABI 前缀、API 版本、Worker 文件和 Worker Pool，不在 React 主线程运行 RNG 循环。
-- **FR-WILD-TASK-02** 每个分片最多处理 100,000 个状态；Worker 数、结果上限、批次顺序、进度和取消遵循 ID/Static 的同一工程边界。
+- **FR-WILD-TASK-02** Generator 每个分片最多处理 100,000 个状态，Searcher 每个分片最多处理 10,000 个 IV 组合；Worker 数、结果上限、批次顺序、进度和取消遵循 ID/Static 的同一工程边界。
 - **FR-WILD-TASK-03** 结果使用 60 字节定长记录和 transferable `ArrayBuffer` 返回。
 - **FR-WILD-RESULT-01** 结果包含 Advances、Encounter Slot、Pokemon、Level、PID、Shiny、Nature、Ability、六项 IV、Hidden Power、Power 与 Gender，共 16 列。
 - **FR-WILD-RESULT-02** Advances、处理数和结果数使用原始十进制数字，不添加本地化千位分隔符。
 - **FR-WILD-RESULT-03** 结果支持数值排序、虚拟化显示、清空和带 UTF-8 BOM 的 CSV；结果达到 250,000 条时停止并提示。
 
+### 8.4 Searcher
+
+- **FR-WILD-SEARCH-01** Searcher 不接受 Seed、Initial Advances、Max Advances 或 Offset；它按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 的确定顺序枚举六项 IV 闭区间笛卡尔积。
+- **FR-WILD-SEARCH-02** IV 组合总数不得超过 50,000,000；TypeScript 按最多 10,000 个组合分片，C ABI 同时校验 `startIndex + stateCount` 边界。
+- **FR-WILD-SEARCH-03** Method 1/2 使用 PokeFinder 连续两次 IV 调用的逆推规则，Method 4 使用两次 IV 调用之间存在一次额外推进的逆推规则，不扫描完整 `2^32` Seed 空间。
+- **FR-WILD-SEARCH-04** Searcher 的 Synchronize 是上游通用选项，不选择指定性格；None、Cute Charm、Pressure/Hustle/Vital Spirit、Magnet Pull 与 Static 沿用 `WildSearcher3` 分支。
+- **FR-WILD-SEARCH-05** Searcher 应用 Feebas、Safari、RSE Rock Smash、槽位、等级、Nature、Hidden Power、Shiny、Gender 与 Ability 规则；Searcher 不提供 Generator 的“取消筛选”。
+- **FR-WILD-SEARCH-06** Searcher 与 Generator 共享 API v3 `gen3wild` Wasm 模块和 60 字节结果记录；第一字段在 Generator 中解释为 Advances，在 Searcher 中解释为 Seed。
+- **FR-WILD-SEARCH-07** Generator 与 Searcher 使用独立 Worker Pool 和取消生命周期；计算中不得切换操作标签或并发启动另一种操作。
+- **FR-WILD-SEARCH-08** Route 111 全 31 IV 固定夹具必须覆盖 Method 1 + None、Method 2 + Synchronize、Method 4 + Cute Charm，并验证一个候选 Seed 能重新生成匹配状态。
+
 ## 9. 后续 MVP
 
-当前工作区通过工程检查与项目所有者验收后，按以下顺序推进：
+当前工作区通过工程检查、部署页面回归与项目所有者最终验收后，按以下顺序推进：
 
-1. Wild Generator 的 Actions、Pages 和项目所有者验收。
-2. Wild Searcher；当前 Generator 筛选不应重复实现到 Searcher 之前的工作区。
-3. Tanoby Chamber form 数据、来源记录与固定夹具。
-4. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
+1. Wild Generator/Searcher 的 Actions、Pages 部署回归和项目所有者最终验收。
+2. Tanoby Chamber form 数据、来源记录与固定夹具。
+3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
-Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估。Gen IV 及其他世代不属于当前承诺；如进入开发，按 `gen4id` 等独立模块命名和验证。
+Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估。Gen IV 及其他世代不属于当前承诺；仓库只保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口与[开发交接](gen4-development.md)，没有第四世代算法或 UI。
 
 ## 10. 非目标
 
@@ -306,6 +316,7 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 - 一键入口保持为 `npm run build`，不同原生语言的工具链由模块构建驱动封装。
 - JavaScript 依赖通过 `package-lock.json` 复现；发布工具链使用精确版本。
 - 新依赖只有在对应功能开始实现且能减少实际复杂度时加入。
+- 第四世代扩展必须使用共享模块契约和独立 API 版本；接口预留不得自动进入导航、默认构建或产品范围。
 
 ## 12. 浏览器支持
 
@@ -323,44 +334,48 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 
 ### 13.1 工程门槛
 
-以下项目全部通过后，当前模块才能进入项目所有者验收：
+以下项目全部通过后，当前模块才能进入部署页面回归：
 
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
-3. `npm run wasm:test:native` 通过 ID 三种模式、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator 及错误边界。
+3. `npm run wasm:test:native` 通过 ID 三种模式、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher 及错误边界。
 4. `npm run wasm:build` 生成 `gen3id`、`gen3static` 与 `gen3wild` 的 MJS/Wasm 产物。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
 
-### 13.2 项目所有者验收
+### 13.2 部署页面算法回归
 
-项目所有者至少检查：
+项目所有者使用 GitHub Desktop 提交并完成 GitHub Pages 部署，再把实际 URL 交给 Codex。Codex 至少检查：
 
 1. ID 三种模式各使用一组已知输入比对 PokeFinder 结果。
 2. Static Generator/Searcher 的 Method 1、Method 4 与 Latios/Latias 游走缺陷各使用已知输入比对。
 3. ID 的 TID、SID、TSV 筛选，以及 Static 的 IV、性格、特性、性别、闪光筛选。
 4. 大范围任务的进度、取消、页面响应和结果上限提示。
-5. ID、Static 与 Wild Generator 的结果排序、CSV 内容、清空结果和移动端横向滚动。
-6. 简体中文、英文、日文切换及刷新保留。
-7. 存档信息的新建、编辑、选择、刷新恢复、导入、导出、清除和悬浮窗折叠。
-8. Wild Generator 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
-9. GitHub Pages 在线加载三个 Worker/Wasm 模块、刷新、安装 PWA 和离线重载。
-10. 桌面与移动浏览器的布局和操作。
+5. ID、Static 与 Wild Generator/Searcher 的结果排序、CSV 内容、清空结果和移动端横向滚动。
+6. Wild Generator/Searcher 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
+7. GitHub Pages 在线加载三个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
+8. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
+
+算法回归必须使用真实生产 Wasm，不能使用 `ui` 预览模式。无法从部署页面确认的原生夹具、移动设备性能或离线安装行为必须明确列为未覆盖。
+
+### 13.3 项目所有者最终验收
+
+项目所有者至少检查简体中文/英文/日文切换、存档信息 CRUD 与导入导出、主题和悬浮窗、真实桌面/移动设备布局、PWA 安装与离线重载。界面布局和交互可以先在 UI 预览模式检查，RNG 结果仍以 13.2 的生产 Wasm 回归记录为准。
 
 界面布局、文案和交互可以先在 UI 预览模式验收；RNG 结果、Worker 性能和离线完整功能仍必须在真实 Wasm 构建中验收。
 
-当前状态不得写成“已验收”，直到项目所有者明确记录结果。
+当前状态不得写成“已验收”，直到部署页面算法回归和项目所有者最终验收都已记录结果。
 
 ## 14. 阶段划分
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
-- **阶段 1：`gen3id` Generator** - React UI、Worker Pool、C++ bridge、上游最小 Core、三语和 Actions（已实现，待项目所有者完整验收）。
-- **阶段 2A：`gen3static` Generator** - 独立 Wasm/Worker、Method 1/4、游走缺陷、筛选和结果（已进入 Git 基线，待项目所有者完整验收）。
-- **阶段 2B：Static Searcher** - 反向恢复、搜索协议、结果边界和上游一致性测试（已进入 Git 基线，待项目所有者完整验收）。
+- **阶段 1：`gen3id` Generator** - React UI、Worker Pool、C++ bridge、上游最小 Core、三语和 Actions（已实现，待部署回归与最终验收）。
+- **阶段 2A：`gen3static` Generator** - 独立 Wasm/Worker、Method 1/4、游走缺陷、筛选和结果（已进入 Git 基线，待部署回归与最终验收）。
+- **阶段 2B：Static Searcher** - 反向恢复、搜索协议、结果边界和上游一致性测试（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 镜像、CRUD、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
-- **阶段 4A：`gen3wild` Generator** - 遭遇数据、独立 Wasm/Worker、特殊规则、完整筛选和一致性夹具（已实现，待 Actions 与项目所有者验收）。
-- **阶段 4B：Wild Searcher** - IV 反向检索、完整 Wild 筛选和独立任务协议。
+- **阶段 4A：`gen3wild` Generator** - 遭遇数据、独立 Wasm/Worker、特殊规则、完整筛选和一致性夹具（已实现，待 Actions、部署回归与最终验收）。
+- **阶段 4B：Wild Searcher** - IV 反向检索、完整 Wild 筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 5：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

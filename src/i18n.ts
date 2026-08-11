@@ -64,7 +64,7 @@ const resources = {
       version: "Gen III / ID API 1",
       staticVersion: "Gen III / Static API 3",
       staticEngine: "GEN 3 STATIC",
-      wildVersion: "Gen III / Wild Generator",
+      wildVersion: "Gen III / Wild Generator / Searcher",
       wildEngine: "GEN 3 WILD",
       wildEncounter: "ENCOUNTER SLOT",
       wildSlot: "Encounter slot",
@@ -278,6 +278,8 @@ const resources = {
         "Level and stats must be within the supported ranges.",
       staticSearchRangeTooLarge:
         "The IV range contains {{count}} combinations; narrow it to {{limit}} or fewer.",
+      wildSearchRangeTooLarge:
+        "The IV range contains {{count}} combinations; narrow it to {{limit}} or fewer.",
       collapse: "Collapse",
       expand: "Expand",
       openModules: "Open Modules",
@@ -347,7 +349,7 @@ const resources = {
       version: "第3世代 / ID API 1",
       staticVersion: "Gen III / Static API 3",
       staticEngine: "第3世代 固定シンボル乱数",
-      wildVersion: "第3世代 / 野生生成",
+      wildVersion: "第3世代 / 野生生成・検索",
       wildEngine: "第3世代 野生乱数",
       wildEncounter: "遭遇スロット",
       wildSlot: "遭遇スロット",
@@ -561,6 +563,8 @@ const resources = {
         "Level and stats must be within the supported ranges.",
       staticSearchRangeTooLarge:
         "The IV range contains {{count}} combinations; narrow it to {{limit}} or fewer.",
+      wildSearchRangeTooLarge:
+        "The IV range contains {{count}} combinations; narrow it to {{limit}} or fewer.",
       collapse: "Collapse",
       expand: "Expand",
       openModules: "Open Modules",
@@ -630,7 +634,7 @@ const resources = {
       version: "第三世代 / ID API 1",
       staticVersion: "第三世代 / Static API 3",
       staticEngine: "第三世代定点乱数",
-      wildVersion: "第三世代 / 野生生成器",
+      wildVersion: "第三世代 / 野生生成器 / 检索器",
       wildEngine: "第三世代野生乱数",
       wildEncounter: "遭遇槽位",
       wildSlot: "遭遇槽位",
@@ -839,6 +843,8 @@ const resources = {
         "Next level may not be completely accurate without specifying a nature",
       invalidIvCalculatorInput: "等级和能力值超出支持范围。",
       staticSearchRangeTooLarge:
+        "个体值范围包含 {{count}} 个组合，请缩小到 {{limit}} 个以内。",
+      wildSearchRangeTooLarge:
         "个体值范围包含 {{count}} 个组合，请缩小到 {{limit}} 个以内。",
       collapse: "Collapse",
       expand: "Expand",

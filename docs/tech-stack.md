@@ -1,8 +1,8 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：阶段 4A，Wild Generator 已接入独立 Wasm/Worker 并等待完整验证
+> - 状态：阶段 4B，Wild Generator/Searcher 已接入独立 Wasm/Worker 并等待完整验证
 > - 更新日期：2026-08-11
-> - 当前范围：第三世代 ID、Static Generator/Searcher、Wild Generator 与存档信息
+> - 当前范围：第三世代 ID、Static Generator/Searcher、Wild Generator/Searcher 与存档信息
 > - 包管理器：npm
 
 ## 1. 技术结论
@@ -42,9 +42,10 @@ React UI
         |-- Gen3IdWorkerPool -> gen3id.mjs + gen3id.wasm
         |-- Gen3StaticWorkerPool ---------+
         |-- Gen3StaticSearcherWorkerPool -+-> gen3static.mjs + gen3static.wasm
-        `-- Gen3WildWorkerPool -> gen3wild.mjs + gen3wild.wasm
-                                      |
-                                      `-- narrow C ABI bridges
+        |-- Gen3WildWorkerPool ---------+
+        `-- Gen3WildSearcherWorkerPool -+-> gen3wild.mjs + gen3wild.wasm
+                                           |
+                                           `-- narrow C ABI bridges
                                             `-- PokeFinder 4.3.2 Gen III rules
 ```
 
@@ -156,9 +157,13 @@ gen3id
 gen4id
 gen3static
 gen3wild
+gen4static
+gen4wild
 ```
 
 每个模块必须拥有独立目录、manifest、构建 target、C ABI 前缀、Worker client 和测试，避免一个 Wasm 文件吸收所有世代和功能。
+
+`src/features/shared/rngModuleContract.ts` 保留跨世代的 manifest、Worker 信封和第四世代模块标识。`gen4id`、`gen4static`、`gen4wild` 当前只有 reservation，没有 API 版本、产物、导航或运行时注册；实施要求见[第四世代扩展接口与 AI 交接](gen4-development.md)。
 
 ### 7.2 当前目录
 
@@ -196,7 +201,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 2。ID C ABI 为：
+当前 `gen3id` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 3。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -235,10 +240,11 @@ uint32 level
 uint32 natureShiny  # low 8 bits nature, remaining bits shiny type
 ```
 
-Wild C ABI v2 提供 `gen3wild_generate`，传入紧凑槽位数组、Seed、推进范围、Offset、Method、Lead、Encounter、遭遇率、RSE/Feebas/Safari/Rock Smash 特殊规则、TID/SID，以及 Shiny、Gender、Ability、Nature、Hidden Power、Encounter Slot、Level 和六项 IV 范围筛选。它返回连续 60 字节记录：
+Wild C ABI v3 提供 `gen3wild_generate` 与 `gen3wild_search`。Generator 传入紧凑槽位数组、Seed、推进范围、Offset、Method、Lead、Encounter、遭遇率、RSE/Feebas/Safari/Rock Smash 特殊规则、TID/SID 和完整筛选；Searcher 传入 IV 组合 `startIndex`、`stateCount`、相同的遭遇规则与筛选，并通过逆推恢复候选 Seed。两者返回连续 60 字节记录：
 
 ```text
-uint32 advances / pid
+uint32 advancesOrSeed  # Generator 为 Advances，Searcher 为 Seed
+uint32 pid
 uint32 ivHP / ivAtk / ivDef / ivSpA / ivSpD / ivSpe
 uint32 ability / gender / level
 uint32 natureShiny
@@ -248,8 +254,8 @@ uint32 encounterSlot / species / form
 边界原则：
 
 - 只传递固定宽度整数、指针和长度，不暴露 C++ 对象、STL 或 Qt 类型。
-- 每次 C ABI 调用最多处理 100,000 个 Generator 状态或 Searcher IV 组合。
-- `gen3wild` API v2 的筛选在 C++/Wasm 内完成，Worker 不再复制第二套 RNG 筛选逻辑。
+- 每次 C ABI 调用最多处理 100,000 个 Generator 状态；Wild Searcher 的 TypeScript 分片上限为 10,000 个 IV 组合，C ABI 保留 100,000 的防御上限。
+- `gen3wild` API v3 的 Generator/Searcher 筛选都在 C++/Wasm 内完成，Worker 不复制第二套 RNG 筛选逻辑。
 - 返回缓冲区在下一次同 Worker 调用前有效，Worker 必须立即复制并转移。
 - 错误使用稳定数值码，TypeScript 负责转换为用户可见错误。
 - API 版本不匹配时停止初始化，不尝试兼容猜测。
@@ -321,6 +327,8 @@ type ModuleWorkerResponse =
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
 - ID、Static 与 Wild 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。
 
+第四世代新模块使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`，任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`。这一契约只约束未来模块，不改写已验证的三代消息类型。
+
 ## 9. 源码与许可证边界
 
 `third_party/pokefinder/` 是构建使用的可审计 vendored snapshot，不引用开发者桌面绝对路径。
@@ -344,6 +352,7 @@ docs/
 |   |-- gen3static.md
 |   `-- gen3wild.md
 |-- ai-development.md
+|-- gen4-development.md
 |-- progress.md
 |-- requirements.md
 `-- tech-stack.md
@@ -356,6 +365,8 @@ src/
 |-- i18n.ts
 |-- styles.css
 `-- features/
+    |-- shared/
+    |   `-- rngModuleContract.ts
     |-- id/
     |   |-- domain.ts
     |   |-- preview/
@@ -385,7 +396,7 @@ wasm/modules/
 `-- gen3wild/
 ```
 
-后续模块沿用同一结构。Static Generator/Searcher 共享同一个版本化 `gen3static` Wasm 模块，但使用独立请求、Pool 和任务生命周期；不要把 `gen4id` 或 Wild 逻辑塞进现有模块。
+后续模块沿用同一结构。Static 与 Wild 的 Generator/Searcher 各自共享同一个版本化模块，但使用独立请求、Pool 和任务生命周期；不要把 `gen4id` 或其他世代逻辑塞进现有模块。
 
 ## 11. npm 构建入口
 
@@ -423,10 +434,10 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 ### 12.1 当前已实现
 
-- **C++ 原生夹具**：ID 三种模式，Static Generator Method 1/4、Searcher 反向恢复、游走缺陷、筛选和错误码，以及 Wild Route 111 Generator 固定结果。
+- **C++ 原生夹具**：ID 三种模式，Static Generator Method 1/4、Searcher 反向恢复、游走缺陷、筛选和错误码，以及 Wild Route 111 Generator/Searcher 固定结果。
 - **TypeScript 单元测试**：ID/Static/Wild 输入边界、Generator/Searcher 分片、解码、觉醒力量、输入规范化、主题和红蓝宝石 Seed 推导。
 - **持久化单元测试**：存档 JSON schema、合并边界、IndexedDB 主存储抽象与 localStorage 兜底。
-- **UI 预览引擎测试**：ID/Static 确定性样例、进度和取消。
+- **UI 预览引擎测试**：ID/Static/Wild Generator/Searcher 确定性样例、进度和取消。
 - **静态检查**：Prettier、ESLint、TypeScript project build。
 - **生产 Web 构建**：Vite Worker、PWA、相对 base 和法律文件。
 
@@ -441,18 +452,20 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 ## 13. 当前模块技术验证门槛
 
-当前 `gen3wild` Generator 进入项目所有者验收前必须完成：
+当前 `gen3wild` Generator/Searcher 进入部署页面算法回归前必须完成：
 
-1. 原生夹具通过 Emerald Route 111、Method 1、Advances `0..9` 固定结果和错误边界。
+1. 原生夹具通过 Emerald Route 111 Generator 的 Method 1、Advances `0..9` 固定结果和错误边界。
 2. 固定 Seed 的槽位、物种、等级、PID、IV 与性格逐字段匹配 PokeFinder 4.3.2 基线。
-3. Emscripten 6.0.6 生成可加载的 `gen3wild.mjs` 与 `gen3wild.wasm`，API 握手为版本 2。
-4. Wild Worker Pool 在多 Worker 下保持结果顺序、稳定进度和取消行为。
-5. 大范围任务运行时主线程仍能响应输入、模块切换和结果滚动。
-6. 简体中文、英文和日文可以切换，地点、遭遇类型、Method 和队首随存档版本正确联动。
-7. Route 119 Feebas、RSE Safari、RSE Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 分支完成固定输入核对。
-8. 排序、CSV、结果上限、错误状态和移动端横向滚动符合需求。
-9. GitHub Pages 无 ID/Static/Wild JS、Worker、Wasm、manifest 或 Service Worker 404。
-10. 项目所有者完成并记录功能、移动端和离线验收。
+3. Searcher 全 31 IV 夹具覆盖 Method 1 + None、Method 2 + Synchronize、Method 4 + Cute Charm，并验证候选 Seed 可重新生成匹配状态。
+4. Emscripten 6.0.6 生成可加载的 `gen3wild.mjs` 与 `gen3wild.wasm`，API 握手为版本 3。
+5. Generator/Searcher Worker Pool 在多 Worker 下保持结果顺序、稳定进度和取消行为。
+6. 大范围任务运行时主线程仍能响应输入、模块切换和结果滚动。
+7. 简体中文、英文和日文可以切换，地点、遭遇类型、Method 和队首随存档版本正确联动。
+8. Route 119 Feebas、RSE Safari、RSE Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 分支完成固定输入核对。
+9. 排序、CSV、结果上限、错误状态和移动端横向滚动符合需求。
+10. GitHub Pages 无 ID/Static/Wild JS、Worker、Wasm、manifest 或 Service Worker 404。
+11. Codex 使用项目所有者提供的 GitHub Pages URL 完成生产 Wasm 算法与功能回归并记录证据。
+12. 项目所有者完成并记录界面、真实设备、PWA 和正式发布验收。
 
 ## 14. GitHub Actions 与 Pages
 

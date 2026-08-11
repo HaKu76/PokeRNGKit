@@ -15,7 +15,7 @@ if(EMSCRIPTEN)
         "-sASSERTIONS=0"
         "-sNO_EXIT_RUNTIME=1"
         "-sMALLOC=emmalloc"
-        "-sEXPORTED_FUNCTIONS=['_malloc','_free','_gen3wild_api_version','_gen3wild_generate','_gen3wild_result_ptr','_gen3wild_result_count','_gen3wild_last_error']"
+        "-sEXPORTED_FUNCTIONS=['_malloc','_free','_gen3wild_api_version','_gen3wild_generate','_gen3wild_search','_gen3wild_result_ptr','_gen3wild_result_count','_gen3wild_last_error']"
         "-sEXPORTED_RUNTIME_METHODS=['HEAPU32']"
     )
     set_target_properties(

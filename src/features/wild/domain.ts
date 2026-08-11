@@ -1,7 +1,8 @@
 import type { Gen3GameVersion } from "../profiles/domain";
 
-export const GEN3_WILD_API_VERSION = 2;
+export const GEN3_WILD_API_VERSION = 3;
 export const GEN3_WILD_CHUNK_SIZE = 100_000;
+export const GEN3_WILD_SEARCHER_CHUNK_SIZE = 10_000;
 export const GEN3_WILD_MAX_TOTAL_STATES = 50_000_000;
 export const GEN3_WILD_MAX_RESULTS = 250_000;
 
@@ -74,8 +75,35 @@ export interface Gen3WildRequest {
   filters: Gen3WildFilters;
 }
 
+export interface Gen3WildSearcherRequest {
+  method: Gen3WildMethod;
+  lead: Gen3WildLead;
+  feebasTile: boolean;
+  bike: boolean;
+  item: Gen3WildItem;
+  version: Gen3GameVersion;
+  tid: number;
+  sid: number;
+  area: Gen3WildArea;
+  filters: Gen3WildFilters;
+}
+
 export interface Gen3WildState {
   advances: number;
+  pid: number;
+  ivs: [number, number, number, number, number, number];
+  ability: number;
+  gender: number;
+  level: number;
+  nature: number;
+  shiny: number;
+  encounterSlot: number;
+  species: number;
+  form: number;
+}
+
+export interface Gen3WildSearcherState {
+  seed: number;
   pid: number;
   ivs: [number, number, number, number, number, number];
   ability: number;
@@ -92,6 +120,12 @@ export interface Gen3WildChunk {
   index: number;
   initialAdvances: number;
   maxAdvances: number;
+  stateCount: number;
+}
+
+export interface Gen3WildSearcherChunk {
+  index: number;
+  startIndex: number;
   stateCount: number;
 }
 
@@ -122,6 +156,10 @@ export function wildLeadToWasm(lead: Gen3WildLead, synchronizeNature: number) {
     hustle: 32,
     "vital-spirit": 32,
   }[lead];
+}
+
+export function wildSearcherLeadToWasm(lead: Gen3WildLead) {
+  return lead === "synchronize" ? 0 : wildLeadToWasm(lead, 0);
 }
 
 export function isGen3WildTanobyChamber(locationName: string) {
@@ -290,6 +328,44 @@ export function validateGen3WildRequest(request: Gen3WildRequest) {
   return errors;
 }
 
+export function gen3WildSearcherCombinationCount(
+  request: Gen3WildSearcherRequest,
+) {
+  return request.filters.ivMin.reduce(
+    (total, minimum, index) =>
+      total * (request.filters.ivMax[index] - minimum + 1),
+    1,
+  );
+}
+
+export function validateGen3WildSearcherRequest(
+  request: Gen3WildSearcherRequest,
+) {
+  const generatorShape: Gen3WildRequest = {
+    ...request,
+    seed: 0,
+    initialAdvances: 0,
+    maxAdvances: 0,
+    offset: 0,
+    synchronizeNature: 0,
+  };
+  const errors = validateGen3WildRequest(generatorShape).filter(
+    (error) =>
+      error !== "seed" &&
+      error !== "initialAdvances" &&
+      error !== "maxAdvances" &&
+      error !== "offset" &&
+      error !== "advanceRange" &&
+      error !== "synchronizeNature",
+  );
+  if (
+    errors.length === 0 &&
+    gen3WildSearcherCombinationCount(request) > GEN3_WILD_MAX_TOTAL_STATES
+  )
+    errors.push("searchRange");
+  return errors;
+}
+
 export function createGen3WildChunks(
   request: Gen3WildRequest,
   chunkSize = GEN3_WILD_CHUNK_SIZE,
@@ -313,6 +389,28 @@ export function createGen3WildChunks(
       stateCount,
     });
     offset += stateCount;
+  }
+  return chunks;
+}
+
+export function createGen3WildSearcherChunks(
+  request: Gen3WildSearcherRequest,
+  chunkSize = GEN3_WILD_SEARCHER_CHUNK_SIZE,
+) {
+  if (
+    !Number.isInteger(chunkSize) ||
+    chunkSize < 1 ||
+    chunkSize > GEN3_WILD_SEARCHER_CHUNK_SIZE
+  )
+    throw new RangeError(
+      `Gen3 wild searcher chunk size must be between 1 and ${GEN3_WILD_SEARCHER_CHUNK_SIZE}.`,
+    );
+  const chunks: Gen3WildSearcherChunk[] = [];
+  const totalStates = gen3WildSearcherCombinationCount(request);
+  for (let startIndex = 0, index = 0; startIndex < totalStates; index++) {
+    const stateCount = Math.min(chunkSize, totalStates - startIndex);
+    chunks.push({ index, startIndex, stateCount });
+    startIndex += stateCount;
   }
   return chunks;
 }
@@ -364,4 +462,13 @@ export function decodeGen3WildStates(buffer: ArrayBuffer) {
     };
   }
   return states;
+}
+
+export function decodeGen3WildSearcherStates(buffer: ArrayBuffer) {
+  return decodeGen3WildStates(buffer).map(
+    ({ advances: seed, ...state }): Gen3WildSearcherState => ({
+      seed,
+      ...state,
+    }),
+  );
 }

@@ -5,17 +5,18 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代 Wild Generator 验证。** `gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前工作区已完成 `gen3wild` C++/Wasm/Worker Pool 实现。真实 Wild Wasm、GitHub Pages 与项目所有者验收仍待完成。
+**当前里程碑：第三世代 Wild Generator/Searcher 验证。** `gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前工作区已完成 `gen3wild` Generator/Searcher 的 C++/Wasm/Worker Pool 实现。真实 Wild Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
 - 已有模块：ID Generator、Static Generator/Searcher、三代存档信息、个体值计算器
-- 当前模块：Wild Generator；Wild Searcher 尚未实现
+- 当前模块：Wild Generator/Searcher；实现尚未提交，真实 Wasm 待 Actions 验证
 - 上游核验基线：PokeFinder 4.3.2
 - 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
 - AI 开发入口：[docs/ai-development.md](docs/ai-development.md)
+- 第四世代接口与 AI 交接：[docs/gen4-development.md](docs/gen4-development.md)
 
 ## 产品定位
 
@@ -39,7 +40,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - 觉醒属性、觉醒威力、能力值显示、取消筛选和 IV 组合键快捷设置
 - 独立 Generator/Searcher Worker Pool、进度、取消、虚拟化结果表、排序和 CSV
 
-当前 Wild Generator 包含：
+当前 Wild 模块包含：
 
 - Ruby、Sapphire、Emerald、FireRed 与 LeafGreen 的陆地、冲浪、碎岩和三种鱼竿遭遇表
 - Method 1、Method 2、Method 4，以及 Emerald 的同步、迷人身躯、等级修正和槽位修正队首规则
@@ -48,6 +49,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - Shiny、Gender、Ability、Nature、Hidden Power、Encounter Slot、Level 和六项 IV 范围筛选；支持“取消筛选”
 - Pokémon 联动的槽位/等级范围、IV 快捷键、能力值显示和 16 列结果表
 - 独立 `gen3wild` Wasm、Worker Pool、进度、取消、虚拟化结果表、排序和 CSV
+- Searcher 按六项 IV 笛卡尔积反向恢复候选 Seed，复用 Wild 特殊规则与完整筛选，并以独立 Worker Pool 分片执行
 - PokeFinder Route 111 固定夹具；当前本机尚未编译运行，等待 Actions 验证
 
 当前三代存档信息基础包含：
@@ -64,11 +66,10 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 
 后续 MVP 计划包含：
 
-- Wild Searcher
 - PWA 安装与首次加载后的离线使用加固
 - 浏览器矩阵、性能基线和可访问性补充
 
-当前不包含 Wild Searcher、Tanoby Chamber 未知图腾 form 规则、Egg、GameCube、PokeSpot、Jirachi 及其他世代。每个功能继续使用独立 Wasm 模块和验收记录，不把后续算法并入 `gen3id`、`gen3static` 或其他模块。
+当前不包含 Tanoby Chamber 未知图腾 form 规则、Egg、GameCube、PokeSpot、Jirachi 及其他世代算法。第四世代当前仅保留 `gen4id`、`gen4static`、`gen4wild` 的扩展契约和 AI 交接文档，不提供界面或运行时模块。每个功能继续使用独立 Wasm 模块和验收记录，不把后续算法并入 `gen3id`、`gen3static` 或其他模块。
 
 ## 纯静态与隐私
 
@@ -126,7 +127,7 @@ npm run preview:ui
 
 打开 <http://127.0.0.1:4173/>。
 
-UI 预览模式使用确定性样例数据，可以验收 ID 三种模式、Static Generator/Searcher、存档信息、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
+UI 预览模式使用确定性样例数据，可以验收 ID 三种模式、Static Generator/Searcher、Wild Generator/Searcher、存档信息、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
 
 本地验收服务器固定绑定 `127.0.0.1`，只允许当前电脑访问。如果 Windows 首次运行 Node.js 时弹出防火墙网络放行或管理员密码提示，可以直接取消/不允许；不需要为本地验收创建公网或局域网放行规则。
 
@@ -175,7 +176,7 @@ npm run verify
 4. Worker + 真实 Wasm + IndexedDB 的浏览器集成测试（后续补充）。
 5. Playwright 覆盖核心流程、静态子路径部署和离线重载（Pages 预览稳定后引入）。
 
-当前验证门槛要求 `gen3id`、`gen3static` 与 `gen3wild` 固定输入结果对齐上游、长范围计算可汇报进度并响应取消、GitHub Pages 能加载三个 Worker/Wasm 模块，且离线重载可用。功能测试和最终验收由项目所有者执行；仓库记录命令、输入和结果，不代替人工验收结论。
+当前验证门槛要求 `gen3id`、`gen3static` 与 `gen3wild` 固定输入结果对齐上游、长范围计算可汇报进度并响应取消、GitHub Pages 能加载三个 Worker/Wasm 模块，且离线重载可用。项目所有者负责提交并提供部署 URL；Codex 在已部署页面执行算法与功能回归并记录证据，项目所有者保留界面、设备和正式发布的最终验收。
 
 ## 部署
 
@@ -207,14 +208,14 @@ npm run build:web
 ## 路线图
 
 - **阶段 0：仓库基线** - README、需求、技术栈、忽略规则与许可证策略（已完成）。
-- **阶段 1：第三世代 ID Generator** - `gen3id`、Worker Pool、三语界面和上游一致性夹具（已实现，待项目所有者完整验收）。
-- **阶段 2A：第三世代 Static Generator** - `gen3static`、Method 1/4、游走缺陷、筛选和结果工作区（已进入 Git 基线，待项目所有者完整验收）。
-- **阶段 2B：Static Searcher** - 反向 IV 恢复、搜索边界、独立 Worker Pool 和结果工作区（已进入 Git 基线，待项目所有者完整验收）。
+- **阶段 1：第三世代 ID Generator** - `gen3id`、Worker Pool、三语界面和上游一致性夹具（已实现，待部署回归与最终验收）。
+- **阶段 2A：第三世代 Static Generator** - `gen3static`、Method 1/4、游走缺陷、筛选和结果工作区（已进入 Git 基线，待部署回归与最终验收）。
+- **阶段 2B：Static Searcher** - 反向 IV 恢复、搜索边界、独立 Worker Pool 和结果工作区（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 兜底、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
-- **阶段 4A：Wild Generator** - 遭遇数据、独立 `gen3wild` Wasm/Worker、特殊地点规则、完整筛选和固定夹具（已实现，待 Actions 与项目所有者验收）。
-- **阶段 4B：Wild Searcher** - IV 反向检索、完整筛选和独立任务协议。
+- **阶段 4A：Wild Generator** - 遭遇数据、独立 `gen3wild` Wasm/Worker、特殊地点规则、完整筛选和固定夹具（已实现，待 Actions、部署回归与最终验收）。
+- **阶段 4B：Wild Searcher** - IV 反向检索、完整筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 5：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
-- **后续** - Egg、GameCube、PokeSpot、Jirachi 等三代能力；是否支持其他世代另行决策。
+- **后续** - Egg、GameCube、PokeSpot、Jirachi 等三代能力；第四世代仅保留接口，是否实现由项目所有者另行决定。
 
 ## 许可证、署名与源码分发
 

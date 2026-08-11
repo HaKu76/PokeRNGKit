@@ -1,4 +1,9 @@
-import type { Gen3WildChunk, Gen3WildRequest } from "../domain";
+import type {
+  Gen3WildChunk,
+  Gen3WildRequest,
+  Gen3WildSearcherChunk,
+  Gen3WildSearcherRequest,
+} from "../domain";
 
 export interface Gen3WildWorkerInitMessage {
   type: "init";
@@ -12,8 +17,17 @@ export interface Gen3WildWorkerRunMessage {
   request: Gen3WildRequest;
 }
 
+export interface Gen3WildWorkerSearchMessage {
+  type: "search";
+  taskId: string;
+  chunk: Gen3WildSearcherChunk;
+  request: Gen3WildSearcherRequest;
+}
+
 export type Gen3WildWorkerRequest =
-  Gen3WildWorkerInitMessage | Gen3WildWorkerRunMessage;
+  | Gen3WildWorkerInitMessage
+  | Gen3WildWorkerRunMessage
+  | Gen3WildWorkerSearchMessage;
 
 export type Gen3WildWorkerResponse =
   | { type: "ready"; apiVersion: number }
