@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   createGen3WildChunks,
+  createGen3WildSearcherChunks,
   decodeGen3WildStates,
+  validateGen3WildSearcherRequest,
   isGen3WildTanobyChamber,
   validateGen3WildRequest,
   type Gen3WildRequest,
@@ -107,5 +109,62 @@ describe("Gen3 wild domain", () => {
       isGen3WildTanobyChamber("Seven Island Tanoby Ruins Monean Chamber"),
     ).toBe(true);
     expect(isGen3WildTanobyChamber("Seven Island Tanoby Ruins")).toBe(false);
+  });
+
+  it("splits an IV search range deterministically", () => {
+    const search = {
+      method: "method1" as const,
+      lead: "none" as const,
+      feebasTile: false,
+      version: "emerald" as const,
+      tid: 12345,
+      sid: 54321,
+      area: request.area,
+      filters: {
+        natureMask: 0x1ff_ffff,
+        ivMin: [30, 30, 30, 30, 30, 30] as [
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+        ],
+        ivMax: [31, 31, 31, 31, 31, 31] as [
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+        ],
+      },
+    };
+    expect(validateGen3WildSearcherRequest(search)).toEqual([]);
+    expect(createGen3WildSearcherChunks(search, 16)).toEqual([
+      { index: 0, startIndex: 0, stateCount: 16 },
+      { index: 1, startIndex: 16, stateCount: 16 },
+      { index: 2, startIndex: 32, stateCount: 16 },
+      { index: 3, startIndex: 48, stateCount: 16 },
+    ]);
+  });
+
+  it("rejects inverted IV ranges before dispatching a Worker", () => {
+    expect(
+      validateGen3WildSearcherRequest({
+        method: "method1",
+        lead: "none",
+        feebasTile: false,
+        version: "emerald",
+        tid: 0,
+        sid: 0,
+        area: request.area,
+        filters: {
+          natureMask: 1,
+          ivMin: [31, 0, 0, 0, 0, 0],
+          ivMax: [30, 31, 31, 31, 31, 31],
+        },
+      }),
+    ).toContain("ivRange");
   });
 });

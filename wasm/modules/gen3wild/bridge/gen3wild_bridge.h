@@ -55,6 +55,34 @@ extern "C"
         std::uint32_t tid,
         std::uint32_t sid,
         std::uint32_t natureMask);
+    std::uint32_t gen3wild_search(
+        const Gen3WildPackedSlot *slots,
+        std::uint32_t slotCount,
+        std::uint32_t startIndex,
+        std::uint32_t stateCount,
+        std::uint32_t method,
+        std::uint32_t lead,
+        std::uint32_t encounter,
+        std::uint32_t rate,
+        std::uint32_t rse,
+        std::uint32_t feebasTile,
+        std::uint32_t feebasLocation,
+        std::uint32_t safariZone,
+        std::uint32_t tid,
+        std::uint32_t sid,
+        std::uint32_t natureMask,
+        std::uint32_t hpMin,
+        std::uint32_t attackMin,
+        std::uint32_t defenseMin,
+        std::uint32_t specialAttackMin,
+        std::uint32_t specialDefenseMin,
+        std::uint32_t speedMin,
+        std::uint32_t hpMax,
+        std::uint32_t attackMax,
+        std::uint32_t defenseMax,
+        std::uint32_t specialAttackMax,
+        std::uint32_t specialDefenseMax,
+        std::uint32_t speedMax);
     std::uintptr_t gen3wild_result_ptr();
     std::uint32_t gen3wild_result_count();
     std::uint32_t gen3wild_last_error();

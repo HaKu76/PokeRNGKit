@@ -808,6 +808,7 @@ function App() {
           ) : (
             <Gen3WildPanel
               profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
+              uiPreviewMode={uiPreviewMode}
             />
           )}
         </main>

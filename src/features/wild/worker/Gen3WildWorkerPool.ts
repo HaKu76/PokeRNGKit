@@ -1,10 +1,14 @@
 import {
   createGen3WildChunks,
+  createGen3WildSearcherChunks,
   decodeGen3WildStates,
+  gen3WildSearcherCombinationCount,
   GEN3_WILD_CHUNK_SIZE,
   GEN3_WILD_MAX_RESULTS,
   type Gen3WildChunk,
   type Gen3WildRequest,
+  type Gen3WildSearcherChunk,
+  type Gen3WildSearcherRequest,
 } from "../domain";
 import type {
   Gen3WildSearchEngine,
@@ -53,6 +57,20 @@ class Gen3WildWorkerClient {
     return new Promise<Gen3WildWorkerBatchMessage>((resolve, reject) => {
       this.pending = { taskId, resolve, reject };
       this.post({ type: "run", taskId, request, chunk });
+    });
+  }
+
+  async search(
+    taskId: string,
+    request: Gen3WildSearcherRequest,
+    chunk: Gen3WildSearcherChunk,
+  ) {
+    await this.ready;
+    if (this.pending)
+      throw new Error("Gen3 wild Worker received overlapping chunks.");
+    return new Promise<Gen3WildWorkerBatchMessage>((resolve, reject) => {
+      this.pending = { taskId, resolve, reject };
+      this.post({ type: "search", taskId, request, chunk });
     });
   }
 
@@ -186,6 +204,106 @@ export class Gen3WildWorkerPool implements Gen3WildSearchEngine {
           if (!chunk) return;
           try {
             const batch = await client.run(taskId, request, chunk);
+            if (stopped) return;
+            pendingBatches.set(batch.chunkIndex, batch.buffer);
+            processedStates += batch.stateCount;
+            flushBatches();
+            report();
+          } catch (error) {
+            if (!cancelled) throw error;
+          }
+        }
+      };
+      await Promise.all(this.clients.slice(0, workerCount).map(work));
+      flushBatches();
+      return {
+        ...report(),
+        elapsedMs: performance.now() - startedAt,
+        workerCount,
+        cancelled,
+        resultLimitReached,
+      };
+    } catch (error) {
+      if (!cancelled) this.resetClients();
+      throw error;
+    } finally {
+      options.signal?.removeEventListener("abort", cancel);
+      this.cancelActive = undefined;
+      this.running = false;
+    }
+  }
+
+  async searchIvs(
+    request: Gen3WildSearcherRequest,
+    options: Gen3WildSearchOptions = {},
+  ): Promise<Gen3WildSearchSummary> {
+    if (this.running)
+      throw new Error("A Gen3 wild calculation is already running.");
+    this.running = true;
+    const startedAt = performance.now();
+    const chunks = createGen3WildSearcherChunks(
+      request,
+      options.chunkSize ?? GEN3_WILD_CHUNK_SIZE,
+    );
+    const totalStates = gen3WildSearcherCombinationCount(request);
+    const workerCount = Math.min(
+      options.workerCount ?? recommendedGen3WildWorkerCount(),
+      chunks.length,
+    );
+    const maxResults = options.maxResults ?? GEN3_WILD_MAX_RESULTS;
+    const taskId = crypto.randomUUID();
+    const pendingBatches = new Map<number, ArrayBuffer>();
+    let nextChunk = 0;
+    let nextBatch = 0;
+    let processedStates = 0;
+    let resultCount = 0;
+    let cancelled = false;
+    let resultLimitReached = false;
+    let stopped = false;
+    const cancel = () => {
+      if (stopped) return;
+      cancelled = true;
+      stopped = true;
+      this.resetClients();
+    };
+    this.cancelActive = cancel;
+    options.signal?.addEventListener("abort", cancel, { once: true });
+    const report = () => {
+      const progress = {
+        processedStates,
+        totalStates,
+        resultCount,
+        percent:
+          totalStates === 0 ? 100 : (processedStates / totalStates) * 100,
+      };
+      options.onProgress?.(progress);
+      return progress;
+    };
+    const flushBatches = () => {
+      while (pendingBatches.has(nextBatch)) {
+        const states = decodeGen3WildStates(pendingBatches.get(nextBatch)!);
+        pendingBatches.delete(nextBatch);
+        nextBatch++;
+        const remaining = maxResults - resultCount;
+        if (states.length > remaining) {
+          options.onBatch?.(states.slice(0, Math.max(0, remaining)));
+          resultCount = maxResults;
+          resultLimitReached = true;
+          stopped = true;
+          return;
+        }
+        resultCount += states.length;
+        options.onBatch?.(states);
+      }
+    };
+    try {
+      await this.ensureClients(workerCount);
+      const work = async (client: Gen3WildWorkerClient) => {
+        while (!stopped) {
+          const chunk = chunks[nextChunk++];
+          if (!chunk) return;
+          try {
+            const batch = await client.search(taskId, request, chunk);
             if (stopped) return;
             pendingBatches.set(batch.chunkIndex, batch.buffer);
             processedStates += batch.stateCount;

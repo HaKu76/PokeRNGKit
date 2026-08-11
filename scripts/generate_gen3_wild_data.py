@@ -25,7 +25,29 @@ def slots(encounter: dict) -> list[list[int]]:
     return [[entry["species"], entry["min_level"], entry["max_level"]] for entry in encounter["mons"]]
 
 
-def collect(path: Path, marker: str | None) -> list[dict]:
+def location_translations(directory: Path, game: str) -> dict[str, str]:
+    english = {}
+    chinese = {}
+    for line in (directory / "en" / f"{game}_en.txt").read_text(encoding="utf-8").splitlines():
+        if "," in line:
+            key, value = line.split(",", 1)
+            english[key] = value
+    for line in (directory / "zh" / f"{game}_zh.txt").read_text(encoding="utf-8").splitlines():
+        if "," in line:
+            key, value = line.split(",", 1)
+            chinese[key] = value
+
+    def normalize(value: str) -> str:
+        value = value.lower().replace("pokémon", "pokemon")
+        return re.sub(r"[^a-z0-9]", "", value)
+
+    return {
+        normalize(english[key]): chinese[key]
+        for key in english.keys() & chinese.keys()
+    }
+
+
+def collect(path: Path, marker: str | None, translations: dict[str, str]) -> list[dict]:
     tables = json.loads(path.read_text(encoding="utf-8"))
     if marker:
         tables = [entry for entry in tables if marker in entry["base_label"]]
@@ -41,7 +63,9 @@ def collect(path: Path, marker: str | None) -> list[dict]:
             for kind, start, end in (("old-rod", 0, 2), ("good-rod", 2, 5), ("super-rod", 5, 10)):
                 kinds.append({"kind": kind, "rate": fish["encounter_rate"], "slots": fish_slots[start:end]})
         if kinds:
-            result.append({"name": label(entry["map"]), "encounters": kinds})
+            name = label(entry["map"])
+            normalized = re.sub(r"[^a-z0-9]", "", name.lower().replace("pokémon", "pokemon"))
+            result.append({"name": name, "zhName": translations.get(normalized, name), "encounters": kinds})
     return result
 
 
@@ -50,6 +74,7 @@ def main() -> None:
     parser.add_argument("--tables", type=Path, required=True)
     parser.add_argument("--species", type=Path, required=True)
     parser.add_argument("--personal", type=Path, required=True)
+    parser.add_argument("--locations", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -59,12 +84,15 @@ def main() -> None:
     for offset in range(0, len(raw), 0x1C):
         personal.append([raw[offset + 0x10], TYPE_MAP[raw[offset + 0x6]], TYPE_MAP[raw[offset + 0x7]]])
 
+    rs = location_translations(args.locations, "rs")
+    emerald = location_translations(args.locations, "e")
+    frlg = location_translations(args.locations, "frlg")
     games = {
-        "ruby": collect(args.tables / "rs" / "wild_encounters.json", "Ruby"),
-        "sapphire": collect(args.tables / "rs" / "wild_encounters.json", "Sapphire"),
-        "emerald": collect(args.tables / "emerald" / "wild_encounters.json", None),
-        "fire-red": collect(args.tables / "frlg" / "wild_encounters.json", "FireRed"),
-        "leaf-green": collect(args.tables / "frlg" / "wild_encounters.json", "LeafGreen"),
+        "ruby": collect(args.tables / "rs" / "wild_encounters.json", "Ruby", rs),
+        "sapphire": collect(args.tables / "rs" / "wild_encounters.json", "Sapphire", rs),
+        "emerald": collect(args.tables / "emerald" / "wild_encounters.json", None, emerald),
+        "fire-red": collect(args.tables / "frlg" / "wild_encounters.json", "FireRed", frlg),
+        "leaf-green": collect(args.tables / "frlg" / "wild_encounters.json", "LeafGreen", frlg),
     }
     header = "/*! Generated from EncounterTableGenerator raw tables and PokeFinder resources. GPL-3.0-or-later. */\n"
     data = "export const GEN3_SPECIES_ZH = " + json.dumps(species, ensure_ascii=False, separators=(",", ":")) + " as const;\n"

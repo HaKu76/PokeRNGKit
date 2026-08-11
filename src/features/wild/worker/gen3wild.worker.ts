@@ -37,6 +37,35 @@ interface Gen3WildEmscriptenModule {
     sid: number,
     natureMask: number,
   ): number;
+  _gen3wild_search(
+    slots: number,
+    slotCount: number,
+    startIndex: number,
+    stateCount: number,
+    method: number,
+    lead: number,
+    encounter: number,
+    rate: number,
+    rse: number,
+    feebasTile: number,
+    feebasLocation: number,
+    safariZone: number,
+    tid: number,
+    sid: number,
+    natureMask: number,
+    hpMin: number,
+    attackMin: number,
+    defenseMin: number,
+    specialAttackMin: number,
+    specialDefenseMin: number,
+    speedMin: number,
+    hpMax: number,
+    attackMax: number,
+    defenseMax: number,
+    specialAttackMax: number,
+    specialDefenseMax: number,
+    speedMax: number,
+  ): number;
   _gen3wild_result_ptr(): number;
   _gen3wild_result_count(): number;
   _gen3wild_last_error(): number;
@@ -128,12 +157,67 @@ function run(message: Extract<Gen3WildWorkerRequest, { type: "run" }>) {
   }
 }
 
+function search(message: Extract<Gen3WildWorkerRequest, { type: "search" }>) {
+  if (!wasm) throw new Error("Gen3 wild Wasm module is not initialized.");
+  const packedSlots = packGen3WildSlots(message.request.area.slots);
+  const pointer = wasm._malloc(packedSlots.byteLength);
+  const startedAt = performance.now();
+  try {
+    wasm.HEAPU32.set(packedSlots, pointer >>> 2);
+    const request = message.request;
+    const resultCount = wasm._gen3wild_search(
+      pointer,
+      request.area.slots.length,
+      message.chunk.startIndex,
+      message.chunk.stateCount,
+      wildMethodToWasm(request.method),
+      wildLeadToWasm(request.lead, 0),
+      wildEncounterToWasm(request.area.encounter),
+      request.area.rate,
+      isRseVersion(request.version) ? 1 : 0,
+      request.feebasTile ? 1 : 0,
+      request.area.feebasLocation ? 1 : 0,
+      request.area.safariZone ? 1 : 0,
+      request.tid,
+      request.sid,
+      request.filters.natureMask,
+      ...request.filters.ivMin,
+      ...request.filters.ivMax,
+    );
+    const errorCode = wasm._gen3wild_last_error();
+    if (errorCode !== 0)
+      throw new Error(`Gen3 wild Wasm core returned error ${errorCode}.`);
+    if (resultCount !== wasm._gen3wild_result_count())
+      throw new Error("Gen3 wild result count changed before copy.");
+    const resultPointer = wasm._gen3wild_result_ptr() >>> 2;
+    const words = wasm.HEAPU32.slice(
+      resultPointer,
+      resultPointer + resultCount * 15,
+    );
+    post(
+      {
+        type: "batch",
+        taskId: message.taskId,
+        chunkIndex: message.chunk.index,
+        stateCount: message.chunk.stateCount,
+        resultCount,
+        elapsedMs: performance.now() - startedAt,
+        buffer: words.buffer,
+      },
+      [words.buffer],
+    );
+  } finally {
+    wasm._free(pointer);
+  }
+}
+
 workerScope.onmessage = async ({
   data,
 }: MessageEvent<Gen3WildWorkerRequest>) => {
   try {
     if (data.type === "init") await initialize(data.moduleUrl);
-    else run(data);
+    else if (data.type === "run") run(data);
+    else search(data);
   } catch (error) {
     post({
       type: "error",

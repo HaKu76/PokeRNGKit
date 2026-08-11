@@ -1,6 +1,6 @@
 import type { Gen3GameVersion } from "../profiles/domain";
 
-export const GEN3_WILD_API_VERSION = 1;
+export const GEN3_WILD_API_VERSION = 2;
 export const GEN3_WILD_CHUNK_SIZE = 100_000;
 export const GEN3_WILD_MAX_TOTAL_STATES = 50_000_000;
 export const GEN3_WILD_MAX_RESULTS = 250_000;
@@ -60,6 +60,26 @@ export interface Gen3WildRequest {
   sid: number;
   area: Gen3WildArea;
   filters: Gen3WildFilters;
+}
+
+export interface Gen3WildSearcherRequest {
+  method: Gen3WildMethod;
+  lead: Gen3WildLead;
+  feebasTile: boolean;
+  version: Gen3GameVersion;
+  tid: number;
+  sid: number;
+  area: Gen3WildArea;
+  filters: Gen3WildFilters & {
+    ivMin: [number, number, number, number, number, number];
+    ivMax: [number, number, number, number, number, number];
+  };
+}
+
+export interface Gen3WildSearcherChunk {
+  index: number;
+  startIndex: number;
+  stateCount: number;
 }
 
 export interface Gen3WildState {
@@ -189,6 +209,78 @@ export function validateGen3WildRequest(request: Gen3WildRequest) {
       errors.push("slot");
   }
   return errors;
+}
+
+export function gen3WildSearcherCombinationCount(
+  request: Gen3WildSearcherRequest,
+) {
+  return request.filters.ivMin.reduce(
+    (count, minimum, index) =>
+      count * (request.filters.ivMax[index] - minimum + 1),
+    1,
+  );
+}
+
+export function validateGen3WildSearcherRequest(
+  request: Gen3WildSearcherRequest,
+) {
+  const probe: Gen3WildRequest = {
+    seed: 0,
+    initialAdvances: 0,
+    maxAdvances: 0,
+    offset: 0,
+    method: request.method,
+    lead: request.lead,
+    synchronizeNature: 0,
+    feebasTile: request.feebasTile,
+    bike: false,
+    item: "none",
+    version: request.version,
+    tid: request.tid,
+    sid: request.sid,
+    area: request.area,
+    filters: { natureMask: request.filters.natureMask },
+  };
+  const errors = validateGen3WildRequest(probe);
+  request.filters.ivMin.forEach((minimum, index) => {
+    const maximum = request.filters.ivMax[index];
+    if (
+      !Number.isInteger(minimum) ||
+      !Number.isInteger(maximum) ||
+      minimum < 0 ||
+      maximum > 31 ||
+      minimum > maximum
+    )
+      errors.push("ivRange");
+  });
+  if (
+    errors.length === 0 &&
+    gen3WildSearcherCombinationCount(request) > GEN3_WILD_MAX_TOTAL_STATES
+  )
+    errors.push("searchRange");
+  return errors;
+}
+
+export function createGen3WildSearcherChunks(
+  request: Gen3WildSearcherRequest,
+  chunkSize = GEN3_WILD_CHUNK_SIZE,
+) {
+  if (
+    !Number.isInteger(chunkSize) ||
+    chunkSize < 1 ||
+    chunkSize > GEN3_WILD_CHUNK_SIZE
+  )
+    throw new RangeError(
+      `Gen3 wild search chunk size must be between 1 and ${GEN3_WILD_CHUNK_SIZE}.`,
+    );
+  const chunks: Gen3WildSearcherChunk[] = [];
+  const totalStates = gen3WildSearcherCombinationCount(request);
+  for (let startIndex = 0, index = 0; startIndex < totalStates; index++) {
+    const stateCount = Math.min(chunkSize, totalStates - startIndex);
+    chunks.push({ index, startIndex, stateCount });
+    startIndex += stateCount;
+  }
+  return chunks;
 }
 
 export function createGen3WildChunks(
