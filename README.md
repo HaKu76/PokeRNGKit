@@ -5,12 +5,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**阶段 1：第三世代 ID 乱数模块落地中。** 当前已具备 React/Vite 应用壳、`gen3id` Wasm 模块边界、TypeScript Worker Pool、ID 输入/筛选/结果表和 GitHub Pages 工作流。CMake 与 Ninja 由 npm 提供；本机尚未激活 Emscripten，因此完整 Wasm 构建和 Pages 实机验收待完成。
+**当前里程碑：第三世代 Static Generator 工程实现。** `gen3id` 已完成首轮工程实现并进入 Git 基线；当前工作区新增 `gen3static` Wasm 模块、独立 Worker Pool、定点输入/筛选/结果表和三语界面。Static Searcher、真实 Wasm 浏览器集成和项目所有者验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
-- 当前模块：ID Generator（XD/Colosseum、FireRed/LeafGreen/Emerald、Ruby/Sapphire）
+- 已有模块：ID Generator（XD/Colosseum、FireRed/LeafGreen/Emerald、Ruby/Sapphire）
+- 当前模块：Static Generator（Method 1、Method 4、游走 IV 缺陷）
 - 上游核验基线：PokeFinder 4.3.2
-- 当前里程碑：`gen3id` Worker + Wasm 技术验证
+- 算法说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Static](docs/modules/gen3static.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
@@ -27,10 +28,18 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - Web Worker Pool 并行调度、进度、取消和错误状态
 - 虚拟化结果表、数值排序和 CSV 导出
 
+当前工作区已落地的 Static Generator 包含：
+
+- Mewtwo、Rayquaza、Regirock、Regice、Registeel、Deoxys、Latios、Latias 首批预设
+- Method 1、Method 4 与 Latios/Latias 游走 IV 缺陷
+- Seed、Initial Advances、Max Advances、Offset、TID、SID
+- IV、性格、特性、性别和闪光筛选
+- 独立 `gen3static` Worker Pool、进度、取消、虚拟化结果表、排序和 CSV
+
 后续 MVP 计划包含：
 
 - 三代档案的创建、编辑、选择与删除
-- Static Generator / Searcher
+- Static Searcher
 - Wild Generator / Searcher
 - IV、性格、特性、性别、闪光、觉醒力量、遭遇槽等适用筛选项
 - 可排序结果表格、分批展示和 CSV 导出
@@ -38,7 +47,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - 简体中文、英文与日文
 - PWA 安装与首次加载后的离线使用
 
-当前不包含 Egg、GameCube、PokeSpot、Jirachi 及其他世代。Static/Wild 将在 `gen3id` 的正确性、性能与离线流程验证后继续实现。
+当前不包含 Static Searcher、Wild、Egg、GameCube、PokeSpot、Jirachi 及其他世代。每个功能继续使用独立 Wasm 模块和验收记录，不把后续算法并入 `gen3id` 或 `gen3static`。
 
 ## 纯静态与隐私
 
@@ -63,7 +72,8 @@ React UI
   `-- typed messages
         `-- Web Worker
               `-- Worker Pool
-                    `-- Emscripten gen3id module
+                    |-- Emscripten gen3id module
+                    `-- Emscripten gen3static module
                           `-- PokeFinder Gen III C++ Core + thin adapter
 ```
 
@@ -94,7 +104,7 @@ npm run preview:ui
 
 打开 <http://127.0.0.1:4173/>。
 
-UI 预览模式使用确定性样例数据，可以验收三种模式切换、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
+UI 预览模式使用确定性样例数据，可以验收 ID 三种模式、Static Generator、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
 
 本地验收服务器固定绑定 `127.0.0.1`，只允许当前电脑访问。如果 Windows 首次运行 Node.js 时弹出防火墙网络放行或管理员密码提示，可以直接取消/不允许；不需要为本地验收创建公网或局域网放行规则。
 
@@ -133,7 +143,7 @@ npm run verify
 
 ## 构建与测试
 
-`npm run build` 先生成 release 模式的 `public/wasm/gen3id.mjs` 与 `gen3id.wasm`，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
+`npm run build` 先生成 release 模式的 `gen3id` 与 `gen3static` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
 
 测试规划分为五层：
 
@@ -143,7 +153,7 @@ npm run verify
 4. Worker + 真实 Wasm + IndexedDB 的浏览器集成测试（后续补充）。
 5. Playwright 覆盖核心流程、静态子路径部署和离线重载（Pages 预览稳定后引入）。
 
-首个技术验证先证明 `gen3id` 固定输入结果与上游一致、长范围计算可汇报进度并响应取消、GitHub Pages 能加载 Worker/Wasm，且离线重载可用。功能测试和最终验收由项目所有者执行；仓库记录命令、输入和结果，不代替人工验收结论。
+当前验证门槛要求 `gen3id` 与 `gen3static` 固定输入结果对齐上游、长范围计算可汇报进度并响应取消、GitHub Pages 能加载两个 Worker/Wasm 模块，且离线重载可用。功能测试和最终验收由项目所有者执行；仓库记录命令、输入和结果，不代替人工验收结论。
 
 ## 部署
 
@@ -175,16 +185,16 @@ npm run build:web
 ## 路线图
 
 - **阶段 0：仓库基线** - README、需求、技术栈、忽略规则与许可证策略（已完成）。
-- **阶段 1：第三世代 ID 模块** - React/Vite、`gen3id`、Worker Pool、三语界面、GitHub Pages 和上游一致性验证（进行中）。
-- **阶段 2：应用基础** - 三代档案、IndexedDB 迁移和本地设置。
-- **阶段 3：Static MVP** - Generator、Searcher、筛选、批量结果、排序、CSV、进度和取消。
-- **阶段 4：Wild MVP** - 遭遇数据、条件联动、Generator/Searcher 与全链路回归。
+- **阶段 1：第三世代 ID Generator** - `gen3id`、Worker Pool、三语界面和上游一致性夹具（已实现，待项目所有者完整验收）。
+- **阶段 2：第三世代 Static Generator** - `gen3static`、Method 1/4、游走缺陷、筛选和结果工作区（当前工作区已实现，待验证与提交）。
+- **阶段 3：Static Searcher** - 反向筛选流程、搜索边界和性能基线。
+- **阶段 4：应用基础与 Wild** - 三代档案、IndexedDB、遭遇数据和 Wild Generator/Searcher。
 - **阶段 5：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
 - **后续** - Egg、GameCube、PokeSpot、Jirachi 等三代能力；是否支持其他世代另行决策。
 
 ## 许可证、署名与源码分发
 
-PokeFinder 源码头声明可按 **GNU GPL v3 或更高版本**使用。PokeRNGKit 计划作为包含其衍生和链接代码的整体，以 `GPL-3.0-or-later` 发布。正式导入上游代码前必须完成以下事项：
+PokeFinder 源码头声明可按 **GNU GPL v3 或更高版本**使用。PokeRNGKit 作为包含其衍生和链接代码的整体，以 `GPL-3.0-or-later` 发布。公开部署与发布必须持续满足以下事项：
 
 - 在仓库中保留完整 GPL 许可证文本、原作者版权声明和上游署名。
 - 记录采用的上游版本、提交或归档校验和，以及 PokeRNGKit 的修改清单。

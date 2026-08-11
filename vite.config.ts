@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => ({
       : [
           VitePWA({
             registerType: "autoUpdate",
-            includeAssets: ["icon.svg"],
+            includeAssets: ["favicon.ico"],
             manifest: {
               name: "PokeRNGKit",
               short_name: "PokeRNGKit",
@@ -38,16 +38,16 @@ export default defineConfig(({ mode }) => ({
               display: "standalone",
               icons: [
                 {
-                  src: "icon.svg",
-                  sizes: "any",
-                  type: "image/svg+xml",
-                  purpose: "any maskable",
+                  src: "favicon.ico",
+                  sizes: "32x32",
+                  type: "image/x-icon",
+                  purpose: "any",
                 },
               ],
             },
             workbox: {
               navigateFallback: "index.html",
-              globPatterns: ["**/*.{js,css,html,svg,mjs,wasm,txt,md}"],
+              globPatterns: ["**/*.{js,css,html,ico,mjs,wasm,txt,md}"],
             },
           }),
         ]),

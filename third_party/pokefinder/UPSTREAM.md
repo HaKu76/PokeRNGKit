@@ -5,7 +5,7 @@
 - 本地核验来源：`C:\Users\Hakuhiro\Desktop\PokeFinder-master`
 - 导入日期：2026-08-11
 - 许可证：GNU GPL v3 or later
-- 导入范围：第三世代 ID Generator 所需的最小 Core、共享 LCRNG、ID 状态与筛选父类
+- 导入范围：第三世代 ID Generator 所需的最小 Core、共享 LCRNG、ID 状态与筛选父类；Static Generator 复用共享 LCRNG，并以独立 bridge 对照上游源码实现
 
 本地核验目录不是构建依赖。PokeRNGKit 构建只使用本目录内的 vendored snapshot；所有文件保留原始版权与 GPL 头部。
 
@@ -23,6 +23,17 @@ C8502F62B522E150D1635DB550911DF09F01129D8412671057D285F9E3A25A91  Core/Parents/S
 F057BCA7BD5C9A966DEE81EE091178F960A2EF13DF62EEDF5A018EE6F3DACD76  Core/RNG/LCRNG.hpp
 ```
 
+## 只读核验文件 SHA-256
+
+以下文件用于核验 `gen3static` 算法和第三世代日期/属性规则，未复制到 vendored snapshot：
+
+```text
+A3366A5EDC04675F582482D67BF9DD8D406D82CAA880A768121A47F2607C8EA8  Core/Gen3/Generators/StaticGenerator3.cpp
+E4EAE7636B3776E9CE25BD1BD64E8E8E2B3EF90A960A587884574DE5016C34E1  Core/Gen3/Generators/StaticGenerator3.hpp
+EFDC7F4BCBF8E8FF06F96570F1D3FA91D583650567CDF3A10EAD031EA69EB75C  Core/Util/Utilities.cpp
+2DA3496DB43264D42569FB97A70E82E9AB3B1D52008582316C44857042F97458  Core/Util/Utilities.hpp
+```
+
 ## PokeRNGKit 修改
 
-当前 vendored 文件未修改。PokeRNGKit 通过独立的 `wasm/modules/gen3id/bridge/gen3id_bridge.cpp` 提供 C ABI 和二进制结果布局。
+当前 vendored 文件未修改。PokeRNGKit 通过独立的 `wasm/modules/gen3id/bridge/gen3id_bridge.cpp` 提供 ID C ABI；`wasm/modules/gen3static/bridge/gen3static_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `StaticGenerator3.cpp` 与 `Utilities.hpp` 的规则提供 Static C ABI、筛选和二进制结果布局。

@@ -1,8 +1,8 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：阶段 1，`gen3id` 已实现并等待 GitHub Pages 完整验证
+> - 状态：阶段 2A，`gen3static` Generator 已实现并等待完整验证
 > - 更新日期：2026-08-11
-> - 当前范围：第三世代 ID 乱数
+> - 当前范围：第三世代 ID Generator 与 Static Generator
 > - 包管理器：npm
 
 ## 1. 技术结论
@@ -37,13 +37,12 @@ React UI
   |-- i18next / localStorage
   |-- virtualized result table / CSV
   |-- ui mode -> deterministic preview engine
-  `-- production -> Gen3IdWorkerPool
-        |-- Worker 1 -> gen3id.mjs + gen3id.wasm
-        |-- Worker 2 -> gen3id.mjs + gen3id.wasm
-        `-- Worker N -> gen3id.mjs + gen3id.wasm
-                            |
-                            `-- C ABI bridge
-                                  `-- PokeFinder 4.3.2 Gen III Core
+  `-- production -> module-specific Worker Pool
+        |-- Gen3IdWorkerPool -> gen3id.mjs + gen3id.wasm
+        `-- Gen3StaticWorkerPool -> gen3static.mjs + gen3static.wasm
+                                      |
+                                      `-- narrow C ABI bridges
+                                            `-- PokeFinder 4.3.2 Gen III rules
 ```
 
 所有 Worker 相互独立。Pool 负责分片、排序批次、进度、结果上限和取消；C++ 只负责给定输入范围内的确定性计算。
@@ -91,11 +90,11 @@ Vite 的 `ui` mode 在编译期选择本地 UI 预览引擎。该引擎只生成
 
 React 负责高交互表单、进度状态和虚拟化结果视图。TypeScript 为 RNG 请求、Worker 消息、Wasm 解码和状态机提供静态边界。
 
-当前只有一个功能页，状态由 React `useState`、`useMemo` 和明确的类实例管理。暂不引入 Zustand、Redux 或其他全局状态框架；当多个模块需要共享档案、任务队列或列配置时再评估。
+当前有 ID 与 Static 两个工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。暂不引入 Zustand、Redux 或其他全局状态框架；当多个模块需要共享档案、任务队列或列配置时再评估。
 
 ### 5.2 路由
 
-当前不安装 React Router，因为 `gen3id` 是单页工作区。档案、Static 和 Wild 形成独立页面后再加入路由，并优先使用兼容静态托管刷新行为的方案。URL 不保存 TID、SID、Seed 或完整筛选条件。
+当前不安装 React Router。ID 与 Static 使用应用内模块切换即可完成工作流，不需要独立 URL；档案、Wild 或可分享视图形成真正页面边界后再评估路由，并优先使用兼容静态托管刷新行为的方案。URL 不保存 TID、SID、Seed 或完整筛选条件。
 
 ### 5.3 表格
 
@@ -103,6 +102,7 @@ React 负责高交互表单、进度状态和虚拟化结果视图。TypeScript 
 
 - 排序规则简单，直接由 TypeScript 数值排序实现。
 - 虚拟化只渲染可见行，降低大结果集 DOM 成本。
+- ID 四列与 Static 多列结果都只需要单列数值排序，当前 CSS Grid + TypeScript 排序足够。
 - 暂不安装 TanStack Table；当列显隐、组合排序、固定列或复杂表头出现后再评估。
 
 ### 5.4 国际化
@@ -119,9 +119,9 @@ i18next + react-i18next 管理 `zh`、`en`、`ja`：
 `vite-plugin-pwa` 使用 Workbox 生成 Service Worker：
 
 - 注册策略为 `autoUpdate`。
-- 缓存 JS、CSS、HTML、SVG、MJS 和 Wasm。
+- 缓存 JS、CSS、HTML、ICO、MJS 和 Wasm。
 - `navigateFallback` 为 `index.html`。
-- 不依赖运行时 CDN、第三方字体或远端 API。
+- 主界面使用 `system-ui` 默认字体栈，不依赖博客字体、第三方字体或运行时 CDN。
 
 PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等于离线已经通过。
 
@@ -133,7 +133,7 @@ PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等�
 - `localStorage`：只保存语言。
 - Worker/Wasm：任务期间的临时计算状态。
 - 页面刷新：终止任务并重建 Worker，不持久化结果。
-- UI 预览：使用同一 `Id3SearchEngine` 接口的样例引擎，不读取或生成 Wasm。
+- UI 预览：ID 与 Static 各自使用同一搜索接口的样例引擎，不读取或生成 Wasm。
 
 ### 6.2 后续档案
 
@@ -163,25 +163,29 @@ wasm/
 |-- CMakeLists.txt
 |-- build/                         # 生成物，忽略
 `-- modules/
-    `-- gen3id/
+    |-- gen3id/
+    |   |-- CMakeLists.txt
+    |   |-- module.json
+    |   |-- bridge/
+    |   `-- tests/
+    `-- gen3static/
         |-- CMakeLists.txt
         |-- module.json
         |-- bridge/
-        |   |-- gen3id_bridge.h
-        |   `-- gen3id_bridge.cpp
         `-- tests/
-            `-- id3_native_test.cpp
 
 public/wasm/                        # 生成物，忽略
 |-- gen3id.mjs
-`-- gen3id.wasm
+|-- gen3id.wasm
+|-- gen3static.mjs
+`-- gen3static.wasm
 ```
 
 `scripts/wasm.mjs` 读取 `module.json`，选择模块、调用 npm 提供的 CMake/Ninja、执行原生测试或通过 emsdk 构建 Wasm，并检查声明的产物是否存在。
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 1：
+当前 `gen3id` 与 `gen3static` API 版本均为 1。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -208,6 +212,18 @@ uint32 tidSID      # low 16 bits TID, high 16 bits SID
 uint32 tsv
 ```
 
+Static C ABI 使用同一生命周期形式：`gen3static_api_version`、`gen3static_generate`、`gen3static_result_ptr`、`gen3static_result_count` 和 `gen3static_last_error`。请求以固定宽度整数传入 Seed、推进范围、Offset、Method、预设属性、TID/SID 和筛选；结果为连续 48 字节记录：
+
+```text
+uint32 advances
+uint32 pid
+uint32 ivHP / ivAtk / ivDef / ivSpA / ivSpD / ivSpe
+uint32 ability
+uint32 gender
+uint32 level
+uint32 natureShiny  # low 8 bits nature, remaining bits shiny type
+```
+
 边界原则：
 
 - 只传递固定宽度整数、指针和长度，不暴露 C++ 对象、STL 或 Qt 类型。
@@ -228,29 +244,27 @@ uint32 tsv
 - `MALLOC=emmalloc`
 - 单线程、无 `SharedArrayBuffer`
 
-每个 Worker 加载自己的 `gen3id.mjs` 和 `gen3id.wasm`。增加 Worker 会提高并行度，也会增加 Wasm 内存占用；默认上限为 8，并在 Pages 实测后调整。
+每个 Worker 只加载所属模块的 MJS/Wasm。增加 Worker 会提高并行度，也会增加 Wasm 内存占用；默认上限为 8，并在 Pages 实测后调整。
 
 ## 8. Worker 协议
 
 ### 8.1 请求
 
 ```ts
-type Id3WorkerRequest =
+type ModuleWorkerRequest =
   | { type: "init"; moduleUrl: string }
   | {
       type: "run";
       taskId: string;
-      chunk: Id3Chunk;
-      mode: Id3Mode;
-      input: number;
-      filters: Id3Filters;
+      chunk: ModuleChunk;
+      request: ModuleRequest;
     };
 ```
 
 ### 8.2 响应
 
 ```ts
-type Id3WorkerResponse =
+type ModuleWorkerResponse =
   | { type: "ready"; apiVersion: number }
   | {
       type: "batch";
@@ -277,6 +291,7 @@ type Id3WorkerResponse =
 - 批次缓冲区使用 transfer list 移交所有权。
 - 取消通过终止 Pool 中的 Worker 实现，下一任务重新初始化。
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
+- ID 与 Static 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。
 
 ## 9. 源码与许可证边界
 
@@ -284,7 +299,7 @@ type Id3WorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3static_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 
@@ -295,31 +310,39 @@ type Id3WorkerResponse =
 ```text
 .github/workflows/ci.yml            # 验证、Pages、可选 Cloudflare
 docs/
+|-- modules/
+|   |-- gen3id.md
+|   `-- gen3static.md
 |-- progress.md
 |-- requirements.md
 `-- tech-stack.md
 public/
-|-- icon.svg
+|-- favicon.ico
 `-- wasm/                            # 生成物，忽略
 scripts/wasm.mjs
 src/
 |-- App.tsx
 |-- i18n.ts
 |-- styles.css
-`-- features/id/
-    |-- domain.ts
-    |-- domain.test.ts
-    `-- worker/
-        |-- messages.ts
-        |-- Gen3IdWorkerPool.ts
-        `-- gen3id.worker.ts
+`-- features/
+    |-- id/
+    |   |-- domain.ts
+    |   |-- preview/
+    |   `-- worker/
+    `-- static/
+        |-- domain.ts
+        |-- Gen3StaticPanel.tsx
+        |-- preview/
+        `-- worker/
 third_party/pokefinder/
 vite.config.ts
 vitest.config.ts
-wasm/modules/gen3id/
+wasm/modules/
+|-- gen3id/
+`-- gen3static/
 ```
 
-后续模块沿用同一结构，不把 `gen4id`、Static 或 Wild 逻辑塞进现有 `gen3id` 文件。
+后续模块沿用同一结构，不把 `gen4id`、Searcher 或 Wild 逻辑塞进现有 Generator 文件。
 
 ## 11. npm 构建入口
 
@@ -357,33 +380,34 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 ### 12.1 当前已实现
 
-- **C++ 原生夹具**：三种模式各 10 个固定状态、筛选和错误码。
-- **TypeScript 单元测试**：输入解析、边界校验、分片、解码和红蓝宝石 Seed 推导。
-- **UI 预览引擎测试**：确定性样例、进度和取消。
+- **C++ 原生夹具**：ID 三种模式，以及 Static Method 1、Method 4、游走缺陷、筛选和错误码。
+- **TypeScript 单元测试**：ID/Static 输入边界、分片、解码和红蓝宝石 Seed 推导。
+- **UI 预览引擎测试**：ID/Static 确定性样例、进度和取消。
 - **静态检查**：Prettier、ESLint、TypeScript project build。
 - **生产 Web 构建**：Vite Worker、PWA、相对 base 和法律文件。
 
 ### 12.2 Pages 预览后补充
 
-- Testing Library：模式切换、表单校验、取消、排序、CSV 和语言切换。
+- Testing Library：模块切换、表单校验、取消、排序、CSV 和语言切换。
 - Worker + 真实 Wasm 浏览器集成：API 握手、批次顺序、错误、取消和内存边界。
-- Playwright：GitHub Pages 子路径、三种模式冒烟、离线重载和移动视口。
+- Playwright：GitHub Pages 子路径、ID/Static 冒烟、离线重载和移动视口。
 - 性能基线：记录设备、浏览器、状态数、Worker 数、吞吐、取消耗时和峰值内存。
 
 测试数量不代替上游一致性。优先保证 C++ 固定夹具、协议边界和真实 Pages 加载路径。
 
-## 13. 首个技术验证门槛
+## 13. 当前模块技术验证门槛
 
-`gen3id` 进入下一模块前必须完成：
+`gen3static` Generator 进入项目所有者验收前必须完成：
 
-1. 原生夹具通过三种模式和错误边界。
-2. Emscripten 6.0.6 生成可加载的 `gen3id.mjs` 与 `gen3id.wasm`。
-3. Worker Pool 在多 Worker 下保持结果顺序和稳定进度。
-4. 大范围任务可取消，主线程仍能响应输入和滚动。
-5. GitHub Pages 无 JS、Worker、Wasm、manifest 或 Service Worker 404。
-6. 简体中文、英文和日文可以切换并刷新保留。
-7. CSV、结果上限、错误状态和法律入口符合需求。
-8. 项目所有者完成并记录功能、移动端和离线验收。
+1. 原生夹具通过 Method 1、Method 4、游走缺陷、筛选和错误边界。
+2. 固定 Seed 的 PID、IV 与性格逐字段匹配 PokeFinder 4.3.2 基线。
+3. Emscripten 6.0.6 生成可加载的 `gen3static.mjs` 与 `gen3static.wasm`。
+4. Static Worker Pool 在多 Worker 下保持结果顺序、稳定进度和取消行为。
+5. 大范围任务运行时主线程仍能响应输入、模块切换和结果滚动。
+6. 简体中文、英文和日文可以切换，Latios/Latias 禁用 Method 4 并显示游走缺陷说明。
+7. 多列排序、CSV、结果上限、错误状态和移动端横向滚动符合需求。
+8. GitHub Pages 无 ID/Static JS、Worker、Wasm、manifest 或 Service Worker 404。
+9. 项目所有者完成并记录功能、移动端和离线验收。
 
 ## 14. GitHub Actions 与 Pages
 
@@ -398,7 +422,7 @@ checkout
   -> wasm:doctor
   -> npm run verify
   -> npm run wasm:test:native
-  -> npm run build (BASE_PATH=./)
+  -> npm run build (BASE_PATH=./，构建所有 module.json)
   -> configure Pages
   -> upload dist artifact
   -> deploy GitHub Pages
@@ -446,9 +470,9 @@ Cloudflare job 默认不运行。配置以下内容后，工作流会下载与 P
 
 ## 17. 暂不引入
 
-- React Router：当前只有单页模块。
+- React Router：当前模块切换不需要独立 URL。
 - Zustand / Redux：当前状态局部且所有权清晰。
-- TanStack Table：当前只有四列和单列排序。
+- TanStack Table：当前 ID/Static 都只有单列排序和固定列定义。
 - Dexie：档案阶段再安装并锁定。
 - Testing Library / Playwright：Pages 预览稳定后按真实交互补充。
 - Next.js、SSR 或后端框架：违反纯静态目标。
