@@ -172,7 +172,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-STATIC-METHOD-02** Method 4 在第一、第二组 IV 随机数之间额外推进一次，不改变 PID 读取顺序。
 - **FR-STATIC-METHOD-03** Latios/Latias 使用游走 IV 缺陷：第一组 IV 只保留低 8 位，第二组 IV 为零。
 - **FR-STATIC-METHOD-04** 游走缺陷预设限制为 Method 1，界面必须禁用无效选项并显示原因。
-- **FR-STATIC-METHOD-05** 输出包含 Advances、PID、六项 IV、性格、特性槽、性别、等级和闪光类型。
+- **FR-STATIC-METHOD-05** 输出包含 Advances、PID、六项 IV、性格、特性槽及其当前语言名称、性别、等级和闪光类型；特性名称必须由所选物种的 PokeFinder Personal 数据解析。
 
 ### 5.3 筛选
 

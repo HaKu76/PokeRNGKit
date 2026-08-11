@@ -1056,6 +1056,13 @@ h1 {
   gap: 8px;
   margin-bottom: 8px;
 }
+.gen3static-control-grid {
+  grid-template-columns:
+    minmax(230px, 260px) minmax(230px, 260px)
+    minmax(430px, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
 .operation-tabs {
   display: inline-grid;
   grid-template-columns: repeat(2, minmax(120px, 1fr));
@@ -1149,8 +1156,21 @@ h1 {
   gap: 8px;
   margin-top: 9px;
 }
+.gen3static-control-grid .static-form-stack {
+  gap: 6px;
+  margin-top: 6px;
+}
 .static-panel .field {
   gap: 4px;
+}
+.gen3static-control-grid .static-rng-panel .static-form-stack > .field,
+.gen3static-control-grid .static-rng-panel .compact-field-row > .field,
+.gen3static-control-grid .static-settings-panel .static-form-stack > .field {
+  display: grid;
+  grid-template-columns: minmax(86px, 1fr) minmax(104px, 150px);
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 8px;
 }
 .static-panel .field input,
 .static-panel .field select {
@@ -1180,6 +1200,9 @@ h1 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
+}
+.gen3static-control-grid .static-rng-panel .compact-field-row {
+  display: contents;
 }
 .static-encounter-meta {
   display: grid;
@@ -1228,6 +1251,19 @@ h1 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
   margin-top: 9px;
+}
+.gen3static-control-grid .static-filter-selects {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+.gen3static-control-grid .static-filter-selects .field {
+  display: grid;
+  grid-template-columns: minmax(72px, 1fr) minmax(112px, 166px);
+  align-items: center;
+  column-gap: 8px;
 }
 .multi-check-field {
   position: relative;
@@ -1284,6 +1320,12 @@ h1 {
   border: 0;
   padding: 0;
 }
+.gen3static-control-grid .static-filter-panel .filter-controls {
+  display: grid;
+  grid-template-columns: minmax(178px, 1fr) minmax(192px, 1fr);
+  align-items: start;
+  gap: 6px 10px;
+}
 .filter-controls:disabled {
   opacity: 0.45;
 }
@@ -1298,6 +1340,18 @@ h1 {
   justify-content: space-between;
   gap: 8px;
   margin-top: 8px;
+}
+.gen3static-control-grid .static-filter-panel .filter-tool-row {
+  display: grid;
+  grid-column: 1;
+  grid-row: 2;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0;
+}
+.gen3static-control-grid .static-filter-panel .filter-tool-row button {
+  min-height: 30px;
+  padding: 5px 8px;
 }
 .wild-level-display,
 .wild-level-filter {
@@ -1337,6 +1391,11 @@ h1 {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 3px;
+}
+.gen3static-control-grid .static-filter-panel .iv-filter {
+  grid-column: 1;
+  grid-row: 1;
+  margin-top: 6px;
 }
 .iv-filter-header,
 .iv-filter-row {
@@ -1390,15 +1449,15 @@ h1 {
 }
 .static-virtual-table {
   position: relative;
-  min-width: 1220px;
+  min-width: 1258px;
 }
 .static-table-header,
 .static-table-row {
   display: grid;
   grid-template-columns:
-    100px 108px repeat(6, 76px) 92px 92px 110px 88px
-    106px 92px;
-  min-width: 1220px;
+    100px 108px 76px 92px 160px repeat(6, 72px)
+    110px 88px 92px;
+  min-width: 1258px;
   align-items: center;
 }
 .static-table-header {
@@ -1692,6 +1751,24 @@ h1 {
   .filter-panel,
   .static-panel {
     padding: 16px;
+  }
+  .gen3static-control-grid .static-panel {
+    padding: 11px;
+  }
+  .gen3static-control-grid .static-rng-panel .static-form-stack > .field,
+  .gen3static-control-grid .static-rng-panel .compact-field-row > .field,
+  .gen3static-control-grid .static-settings-panel .static-form-stack > .field,
+  .gen3static-control-grid .static-filter-selects .field {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gen3static-control-grid .static-filter-panel .filter-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gen3static-control-grid .static-filter-selects,
+  .gen3static-control-grid .static-filter-panel .iv-filter,
+  .gen3static-control-grid .static-filter-panel .filter-tool-row {
+    grid-column: 1;
+    grid-row: auto;
   }
   .compact-field-row,
   .static-filter-selects {

@@ -1,12 +1,12 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：第三世代生产页面回归与 Static UI 紧凑化
+> - 当前阶段：第三世代 Static 特性名称与紧凑布局
 > - 当前模块：`gen3id`、`gen3static`、`gen3wild`、`profiles`、`ivcalculator`
-> - Git 基线：`7b3383d feat: 实现第三世代野生检索器`
-> - 工作区状态：红蓝宝石 ID Searcher、右侧悬浮工具列与配套文档仍有未提交修改；Codex 不暂存、不提交、不 push
+> - Git 基线：`b6dc62e fix: 修复第三世代检索界面与定点布局`
+> - 工作区状态：Static 特性名称与控制区布局存在未提交修改；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
-> - 验收状态：ID Searcher 与 Static Searcher 固定夹具已在项目所有者授权的 GitHub Pages 页面回归；本地 UI 修复待部署后共同验收
+> - 验收状态：ID Searcher 与 Static Searcher 固定夹具已在项目所有者授权的 GitHub Pages 页面回归；本轮特性显示和布局待部署后共同验收
 
 ## 1. 恢复入口
 
@@ -40,7 +40,7 @@
 
 ## 3. Git 与部署状态
 
-- 当前分支：`main`，HEAD `7b3383d`。
+- 当前分支：`main`，HEAD `b6dc62e`。
 - 当前没有待完成的 merge 状态；本轮工作区修改均保持未提交。
 - 远端和仓库目录沿用现有设置，不在本轮重命名或修改远端。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
@@ -63,20 +63,20 @@
 - `ivcalculator`：第三世代物种、性格、觉醒力量、多行能力值交集和下一级提示。
 - 右侧悬浮工具列：存档信息和个体值计算器按固定纵向按钮列收起，展开后向左延展；点击页面空白不会收起存档信息。
 
-## 5. 当前未提交工作区：红蓝宝石 ID Searcher
+## 5. 当前未提交工作区：Static 特性名称与紧凑布局
 
 ### 5.1 已实现
 
-- `gen3id` API 升级为 v2，增加 `gen3id_search` C ABI 和 24 字节 Searcher 结果记录。
-- SID 模式通过 TID/SID 恢复初始 Seed、帧数、TSV 与 2000 年第一组日期时间。
-- PID 模式枚举八个闪光 SID，并区分星闪与方块闪；无解组合返回空集合。
-- 增加独立 `Gen3IdSearcherWorkerPool`、Worker `search` 消息、结果解码、UI 预览与 Generator/Searcher 标签。
-- UI 复用参考程序的简体中文控件和列名，支持输入限制、取消、结果清除和 CSV。
-- 原生夹具覆盖 SID、PID、无解和非法输入；TypeScript 测试覆盖 24 字节解码与输入位宽。
+- Static 结果的特性列由纯槽位数字改为 PokeFinder 格式 `0/1: 特性名称`；物种特性 ID 来自 `personal_rsefrlg.bin`，名称复用上游中英日资源。
+- Wild 已使用同一共享 Personal 与特性名称表，本轮不修改其算法或筛选协议。
+- `static-control-grid` 保留 PokeFinder 的 RNG Info / Settings / Filters 三栏结构；RNG 与设置控件改为标签在左、控件在右的紧凑行布局。
+- Filters 改为 PokeFinder `Filter.ui` 同类左右分栏：IV 范围与工具位于左侧，性格、觉醒力量、异色、性别和特性位于右侧。
+- 桌面控件限制最大宽度，窄屏恢复单栏，避免输入框随面板无上限拉伸。
 
 ### 5.2 明确未完成
 
-- Emscripten Wasm 产物、Pages 真实资源加载、Codex 部署回归和项目所有者最终验收。
+- 本轮未运行测试、构建、算法回归或浏览器检查；Static 特性名称和新布局尚未进入 Pages 产物。
+- 本轮部署后的 UI 复核与项目所有者最终验收。
 - 第四世代算法、数据、存档、Wasm、Worker 和界面；未得到项目所有者单独指示前不得开始。
 
 ## 6. 验证状态
@@ -111,9 +111,9 @@
 
 ## 8. 下一步
 
-1. 项目所有者在 GitHub Desktop 审查未提交修改并创建提交：`fix: 修复第三世代检索界面与定点布局`。
+1. 项目所有者在 GitHub Desktop 审查未提交修改并创建提交：`feat: 显示第三世代特性名称并优化定点布局`。
 2. 推送后等待 GitHub Actions 部署，再由项目所有者提供更新后的站点 URL；本轮本地 UI 修复必须在新产物上复核。
-3. UI 复核重点：ID Searcher 不再显示 Generator；Static 三栏在桌面和侧栏展开状态下不横向溢出，控件密度接近 PokeFinder。
+3. UI 复核重点：Static 特性列显示 `槽位: 名称`；三栏在桌面和侧栏展开状态下不横向溢出；输入框不再占满整栏，筛选布局接近 PokeFinder。
 4. 项目所有者决定是否授权移动端、PWA、离线和性能检查的范围。
 5. 两阶段验收通过后再决定 Tanoby Chamber 数据或发布加固；第四世代仍等待项目所有者指定具体模块。
 

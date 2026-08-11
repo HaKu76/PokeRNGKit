@@ -10,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import type { Gen3Profile } from "../profiles/domain";
+import { getGen3AbilityName } from "../shared/gen3Abilities";
 import { getGen3Personal } from "../shared/gen3Personal";
 import { getGen3SpeciesName } from "../shared/gen3Species";
 import { computeGen3Stats } from "../shared/gen3Stats";
@@ -338,6 +339,7 @@ export function Gen3StaticPanel({
   }));
   const activeIvRanges = ivRanges[operation];
   const personal = getGen3Personal(template.species, template.form);
+  const resultPersonal = useRef(personal);
 
   useEffect(
     () => () => {
@@ -362,7 +364,7 @@ export function Gen3StaticPanel({
     if (ivIndex >= 0) {
       return showStats
         ? computeGen3Stats(
-            personal.stats,
+            resultPersonal.current.stats,
             state.ivs,
             state.nature,
             state.level,
@@ -515,6 +517,7 @@ export function Gen3StaticPanel({
     }
 
     setError("");
+    resultPersonal.current = personal;
     setResults([]);
     setSummary(undefined);
     setProgress({
@@ -558,7 +561,10 @@ export function Gen3StaticPanel({
             : "genderless",
       );
     }
-    if (key === "ability") return String(state.ability);
+    if (key === "ability") {
+      const abilityId = resultPersonal.current.abilities[state.ability];
+      return `${state.ability}: ${getGen3AbilityName(i18n.language, abilityId)}`;
+    }
     if (key === "nature") return t(natureKeys[state.nature]);
     if (key === "shiny") {
       return t(
@@ -626,7 +632,10 @@ export function Gen3StaticPanel({
         ))}
       </div>
 
-      <form className="static-control-grid" onSubmit={runCalculation}>
+      <form
+        className="static-control-grid gen3static-control-grid"
+        onSubmit={runCalculation}
+      >
         <section className="panel static-panel static-rng-panel">
           <div className="panel-heading">
             <div>
@@ -661,7 +670,6 @@ export function Gen3StaticPanel({
                     }
                     value={seed}
                   />
-                  <small>HEX / 32-bit</small>
                 </label>
                 <div className="compact-field-row">
                   <label className="field">

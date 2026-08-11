@@ -78,8 +78,11 @@ Searcher 仍按用户输入的完整六项 IV 组合恢复原 RNG 状态，再�
 
 ```text
 Nature  = PID mod 25
-Ability = PID AND 1
+Ability slot  = PID AND 1
+Ability index = PersonalInfo.abilities[Ability slot]
 ```
+
+筛选仍使用 PokeFinder 的特性槽位 `Any / 0 / 1`。结果列则按 `Model/Gen3/StaticModel3.cpp` 显示为 `槽位: 特性名称`：先使用物种和形态从 `personal_rsefrlg.bin` 读取特性 ID，再从 PokeFinder 的 `abilities_en.txt`、`abilities_zh.txt` 或 `abilities_ja.txt` 读取当前界面语言的名称。单特性宝可梦由个人数据决定两个槽位对应的特性，不在界面层猜测或合并。每次计算开始时固定当次 Personal 数据，之后切换预设不会重新解释已有结果。
 
 性别使用 PID 最低 8 位：
 
@@ -187,7 +190,7 @@ Searcher 的 Groudon、Method 4、`31/31/31/31/31/31` 固定夹具恢复 4 个�
 
 当前界面包含 PokeFinder 第三世代掌机 Static 的 67 条模板，按 `Starters / Fossils / Gifts / Game Corner / Stationary / Legends / Events / Roamers` 八类组织。分类与宝可梦为独立下拉框，并按当前存档的 Ruby、Sapphire、FireRed、LeafGreen 或 Emerald 版本过滤：Game Corner 只在 FRLG 显示，Events 在 Ruby/Sapphire 隐藏。Bugged Roamer 隐藏 Method 4 并强制 Method 1。
 
-模板数据包含版本、物种、形态、等级和游走缺陷标志，性别阈值来自 `personal_rsefrlg.bin`。物种名称与 Deoxys 形态使用上游简体中文、英文和日文资源；不包含官方美术素材。
+模板数据包含版本、物种、形态、等级和游走缺陷标志，性别阈值与两个特性 ID 来自 `personal_rsefrlg.bin`。物种名称、Deoxys 形态与特性名称使用上游简体中文、英文和日文资源；不包含官方美术素材。
 
 ## 13. Web 执行边界
 
@@ -204,12 +207,14 @@ Worker Pool、批次排序、进度、取消和 250,000 条结果上限属于浏
 - `Core/RNG/LCRNGReverse.hpp`
 - `Form/Gen3/Static3.cpp`
 - `Form/Gen3/Static3.ui`
+- `Model/Gen3/StaticModel3.cpp`
 - `Form/Controls/Filter.cpp`
 - `Form/Controls/Filter.ui`
 - `Form/Controls/CheckList.cpp`
 - `Form/Controls/TextBox.cpp`
 - `Core/Resources/Embed/embed_gen3.py`
 - `Core/Resources/Embed/embed_personal.py`
+- `Core/Resources/i18n/{en,zh,ja}/abilities_*.txt`
 
 仓库验证入口：
 
