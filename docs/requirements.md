@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：阶段 2B / 3，第三世代 Static Searcher 与存档信息基础
+> - 状态：阶段 4A，第三世代 Wild Generator 合并与验证
 > - 更新日期：2026-08-11
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。`gen3id` 与 Static Generator 已进入 Git 基线；当前工作区实现 Static Searcher、三代存档信息和相关界面基础。Wild 仍在后续阶段。
+当前按 PokeFinder 功能模块逐个落地。`gen3id`、`gen3static` Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前合并第三世代 Wild Generator。Wild Searcher 仍在后续阶段。
 
 ## 2. 已确认边界
 
@@ -53,6 +53,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 ### 3.6 存档信息用户
 
 用户在浏览器本地创建和选择第三世代存档信息，刷新后继续使用，并可通过 JSON 文件跨浏览器导入导出。用户可以同时清除 IndexedDB 与 localStorage 中的全部存档记录。
+
+### 3.7 第三世代野生乱数用户
+
+用户从当前掌机存档对应版本的遭遇表中选择遭遇类型和地点，输入 Seed、推进范围、Method、队首和特殊地点条件，生成野生宝可梦的槽位、等级、PID、IV、性格与闪光状态。大范围计算必须在独立 `gen3wild` Worker Pool 中运行。
 
 ## 4. 当前功能需求：`gen3id`
 
@@ -221,17 +225,49 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-IVCALC-06** 计算器作为全局默认收起的悬浮工具，在 ID 与 Static 工作区均可打开。
 - **FR-IVCALC-07** 该工具不得发起远端请求；其轻量确定性计算可以在 TypeScript 主线程同步完成。
 
-## 8. 后续 MVP
+## 8. 当前功能需求：`gen3wild` Generator
+
+### 8.1 输入与数据
+
+- **FR-WILD-INPUT-01** Seed 接受 `0x00000000..0xFFFFFFFF` 的 32 位十六进制值；空输入按上游无符号输入行为解析为 `0`。
+- **FR-WILD-INPUT-02** Initial Advances、Max Advances 和 Offset 接受 32 位无符号整数，三者相加不得溢出；Web 单任务最多处理 50,000,000 个状态。
+- **FR-WILD-INPUT-03** 遭遇数据按当前全局掌机存档的 Ruby、Sapphire、Emerald、FireRed 或 LeafGreen 版本切换，TID/SID 同样来自当前存档。
+- **FR-WILD-INPUT-04** 提供 Grass、Rock Smash、Surfing、Old Rod、Good Rod 与 Super Rod；地点列表只显示当前版本和遭遇类型中存在的地点。
+- **FR-WILD-INPUT-05** 当前生成数据未保留 Tanoby Chamber 的未知图腾 form，七个 Chamber 必须从地点列表排除，不能按 form 0 生成错误结果。
+- **FR-WILD-INPUT-06** `gen3Data.ts` 的原始输入来源、生成命令和精确 revision 必须在全地点验收前补记；固定地点核对不能替代完整数据来源记录。
+
+### 8.2 Method 与特殊规则
+
+- **FR-WILD-METHOD-01** 支持 PokeFinder Method 1、Method 2 与 Method 4 的 PID/IV 调用顺序。
+- **FR-WILD-METHOD-02** 队首规则只在 Emerald 显示；支持 Synchronize、Cute Charm、Pressure、Hustle、Vital Spirit、Magnet Pull 与 Static。
+- **FR-WILD-METHOD-03** Magnet Pull 只用于 Grass，Static 只用于 Grass 与 Surfing；Pressure、Hustle 与 Vital Spirit 共享上游等级修正规则。
+- **FR-WILD-METHOD-04** Route 119 的三种鱼竿支持 Feebas Tile；RSE Safari Zone 执行上游额外 RNG 推进。
+- **FR-WILD-METHOD-05** RSE Rock Smash 支持 Bike、Black Flute、Cleanse Tag 与 White Flute 的遭遇率修正；其他遭遇隐藏并清除这些设置。
+- **FR-WILD-METHOD-06** 遭遇槽权重、等级、性格、PID、IV、Ability、Gender 与 Shiny 的计算顺序必须与 `WildGenerator3::generate` 一致。
+
+### 8.3 筛选、Worker 与结果
+
+- **FR-WILD-FILTER-01** 当前增量提供 25 种性格多选；未选择或清除筛选时保留所有性格。
+- **FR-WILD-FILTER-02** 完整 Wild 筛选与 Wild Searcher 尚未实现，不得在界面、README、进度或发布说明中标记为完成。
+- **FR-WILD-TASK-01** `gen3wild` 使用独立 CMake target、C ABI 前缀、API 版本、Worker 文件和 Worker Pool，不在 React 主线程运行 RNG 循环。
+- **FR-WILD-TASK-02** 每个分片最多处理 100,000 个状态；Worker 数、结果上限、批次顺序、进度和取消遵循 ID/Static 的同一工程边界。
+- **FR-WILD-TASK-03** 结果使用 60 字节定长记录和 transferable `ArrayBuffer` 返回。
+- **FR-WILD-RESULT-01** 结果包含 Advances、Encounter Slot、Pokemon、Level、PID、六项 IV、Nature 与 Shiny。
+- **FR-WILD-RESULT-02** Advances、处理数和结果数使用原始十进制数字，不添加本地化千位分隔符。
+- **FR-WILD-RESULT-03** 结果支持数值排序、虚拟化显示、清空和带 UTF-8 BOM 的 CSV。
+
+## 9. 后续 MVP
 
 当前工作区通过工程检查与项目所有者验收后，按以下顺序推进：
 
-1. Wild Generator / Searcher。
-2. 遭遇槽、等级和 Pokemon 等 Wild 适用筛选。
-3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
+1. Wild Generator 的 Actions、Pages 和项目所有者验收。
+2. Wild Searcher，以及 IV、觉醒力量、特性、性别、闪光、遭遇槽、等级和 Pokemon 筛选。
+3. Tanoby Chamber form 数据、来源记录与固定夹具。
+4. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
 Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估。Gen IV 及其他世代不属于当前承诺；如进入开发，按 `gen4id` 等独立模块命名和验证。
 
-## 9. 非目标
+## 10. 非目标
 
 - 后端、账号、云同步、服务端计算、遥测、广告或运行时 CDN。
 - 模拟器、主机、存档文件或进程内存的实时连接。
@@ -240,37 +276,37 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 - 依赖 `SharedArrayBuffer`、Wasm pthread 或静态托管无法保证的响应头。
 - 未经授权的官方精灵图、音乐、Logo 或其他游戏素材。
 
-## 10. 非功能需求
+## 11. 非功能需求
 
-### 10.1 正确性
+### 11.1 正确性
 
-- `gen3id` 与 `gen3static` C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致。
+- `gen3id`、`gen3static` 与 `gen3wild` C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致。
 - TypeScript 只负责输入规范化、分片和解码，不改变 Core 的 RNG 规则。
 - C ABI 和 Worker 协议必须带显式 API 版本；版本不匹配时拒绝运行。
 - 上游源码文件、版本、SHA-256、修改边界和许可证必须可追溯。
 
-### 10.2 性能与稳定性
+### 11.2 性能与稳定性
 
 - 计算不得在 React 主线程执行。
 - 批次大小、Worker 数量、结果上限和任务上限必须有显式边界。
 - Worker 崩溃、Wasm 初始化失败和结果缓冲区异常不得产生看似有效的部分完成状态。
 - 性能结论必须记录设备、浏览器、Worker 数、范围和耗时，不以单一开发机推断所有用户环境。
 
-### 10.3 隐私与数据
+### 11.3 隐私与数据
 
 - IndexedDB 保存存档信息，localStorage 保存存档镜像、语言、主题和悬浮窗折叠状态。
 - 存档信息不放入 URL、日志或远端请求。
 - 应用不发送 TID、SID、Seed、筛选条件或结果。
 - 清除站点数据会删除设置、PWA 缓存和存档信息；项目没有服务器备份。
 
-### 10.4 可维护性
+### 11.4 可维护性
 
 - 每个 Wasm 功能使用独立目录、manifest、CMake target、C ABI 前缀和测试。
 - 一键入口保持为 `npm run build`，不同原生语言的工具链由模块构建驱动封装。
 - JavaScript 依赖通过 `package-lock.json` 复现；发布工具链使用精确版本。
 - 新依赖只有在对应功能开始实现且能减少实际复杂度时加入。
 
-## 11. 浏览器支持
+## 12. 浏览器支持
 
 目标是支持具备 ES modules、WebAssembly、Dedicated Worker、可转移 `ArrayBuffer`、Service Worker、Cache Storage、IndexedDB 和 `localStorage` 的当前稳定版桌面及移动浏览器。
 
@@ -282,21 +318,21 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 
 本阶段不声明已经通过具体浏览器版本。每次预览或发布应记录实际测试的浏览器完整版本、设备和结果；Service Worker 正式环境要求 HTTPS，本地允许 `localhost`。
 
-## 12. 验收标准
+## 13. 验收标准
 
-### 12.1 工程门槛
+### 13.1 工程门槛
 
 以下项目全部通过后，当前模块才能进入项目所有者验收：
 
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
-3. `npm run wasm:test:native` 通过 ID 三种模式、Static Method 1/4、Searcher 反向恢复、游走缺陷及错误边界。
-4. `npm run wasm:build` 生成 `gen3id` 与 `gen3static` 的 MJS/Wasm 产物。
+3. `npm run wasm:test:native` 通过 ID 三种模式、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator 及错误边界。
+4. `npm run wasm:build` 生成 `gen3id`、`gen3static` 与 `gen3wild` 的 MJS/Wasm 产物。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
 
-### 12.2 项目所有者验收
+### 13.2 项目所有者验收
 
 项目所有者至少检查：
 
@@ -304,29 +340,32 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 2. Static Generator/Searcher 的 Method 1、Method 4 与 Latios/Latias 游走缺陷各使用已知输入比对。
 3. ID 的 TID、SID、TSV 筛选，以及 Static 的 IV、性格、特性、性别、闪光筛选。
 4. 大范围任务的进度、取消、页面响应和结果上限提示。
-5. ID 与 Static 结果排序、CSV 内容、清空结果和移动端横向滚动。
+5. ID、Static 与 Wild Generator 的结果排序、CSV 内容、清空结果和移动端横向滚动。
 6. 简体中文、英文、日文切换及刷新保留。
 7. 存档信息的新建、编辑、选择、刷新恢复、导入、导出、清除和悬浮窗折叠。
-8. GitHub Pages 在线加载两个 Worker/Wasm 模块、刷新、安装 PWA 和离线重载。
-9. 桌面与移动浏览器的布局和操作。
+8. Wild Generator 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
+9. GitHub Pages 在线加载三个 Worker/Wasm 模块、刷新、安装 PWA 和离线重载。
+10. 桌面与移动浏览器的布局和操作。
 
 界面布局、文案和交互可以先在 UI 预览模式验收；RNG 结果、Worker 性能和离线完整功能仍必须在真实 Wasm 构建中验收。
 
 当前状态不得写成“已验收”，直到项目所有者明确记录结果。
 
-## 13. 阶段划分
+## 14. 阶段划分
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator** - React UI、Worker Pool、C++ bridge、上游最小 Core、三语和 Actions（已实现，待项目所有者完整验收）。
 - **阶段 2A：`gen3static` Generator** - 独立 Wasm/Worker、Method 1/4、游走缺陷、筛选和结果（已进入 Git 基线，待项目所有者完整验收）。
-- **阶段 2B：Static Searcher** - 反向恢复、搜索协议、结果边界和上游一致性测试（当前工作区已实现，待真实 Wasm 验证与提交）。
-- **阶段 3：三代存档信息** - IndexedDB、localStorage 镜像、CRUD、导入导出、清除和悬浮窗（当前工作区已实现，待项目所有者验收）。
-- **阶段 4：`gen3wild`** - 遭遇数据、Generator、Searcher 和一致性测试。
+- **阶段 2B：Static Searcher** - 反向恢复、搜索协议、结果边界和上游一致性测试（已进入 Git 基线，待项目所有者完整验收）。
+- **阶段 3：三代存档信息** - IndexedDB、localStorage 镜像、CRUD、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
+- **阶段 4A：`gen3wild` Generator** - 遭遇数据、独立 Wasm/Worker、特殊规则和一致性夹具（当前 PR 合并工作区已实现，待 Actions 与项目所有者验收）。
+- **阶段 4B：Wild Searcher** - IV 反向检索、完整 Wild 筛选和独立任务协议。
 - **阶段 5：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
-## 14. 未决事项
+## 15. 未决事项
 
 - Cloudflare Pages 正式项目名和 `hakuhiro.top` 下的主机名。
 - GitHub Pages 实机测试后的 ID/Static 分片大小、默认 Worker 数和取消耗时基线。
 - Static encounter presets 的完整导入范围和分批验收顺序。
 - Pages 预览稳定后何时加入 Playwright 和 Testing Library。
+- Wild 遭遇数据所用 `EncounterTableGenerator` 精确 revision、完整生成命令和 Tanoby Chamber form 数据导入方式。
