@@ -1,0 +1,53 @@
+# Dependencies and package-manager caches
+node_modules/
+.npm-cache-verify/
+
+# Vite and production output
+dist/
+dev-dist/
+.vite/
+*.local
+
+# Tests and reports
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Emscripten and CMake build output
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+wasm/build/
+wasm/generated/
+
+# Environment files; keep an explicit template when one exists
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editors and operating systems
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+
+# Local scratch files
+.tmp/
+tmp/
+
+# Do not ignore third_party/: GPL-covered source used for a release must ship.

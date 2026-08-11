@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hakuhiro Project Style"
+  short_description: "统一 Hakuhiro 项目文档、提交信息、构建版本与发布说明"
+  default_prompt: "Use $hakuhiro-project-style to draft repository documentation, commit messages, build metadata, or release notes in Hakuhiro style."
