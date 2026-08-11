@@ -1,31 +1,44 @@
-import { type FormEvent, useMemo, useRef, useState } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatHex, parseDecimal, parseHex } from "../id/domain";
-import { GEN3_ENCOUNTERS, GEN3_PERSONAL, GEN3_SPECIES_ZH } from "./gen3Data";
+import type { Gen3Profile } from "../profiles/domain";
+import { getGen3SpeciesName } from "../shared/gen3Species";
+import { normalizeDecimalInput, normalizeHexInput } from "../../input";
+import {
+  GEN3_WILD_MAX_RESULTS,
+  isGen3WildTanobyChamber,
+  validateGen3WildRequest,
+  type Gen3WildArea,
+  type Gen3WildEncounter,
+  type Gen3WildItem,
+  type Gen3WildLead,
+  type Gen3WildMethod,
+  type Gen3WildRequest,
+  type Gen3WildState,
+} from "./domain";
+import { GEN3_ENCOUNTERS, GEN3_PERSONAL } from "./gen3Data";
+import type { Gen3WildSearchEngine, Gen3WildSearchProgress } from "./search";
+import { Gen3WildWorkerPool } from "./worker/Gen3WildWorkerPool";
 
-type Game = keyof typeof GEN3_ENCOUNTERS;
-type Method = "method1" | "method2" | "method4";
-type Lead =
-  | "none"
-  | "synchronize"
-  | "cute-charm-f"
-  | "cute-charm-m"
-  | "pressure"
-  | "magnet-pull"
-  | "static";
-type EncounterKind =
-  "land" | "surf" | "rock-smash" | "old-rod" | "good-rod" | "super-rod";
-type WildState = {
-  advances: number;
-  slot: number;
-  species: number;
-  level: number;
-  pid: number;
-  ivs: [number, number, number, number, number, number];
-  nature: number;
-  shiny: boolean;
+type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
+type DataGame = "ruby" | "sapphire" | "emerald" | "fire-red" | "leaf-green";
+type SortKey =
+  "advances" | "slot" | "species" | "level" | "pid" | "nature" | "shiny";
+type RawLocation = {
+  readonly name: string;
+  readonly encounters: readonly {
+    readonly kind: Gen3WildEncounter;
+    readonly rate: number;
+    readonly slots: readonly (readonly [number, number, number])[];
+  }[];
 };
 
+interface Gen3WildPanelProps {
+  profile: Gen3Profile;
+}
+
+const NATURE_MASK_ALL = 0x1ff_ffff;
 const natureKeys = [
   "natureHardy",
   "natureLonely",
@@ -53,278 +66,288 @@ const natureKeys = [
   "natureCareful",
   "natureQuirky",
 ] as const;
-const kindLabels: Record<EncounterKind, string> = {
-  land: "Land",
-  surf: "Surf",
-  "rock-smash": "Rock Smash",
-  "old-rod": "Old Rod",
-  "good-rod": "Good Rod",
-  "super-rod": "Super Rod",
+const encounterLabels: Record<Gen3WildEncounter, string> = {
+  land: "wildGrass",
+  surf: "wildSurfing",
+  "rock-smash": "wildRockSmash",
+  "old-rod": "wildOldRod",
+  "good-rod": "wildGoodRod",
+  "super-rod": "wildSuperRod",
 };
-const gameLabels: Record<Game, string> = {
-  ruby: "Ruby",
-  sapphire: "Sapphire",
-  emerald: "Emerald",
-  "fire-red": "FireRed",
-  "leaf-green": "LeafGreen",
-};
-const slotRanges: Record<EncounterKind, number[]> = {
-  land: [20, 40, 50, 60, 70, 80, 85, 90, 94, 98, 99, 100],
-  surf: [60, 90, 95, 99, 100],
-  "rock-smash": [60, 90, 95, 99, 100],
-  "old-rod": [70, 100],
-  "good-rod": [60, 80, 100],
-  "super-rod": [40, 80, 95, 99, 100],
-};
+const gameData = GEN3_ENCOUNTERS as unknown as Record<
+  DataGame,
+  readonly RawLocation[]
+>;
 
-function next(seed: number) {
-  return (Math.imul(seed, 0x41c64e6d) + 0x6073) >>> 0;
-}
-function nextUShort(seed: number) {
-  const state = next(seed);
-  return [state, state >>> 16] as const;
-}
-function slotFor(kind: EncounterKind, value: number) {
-  return slotRanges[kind].findIndex((limit) => value < limit);
-}
-function ivs(first: number, second: number): WildState["ivs"] {
-  return [
-    first & 31,
-    (first >>> 5) & 31,
-    (first >>> 10) & 31,
-    (second >>> 5) & 31,
-    (second >>> 10) & 31,
-    second & 31,
-  ];
+function dataGame(version: Gen3Profile["version"]): DataGame {
+  if (version === "firered") return "fire-red";
+  if (version === "leafgreen") return "leaf-green";
+  if (version === "ruby" || version === "sapphire") return version;
+  return "emerald";
 }
 
-export function Gen3WildPanel() {
-  const { t } = useTranslation();
-  const cancelled = useRef(false);
-  const [game, setGame] = useState<Game>("emerald");
-  const [kind, setKind] = useState<EncounterKind>("land");
-  const [method, setMethod] = useState<Method>("method1");
-  const [locationIndex, setLocationIndex] = useState("0");
-  const [lead, setLead] = useState<Lead>("none");
-  const [leadNature, setLeadNature] = useState("0");
-  const [seed, setSeed] = useState("12345678");
-  const [initial, setInitial] = useState("0");
-  const [maximum, setMaximum] = useState("10000");
+function personal(species: number) {
+  const value = GEN3_PERSONAL[species] ?? [255, 0, 0];
+  return { genderRatio: value[0], type1: value[1], type2: value[2] };
+}
+
+function buildArea(
+  version: Gen3Profile["version"],
+  location: RawLocation,
+  encounter: Gen3WildEncounter,
+  feebasTile: boolean,
+): Gen3WildArea | undefined {
+  const source = location.encounters.find((entry) => entry.kind === encounter);
+  if (!source) return undefined;
+  const feebasLocation =
+    location.name === "Route 119" &&
+    (version === "ruby" || version === "sapphire" || version === "emerald") &&
+    (encounter === "old-rod" ||
+      encounter === "good-rod" ||
+      encounter === "super-rod");
+  const slots = source.slots.map(([species, minLevel, maxLevel]) => ({
+    species,
+    form: 0,
+    minLevel,
+    maxLevel,
+    ...personal(species),
+  }));
+  if (feebasLocation && feebasTile) {
+    slots.push({
+      species: 349,
+      form: 0,
+      minLevel: 20,
+      maxLevel: 25,
+      ...personal(349),
+    });
+  }
+  return {
+    name: location.name,
+    encounter,
+    rate: source.rate,
+    slots,
+    feebasLocation,
+    safariZone:
+      (version === "ruby" || version === "sapphire" || version === "emerald") &&
+      location.name.includes("Safari Zone"),
+  };
+}
+
+function csvCell(value: string | number) {
+  const text = String(value);
+  return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+export function Gen3WildPanel({ profile }: Gen3WildPanelProps) {
+  const { t, i18n } = useTranslation();
+  const engine = useMemo<Gen3WildSearchEngine>(
+    () => new Gen3WildWorkerPool(),
+    [],
+  );
+  const tableRef = useRef<HTMLDivElement>(null);
+  const [encounter, setEncounter] = useState<Gen3WildEncounter>("land");
+  const [locationIndex, setLocationIndex] = useState(0);
+  const [method, setMethod] = useState<Gen3WildMethod>("method1");
+  const [lead, setLead] = useState<Gen3WildLead>("none");
+  const [synchronizeNature, setSynchronizeNature] = useState(0);
+  const [seed, setSeed] = useState("");
+  const [initialAdvances, setInitialAdvances] = useState("0");
+  const [maxAdvances, setMaxAdvances] = useState("100000");
   const [offset, setOffset] = useState("0");
-  const [tid, setTid] = useState("0");
-  const [sid, setSid] = useState("0");
-  const [nature, setNature] = useState("-1");
-  const [results, setResults] = useState<WildState[]>([]);
-  const [processed, setProcessed] = useState(0);
+  const [feebasTile, setFeebasTile] = useState(false);
+  const [bike, setBike] = useState(false);
+  const [item, setItem] = useState<Gen3WildItem>("none");
+  const [natureMask, setNatureMask] = useState(0);
+  const [results, setResults] = useState<Gen3WildState[]>([]);
+  const [progress, setProgress] = useState<Gen3WildSearchProgress>({
+    processedStates: 0,
+    totalStates: 0,
+    resultCount: 0,
+    percent: 0,
+  });
+  const [status, setStatus] = useState<RunStatus>("ready");
   const [error, setError] = useState("");
-  const [status, setStatus] = useState<
-    "ready" | "calculating" | "completed" | "cancelled" | "failed"
-  >("ready");
+  const [sort, setSort] = useState<{ key: SortKey; direction: "asc" | "desc" }>(
+    {
+      key: "advances",
+      direction: "asc",
+    },
+  );
+
   const locations = useMemo(
     () =>
-      GEN3_ENCOUNTERS[game].filter((location) =>
-        location.encounters.some((entry) => entry.kind === kind),
+      gameData[dataGame(profile.version)].filter(
+        (location) =>
+          !isGen3WildTanobyChamber(location.name) &&
+          location.encounters.some((entry) => entry.kind === encounter),
       ),
-    [game, kind],
+    [encounter, profile.version],
   );
-  const selected = locations[Number(locationIndex)]?.encounters.find(
-    (entry) => entry.kind === kind,
-  );
-  const displayResults = useMemo(() => results.slice(0, 10_000), [results]);
-  const chooseGame = (value: Game) => {
-    setGame(value);
-    setLocationIndex("0");
-  };
-  const chooseKind = (value: EncounterKind) => {
-    setKind(value);
-    setLocationIndex("0");
-  };
+  const location = locations[locationIndex] ?? locations[0];
+  const area = location
+    ? buildArea(profile.version, location, encounter, feebasTile)
+    : undefined;
+  const feebasAvailable = area?.feebasLocation ?? false;
+  const rockOptions =
+    encounter === "rock-smash" &&
+    (profile.version === "ruby" ||
+      profile.version === "sapphire" ||
+      profile.version === "emerald");
+  const leadAvailable = profile.version === "emerald";
 
-  const generate = async (event: FormEvent) => {
-    event.preventDefault();
-    const input = {
-      seed: parseHex(seed),
-      initial: parseDecimal(initial),
-      max: parseDecimal(maximum),
-      offset: parseDecimal(offset),
-      tid: parseDecimal(tid),
-      sid: parseDecimal(sid),
-      nature: Number.parseInt(nature, 10),
-      leadNature: Number.parseInt(leadNature, 10),
+  const sortedResults = useMemo(() => {
+    const value = (state: Gen3WildState, key: SortKey) => {
+      if (key === "slot") return state.encounterSlot;
+      if (key === "species") return state.species;
+      return state[key];
     };
-    if (
-      !selected ||
-      Object.values(input).some((value) => value === undefined) ||
-      !Number.isInteger(input.nature) ||
-      input.max! > 50_000 ||
-      input.tid! > 65535 ||
-      input.sid! > 65535 ||
-      input.nature < -1 ||
-      input.nature > 24 ||
-      input.leadNature < 0 ||
-      input.leadNature > 24 ||
-      input.initial! + input.offset! + input.max! > 0xffff_ffff
-    ) {
+    return [...results].sort((left, right) => {
+      const difference = value(left, sort.key) - value(right, sort.key);
+      return sort.direction === "asc" ? difference : -difference;
+    });
+  }, [results, sort]);
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const rowVirtualizer = useVirtualizer({
+    count: sortedResults.length,
+    getScrollElement: () => tableRef.current,
+    estimateSize: () => 42,
+    overscan: 10,
+  });
+
+  useEffect(() => () => engine.dispose(), [engine]);
+  useEffect(() => {
+    setLocationIndex(0);
+    setFeebasTile(false);
+    setBike(false);
+    setItem("none");
+  }, [encounter, profile.version]);
+  useEffect(() => {
+    if (!leadAvailable) setLead("none");
+    if (profile.deadBattery) setSeed("5A0");
+  }, [leadAvailable, profile]);
+  useEffect(() => {
+    if (lead === "magnet-pull" && encounter !== "land") setLead("none");
+    if (lead === "static" && encounter !== "land" && encounter !== "surf")
+      setLead("none");
+  }, [encounter, lead]);
+
+  const run = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!area) return;
+    const request: Gen3WildRequest = {
+      seed: parseHex(seed) ?? Number.NaN,
+      initialAdvances: parseDecimal(initialAdvances) ?? Number.NaN,
+      maxAdvances: parseDecimal(maxAdvances) ?? Number.NaN,
+      offset: parseDecimal(offset) ?? Number.NaN,
+      method,
+      lead: leadAvailable ? lead : "none",
+      synchronizeNature,
+      feebasTile: feebasAvailable && feebasTile,
+      bike: rockOptions && bike,
+      item: rockOptions ? item : "none",
+      version: profile.version,
+      tid: profile.tid,
+      sid: profile.sid,
+      area,
+      filters: { natureMask: natureMask || NATURE_MASK_ALL },
+    };
+    if (validateGen3WildRequest(request).length > 0) {
       setError(t("invalidWildInput"));
       setStatus("failed");
       return;
     }
-    cancelled.current = false;
     setError("");
     setResults([]);
-    setProcessed(0);
+    setProgress({
+      processedStates: 0,
+      totalStates: request.maxAdvances + 1,
+      resultCount: 0,
+      percent: 0,
+    });
     setStatus("calculating");
-    await new Promise<void>((resolve) => setTimeout(resolve, 0));
-    const slots = selected.slots;
-    const matchingSlots = slots
-      .map((entry, index) => ({ entry, index }))
-      .filter(({ entry }) => {
-        const personal = GEN3_PERSONAL[entry[0]];
-        return lead === "magnet-pull"
-          ? personal?.[1] === 8 || personal?.[2] === 8
-          : lead === "static" && (personal?.[1] === 12 || personal?.[2] === 12);
+    try {
+      const summary = await engine.search(request, {
+        maxResults: GEN3_WILD_MAX_RESULTS,
+        onBatch: (batch) => setResults((current) => current.concat(batch)),
+        onProgress: setProgress,
       });
-    const found: WildState[] = [];
-    let base = input.seed!;
-    for (let count = 0; count < input.initial! + input.offset!; count++)
-      base = next(base);
-    const trainerXor = input.tid! ^ input.sid!;
-    for (let count = 0; count <= input.max!; count++) {
-      if (cancelled.current) break;
-      let state = base;
-      let value: number;
-      if (kind === "rock-smash") {
-        [state, value] = nextUShort(state);
-        if (value % 2880 >= selected.rate * 16) {
-          base = next(base);
-          continue;
-        }
-      }
-      let slot: number;
-      if (
-        (lead === "magnet-pull" || lead === "static") &&
-        matchingSlots.length
-      ) {
-        [state, value] = nextUShort(state);
-        if (value % 2 === 0) {
-          [state, value] = nextUShort(state);
-          slot = matchingSlots[value % matchingSlots.length].index;
-        } else {
-          [state, value] = nextUShort(state);
-          slot = slotFor(kind, value % 100);
-        }
-      } else {
-        [state, value] = nextUShort(state);
-        slot = slotFor(kind, value % 100);
-      }
-      const encounter = slots[slot];
-      if (!encounter) {
-        base = next(base);
-        continue;
-      }
-      const [species, minLevel, maxLevel] = encounter;
-      [state, value] = nextUShort(state);
-      const levelRoll = value % (maxLevel - minLevel + 1);
-      let level = minLevel + levelRoll;
-      if (lead === "pressure") {
-        [state, value] = nextUShort(state);
-        level =
-          value % 2 === 0
-            ? maxLevel
-            : minLevel + (levelRoll === 0 ? 0 : levelRoll - 1);
-      }
-      let targetNature: number;
-      if (lead === "synchronize") {
-        [state, value] = nextUShort(state);
-        if (value % 2 === 0) targetNature = input.leadNature;
-        else {
-          [state, value] = nextUShort(state);
-          targetNature = value % 25;
-        }
-      } else {
-        [state, value] = nextUShort(state);
-        targetNature = value % 25;
-      }
-      const genderRatio = GEN3_PERSONAL[species]?.[0] ?? 255;
-      let pid: number;
-      const cuteCharm =
-        (lead === "cute-charm-f" || lead === "cute-charm-m") &&
-        genderRatio !== 0 &&
-        genderRatio !== 254 &&
-        genderRatio !== 255 &&
-        (() => {
-          const nextValue = nextUShort(state);
-          state = nextValue[0];
-          return nextValue[1] % 3 !== 0;
-        })();
-      do {
-        let low: number, high: number;
-        [state, low] = nextUShort(state);
-        [state, high] = nextUShort(state);
-        pid = (low | (high << 16)) >>> 0;
-      } while (
-        pid % 25 !== targetNature ||
-        (cuteCharm &&
-          (lead === "cute-charm-f"
-            ? (pid & 0xff) >= genderRatio
-            : (pid & 0xff) < genderRatio))
+      setStatus(summary.cancelled ? "cancelled" : "completed");
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : String(caught);
+      setError(
+        /initial|module|fetch|wasm/i.test(message)
+          ? t("wildWasmMissing")
+          : message,
       );
-      if (method === "method2") state = next(state);
-      const nextFirst = nextUShort(state);
-      state = nextFirst[0];
-      const first = nextFirst[1];
-      if (method === "method4") state = next(state);
-      const second = nextUShort(state)[1];
-      const shiny = (((pid >>> 16) ^ (pid & 0xffff) ^ trainerXor) & 0xffff) < 8;
-      if (input.nature === -1 || input.nature === targetNature)
-        found.push({
-          advances: input.initial! + count,
-          slot,
-          species,
-          level,
-          pid,
-          ivs: ivs(first, second),
-          nature: targetNature,
-          shiny,
-        });
-      base = next(base);
-      if (count % 500 === 0) {
-        setProcessed(count + 1);
-        await new Promise<void>((resolve) => setTimeout(resolve, 0));
-      }
+      setStatus("failed");
     }
-    setProcessed(input.max! + 1);
-    setResults(found);
-    setStatus(cancelled.current ? "cancelled" : "completed");
   };
 
+  const toggleSort = (key: SortKey) =>
+    setSort((current) => ({
+      key,
+      direction:
+        current.key === key && current.direction === "asc" ? "desc" : "asc",
+    }));
+  const sortLabel = (key: SortKey) =>
+    sort.key === key ? (sort.direction === "asc" ? " ▲" : " ▼") : "";
+  const clearResults = () => {
+    setResults([]);
+    setProgress({
+      processedStates: 0,
+      totalStates: 0,
+      resultCount: 0,
+      percent: 0,
+    });
+    setStatus("ready");
+  };
   const exportCsv = () => {
     const rows = [
-      "Advance,Slot,Pokémon,Level,PID,HP,Atk,Def,SpA,SpD,Spe,Nature,Shiny",
-      ...results.map((entry) =>
-        [
-          entry.advances,
-          entry.slot + 1,
-          GEN3_SPECIES_ZH[entry.species],
-          entry.level,
-          formatHex(entry.pid, 8),
-          ...entry.ivs,
-          t(natureKeys[entry.nature]),
-          entry.shiny ? "Yes" : "No",
-        ].join(","),
-      ),
+      [
+        "Advance",
+        "Slot",
+        "Pokemon",
+        "Level",
+        "PID",
+        "HP",
+        "Atk",
+        "Def",
+        "SpA",
+        "SpD",
+        "Spe",
+        "Nature",
+        "Shiny",
+      ],
+      ...sortedResults.map((state) => [
+        state.advances,
+        state.encounterSlot + 1,
+        getGen3SpeciesName(i18n.language, state.species, state.form),
+        state.level,
+        formatHex(state.pid, 8),
+        ...state.ivs,
+        t(natureKeys[state.nature]),
+        state.shiny === 0
+          ? t("shinyNone")
+          : state.shiny === 1
+            ? t("shinyStar")
+            : t("shinySquare"),
+      ]),
     ];
-    const url = URL.createObjectURL(
-      new Blob([`\uFEFF${rows.join("\n")}`], {
+    const blob = new Blob(
+      [`\uFEFF${rows.map((row) => row.map(csvCell).join(",")).join("\n")}`],
+      {
         type: "text/csv;charset=utf-8",
-      }),
+      },
     );
+    const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
     anchor.download = "pokerngkit-gen3wild.csv";
     anchor.click();
     URL.revokeObjectURL(url);
   };
+
   const statusLabel = {
     ready: t("ready"),
     calculating: t("calculating"),
@@ -332,64 +355,97 @@ export function Gen3WildPanel() {
     cancelled: t("cancelled"),
     failed: t("failed"),
   }[status];
+  const leadOptions: { value: Gen3WildLead; label: string }[] = [
+    { value: "none", label: t("wildNone") },
+    { value: "synchronize", label: t("wildSynchronize") },
+    { value: "cute-charm-f", label: t("wildCuteCharmFemale") },
+    { value: "cute-charm-m", label: t("wildCuteCharmMale") },
+    { value: "pressure", label: t("wildPressure") },
+    { value: "hustle", label: t("wildHustle") },
+    { value: "vital-spirit", label: t("wildVitalSpirit") },
+    ...(encounter === "land"
+      ? [{ value: "magnet-pull" as const, label: t("wildMagnetPull") }]
+      : []),
+    ...(encounter === "land" || encounter === "surf"
+      ? [{ value: "static" as const, label: t("wildStatic") }]
+      : []),
+  ];
+
   return (
     <>
-      <form className="static-control-grid" onSubmit={generate}>
+      <form className="static-control-grid" onSubmit={run}>
         <section className="panel static-panel static-rng-panel">
           <div className="panel-heading">
             <div>
               <span className="panel-index">01</span>
               <h2>{t("rngInfo")}</h2>
             </div>
-            <span className="panel-note">Gen III / Wild</span>
+            <span className="panel-note">Gen III / Wild API 1</span>
           </div>
           <div className="static-form-stack">
-            <div className="mode-tabs static-method-tabs">
-              {(["method1", "method2", "method4"] as Method[]).map((entry) => (
-                <button
-                  className={method === entry ? "mode-tab active" : "mode-tab"}
-                  key={entry}
-                  onClick={() => setMethod(entry)}
-                  type="button"
-                >
-                  {entry === "method1"
-                    ? t("method1")
-                    : entry === "method2"
-                      ? "Method 2"
-                      : t("method4")}
-                </button>
-              ))}
-            </div>
+            <label className="field">
+              <span>{t("method")}</span>
+              <select
+                value={method}
+                onChange={(event) =>
+                  setMethod(event.target.value as Gen3WildMethod)
+                }
+              >
+                <option value="method1">{t("method1")}</option>
+                <option value="method2">Method 2</option>
+                <option value="method4">{t("method4")}</option>
+              </select>
+            </label>
             <label className="field">
               <span>{t("seed")}</span>
               <input
-                maxLength={10}
-                onChange={(event) => setSeed(event.target.value)}
+                maxLength={8}
                 value={seed}
+                onChange={(event) =>
+                  setSeed(normalizeHexInput(event.target.value, 8))
+                }
               />
             </label>
             <div className="compact-field-row">
               <label className="field">
                 <span>{t("initialAdvances")}</span>
                 <input
-                  onChange={(event) => setInitial(event.target.value)}
-                  value={initial}
+                  maxLength={10}
+                  value={initialAdvances}
+                  onChange={(event) =>
+                    setInitialAdvances(
+                      normalizeDecimalInput(
+                        event.target.value,
+                        0xffff_ffff,
+                        10,
+                      ),
+                    )
+                  }
                 />
               </label>
               <label className="field">
                 <span>{t("maxAdvances")}</span>
                 <input
-                  onChange={(event) => setMaximum(event.target.value)}
-                  value={maximum}
+                  maxLength={10}
+                  value={maxAdvances}
+                  onChange={(event) =>
+                    setMaxAdvances(
+                      normalizeDecimalInput(event.target.value, 49_999_999, 10),
+                    )
+                  }
                 />
-                <small>MAX / 50,000</small>
               </label>
             </div>
             <label className="field">
               <span>{t("offset")}</span>
               <input
-                onChange={(event) => setOffset(event.target.value)}
+                maxLength={10}
                 value={offset}
+                onChange={(event) =>
+                  setOffset(
+                    normalizeDecimalInput(event.target.value, 0xffff_ffff, 10),
+                  )
+                }
               />
             </label>
           </div>
@@ -404,9 +460,7 @@ export function Gen3WildPanel() {
             {status === "calculating" && (
               <button
                 className="secondary-action"
-                onClick={() => {
-                  cancelled.current = true;
-                }}
+                onClick={() => engine.cancel()}
                 type="button"
               >
                 {t("cancel")}
@@ -414,48 +468,42 @@ export function Gen3WildPanel() {
             )}
           </div>
         </section>
+
         <section className="panel static-panel static-settings-panel">
           <div className="panel-heading">
             <div>
               <span className="panel-index">02</span>
-              <h2>{t("wildEncounter")}</h2>
+              <h2>{t("wildEncounterType")}</h2>
             </div>
-            <span className="panel-note">PokeFinder data</span>
+            <span className="panel-note">
+              {profile.name} / {profile.version}
+            </span>
           </div>
           <div className="static-form-stack">
             <label className="field">
-              <span>Game</span>
+              <span>{t("wildEncounterType")}</span>
               <select
-                onChange={(event) => chooseGame(event.target.value as Game)}
-                value={game}
-              >
-                {(Object.keys(gameLabels) as Game[]).map((entry) => (
-                  <option key={entry} value={entry}>
-                    {gameLabels[entry]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              <span>Encounter</span>
-              <select
+                value={encounter}
                 onChange={(event) =>
-                  chooseKind(event.target.value as EncounterKind)
+                  setEncounter(event.target.value as Gen3WildEncounter)
                 }
-                value={kind}
               >
-                {(Object.keys(kindLabels) as EncounterKind[]).map((entry) => (
-                  <option key={entry} value={entry}>
-                    {kindLabels[entry]}
-                  </option>
-                ))}
+                {(Object.keys(encounterLabels) as Gen3WildEncounter[]).map(
+                  (value) => (
+                    <option key={value} value={value}>
+                      {t(encounterLabels[value])}
+                    </option>
+                  ),
+                )}
               </select>
             </label>
             <label className="field">
-              <span>Location</span>
+              <span>{t("wildLocation")}</span>
               <select
-                onChange={(event) => setLocationIndex(event.target.value)}
                 value={locationIndex}
+                onChange={(event) =>
+                  setLocationIndex(Number(event.target.value))
+                }
               >
                 {locations.map((entry, index) => (
                   <option key={`${entry.name}-${index}`} value={index}>
@@ -465,26 +513,29 @@ export function Gen3WildPanel() {
               </select>
             </label>
             <label className="field">
-              <span>Lead</span>
+              <span>{t("wildLead")}</span>
               <select
-                onChange={(event) => setLead(event.target.value as Lead)}
+                disabled={!leadAvailable}
                 value={lead}
+                onChange={(event) =>
+                  setLead(event.target.value as Gen3WildLead)
+                }
               >
-                <option value="none">None</option>
-                <option value="synchronize">Synchronize</option>
-                <option value="cute-charm-f">Cute Charm (female)</option>
-                <option value="cute-charm-m">Cute Charm (male)</option>
-                <option value="pressure">Pressure</option>
-                <option value="magnet-pull">Magnet Pull</option>
-                <option value="static">Static</option>
+                {leadOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </label>
-            {lead === "synchronize" && (
+            {leadAvailable && lead === "synchronize" && (
               <label className="field">
-                <span>Synchronize nature</span>
+                <span>{t("nature")}</span>
                 <select
-                  onChange={(event) => setLeadNature(event.target.value)}
-                  value={leadNature}
+                  value={synchronizeNature}
+                  onChange={(event) =>
+                    setSynchronizeNature(Number(event.target.value))
+                  }
                 >
                   {natureKeys.map((key, index) => (
                     <option key={key} value={index}>
@@ -494,24 +545,45 @@ export function Gen3WildPanel() {
                 </select>
               </label>
             )}
-            <div className="compact-field-row">
-              <label className="field">
-                <span>{t("tid")}</span>
+            {feebasAvailable && (
+              <label className="checkbox-field">
                 <input
-                  onChange={(event) => setTid(event.target.value)}
-                  value={tid}
+                  checked={feebasTile}
+                  onChange={(event) => setFeebasTile(event.target.checked)}
+                  type="checkbox"
                 />
+                <span>{t("wildFeebasTile")}</span>
               </label>
-              <label className="field">
-                <span>{t("sid")}</span>
-                <input
-                  onChange={(event) => setSid(event.target.value)}
-                  value={sid}
-                />
-              </label>
-            </div>
+            )}
+            {rockOptions && (
+              <>
+                <label className="field">
+                  <span>{t("wildItem")}</span>
+                  <select
+                    value={item}
+                    onChange={(event) =>
+                      setItem(event.target.value as Gen3WildItem)
+                    }
+                  >
+                    <option value="none">{t("wildNone")}</option>
+                    <option value="black-flute">{t("wildBlackFlute")}</option>
+                    <option value="cleanse-tag">{t("wildCleanseTag")}</option>
+                    <option value="white-flute">{t("wildWhiteFlute")}</option>
+                  </select>
+                </label>
+                <label className="checkbox-field">
+                  <input
+                    checked={bike}
+                    onChange={(event) => setBike(event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>{t("wildBike")}</span>
+                </label>
+              </>
+            )}
           </div>
         </section>
+
         <section className="panel static-panel static-filter-panel">
           <div className="panel-heading">
             <div>
@@ -519,24 +591,36 @@ export function Gen3WildPanel() {
               <h2>{t("filters")}</h2>
             </div>
           </div>
-          <div className="static-filter-selects">
-            <label className="field">
-              <span>{t("nature")}</span>
-              <select
-                onChange={(event) => setNature(event.target.value)}
-                value={nature}
-              >
-                <option value="-1">{t("any")}</option>
-                {natureKeys.map((key, index) => (
-                  <option key={key} value={index}>
-                    {t(key)}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <div className="nature-check-grid">
+            {natureKeys.map((key, index) => (
+              <label key={key}>
+                <input
+                  checked={(natureMask & (1 << index)) !== 0}
+                  onChange={(event) =>
+                    setNatureMask((current) =>
+                      event.target.checked
+                        ? current | (1 << index)
+                        : current & ~(1 << index),
+                    )
+                  }
+                  type="checkbox"
+                />
+                <span>{t(key)}</span>
+              </label>
+            ))}
+          </div>
+          <div className="panel-actions">
+            <button
+              className="secondary-action"
+              onClick={() => setNatureMask(0)}
+              type="button"
+            >
+              {t("disableFilters")}
+            </button>
           </div>
         </section>
       </form>
+
       <section className="panel results-panel static-results-panel">
         <div className="results-heading">
           <div className="panel-heading compact">
@@ -548,7 +632,7 @@ export function Gen3WildPanel() {
           </div>
           <div className="result-actions">
             <span className="result-count">
-              {results.length.toLocaleString()} / {processed.toLocaleString()}
+              {String(results.length)} / {String(progress.processedStates)}
             </span>
             <button
               className="secondary-action"
@@ -558,11 +642,19 @@ export function Gen3WildPanel() {
             >
               {t("exportCsv")}
             </button>
+            <button
+              className="secondary-action"
+              disabled={!results.length}
+              onClick={clearResults}
+              type="button"
+            >
+              {t("clear")}
+            </button>
           </div>
         </div>
         {error && <div className="alert error">{error}</div>}
-        <div className="table-shell static-table-shell">
-          {displayResults.length === 0 ? (
+        <div className="table-shell static-table-shell" ref={tableRef}>
+          {sortedResults.length === 0 ? (
             <div className="empty-state">
               <span className="empty-cross">+</span>
               <span>{t("emptyStatic")}</span>
@@ -570,34 +662,70 @@ export function Gen3WildPanel() {
           ) : (
             <div
               className="static-virtual-table"
-              style={{ height: `${displayResults.length * 42 + 38}px` }}
+              style={{ height: `${rowVirtualizer.getTotalSize() + 38}px` }}
             >
               <div className="static-table-header wild-table-header">
-                <span>{t("rowAdvance")}</span>
-                <span>{t("wildSlot")}</span>
-                <span>{t("pokemon")}</span>
-                <span>{t("level")}</span>
-                <span>{t("rowPid")}</span>
+                {(
+                  [
+                    ["advances", "rowAdvance"],
+                    ["slot", "wildSlot"],
+                    ["species", "pokemon"],
+                    ["level", "level"],
+                    ["pid", "rowPid"],
+                  ] as [SortKey, string][]
+                ).map(([key, label]) => (
+                  <button
+                    key={key}
+                    onClick={() => toggleSort(key)}
+                    type="button"
+                  >
+                    {t(label)}
+                    {sortLabel(key)}
+                  </button>
+                ))}
                 <span>IVs</span>
-                <span>{t("nature")}</span>
-                <span>{t("shiny")}</span>
+                <button onClick={() => toggleSort("nature")} type="button">
+                  {t("nature")}
+                  {sortLabel("nature")}
+                </button>
+                <button onClick={() => toggleSort("shiny")} type="button">
+                  {t("shiny")}
+                  {sortLabel("shiny")}
+                </button>
               </div>
-              {displayResults.map((entry, index) => (
-                <div
-                  className="static-table-row wild-table-row"
-                  key={`${entry.advances}-${entry.pid}`}
-                  style={{ transform: `translateY(${index * 42 + 38}px)` }}
-                >
-                  <span>{entry.advances}</span>
-                  <span>{entry.slot + 1}</span>
-                  <span>{GEN3_SPECIES_ZH[entry.species]}</span>
-                  <span>{entry.level}</span>
-                  <span>{formatHex(entry.pid, 8)}</span>
-                  <span>{entry.ivs.join("/")}</span>
-                  <span>{t(natureKeys[entry.nature])}</span>
-                  <span>{entry.shiny ? t("shinyAny") : t("shinyNone")}</span>
-                </div>
-              ))}
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const state = sortedResults[virtualRow.index];
+                return (
+                  <div
+                    className="static-table-row wild-table-row"
+                    key={`${state.advances}-${state.pid}-${virtualRow.index}`}
+                    style={{
+                      transform: `translateY(${virtualRow.start + 38}px)`,
+                    }}
+                  >
+                    <span>{String(state.advances)}</span>
+                    <span>{String(state.encounterSlot + 1)}</span>
+                    <span>
+                      {getGen3SpeciesName(
+                        i18n.language,
+                        state.species,
+                        state.form,
+                      )}
+                    </span>
+                    <span>{String(state.level)}</span>
+                    <span>{formatHex(state.pid, 8)}</span>
+                    <span>{state.ivs.join("/")}</span>
+                    <span>{t(natureKeys[state.nature])}</span>
+                    <span>
+                      {state.shiny === 0
+                        ? t("shinyNone")
+                        : state.shiny === 1
+                          ? t("shinyStar")
+                          : t("shinySquare")}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

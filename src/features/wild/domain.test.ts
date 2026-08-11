@@ -1,0 +1,111 @@
+import { describe, expect, it } from "vitest";
+import {
+  createGen3WildChunks,
+  decodeGen3WildStates,
+  isGen3WildTanobyChamber,
+  validateGen3WildRequest,
+  type Gen3WildRequest,
+} from "./domain";
+
+const request: Gen3WildRequest = {
+  seed: 0,
+  initialAdvances: 0,
+  maxAdvances: 100_000,
+  offset: 0,
+  method: "method1",
+  lead: "none",
+  synchronizeNature: 0,
+  feebasTile: false,
+  bike: false,
+  item: "none",
+  version: "emerald",
+  tid: 12345,
+  sid: 54321,
+  area: {
+    name: "Route 111",
+    encounter: "land",
+    rate: 10,
+    feebasLocation: false,
+    safariZone: false,
+    slots: [
+      {
+        species: 328,
+        form: 0,
+        minLevel: 20,
+        maxLevel: 20,
+        genderRatio: 127,
+        type1: 4,
+        type2: 4,
+      },
+    ],
+  },
+  filters: { natureMask: 0x1ff_ffff },
+};
+
+describe("Gen3 wild domain", () => {
+  it("uses deterministic chunks that preserve the displayed advances", () => {
+    const chunks = createGen3WildChunks(request);
+    expect(chunks).toEqual([
+      {
+        index: 0,
+        initialAdvances: 0,
+        maxAdvances: 99_999,
+        stateCount: 100_000,
+      },
+      { index: 1, initialAdvances: 100_000, maxAdvances: 0, stateCount: 1 },
+    ]);
+  });
+
+  it("validates the uint32 advance sum", () => {
+    expect(validateGen3WildRequest(request)).toEqual([]);
+    expect(
+      validateGen3WildRequest({
+        ...request,
+        initialAdvances: 0xffff_ffff,
+        maxAdvances: 1,
+      }),
+    ).toContain("advanceRange");
+  });
+
+  it("decodes the fixed 60-byte Wasm record", () => {
+    const words = new Uint32Array([
+      7,
+      0x12345678,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      1,
+      0,
+      20,
+      17 | (2 << 8),
+      3,
+      328,
+      0,
+    ]);
+    expect(decodeGen3WildStates(words.buffer)).toEqual([
+      {
+        advances: 7,
+        pid: 0x12345678,
+        ivs: [1, 2, 3, 4, 5, 6],
+        ability: 1,
+        gender: 0,
+        level: 20,
+        nature: 17,
+        shiny: 2,
+        encounterSlot: 3,
+        species: 328,
+        form: 0,
+      },
+    ]);
+  });
+
+  it("recognizes the full decomp labels for unsupported Tanoby Chambers", () => {
+    expect(
+      isGen3WildTanobyChamber("Seven Island Tanoby Ruins Monean Chamber"),
+    ).toBe(true);
+    expect(isGen3WildTanobyChamber("Seven Island Tanoby Ruins")).toBe(false);
+  });
+});

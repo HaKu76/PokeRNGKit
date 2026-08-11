@@ -1,4 +1,4 @@
-"""Generate the browser-safe Gen III wild encounter dataset from PokeFinder sources."""
+"""Generate browser-safe Gen III wild data from EncounterTableGenerator raw tables and PokeFinder resources."""
 
 import argparse
 import json
@@ -66,7 +66,7 @@ def main() -> None:
         "fire-red": collect(args.tables / "frlg" / "wild_encounters.json", "FireRed"),
         "leaf-green": collect(args.tables / "frlg" / "wild_encounters.json", "LeafGreen"),
     }
-    header = "/* Generated from PokeFinder EncounterTableGenerator and Gen III personal data. GPL-3.0-or-later. */\n"
+    header = "/*! Generated from EncounterTableGenerator raw tables and PokeFinder resources. GPL-3.0-or-later. */\n"
     data = "export const GEN3_SPECIES_ZH = " + json.dumps(species, ensure_ascii=False, separators=(",", ":")) + " as const;\n"
     data += "export const GEN3_PERSONAL = " + json.dumps(personal, separators=(",", ":")) + " as const;\n"
     data += "export const GEN3_ENCOUNTERS = " + json.dumps(games, ensure_ascii=False, separators=(",", ":")) + " as const;\n"

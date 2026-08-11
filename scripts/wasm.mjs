@@ -76,7 +76,7 @@ function probe(command, args = ["--version"]) {
 
 async function loadModules() {
   const moduleNames = (
-    process.env.POKERNGKIT_WASM_MODULES ?? "gen3id,gen3static"
+    process.env.POKERNGKIT_WASM_MODULES ?? "gen3id,gen3static,gen3wild"
   )
     .split(",")
     .map((value) => value.trim())

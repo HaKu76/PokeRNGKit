@@ -1295,6 +1295,27 @@ h1 {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.checkbox-field,
+.nature-check-grid label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 11px;
+}
+.checkbox-field input,
+.nature-check-grid input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--brand);
+}
+.nature-check-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 12px;
+  padding: 14px 18px;
+}
 .results-heading {
   min-height: 67px;
   justify-content: space-between;
