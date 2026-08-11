@@ -1,8 +1,8 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-11
-> - 当前阶段：阶段 2A，第三世代 Static Generator
-> - 当前模块：`gen3static`
+> - 当前阶段：阶段 4A，第三世代 Wild Generator 首轮
+> - 当前模块：`gen3static`、`gen3wild`（首轮）
 > - Git 基线：`93c9d5a docs: 更新 Pages 部署阻塞记录`
 > - 工作区状态：Static Generator 代码、界面、图标和文档尚未提交
 > - 部署状态：GitHub Pages 尚未部署，仓库需要先启用 GitHub Actions 作为 Pages Source
@@ -145,12 +145,21 @@ vite.config.ts
 - `third_party/pokefinder/UPSTREAM.md` 已补充 StaticGenerator3 与 Utilities 只读核验 SHA-256。
 - Worker 分片在文档中明确为执行编排，不属于 RNG 规则。
 
+### 5.5 `gen3wild` 首轮
+
+- 新增可切换的 Wild 模块入口、五个第三世代版本的地点遭遇表、三语界面与按图鉴编号的简中物种名。
+- 支持 Method 1、Method 2、Method 4、陆地/冲浪/碎岩/三种鱼竿、同步、可爱魅惑、压力、磁力、静电、等级、性格、PID、IV、闪光、取消和 CSV。
+- 数据来自 PokeFinder 的 `EncounterTableGenerator` 与 Gen III Personal 快照；简中物种表使用与神奇宝贝百科一致的名称形式。
+- 当前实现尚未接入独立 Wasm/Worker，不能作为大范围性能或完整 PokeFinder 一致性验收；后续需迁移到独立模块并增加夹具，补齐沙狐乐园、丑丑鱼格与未知图腾特例。
+- 算法边界见 [Gen 3 Wild 算法](modules/gen3wild.md)。
+
 ## 6. 当前验证状态
 
 ### 6.1 本轮已观察
 
 2026-08-11 在当前工作区通过：
 
+- Wild 首轮：使用当前桌面随附 Node.js `24.14.0` 直接执行 Prettier、TypeScript、ESLint、Vitest 与 Vite；格式检查、类型检查、Wild 相关 lint、4 个测试文件共 12 项测试、`build --mode ui` 均通过。
 - `npm run format`。
 - `npm run typecheck`。
 - `npm run lint`。

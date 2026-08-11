@@ -19,10 +19,11 @@ import type {
 } from "./features/id/search";
 import { Gen3IdWorkerPool } from "./features/id/worker/Gen3IdWorkerPool";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
+import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
 
 type SortKey = keyof Id3State;
 type SupportedLanguage = "zh" | "en" | "ja";
-type ActiveModule = "id" | "static";
+type ActiveModule = "id" | "static" | "wild";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -304,11 +305,17 @@ function App() {
               <small>{t("staticVersion")}</small>
             </span>
           </button>
-          <button className="module-entry disabled" disabled type="button">
+          <button
+            className={
+              activeModule === "wild" ? "module-entry active" : "module-entry"
+            }
+            onClick={() => setActiveModule("wild")}
+            type="button"
+          >
             <span className="module-index">03</span>
             <span>
               <strong>{t("wildModule")}</strong>
-              <small>{t("planned")}</small>
+              <small>{t("wildVersion")}</small>
             </span>
           </button>
           <div className="rail-footer">
@@ -321,10 +328,24 @@ function App() {
           <div className="page-heading">
             <div>
               <div className="eyebrow">GEN III / RNG LAB</div>
-              <h1>{t(activeModule === "id" ? "engine" : "staticEngine")}</h1>
+              <h1>
+                {t(
+                  activeModule === "id"
+                    ? "engine"
+                    : activeModule === "static"
+                      ? "staticEngine"
+                      : "wildEngine",
+                )}
+              </h1>
             </div>
             <div className="heading-version">
-              {t(activeModule === "id" ? "version" : "staticVersion")}
+              {t(
+                activeModule === "id"
+                  ? "version"
+                  : activeModule === "static"
+                    ? "staticVersion"
+                    : "wildVersion",
+              )}
             </div>
           </div>
           {uiPreviewMode && (
@@ -666,8 +687,10 @@ function App() {
                 </div>
               </section>
             </>
-          ) : (
+          ) : activeModule === "static" ? (
             <Gen3StaticPanel uiPreviewMode={uiPreviewMode} />
+          ) : (
+            <Gen3WildPanel />
           )}
         </main>
       </div>

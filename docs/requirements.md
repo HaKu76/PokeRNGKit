@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。`gen3id` 已完成首轮工程实现；当前工作区实现 `gen3static` Generator，Static Searcher、Wild 和档案仍在后续阶段。
+当前按 PokeFinder 功能模块逐个落地。`gen3id` 已完成首轮工程实现；当前工作区实现 `gen3static` Generator，并增加含完整第三世代地点遭遇表与首发特性的 Wild Generator。Static Searcher、Wild Searcher、特殊地点规则和档案仍在后续阶段。
 
 ## 2. 已确认边界
 
@@ -177,7 +177,7 @@ Static Searcher 不属于本节，不得在 Generator 已完成前混入同一�
 
 1. Static Searcher。
 2. 三代档案管理：Ruby、Sapphire、Emerald、FireRed、LeafGreen；IndexedDB 持久化。
-3. Wild Generator / Searcher。
+3. Wild Searcher、特殊 Wild 地点规则与独立 Wasm/Worker 模块。
 4. 适用的觉醒力量、遭遇槽、等级和 Pokemon 筛选。
 5. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 

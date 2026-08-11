@@ -40,14 +40,14 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 
 - 三代档案的创建、编辑、选择与删除
 - Static Searcher
-- Wild Generator / Searcher
+- Wild Generator（第三世代地点与首发特性）/ Searcher
 - IV、性格、特性、性别、闪光、觉醒力量、遭遇槽等适用筛选项
 - 可排序结果表格、分批展示和 CSV 导出
 - 长任务的进度、取消和错误恢复
 - 简体中文、英文与日文
 - PWA 安装与首次加载后的离线使用
 
-当前不包含 Static Searcher、Wild、Egg、GameCube、PokeSpot、Jirachi 及其他世代。每个功能继续使用独立 Wasm 模块和验收记录，不把后续算法并入 `gen3id` 或 `gen3static`。
+当前不包含 Static Searcher、Wild Searcher、野生遭遇特殊地点规则、Egg、GameCube、PokeSpot、Jirachi 及其他世代。每个功能继续使用独立 Wasm 模块和验收记录，不把后续算法并入 `gen3id` 或 `gen3static`。
 
 ## 纯静态与隐私
 

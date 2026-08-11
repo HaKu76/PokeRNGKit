@@ -665,6 +665,19 @@ h1 {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.wild-table-header,
+.wild-table-row {
+  grid-template-columns: 92px 92px 92px 92px 120px 180px 120px 92px;
+  min-width: 880px;
+}
+.wild-table-header span {
+  overflow: hidden;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .results-heading {
   min-height: 67px;
   justify-content: space-between;
