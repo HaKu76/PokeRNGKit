@@ -2,7 +2,7 @@
 
 > - 最近更新：2026-08-11
 > - Git 基线：`upstream/main` 的 `9092968 feat: 合并第三世代野生生成器`
-> - 当前工作：在最新主线补齐第三世代 Wild 的地点中文、Searcher、筛选与结果显示，并完成本机真实 Wasm 验证；本轮改动提交后通过 PR 验收。
+> - 当前工作：在最新主线补齐第三世代 Wild 的地点中文、Searcher、筛选与结果显示，并完成本机真实 Wasm 验证；已提交 [PR #2](https://github.com/HaKu76/PokeRNGKit/pull/2)，待验收与合并。
 
 ## 当前可用模块
 
@@ -27,6 +27,7 @@
 - 通过：`npm run wasm:test:native`，`gen3id`、`gen3static`、`gen3wild` 共 3 项原生一致性测试全部通过。
 - 通过：`npm run wasm:build`，生成 `gen3id`、`gen3static`、`gen3wild` 的 `.mjs/.wasm` 产物。
 - 本机完整模式：`http://127.0.0.1:5199/`。浏览器冒烟确认 Wild Generator 与 Searcher 真实计算完成，最大 IV 默认值、17 列表头、0 基槽位、Searcher Seed、排序和模式切换清空均符合预期；`gen3wild.mjs/.wasm` 返回 200，控制台无警告或错误。
+- PR：`axechaso:agent/gen3-wild-searcher-localized` -> `HaKu76/PokeRNGKit:main` 的 [#2](https://github.com/HaKu76/PokeRNGKit/pull/2) 已创建，当前待验收与合并。
 - 未通过：`npm run verify:full` 在 `format:check` 阶段被仓库现有 68 个文件的格式基线阻断；未批量改写无关文件。CMake 4.3.1 对 Emscripten 共享库支持发出警告，但本项目三个独立 Wasm 模块构建成功。
 
 ## 后续验收
@@ -34,6 +35,6 @@
 1. 由项目所有者在 `http://127.0.0.1:5199/` 验收 Wild 的交互、翻译和实际结果。
 2. 用 PokeFinder 4.3.2 固定输入逐项核对 Wild Generator/Searcher，重点覆盖 Synchronize、Cute Charm、Magnet Pull、Static、Pressure、Feebas、Safari 与碎岩。
 3. 单独处理仓库现有 Prettier 格式基线后，再运行完整 `npm run verify:full`。
-4. 在本轮 PR 中完成验收，合入后再开始后续模块；禁止从旧的重复分支直接推送。
+4. 在 PR #2 中完成验收，合入后再开始后续模块；禁止从旧的重复分支直接推送。
 
-本轮提交标题：`fix: 对齐第三世代野生筛选与结果显示`
+本轮功能提交标题：`fix: 对齐第三世代野生筛选与结果显示`
