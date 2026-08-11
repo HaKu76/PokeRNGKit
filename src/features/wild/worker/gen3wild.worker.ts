@@ -9,6 +9,7 @@ import {
   wildLeadToWasm,
   wildMethodToWasm,
 } from "../domain";
+import type { Gen3WildRequest, Gen3WildSearcherRequest } from "../domain";
 import type { Gen3WildWorkerRequest, Gen3WildWorkerResponse } from "./messages";
 
 interface Gen3WildEmscriptenModule {
@@ -78,6 +79,51 @@ type Gen3WildModuleFactory = (options: {
 const workerScope = self as DedicatedWorkerGlobalScope;
 let wasm: Gen3WildEmscriptenModule | undefined;
 
+function hiddenPowerType(words: Uint32Array, offset: number) {
+  const bits =
+    (words[offset + 2] & 1) +
+    2 * (words[offset + 3] & 1) +
+    4 * (words[offset + 4] & 1) +
+    8 * (words[offset + 7] & 1) +
+    16 * (words[offset + 5] & 1) +
+    32 * (words[offset + 6] & 1);
+  return Math.floor((bits * 15) / 63);
+}
+
+function filterWords(
+  words: Uint32Array,
+  request: Gen3WildRequest | Gen3WildSearcherRequest,
+): Uint32Array {
+  const output: number[] = [];
+  const { filters } = request;
+  const shinyFilter = { any: 0, star: 1, square: 2, "star-square": 3 }[
+    filters.shiny
+  ];
+  const genderFilter = { any: -1, male: 0, female: 1 }[filters.gender];
+  const abilityFilter = { any: -1, first: 0, second: 1 }[filters.ability];
+  for (let offset = 0; offset < words.length; offset += 15) {
+    const nature = words[offset + 11] & 0xff;
+    const shiny = words[offset + 11] >>> 8;
+    if (
+      (filters.natureMask & (1 << nature)) === 0 ||
+      (filters.hiddenPowerMask & (1 << hiddenPowerType(words, offset))) === 0 ||
+      (shinyFilter !== 0 && (shinyFilter & shiny) === 0) ||
+      (genderFilter !== -1 && words[offset + 9] !== genderFilter) ||
+      (abilityFilter !== -1 && words[offset + 8] !== abilityFilter) ||
+      (filters.species !== 0 && words[offset + 13] !== filters.species) ||
+      (filters.slotMask & (1 << words[offset + 12])) === 0 ||
+      filters.ivMin.some(
+        (minimum, index) =>
+          words[offset + 2 + index] < minimum ||
+          words[offset + 2 + index] > filters.ivMax[index],
+      )
+    )
+      continue;
+    output.push(...words.subarray(offset, offset + 15));
+  }
+  return Uint32Array.from(output);
+}
+
 function post(message: Gen3WildWorkerResponse, transfer: Transferable[] = []) {
   workerScope.postMessage(message, transfer);
 }
@@ -140,17 +186,18 @@ function run(message: Extract<Gen3WildWorkerRequest, { type: "run" }>) {
       resultPointer,
       resultPointer + resultCount * 15,
     );
+    const filtered = filterWords(words, request);
     post(
       {
         type: "batch",
         taskId: message.taskId,
         chunkIndex: message.chunk.index,
         stateCount: message.chunk.stateCount,
-        resultCount,
+        resultCount: filtered.length / 15,
         elapsedMs: performance.now() - startedAt,
-        buffer: words.buffer,
+        buffer: filtered.buffer as ArrayBuffer,
       },
-      [words.buffer],
+      [filtered.buffer as ArrayBuffer],
     );
   } finally {
     wasm._free(pointer);
@@ -194,17 +241,18 @@ function search(message: Extract<Gen3WildWorkerRequest, { type: "search" }>) {
       resultPointer,
       resultPointer + resultCount * 15,
     );
+    const filtered = filterWords(words, request);
     post(
       {
         type: "batch",
         taskId: message.taskId,
         chunkIndex: message.chunk.index,
         stateCount: message.chunk.stateCount,
-        resultCount,
+        resultCount: filtered.length / 15,
         elapsedMs: performance.now() - startedAt,
-        buffer: words.buffer,
+        buffer: filtered.buffer as ArrayBuffer,
       },
-      [words.buffer],
+      [filtered.buffer as ArrayBuffer],
     );
   } finally {
     wasm._free(pointer);

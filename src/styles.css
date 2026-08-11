@@ -1284,8 +1284,13 @@ h1 {
 }
 .wild-table-header,
 .wild-table-row {
-  grid-template-columns: 92px 92px 92px 92px 120px 180px 120px 92px;
-  min-width: 880px;
+  grid-template-columns:
+    100px 108px 92px 92px 92px repeat(6, 76px) 110px 88px 106px
+    92px 140px 92px;
+  min-width: 1568px;
+}
+.wild-virtual-table {
+  min-width: 1568px;
 }
 .wild-table-header span {
   overflow: hidden;

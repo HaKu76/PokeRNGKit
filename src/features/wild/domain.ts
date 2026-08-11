@@ -1,6 +1,6 @@
 import type { Gen3GameVersion } from "../profiles/domain";
 
-export const GEN3_WILD_API_VERSION = 2;
+export const GEN3_WILD_API_VERSION = 3;
 export const GEN3_WILD_CHUNK_SIZE = 100_000;
 export const GEN3_WILD_MAX_TOTAL_STATES = 50_000_000;
 export const GEN3_WILD_MAX_RESULTS = 250_000;
@@ -20,6 +20,9 @@ export type Gen3WildLead =
   | "static";
 export type Gen3WildItem =
   "none" | "black-flute" | "cleanse-tag" | "white-flute";
+export type Gen3WildShinyFilter = "any" | "star" | "square" | "star-square";
+export type Gen3WildGenderFilter = "any" | "male" | "female";
+export type Gen3WildAbilityFilter = "any" | "first" | "second";
 
 export interface Gen3WildSlot {
   species: number;
@@ -42,6 +45,14 @@ export interface Gen3WildArea {
 
 export interface Gen3WildFilters {
   natureMask: number;
+  shiny: Gen3WildShinyFilter;
+  gender: Gen3WildGenderFilter;
+  ability: Gen3WildAbilityFilter;
+  hiddenPowerMask: number;
+  species: number;
+  slotMask: number;
+  ivMin: [number, number, number, number, number, number];
+  ivMax: [number, number, number, number, number, number];
 }
 
 export interface Gen3WildRequest {
@@ -70,10 +81,7 @@ export interface Gen3WildSearcherRequest {
   tid: number;
   sid: number;
   area: Gen3WildArea;
-  filters: Gen3WildFilters & {
-    ivMin: [number, number, number, number, number, number];
-    ivMax: [number, number, number, number, number, number];
-  };
+  filters: Gen3WildFilters;
 }
 
 export interface Gen3WildSearcherChunk {
@@ -132,6 +140,18 @@ export function wildLeadToWasm(lead: Gen3WildLead, synchronizeNature: number) {
   }[lead];
 }
 
+export function wildShinyFilterToWasm(filter: Gen3WildShinyFilter) {
+  return { any: 0, star: 1, square: 2, "star-square": 3 }[filter];
+}
+
+export function wildGenderFilterToWasm(filter: Gen3WildGenderFilter) {
+  return { any: 0, male: 1, female: 2 }[filter];
+}
+
+export function wildAbilityFilterToWasm(filter: Gen3WildAbilityFilter) {
+  return { any: 0, first: 1, second: 2 }[filter];
+}
+
 export function isGen3WildTanobyChamber(locationName: string) {
   return (
     locationName.includes("Tanoby Ruins") && locationName.endsWith("Chamber")
@@ -182,6 +202,32 @@ export function validateGen3WildRequest(request: Gen3WildRequest) {
     request.filters.natureMask > 0x1ff_ffff
   )
     errors.push("nature");
+  if (
+    !Number.isInteger(request.filters.hiddenPowerMask) ||
+    request.filters.hiddenPowerMask < 1 ||
+    request.filters.hiddenPowerMask > 0xffff
+  )
+    errors.push("hiddenPower");
+  if (
+    !Number.isInteger(request.filters.species) ||
+    request.filters.species < 0 ||
+    request.filters.species > 1025 ||
+    !Number.isInteger(request.filters.slotMask) ||
+    request.filters.slotMask < 1 ||
+    request.filters.slotMask > 0xfff
+  )
+    errors.push("filter");
+  request.filters.ivMin.forEach((minimum, index) => {
+    const maximum = request.filters.ivMax[index];
+    if (
+      !Number.isInteger(minimum) ||
+      !Number.isInteger(maximum) ||
+      minimum < 0 ||
+      maximum > 31 ||
+      minimum > maximum
+    )
+      errors.push("ivRange");
+  });
   if (
     !Number.isInteger(request.area.rate) ||
     request.area.rate < 1 ||
@@ -239,20 +285,9 @@ export function validateGen3WildSearcherRequest(
     tid: request.tid,
     sid: request.sid,
     area: request.area,
-    filters: { natureMask: request.filters.natureMask },
+    filters: request.filters,
   };
   const errors = validateGen3WildRequest(probe);
-  request.filters.ivMin.forEach((minimum, index) => {
-    const maximum = request.filters.ivMax[index];
-    if (
-      !Number.isInteger(minimum) ||
-      !Number.isInteger(maximum) ||
-      minimum < 0 ||
-      maximum > 31 ||
-      minimum > maximum
-    )
-      errors.push("ivRange");
-  });
   if (
     errors.length === 0 &&
     gen3WildSearcherCombinationCount(request) > GEN3_WILD_MAX_TOTAL_STATES

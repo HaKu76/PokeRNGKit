@@ -51,6 +51,7 @@ Desktop.ini
 *.swo
 
 # Local scratch files
+.tools/
 .tmp/
 tmp/
 

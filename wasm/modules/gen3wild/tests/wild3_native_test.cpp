@@ -5,7 +5,7 @@
 
 int main()
 {
-    assert(gen3wild_api_version() == 2);
+    assert(gen3wild_api_version() == 3);
     const std::array<Gen3WildPackedSlot, 12> slots = {
         Gen3WildPackedSlot { 27, 0, 20, 20, 127, 4 | (4 << 8) },
         Gen3WildPackedSlot { 328, 0, 20, 20, 127, 4 | (4 << 8) },

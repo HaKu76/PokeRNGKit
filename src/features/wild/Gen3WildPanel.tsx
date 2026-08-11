@@ -1,9 +1,17 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type FormEvent,
+  type MouseEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { formatHex, parseDecimal, parseHex } from "../id/domain";
 import type { Gen3Profile } from "../profiles/domain";
 import { getGen3SpeciesName } from "../shared/gen3Species";
+import { gen3HiddenPower } from "../static/domain";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import {
   GEN3_WILD_MAX_RESULTS,
@@ -13,10 +21,13 @@ import {
   type Gen3WildArea,
   type Gen3WildEncounter,
   type Gen3WildItem,
+  type Gen3WildAbilityFilter,
+  type Gen3WildGenderFilter,
   type Gen3WildLead,
   type Gen3WildMethod,
   type Gen3WildRequest,
   type Gen3WildSearcherRequest,
+  type Gen3WildShinyFilter,
   type Gen3WildState,
 } from "./domain";
 import { GEN3_ENCOUNTERS, GEN3_PERSONAL } from "./gen3Data";
@@ -27,8 +38,21 @@ import { Gen3WildWorkerPool } from "./worker/Gen3WildWorkerPool";
 type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
 type WildOperation = "generator" | "searcher";
 type DataGame = "ruby" | "sapphire" | "emerald" | "fire-red" | "leaf-green";
+type IvKey =
+  "hp" | "attack" | "defense" | "specialAttack" | "specialDefense" | "speed";
 type SortKey =
-  "advances" | "slot" | "species" | "level" | "pid" | "nature" | "shiny";
+  | "advances"
+  | "pid"
+  | "shiny"
+  | "nature"
+  | "ability"
+  | IvKey
+  | "hiddenPower"
+  | "hiddenPowerStrength"
+  | "gender"
+  | "slot"
+  | "species"
+  | "level";
 type RawLocation = {
   readonly name: string;
   readonly zhName: string;
@@ -44,15 +68,24 @@ interface Gen3WildPanelProps {
   uiPreviewMode: boolean;
 }
 
+interface MultiCheckSelectProps {
+  label: string;
+  anyLabel: string;
+  mask: number;
+  onChange(mask: number): void;
+  options: readonly { label: string; value: number }[];
+}
+
 const NATURE_MASK_ALL = 0x1ff_ffff;
-const ivKeys = [
+const HIDDEN_POWER_MASK_ALL = 0xffff;
+const ivKeys: IvKey[] = [
   "hp",
   "attack",
   "defense",
   "specialAttack",
   "specialDefense",
   "speed",
-] as const;
+];
 const natureKeys = [
   "natureHardy",
   "natureLonely",
@@ -80,6 +113,39 @@ const natureKeys = [
   "natureCareful",
   "natureQuirky",
 ] as const;
+const hiddenPowerKeys = [
+  "powerFighting",
+  "powerFlying",
+  "powerPoison",
+  "powerGround",
+  "powerRock",
+  "powerBug",
+  "powerGhost",
+  "powerSteel",
+  "powerFire",
+  "powerWater",
+  "powerGrass",
+  "powerElectric",
+  "powerPsychic",
+  "powerIce",
+  "powerDragon",
+  "powerDark",
+] as const;
+const commonWildColumns: Array<{ key: SortKey; label: string }> = [
+  { key: "pid", label: "rowPid" },
+  { key: "shiny", label: "shiny" },
+  { key: "nature", label: "nature" },
+  { key: "ability", label: "ability" },
+  { key: "hp", label: "ivHp" },
+  { key: "attack", label: "ivAttack" },
+  { key: "defense", label: "ivDefense" },
+  { key: "specialAttack", label: "ivSpecialAttack" },
+  { key: "specialDefense", label: "ivSpecialDefense" },
+  { key: "speed", label: "ivSpeed" },
+  { key: "hiddenPower", label: "hiddenPowerType" },
+  { key: "hiddenPowerStrength", label: "hiddenPowerStrength" },
+  { key: "gender", label: "gender" },
+];
 const encounterLabels: Record<Gen3WildEncounter, string> = {
   land: "wildGrass",
   surf: "wildSurfing",
@@ -92,6 +158,72 @@ const gameData = GEN3_ENCOUNTERS as unknown as Record<
   DataGame,
   readonly RawLocation[]
 >;
+
+function MultiCheckSelect({
+  anyLabel,
+  label,
+  mask,
+  onChange,
+  options,
+}: MultiCheckSelectProps) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const fullMask = options.reduce(
+    (value, option) => value | (1 << option.value),
+    0,
+  );
+  const selected = options.filter(
+    (option) => (mask & (1 << option.value)) !== 0,
+  );
+  const summary =
+    mask === 0 || mask === fullMask
+      ? anyLabel
+      : selected.map((option) => option.label).join(", ");
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [open]);
+
+  return (
+    <div className="field multi-check-field" ref={rootRef}>
+      <span>{label}</span>
+      <button
+        aria-expanded={open}
+        className="multi-check-trigger"
+        onClick={() => setOpen((current) => !current)}
+        type="button"
+      >
+        <span>{summary}</span>
+        <span aria-hidden="true">▾</span>
+      </button>
+      {open && (
+        <div className="multi-check-menu">
+          {options.map((option) => (
+            <label key={option.value}>
+              <input
+                checked={(mask & (1 << option.value)) !== 0}
+                onChange={(event) =>
+                  onChange(
+                    event.target.checked
+                      ? mask | (1 << option.value)
+                      : mask & ~(1 << option.value),
+                  )
+                }
+                type="checkbox"
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function dataGame(version: Gen3Profile["version"]): DataGame {
   if (version === "firered") return "fire-red";
@@ -181,6 +313,29 @@ function csvCell(value: string | number) {
   return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
+function wildColumns(operation: WildOperation) {
+  return [
+    {
+      key: "advances" as const,
+      label: operation === "generator" ? "rowAdvance" : "seed",
+    },
+    ...commonWildColumns,
+    { key: "slot" as const, label: "wildSlot" },
+    { key: "species" as const, label: "pokemon" },
+    { key: "level" as const, label: "level" },
+  ];
+}
+
+function wildStateValue(state: Gen3WildState, key: SortKey): number {
+  const ivIndex = ivKeys.indexOf(key as IvKey);
+  if (ivIndex >= 0) return state.ivs[ivIndex];
+  if (key === "hiddenPower") return gen3HiddenPower(state.ivs).type;
+  if (key === "hiddenPowerStrength") return gen3HiddenPower(state.ivs).power;
+  if (key === "slot") return state.encounterSlot;
+  if (key === "species") return state.species;
+  return state[key as keyof Omit<Gen3WildState, "ivs">] as number;
+}
+
 export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
   const { t, i18n } = useTranslation();
   const engine = useMemo(
@@ -203,12 +358,19 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
   const [bike, setBike] = useState(false);
   const [item, setItem] = useState<Gen3WildItem>("none");
   const [natureMask, setNatureMask] = useState(0);
+  const [hiddenPowerMask, setHiddenPowerMask] = useState(0);
+  const [shiny, setShiny] = useState<Gen3WildShinyFilter>("any");
+  const [gender, setGender] = useState<Gen3WildGenderFilter>("any");
+  const [ability, setAbility] = useState<Gen3WildAbilityFilter>("any");
+  const [species, setSpecies] = useState(0);
+  const [slotMask, setSlotMask] = useState(0);
+  const [pokemonSlot, setPokemonSlot] = useState("any");
   const [ivMin, setIvMin] = useState<
     [string, string, string, string, string, string]
   >(["0", "0", "0", "0", "0", "0"]);
   const [ivMax, setIvMax] = useState<
     [string, string, string, string, string, string]
-  >(["0", "0", "0", "0", "0", "0"]);
+  >(["31", "31", "31", "31", "31", "31"]);
   const [results, setResults] = useState<Gen3WildState[]>([]);
   const [progress, setProgress] = useState<Gen3WildSearchProgress>({
     processedStates: 0,
@@ -224,6 +386,7 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
       direction: "asc",
     },
   );
+  const columns = useMemo(() => wildColumns(operation), [operation]);
 
   const locations = useMemo(
     () =>
@@ -245,15 +408,40 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
       profile.version === "sapphire" ||
       profile.version === "emerald");
   const leadAvailable = profile.version === "emerald";
+  const effectiveSlotMask = area ? slotMask || (1 << area.slots.length) - 1 : 1;
+  const pokemonOptions = area
+    ? [...new Set(area.slots.map((slot) => slot.species))]
+    : [];
+  const filters = {
+    natureMask: natureMask || NATURE_MASK_ALL,
+    shiny,
+    gender,
+    ability,
+    hiddenPowerMask: hiddenPowerMask || HIDDEN_POWER_MASK_ALL,
+    species,
+    slotMask: effectiveSlotMask,
+    ivMin: ivMin.map((value) => parseDecimal(value) ?? Number.NaN) as [
+      number,
+      number,
+      number,
+      number,
+      number,
+      number,
+    ],
+    ivMax: ivMax.map((value) => parseDecimal(value) ?? Number.NaN) as [
+      number,
+      number,
+      number,
+      number,
+      number,
+      number,
+    ],
+  };
 
   const sortedResults = useMemo(() => {
-    const value = (state: Gen3WildState, key: SortKey) => {
-      if (key === "slot") return state.encounterSlot;
-      if (key === "species") return state.species;
-      return state[key];
-    };
     return [...results].sort((left, right) => {
-      const difference = value(left, sort.key) - value(right, sort.key);
+      const difference =
+        wildStateValue(left, sort.key) - wildStateValue(right, sort.key);
       return sort.direction === "asc" ? difference : -difference;
     });
   }, [results, sort]);
@@ -269,10 +457,18 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
   useEffect(() => () => engine.dispose(), [engine]);
   useEffect(() => {
     setLocationIndex(0);
+    setPokemonSlot("any");
+    setSpecies(0);
+    setSlotMask(0);
     setFeebasTile(false);
     setBike(false);
     setItem("none");
   }, [encounter, profile.version]);
+  useEffect(() => {
+    setPokemonSlot("any");
+    setSpecies(0);
+    setSlotMask(0);
+  }, [locationIndex]);
   useEffect(() => {
     if (!leadAvailable) setLead("none");
     if (profile.deadBattery) setSeed("5A0");
@@ -301,7 +497,7 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
       tid: profile.tid,
       sid: profile.sid,
       area,
-      filters: { natureMask: natureMask || NATURE_MASK_ALL },
+      filters,
     };
     if (validateGen3WildRequest(request).length > 0) {
       setError(t("invalidWildInput"));
@@ -346,15 +542,7 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
       tid: profile.tid,
       sid: profile.sid,
       area,
-      filters: {
-        natureMask: natureMask || NATURE_MASK_ALL,
-        ivMin: ivMin.map(
-          (value) => parseDecimal(value) ?? Number.NaN,
-        ) as Gen3WildSearcherRequest["filters"]["ivMin"],
-        ivMax: ivMax.map(
-          (value) => parseDecimal(value) ?? Number.NaN,
-        ) as Gen3WildSearcherRequest["filters"]["ivMax"],
-      },
+      filters,
     };
     if (validateGen3WildSearcherRequest(request).length > 0) {
       setError(t("invalidWildInput"));
@@ -388,6 +576,29 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
     }
   };
 
+  const applyIvShortcut = (index: number, event: MouseEvent) => {
+    const [minimum, maximum] =
+      event.ctrlKey && event.altKey
+        ? ["0", "0"]
+        : event.ctrlKey
+          ? ["31", "31"]
+          : event.altKey
+            ? ["30", "31"]
+            : ["0", "31"];
+    setIvMin(
+      (current) =>
+        current.map((value, currentIndex) =>
+          currentIndex === index ? minimum : value,
+        ) as typeof current,
+    );
+    setIvMax(
+      (current) =>
+        current.map((value, currentIndex) =>
+          currentIndex === index ? maximum : value,
+        ) as typeof current,
+    );
+  };
+
   const run = (event: FormEvent) =>
     operation === "generator" ? runGenerator(event) : runSearcher(event);
 
@@ -398,7 +609,20 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
         current.key === key && current.direction === "asc" ? "desc" : "asc",
     }));
   const sortLabel = (key: SortKey) =>
-    sort.key === key ? (sort.direction === "asc" ? " ▲" : " ▼") : "";
+    sort.key === key ? (sort.direction === "asc" ? " ↑" : " ↓") : "";
+  const resetRunState = (nextOperation: WildOperation) => {
+    setOperation(nextOperation);
+    setResults([]);
+    setProgress({
+      processedStates: 0,
+      totalStates: 0,
+      resultCount: 0,
+      percent: 0,
+    });
+    setStatus("ready");
+    setError("");
+    setSort({ key: "advances", direction: "asc" });
+  };
   const clearResults = () => {
     setResults([]);
     setProgress({
@@ -409,37 +633,44 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
     });
     setStatus("ready");
   };
-  const exportCsv = () => {
-    const rows = [
-      [
-        "Advance",
-        "Slot",
-        "Pokemon",
-        "Level",
-        "PID",
-        "HP",
-        "Atk",
-        "Def",
-        "SpA",
-        "SpD",
-        "Spe",
-        "Nature",
-        "Shiny",
-      ],
-      ...sortedResults.map((state) => [
-        state.advances,
-        state.encounterSlot + 1,
-        getGen3SpeciesName(i18n.language, state.species, state.form),
-        state.level,
-        formatHex(state.pid, 8),
-        ...state.ivs,
-        t(natureKeys[state.nature]),
+  const displayStateValue = (state: Gen3WildState, key: SortKey) => {
+    if (key === "pid" || (key === "advances" && operation === "searcher")) {
+      return formatHex(wildStateValue(state, key), 8);
+    }
+    if (key === "gender") {
+      return t(
+        state.gender === 0
+          ? "male"
+          : state.gender === 1
+            ? "female"
+            : "genderless",
+      );
+    }
+    if (key === "nature") return t(natureKeys[state.nature]);
+    if (key === "shiny") {
+      return t(
         state.shiny === 0
-          ? t("shinyNone")
+          ? "no"
           : state.shiny === 1
-            ? t("shinyStar")
-            : t("shinySquare"),
-      ]),
+            ? "shinyStar"
+            : "shinySquare",
+      );
+    }
+    if (key === "hiddenPower") {
+      return t(hiddenPowerKeys[gen3HiddenPower(state.ivs).type]);
+    }
+    if (key === "species") {
+      return getGen3SpeciesName(i18n.language, state.species, state.form);
+    }
+    return String(wildStateValue(state, key));
+  };
+  const exportCsv = () => {
+    if (sortedResults.length === 0) return;
+    const rows = [
+      columns.map((column) => t(column.label)),
+      ...sortedResults.map((state) =>
+        columns.map((column) => displayStateValue(state, column.key)),
+      ),
     ];
     const blob = new Blob(
       [`\uFEFF${rows.map((row) => row.map(csvCell).join(",")).join("\n")}`],
@@ -477,6 +708,14 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
       ? [{ value: "static" as const, label: t("wildStatic") }]
       : []),
   ];
+  const natureOptions = natureKeys.map((key, value) => ({
+    label: t(key),
+    value,
+  }));
+  const hiddenPowerOptions = hiddenPowerKeys.map((key, value) => ({
+    label: t(key),
+    value,
+  }));
 
   return (
     <>
@@ -487,7 +726,7 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
               <span className="panel-index">01</span>
               <h2>{t("rngInfo")}</h2>
             </div>
-            <span className="panel-note">Gen III / Wild API 2</span>
+            <span className="panel-note">Gen III / Wild API 3</span>
           </div>
           <div
             className="mode-tabs"
@@ -498,7 +737,7 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
               className={
                 operation === "generator" ? "mode-tab active" : "mode-tab"
               }
-              onClick={() => setOperation("generator")}
+              onClick={() => resetRunState("generator")}
               role="tab"
               type="button"
             >
@@ -508,7 +747,7 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
               className={
                 operation === "searcher" ? "mode-tab active" : "mode-tab"
               }
-              onClick={() => setOperation("searcher")}
+              onClick={() => resetRunState("searcher")}
               role="tab"
               type="button"
             >
@@ -595,54 +834,6 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
                 />
               </label>
             )}
-            {operation === "searcher" && (
-              <div className="iv-range-grid">
-                {ivKeys.map((key, index) => (
-                  <div className="compact-field-row" key={key}>
-                    <label className="field">
-                      <span>
-                        {t(`iv${key.charAt(0).toUpperCase()}${key.slice(1)}`)}
-                      </span>
-                      <input
-                        inputMode="numeric"
-                        maxLength={2}
-                        onChange={(event) =>
-                          setIvMin((current) => {
-                            const next = [...current] as typeof current;
-                            next[index] = normalizeDecimalInput(
-                              event.target.value,
-                              31,
-                              2,
-                            );
-                            return next;
-                          })
-                        }
-                        value={ivMin[index]}
-                      />
-                    </label>
-                    <label className="field">
-                      <span>{t("maximum")}</span>
-                      <input
-                        inputMode="numeric"
-                        maxLength={2}
-                        onChange={(event) =>
-                          setIvMax((current) => {
-                            const next = [...current] as typeof current;
-                            next[index] = normalizeDecimalInput(
-                              event.target.value,
-                              31,
-                              2,
-                            );
-                            return next;
-                          })
-                        }
-                        value={ivMax[index]}
-                      />
-                    </label>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
           <div className="panel-actions">
             <button
@@ -703,6 +894,39 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
                 {locations.map((entry, index) => (
                   <option key={`${entry.name}-${index}`} value={index}>
                     {displayLocation(i18n.language, entry)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field">
+              <span>{t("pokemon")}</span>
+              <select
+                value={pokemonSlot}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setPokemonSlot(value);
+                  if (value === "any") {
+                    setSpecies(0);
+                    setSlotMask(0);
+                    return;
+                  }
+                  const selectedSpecies = Number(value);
+                  setSpecies(selectedSpecies);
+                  setSlotMask(
+                    (area?.slots ?? []).reduce(
+                      (mask, slot, index) =>
+                        slot.species === selectedSpecies
+                          ? mask | (1 << index)
+                          : mask,
+                      0,
+                    ),
+                  );
+                }}
+              >
+                <option value="any">{t("any")}</option>
+                {pokemonOptions.map((value) => (
+                  <option key={value} value={value}>
+                    {getGen3SpeciesName(i18n.language, value, 0)}
                   </option>
                 ))}
               </select>
@@ -786,22 +1010,117 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
               <h2>{t("filters")}</h2>
             </div>
           </div>
-          <div className="nature-check-grid">
-            {natureKeys.map((key, index) => (
-              <label key={key}>
+          <div className="static-filter-selects">
+            <MultiCheckSelect
+              anyLabel={t("any")}
+              label={t("nature")}
+              mask={natureMask}
+              onChange={setNatureMask}
+              options={natureOptions}
+            />
+            <MultiCheckSelect
+              anyLabel={t("any")}
+              label={t("hiddenPower")}
+              mask={hiddenPowerMask}
+              onChange={setHiddenPowerMask}
+              options={hiddenPowerOptions}
+            />
+            <label className="field">
+              <span>{t("shiny")}</span>
+              <select
+                onChange={(event) =>
+                  setShiny(event.target.value as Gen3WildShinyFilter)
+                }
+                value={shiny}
+              >
+                <option value="any">{t("any")}</option>
+                <option value="star">{t("shinyStar")}</option>
+                <option value="square">{t("shinySquare")}</option>
+                <option value="star-square">{t("shinyStarSquare")}</option>
+              </select>
+            </label>
+            <label className="field">
+              <span>{t("gender")}</span>
+              <select
+                onChange={(event) =>
+                  setGender(event.target.value as Gen3WildGenderFilter)
+                }
+                value={gender}
+              >
+                <option value="any">{t("any")}</option>
+                <option value="male">{t("male")}</option>
+                <option value="female">{t("female")}</option>
+              </select>
+            </label>
+            <label className="field">
+              <span>{t("ability")}</span>
+              <select
+                onChange={(event) =>
+                  setAbility(event.target.value as Gen3WildAbilityFilter)
+                }
+                value={ability}
+              >
+                <option value="any">{t("any")}</option>
+                <option value="first">0</option>
+                <option value="second">1</option>
+              </select>
+            </label>
+          </div>
+          <div className="iv-filter">
+            <div className="iv-filter-header">
+              <span>{t("ivs")}</span>
+              <span>{t("minimum")}</span>
+              <span>{t("maximum")}</span>
+            </div>
+            {ivKeys.map((key, index) => (
+              <div className="iv-filter-row" key={key}>
+                <button
+                  className="iv-shortcut"
+                  onClick={(event) => applyIvShortcut(index, event)}
+                  title={t("ivShortcutHint")}
+                  type="button"
+                >
+                  {t(`iv${key.charAt(0).toUpperCase()}${key.slice(1)}`)}
+                </button>
                 <input
-                  checked={(natureMask & (1 << index)) !== 0}
+                  aria-label={`${t(`iv${key.charAt(0).toUpperCase()}${key.slice(1)}`)} ${t("minimum")}`}
+                  inputMode="numeric"
+                  max="31"
+                  min="0"
                   onChange={(event) =>
-                    setNatureMask((current) =>
-                      event.target.checked
-                        ? current | (1 << index)
-                        : current & ~(1 << index),
-                    )
+                    setIvMin((current) => {
+                      const next = [...current] as typeof current;
+                      next[index] = normalizeDecimalInput(
+                        event.target.value,
+                        31,
+                        2,
+                      );
+                      return next;
+                    })
                   }
-                  type="checkbox"
+                  type="number"
+                  value={ivMin[index]}
                 />
-                <span>{t(key)}</span>
-              </label>
+                <input
+                  aria-label={`${t(`iv${key.charAt(0).toUpperCase()}${key.slice(1)}`)} ${t("maximum")}`}
+                  inputMode="numeric"
+                  max="31"
+                  min="0"
+                  onChange={(event) =>
+                    setIvMax((current) => {
+                      const next = [...current] as typeof current;
+                      next[index] = normalizeDecimalInput(
+                        event.target.value,
+                        31,
+                        2,
+                      );
+                      return next;
+                    })
+                  }
+                  type="number"
+                  value={ivMax[index]}
+                />
+              </div>
             ))}
           </div>
           <div className="panel-actions">
@@ -856,37 +1175,20 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
             </div>
           ) : (
             <div
-              className="static-virtual-table"
+              className="static-virtual-table wild-virtual-table"
               style={{ height: `${rowVirtualizer.getTotalSize() + 38}px` }}
             >
               <div className="static-table-header wild-table-header">
-                {(
-                  [
-                    ["advances", "rowAdvance"],
-                    ["slot", "wildSlot"],
-                    ["species", "pokemon"],
-                    ["level", "level"],
-                    ["pid", "rowPid"],
-                  ] as [SortKey, string][]
-                ).map(([key, label]) => (
+                {columns.map((column) => (
                   <button
-                    key={key}
-                    onClick={() => toggleSort(key)}
+                    key={column.key}
+                    onClick={() => toggleSort(column.key)}
                     type="button"
                   >
-                    {t(label)}
-                    {sortLabel(key)}
+                    {t(column.label)}
+                    {sortLabel(column.key)}
                   </button>
                 ))}
-                <span>IVs</span>
-                <button onClick={() => toggleSort("nature")} type="button">
-                  {t("nature")}
-                  {sortLabel("nature")}
-                </button>
-                <button onClick={() => toggleSort("shiny")} type="button">
-                  {t("shiny")}
-                  {sortLabel("shiny")}
-                </button>
               </div>
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const state = sortedResults[virtualRow.index];
@@ -898,26 +1200,11 @@ export function Gen3WildPanel({ profile, uiPreviewMode }: Gen3WildPanelProps) {
                       transform: `translateY(${virtualRow.start + 38}px)`,
                     }}
                   >
-                    <span>{String(state.advances)}</span>
-                    <span>{String(state.encounterSlot + 1)}</span>
-                    <span>
-                      {getGen3SpeciesName(
-                        i18n.language,
-                        state.species,
-                        state.form,
-                      )}
-                    </span>
-                    <span>{String(state.level)}</span>
-                    <span>{formatHex(state.pid, 8)}</span>
-                    <span>{state.ivs.join("/")}</span>
-                    <span>{t(natureKeys[state.nature])}</span>
-                    <span>
-                      {state.shiny === 0
-                        ? t("shinyNone")
-                        : state.shiny === 1
-                          ? t("shinyStar")
-                          : t("shinySquare")}
-                    </span>
+                    {columns.map((column) => (
+                      <span key={column.key}>
+                        {displayStateValue(state, column.key)}
+                      </span>
+                    ))}
                   </div>
                 );
               })}

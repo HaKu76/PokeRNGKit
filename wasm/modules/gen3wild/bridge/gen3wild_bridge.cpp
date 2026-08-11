@@ -23,7 +23,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 2;
+    constexpr std::uint32_t apiVersion = 3;
     constexpr std::uint32_t maxStatesPerCall = 100000;
 
     enum ErrorCode : std::uint32_t
@@ -141,6 +141,28 @@ namespace
     bool fixedGender(std::uint32_t ratio)
     {
         return ratio == 0 || ratio == 254 || ratio == 255;
+    }
+
+    bool matchesFilters(const std::array<std::uint8_t, 6> &ivs, std::uint32_t pid, std::uint8_t resultGender,
+                        std::uint8_t resultShiny, std::uint8_t slotIndex, const Gen3WildPackedSlot &slot,
+                        std::uint32_t level, std::uint32_t shinyFilter, std::uint32_t genderFilter,
+                        std::uint32_t abilityFilter, std::uint32_t speciesFilter, std::uint32_t slotMask,
+                        std::uint32_t levelMin, std::uint32_t levelMax, const std::array<std::uint32_t, 6> &ivMin,
+                        const std::array<std::uint32_t, 6> &ivMax)
+    {
+        if ((shinyFilter != 0 && (shinyFilter & resultShiny) == 0)
+            || (genderFilter != 0 && resultGender != genderFilter - 1)
+            || (abilityFilter != 0 && (pid & 1) != abilityFilter - 1)
+            || (speciesFilter != 0 && slot.species != speciesFilter) || (slotMask & (1u << slotIndex)) == 0
+            || level < levelMin || level > levelMax)
+        {
+            return false;
+        }
+        for (std::size_t index = 0; index < ivs.size(); index++)
+        {
+            if (ivs[index] < ivMin[index] || ivs[index] > ivMax[index]) return false;
+        }
+        return true;
     }
 
     struct RecoverySeeds

@@ -41,7 +41,17 @@ const request: Gen3WildRequest = {
       },
     ],
   },
-  filters: { natureMask: 0x1ff_ffff },
+  filters: {
+    natureMask: 0x1ff_ffff,
+    shiny: "any",
+    gender: "any",
+    ability: "any",
+    hiddenPowerMask: 0xffff,
+    species: 0,
+    slotMask: 1,
+    ivMin: [0, 0, 0, 0, 0, 0],
+    ivMax: [31, 31, 31, 31, 31, 31],
+  },
 };
 
 describe("Gen3 wild domain", () => {
@@ -121,6 +131,7 @@ describe("Gen3 wild domain", () => {
       sid: 54321,
       area: request.area,
       filters: {
+        ...request.filters,
         natureMask: 0x1ff_ffff,
         ivMin: [30, 30, 30, 30, 30, 30] as [
           number,
@@ -160,6 +171,7 @@ describe("Gen3 wild domain", () => {
         sid: 0,
         area: request.area,
         filters: {
+          ...request.filters,
           natureMask: 1,
           ivMin: [31, 0, 0, 0, 0, 0],
           ivMax: [30, 31, 31, 31, 31, 31],

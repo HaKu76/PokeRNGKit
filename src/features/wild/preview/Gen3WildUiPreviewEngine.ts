@@ -6,10 +6,16 @@ import type {
 import type { Gen3WildSearchOptions, Gen3WildSearchSummary } from "../search";
 
 function previewState(
-  request: Pick<Gen3WildRequest, "area" | "tid" | "sid">,
+  request: Pick<Gen3WildRequest, "area" | "tid" | "sid" | "filters">,
   seed: number,
 ): Gen3WildState {
-  const slot = request.area.slots[0];
+  const slotIndex = request.area.slots.findIndex(
+    (slot, index) =>
+      (request.filters.slotMask & (1 << index)) !== 0 &&
+      (request.filters.species === 0 ||
+        request.filters.species === slot.species),
+  );
+  const slot = request.area.slots[Math.max(0, slotIndex)];
   return {
     advances: seed >>> 0,
     pid: 0x3c6ef35f,
@@ -19,7 +25,7 @@ function previewState(
     level: slot.minLevel,
     nature: 17,
     shiny: request.tid === request.sid ? 2 : 0,
-    encounterSlot: 0,
+    encounterSlot: Math.max(0, slotIndex),
     species: slot.species,
     form: slot.form,
   };
@@ -57,7 +63,7 @@ export class Gen3WildUiPreviewEngine {
   }
 
   private async run(
-    request: Pick<Gen3WildRequest, "area" | "tid" | "sid">,
+    request: Pick<Gen3WildRequest, "area" | "tid" | "sid" | "filters">,
     seed: number,
     totalStates: number,
     options: Gen3WildSearchOptions,
