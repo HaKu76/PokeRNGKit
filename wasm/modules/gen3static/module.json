@@ -1,6 +1,6 @@
 {
   "id": "gen3static",
-  "apiVersion": 1,
+  "apiVersion": 2,
   "target": "gen3static",
   "artifacts": ["gen3static.mjs", "gen3static.wasm"],
   "source": "PokeFinder 4.3.2 Gen III StaticGenerator3"

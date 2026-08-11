@@ -18,7 +18,12 @@ import type {
   Id3SearchSummary,
 } from "./features/id/search";
 import { Gen3IdWorkerPool } from "./features/id/worker/Gen3IdWorkerPool";
+import { Gen3ProfileControls } from "./features/profiles/Gen3ProfileControls";
+import { gen3StaticProfileOrDefault } from "./features/profiles/domain";
+import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
+import { normalizeDecimalInput, normalizeHexInput } from "./input";
+import { useTheme } from "./theme";
 
 type SortKey = keyof Id3State;
 type SupportedLanguage = "zh" | "en" | "ja";
@@ -46,16 +51,19 @@ function initialDateTime() {
 
 function App() {
   const { t, i18n } = useTranslation();
+  const { theme, changeTheme } = useTheme();
+  const profiles = useGen3Profiles();
   const [activeModule, setActiveModule] = useState<ActiveModule>("id");
+  const [moduleRailOpen, setModuleRailOpen] = useState(false);
   const searchEngine = useMemo<Id3SearchEngine>(
     () =>
       uiPreviewMode ? new Gen3IdUiPreviewEngine() : new Gen3IdWorkerPool(),
     [],
   );
   const [mode, setMode] = useState<Id3Mode>("xd-colo");
-  const [xdSeed, setXdSeed] = useState("00000000");
+  const [xdSeed, setXdSeed] = useState("");
   const [frlgTid, setFrlgTid] = useState("0");
-  const [rsSeed, setRsSeed] = useState("0000");
+  const [rsSeed, setRsSeed] = useState("");
   const [rsDateTime, setRsDateTime] = useState(initialDateTime);
   const [rsSource, setRsSource] = useState<"date" | "seed">("date");
   const [deadBattery, setDeadBattery] = useState(false);
@@ -89,6 +97,14 @@ function App() {
     document.documentElement.lang =
       language === "zh" ? "zh-CN" : language === "ja" ? "ja" : "en";
   }, [language]);
+  useEffect(() => {
+    if (!moduleRailOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setModuleRailOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [moduleRailOpen]);
 
   const calculatedRsSeed = useMemo(() => {
     if (deadBattery) return 0x05a0;
@@ -230,18 +246,31 @@ function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div className="brand-lockup">
-          <div className="brand-mark" aria-hidden="true">
-            <img
-              alt=""
-              height="32"
-              src={`${import.meta.env.BASE_URL}favicon.ico`}
-              width="32"
-            />
-          </div>
-          <div>
-            <div className="brand-name">{t("brand")}</div>
-            <div className="brand-subtitle">{t("subtitle")}</div>
+        <div className="topbar-leading">
+          <button
+            aria-controls="module-rail"
+            aria-expanded={moduleRailOpen}
+            aria-label={t(moduleRailOpen ? "closeModules" : "openModules")}
+            className="module-menu-button"
+            onClick={() => setModuleRailOpen((current) => !current)}
+            title={t(moduleRailOpen ? "closeModules" : "openModules")}
+            type="button"
+          >
+            <span aria-hidden="true">☰</span>
+          </button>
+          <div className="brand-lockup">
+            <div className="brand-mark" aria-hidden="true">
+              <img
+                alt=""
+                height="32"
+                src={`${import.meta.env.BASE_URL}favicon.ico`}
+                width="32"
+              />
+            </div>
+            <div>
+              <div className="brand-name">{t("brand")}</div>
+              <div className="brand-subtitle">{t("subtitle")}</div>
+            </div>
           </div>
         </div>
         <div className="topbar-meta">
@@ -249,6 +278,15 @@ function App() {
             {t(uiPreviewMode ? "uiPreview" : "wasmCore")}
           </span>
           <span className="status-chip red">{t("workerPool")}</span>
+          <button
+            aria-label={t(theme === "dark" ? "themeLight" : "themeDark")}
+            className="theme-toggle"
+            onClick={() => changeTheme(theme === "dark" ? "light" : "dark")}
+            title={t(theme === "dark" ? "themeLight" : "themeDark")}
+            type="button"
+          >
+            <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
+          </button>
           <div className="language-switch" aria-label={t("language")}>
             <button
               className={language === "zh" ? "selected" : ""}
@@ -276,13 +314,40 @@ function App() {
       </header>
 
       <div className="workspace">
-        <aside className="module-rail">
-          <div className="rail-label">{t("modules")}</div>
+        {moduleRailOpen && (
+          <button
+            aria-label={t("closeModules")}
+            className="module-rail-backdrop"
+            onClick={() => setModuleRailOpen(false)}
+            type="button"
+          />
+        )}
+        <aside
+          aria-hidden={!moduleRailOpen}
+          className={`module-rail${moduleRailOpen ? " open" : ""}`}
+          id="module-rail"
+          inert={moduleRailOpen ? undefined : true}
+        >
+          <div className="rail-heading">
+            <div className="rail-label">{t("modules")}</div>
+            <button
+              aria-label={t("closeModules")}
+              className="rail-close-button"
+              onClick={() => setModuleRailOpen(false)}
+              title={t("closeModules")}
+              type="button"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
           <button
             className={
               activeModule === "id" ? "module-entry active" : "module-entry"
             }
-            onClick={() => setActiveModule("id")}
+            onClick={() => {
+              setActiveModule("id");
+              setModuleRailOpen(false);
+            }}
             type="button"
           >
             <span className="module-index">01</span>
@@ -295,7 +360,10 @@ function App() {
             className={
               activeModule === "static" ? "module-entry active" : "module-entry"
             }
-            onClick={() => setActiveModule("static")}
+            onClick={() => {
+              setActiveModule("static");
+              setModuleRailOpen(false);
+            }}
             type="button"
           >
             <span className="module-index">02</span>
@@ -366,8 +434,10 @@ function App() {
                     <label className="field">
                       <span>{t("seed")}</span>
                       <input
-                        maxLength={10}
-                        onChange={(event) => setXdSeed(event.target.value)}
+                        maxLength={8}
+                        onChange={(event) =>
+                          setXdSeed(normalizeHexInput(event.target.value, 8))
+                        }
                         value={xdSeed}
                       />
                       <small>HEX / 32-bit</small>
@@ -379,7 +449,12 @@ function App() {
                       <span>{t("tid")}</span>
                       <input
                         inputMode="numeric"
-                        onChange={(event) => setFrlgTid(event.target.value)}
+                        maxLength={5}
+                        onChange={(event) =>
+                          setFrlgTid(
+                            normalizeDecimalInput(event.target.value, 0xffff),
+                          )
+                        }
                         value={frlgTid}
                       />
                       <small>DEC / 0 - 65535</small>
@@ -401,6 +476,8 @@ function App() {
                       <div className="radio-row">
                         <label>
                           <input
+                            max="2099-12-31T23:59"
+                            min="2000-01-01T00:00"
                             checked={rsSource === "date"}
                             disabled={deadBattery}
                             onChange={() => setRsSource("date")}
@@ -433,8 +510,12 @@ function App() {
                         <label className="field">
                           <span>{t("seed")}</span>
                           <input
-                            maxLength={6}
-                            onChange={(event) => setRsSeed(event.target.value)}
+                            maxLength={4}
+                            onChange={(event) =>
+                              setRsSeed(
+                                normalizeHexInput(event.target.value, 4),
+                              )
+                            }
                             value={rsSeed}
                           />
                           <small>HEX / 16-bit</small>
@@ -456,8 +537,15 @@ function App() {
                       <span>{t("initialAdvances")}</span>
                       <input
                         inputMode="numeric"
+                        maxLength={10}
                         onChange={(event) =>
-                          setInitialAdvances(event.target.value)
+                          setInitialAdvances(
+                            normalizeDecimalInput(
+                              event.target.value,
+                              0xffff_ffff,
+                              10,
+                            ),
+                          )
                         }
                         value={initialAdvances}
                       />
@@ -466,7 +554,16 @@ function App() {
                       <span>{t("maxAdvances")}</span>
                       <input
                         inputMode="numeric"
-                        onChange={(event) => setMaxAdvances(event.target.value)}
+                        maxLength={10}
+                        onChange={(event) =>
+                          setMaxAdvances(
+                            normalizeDecimalInput(
+                              event.target.value,
+                              0xffff_ffff,
+                              10,
+                            ),
+                          )
+                        }
                         value={maxAdvances}
                       />
                     </label>
@@ -506,7 +603,12 @@ function App() {
                       <span>{t("tid")}</span>
                       <input
                         inputMode="numeric"
-                        onChange={(event) => setFilterTid(event.target.value)}
+                        maxLength={5}
+                        onChange={(event) =>
+                          setFilterTid(
+                            normalizeDecimalInput(event.target.value, 0xffff),
+                          )
+                        }
                         placeholder={t("noFilter")}
                         value={filterTid}
                       />
@@ -516,7 +618,12 @@ function App() {
                       <span>{t("sid")}</span>
                       <input
                         inputMode="numeric"
-                        onChange={(event) => setFilterSid(event.target.value)}
+                        maxLength={5}
+                        onChange={(event) =>
+                          setFilterSid(
+                            normalizeDecimalInput(event.target.value, 0xffff),
+                          )
+                        }
                         placeholder={t("noFilter")}
                         value={filterSid}
                       />
@@ -526,7 +633,12 @@ function App() {
                       <span>{t("tsv")}</span>
                       <input
                         inputMode="numeric"
-                        onChange={(event) => setFilterTsv(event.target.value)}
+                        maxLength={4}
+                        onChange={(event) =>
+                          setFilterTsv(
+                            normalizeDecimalInput(event.target.value, 8191, 4),
+                          )
+                        }
                         placeholder={t("noFilter")}
                         value={filterTsv}
                       />
@@ -667,10 +779,17 @@ function App() {
               </section>
             </>
           ) : (
-            <Gen3StaticPanel uiPreviewMode={uiPreviewMode} />
+            <Gen3StaticPanel
+              profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
+              uiPreviewMode={uiPreviewMode}
+            />
           )}
         </main>
       </div>
+      <Gen3ProfileControls
+        compatibleVersions={activeModule === "static" ? "handheld" : "all"}
+        controller={profiles}
+      />
       <footer className="legal-footer">
         <span>{t("upstream")}</span>
         <a

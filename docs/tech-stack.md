@@ -1,8 +1,8 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：阶段 2A，`gen3static` Generator 已实现并等待完整验证
+> - 状态：阶段 2B / 3，Static Searcher 与三代存档信息已实现并等待完整验证
 > - 更新日期：2026-08-11
-> - 当前范围：第三世代 ID Generator 与 Static Generator
+> - 当前范围：第三世代 ID、Static Generator/Searcher 与存档信息
 > - 包管理器：npm
 
 ## 1. 技术结论
@@ -34,15 +34,17 @@ Wasm 本身不自动提供多线程。PokeRNGKit 当前用 Worker Pool 并行运
 ```text
 React UI
   |-- React local state
-  |-- i18next / localStorage
+  |-- i18next / theme / localStorage
+  |-- profile repository -> IndexedDB + localStorage mirror
   |-- virtualized result table / CSV
   |-- ui mode -> deterministic preview engine
   `-- production -> module-specific Worker Pool
         |-- Gen3IdWorkerPool -> gen3id.mjs + gen3id.wasm
-        `-- Gen3StaticWorkerPool -> gen3static.mjs + gen3static.wasm
-                                      |
-                                      `-- narrow C ABI bridges
-                                            `-- PokeFinder 4.3.2 Gen III rules
+        |-- Gen3StaticWorkerPool ---------+
+        `-- Gen3StaticSearcherWorkerPool -+-> gen3static.mjs + gen3static.wasm
+                                               |
+                                               `-- narrow C ABI bridges
+                                                     `-- PokeFinder 4.3.2 Gen III rules
 ```
 
 所有 Worker 相互独立。Pool 负责分片、排序批次、进度、结果上限和取消；C++ 只负责给定输入范围内的确定性计算。
@@ -90,11 +92,11 @@ Vite 的 `ui` mode 在编译期选择本地 UI 预览引擎。该引擎只生成
 
 React 负责高交互表单、进度状态和虚拟化结果视图。TypeScript 为 RNG 请求、Worker 消息、Wasm 解码和状态机提供静态边界。
 
-当前有 ID 与 Static 两个工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。暂不引入 Zustand、Redux 或其他全局状态框架；当多个模块需要共享档案、任务队列或列配置时再评估。
+当前有 ID 与 Static 两个工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。存档信息由 `useGen3Profiles` 与 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；当多个模块出现复杂共享任务或列配置时再评估。
 
 ### 5.2 路由
 
-当前不安装 React Router。ID 与 Static 使用应用内模块切换即可完成工作流，不需要独立 URL；档案、Wild 或可分享视图形成真正页面边界后再评估路由，并优先使用兼容静态托管刷新行为的方案。URL 不保存 TID、SID、Seed 或完整筛选条件。
+当前不安装 React Router。ID、Static 与存档信息管理使用应用内状态即可完成工作流，不需要独立 URL；Wild 或可分享视图形成真正页面边界后再评估路由，并优先使用兼容静态托管刷新行为的方案。URL 不保存 TID、SID、Seed 或完整筛选条件。
 
 ### 5.3 表格
 
@@ -130,16 +132,17 @@ PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等�
 ### 6.1 当前模块
 
 - React state：输入、筛选、结果、排序、进度和任务终态。
-- `localStorage`：只保存语言。
+- IndexedDB：第三世代存档信息的主存储。
+- `localStorage`：存档完整镜像、语言、主题和存档悬浮窗折叠状态。
 - Worker/Wasm：任务期间的临时计算状态。
 - 页面刷新：终止任务并重建 Worker，不持久化结果。
 - UI 预览：ID 与 Static 各自使用同一搜索接口的样例引擎，不读取或生成 Wasm。
 
-### 6.2 后续档案
+### 6.2 存档 repository
 
-档案使用 IndexedDB，并通过 repository 层隔离页面。档案阶段计划引入 Dexie 处理 schema、事务和迁移，但在该模块开始前不安装依赖；届时重新核验稳定版本并提交 lockfile。
+当前直接使用浏览器 IndexedDB API，并通过 `Gen3ProfileRepository` 隔离页面。schema 只有一个 `app-data` object store 与一个 `gen3-profiles` 记录，不需要为这一级复杂度引入 Dexie。repository 负责验证、事务、IndexedDB 失败回退和镜像恢复。
 
-轻量设置继续使用 `localStorage`。不把 IndexedDB 数据镜像进长期全局 store，也不把 TID/SID 放进 URL。
+每次保存同时更新 localStorage 完整镜像；这是明确的数据恢复路径，不是长期全局 store。导入导出使用带格式标识和 schema 版本的 JSON。清除操作同时删除 IndexedDB 记录和镜像，不把 TID/SID 放进 URL。
 
 ## 7. Wasm 模块化
 
@@ -185,7 +188,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` 与 `gen3static` API 版本均为 1。ID C ABI 为：
+当前 `gen3id` API 版本为 1，`gen3static` API 版本为 2。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -212,10 +215,10 @@ uint32 tidSID      # low 16 bits TID, high 16 bits SID
 uint32 tsv
 ```
 
-Static C ABI 使用同一生命周期形式：`gen3static_api_version`、`gen3static_generate`、`gen3static_result_ptr`、`gen3static_result_count` 和 `gen3static_last_error`。请求以固定宽度整数传入 Seed、推进范围、Offset、Method、预设属性、TID/SID 和筛选；结果为连续 48 字节记录：
+Static C ABI 使用同一结果生命周期，并提供 `gen3static_generate` 与 `gen3static_search`。Generator 传入 Seed、推进范围、Offset、Method、预设属性、TID/SID 和筛选；Searcher 传入 IV 组合 `startIndex`、`stateCount`、Method、预设属性、TID/SID 和筛选。两者都返回连续 48 字节记录：
 
 ```text
-uint32 advances
+uint32 advancesOrSeed  # Generator 为 Advances，Searcher 为 Seed
 uint32 pid
 uint32 ivHP / ivAtk / ivDef / ivSpA / ivSpD / ivSpe
 uint32 ability
@@ -227,7 +230,7 @@ uint32 natureShiny  # low 8 bits nature, remaining bits shiny type
 边界原则：
 
 - 只传递固定宽度整数、指针和长度，不暴露 C++ 对象、STL 或 Qt 类型。
-- 每次 C ABI 调用最多 100,000 个状态。
+- 每次 C ABI 调用最多处理 100,000 个 Generator 状态或 Searcher IV 组合。
 - 返回缓冲区在下一次同 Worker 调用前有效，Worker 必须立即复制并转移。
 - 错误使用稳定数值码，TypeScript 负责转换为用户可见错误。
 - API 版本不匹配时停止初始化，不尝试兼容猜测。
@@ -258,6 +261,12 @@ type ModuleWorkerRequest =
       taskId: string;
       chunk: ModuleChunk;
       request: ModuleRequest;
+    }
+  | {
+      type: "search";
+      taskId: string;
+      chunk: StaticSearcherChunk;
+      request: StaticSearcherRequest;
     };
 ```
 
@@ -312,7 +321,9 @@ type ModuleWorkerResponse =
 docs/
 |-- modules/
 |   |-- gen3id.md
+|   |-- gen3profiles.md
 |   `-- gen3static.md
+|-- ai-development.md
 |-- progress.md
 |-- requirements.md
 `-- tech-stack.md
@@ -329,9 +340,14 @@ src/
     |   |-- domain.ts
     |   |-- preview/
     |   `-- worker/
+    |-- profiles/
+    |   |-- domain.ts
+    |   |-- repository.ts
+    |   `-- useGen3Profiles.ts
     `-- static/
         |-- domain.ts
         |-- Gen3StaticPanel.tsx
+        |-- searcher.ts
         |-- preview/
         `-- worker/
 third_party/pokefinder/
@@ -342,7 +358,7 @@ wasm/modules/
 `-- gen3static/
 ```
 
-后续模块沿用同一结构，不把 `gen4id`、Searcher 或 Wild 逻辑塞进现有 Generator 文件。
+后续模块沿用同一结构。Static Generator/Searcher 共享同一个版本化 `gen3static` Wasm 模块，但使用独立请求、Pool 和任务生命周期；不要把 `gen4id` 或 Wild 逻辑塞进现有模块。
 
 ## 11. npm 构建入口
 
@@ -380,8 +396,9 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 ### 12.1 当前已实现
 
-- **C++ 原生夹具**：ID 三种模式，以及 Static Method 1、Method 4、游走缺陷、筛选和错误码。
-- **TypeScript 单元测试**：ID/Static 输入边界、分片、解码和红蓝宝石 Seed 推导。
+- **C++ 原生夹具**：ID 三种模式，以及 Static Generator Method 1/4、Searcher 反向恢复、游走缺陷、筛选和错误码。
+- **TypeScript 单元测试**：ID/Static 输入边界、Generator/Searcher 分片、解码、觉醒力量、输入规范化、主题和红蓝宝石 Seed 推导。
+- **持久化单元测试**：存档 JSON schema、合并边界、IndexedDB 主存储抽象与 localStorage 兜底。
 - **UI 预览引擎测试**：ID/Static 确定性样例、进度和取消。
 - **静态检查**：Prettier、ESLint、TypeScript project build。
 - **生产 Web 构建**：Vite Worker、PWA、相对 base 和法律文件。
@@ -397,17 +414,18 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 ## 13. 当前模块技术验证门槛
 
-`gen3static` Generator 进入项目所有者验收前必须完成：
+当前 `gen3static` 与存档信息工作区进入项目所有者验收前必须完成：
 
-1. 原生夹具通过 Method 1、Method 4、游走缺陷、筛选和错误边界。
-2. 固定 Seed 的 PID、IV 与性格逐字段匹配 PokeFinder 4.3.2 基线。
+1. 原生夹具通过 Generator Method 1/4、Searcher Method 4 四候选结果、游走缺陷、筛选和错误边界。
+2. 固定 Seed 的 PID、IV 与性格，以及固定 IV 的反向 Seed，逐字段匹配 PokeFinder 4.3.2 基线。
 3. Emscripten 6.0.6 生成可加载的 `gen3static.mjs` 与 `gen3static.wasm`。
-4. Static Worker Pool 在多 Worker 下保持结果顺序、稳定进度和取消行为。
+4. Static Generator/Searcher Worker Pool 在多 Worker 下保持结果顺序、稳定进度和取消行为。
 5. 大范围任务运行时主线程仍能响应输入、模块切换和结果滚动。
 6. 简体中文、英文和日文可以切换，Latios/Latias 禁用 Method 4 并显示游走缺陷说明。
-7. 多列排序、CSV、结果上限、错误状态和移动端横向滚动符合需求。
-8. GitHub Pages 无 ID/Static JS、Worker、Wasm、manifest 或 Service Worker 404。
-9. 项目所有者完成并记录功能、移动端和离线验收。
+7. 多列排序、觉醒力量、CSV、结果上限、错误状态和移动端横向滚动符合需求。
+8. 存档信息的刷新恢复、localStorage 兜底、导入导出、清除和悬浮窗符合需求。
+9. GitHub Pages 无 ID/Static JS、Worker、Wasm、manifest 或 Service Worker 404。
+10. 项目所有者完成并记录功能、移动端和离线验收。
 
 ## 14. GitHub Actions 与 Pages
 
@@ -473,7 +491,7 @@ Cloudflare job 默认不运行。配置以下内容后，工作流会下载与 P
 - React Router：当前模块切换不需要独立 URL。
 - Zustand / Redux：当前状态局部且所有权清晰。
 - TanStack Table：当前 ID/Static 都只有单列排序和固定列定义。
-- Dexie：档案阶段再安装并锁定。
+- Dexie：当前单记录 schema 使用原生 IndexedDB 已足够；出现多 store 迁移或复杂查询后再评估。
 - Testing Library / Playwright：Pages 预览稳定后按真实交互补充。
 - Next.js、SSR 或后端框架：违反纯静态目标。
 - Comlink：显式消息协议更适合批次、版本和转移所有权审计。

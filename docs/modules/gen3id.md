@@ -86,14 +86,31 @@ seed = ((value >> 16) XOR (value AND 0xFFFF)) AND 0xFFFF
 
 红蓝宝石实时时钟电池耗尽时使用固定 Seed `0x05A0`。界面启用“无电池”后不再读取日期时间或手动 Seed。
 
-## 7. Web 执行边界
+## 7. 输入限制
+
+输入限制已对照 PokeFinder `Form/Controls/TextBox.cpp`、`Form/Gen3/IDs3.cpp` 与 `Form/Controls/DateTimeEdit.cpp`：
+
+| 输入                   | 上游类型与范围                               | Web 行为                                 |
+| ---------------------- | -------------------------------------------- | ---------------------------------------- |
+| XD / Colosseum Seed    | `Seed32Bit`，`0..0xFFFFFFFF`，8 位十六进制   | 空输入解析为 `0`；只保留十六进制并转大写 |
+| FR/LG/E TID            | `TIDSID`，`0..65535`，5 位十进制             | 只保留十进制                             |
+| R/S Seed               | `Seed16Bit`，`0..0xFFFF`，4 位十六进制       | 空输入解析为 `0`；只保留十六进制并转大写 |
+| Initial / Max Advances | `Advance32Bit`，`0..4294967295`，10 位十进制 | 两者相加不得超过 `0xFFFFFFFF`            |
+| TID / SID 筛选         | `0..65535`                                   | 空输入表示不筛选                         |
+| TSV 筛选               | `0..8191`                                    | 空输入表示不筛选                         |
+| R/S 日期时间           | `2000-01-01 00:00:00..2099-12-31 23:59:59`   | 当前 Web 控件精确到分钟                  |
+
+Max Advances 包含起点，浏览器单次任务最多处理 50,000,000 个状态；每次 C ABI 调用最多 100,000 个状态。
+
+## 8. Web 执行边界
 
 TypeScript 把大范围拆成最多 100,000 个状态的分片，并交给多个独立 Worker/Wasm 实例。分片只改变任务调度，不改变初始状态、推进序号或 ID 生成顺序；结果按 `chunkIndex` 恢复为确定顺序。
 
-## 8. 验证入口
+## 9. 验证入口
 
 - C++ 固定夹具：`wasm/modules/gen3id/tests/id3_native_test.cpp`
 - TypeScript 边界测试：`src/features/id/domain.test.ts`
+- 输入规范化：`src/input.test.ts`
 - 上游来源与校验和：`third_party/pokefinder/UPSTREAM.md`
 
 运行：

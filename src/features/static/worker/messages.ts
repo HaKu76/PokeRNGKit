@@ -1,4 +1,9 @@
-import type { Gen3StaticChunk, Gen3StaticRequest } from "../domain";
+import type {
+  Gen3StaticChunk,
+  Gen3StaticRequest,
+  Gen3StaticSearcherChunk,
+  Gen3StaticSearcherRequest,
+} from "../domain";
 
 export interface Gen3StaticWorkerInitMessage {
   type: "init";
@@ -12,8 +17,17 @@ export interface Gen3StaticWorkerRunMessage {
   request: Gen3StaticRequest;
 }
 
+export interface Gen3StaticWorkerSearchMessage {
+  type: "search";
+  taskId: string;
+  chunk: Gen3StaticSearcherChunk;
+  request: Gen3StaticSearcherRequest;
+}
+
 export type Gen3StaticWorkerRequest =
-  Gen3StaticWorkerInitMessage | Gen3StaticWorkerRunMessage;
+  | Gen3StaticWorkerInitMessage
+  | Gen3StaticWorkerRunMessage
+  | Gen3StaticWorkerSearchMessage;
 
 export interface Gen3StaticWorkerReadyMessage {
   type: "ready";

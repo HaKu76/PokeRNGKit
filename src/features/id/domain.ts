@@ -182,6 +182,7 @@ export function parseDecimal(value: string): number | undefined {
 
 export function parseHex(value: string): number | undefined {
   const trimmed = value.trim().replace(/^0x/i, "");
+  if (trimmed === "") return 0;
   if (!/^[\da-f]+$/i.test(trimmed)) {
     return undefined;
   }

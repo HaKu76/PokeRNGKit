@@ -15,7 +15,7 @@ if(EMSCRIPTEN)
         "-sASSERTIONS=0"
         "-sNO_EXIT_RUNTIME=1"
         "-sMALLOC=emmalloc"
-        "-sEXPORTED_FUNCTIONS=['_gen3static_api_version','_gen3static_generate','_gen3static_result_ptr','_gen3static_result_count','_gen3static_last_error']"
+        "-sEXPORTED_FUNCTIONS=['_gen3static_api_version','_gen3static_generate','_gen3static_search','_gen3static_result_ptr','_gen3static_result_count','_gen3static_last_error']"
         "-sEXPORTED_RUNTIME_METHODS=['HEAPU32']"
     )
     set_target_properties(

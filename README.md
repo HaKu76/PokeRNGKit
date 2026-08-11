@@ -5,16 +5,17 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代 Static Generator 工程实现。** `gen3id` 已完成首轮工程实现并进入 Git 基线；当前工作区新增 `gen3static` Wasm 模块、独立 Worker Pool、定点输入/筛选/结果表和三语界面。Static Searcher、真实 Wasm 浏览器集成和项目所有者验收仍待完成。
+**当前里程碑：第三世代 Static Searcher 与存档信息基础。** `gen3id` 和 Static Generator 已进入 Git 基线；当前工作区新增 Static Searcher、觉醒力量、输入限制对齐、三代存档信息、本地备份和右下角悬浮窗。真实 Wasm 浏览器集成、GitHub Pages 与项目所有者验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
 - 已有模块：ID Generator（XD/Colosseum、FireRed/LeafGreen/Emerald、Ruby/Sapphire）
-- 当前模块：Static Generator（Method 1、Method 4、游走 IV 缺陷）
+- 当前模块：Static Generator / Searcher 与三代存档信息
 - 上游核验基线：PokeFinder 4.3.2
-- 算法说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Static](docs/modules/gen3static.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
+- AI 开发入口：[docs/ai-development.md](docs/ai-development.md)
 
 ## 产品定位
 
@@ -28,26 +29,35 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - Web Worker Pool 并行调度、进度、取消和错误状态
 - 虚拟化结果表、数值排序和 CSV 导出
 
-当前工作区已落地的 Static Generator 包含：
+当前 Static 工作区包含：
 
 - Mewtwo、Rayquaza、Regirock、Regice、Registeel、Deoxys、Latios、Latias 首批预设
 - Method 1、Method 4 与 Latios/Latias 游走 IV 缺陷
 - Seed、Initial Advances、Max Advances、Offset、TID、SID
 - IV、性格、特性、性别和闪光筛选
-- 独立 `gen3static` Worker Pool、进度、取消、虚拟化结果表、排序和 CSV
+- Static Searcher 的 IV 组合枚举与反向 Seed 恢复
+- 觉醒属性、觉醒威力、取消筛选和 IV 组合键快捷设置
+- 独立 Generator/Searcher Worker Pool、进度、取消、虚拟化结果表、排序和 CSV
+
+当前三代存档信息基础包含：
+
+- 新建、编辑、复制、删除和选择
+- IndexedDB 主存储与 localStorage 镜像兜底
+- JSON 导入、导出与同时清除两处缓存
+- 全局右下角小型悬浮窗、默认收起、折叠状态记忆和当前存档摘要
+
+应用左侧模块导航使用默认收起的覆盖式抽屉，避免在桌面和移动视口持续占用计算工作区宽度。
 
 后续 MVP 计划包含：
 
-- 三代档案的创建、编辑、选择与删除
-- Static Searcher
 - Wild Generator / Searcher
-- IV、性格、特性、性别、闪光、觉醒力量、遭遇槽等适用筛选项
+- 遭遇槽、等级和 Pokemon 等 Wild 适用筛选项
 - 可排序结果表格、分批展示和 CSV 导出
 - 长任务的进度、取消和错误恢复
 - 简体中文、英文与日文
 - PWA 安装与首次加载后的离线使用
 
-当前不包含 Static Searcher、Wild、Egg、GameCube、PokeSpot、Jirachi 及其他世代。每个功能继续使用独立 Wasm 模块和验收记录，不把后续算法并入 `gen3id` 或 `gen3static`。
+当前不包含 Wild、Egg、GameCube、PokeSpot、Jirachi 及其他世代。每个功能继续使用独立 Wasm 模块和验收记录，不把后续算法并入 `gen3id` 或 `gen3static`。
 
 ## 纯静态与隐私
 
@@ -67,7 +77,7 @@ PokeRNGKit 必须能够部署到 GitHub Pages、Cloudflare Pages 或任意等价
 ```text
 React UI
   |-- local UI state (React)
-  |-- profiles (IndexedDB，后续模块)
+  |-- profiles (IndexedDB + localStorage mirror)
   |-- settings (localStorage)
   `-- typed messages
         `-- Web Worker
@@ -104,7 +114,7 @@ npm run preview:ui
 
 打开 <http://127.0.0.1:4173/>。
 
-UI 预览模式使用确定性样例数据，可以验收 ID 三种模式、Static Generator、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
+UI 预览模式使用确定性样例数据，可以验收 ID 三种模式、Static Generator/Searcher、存档信息、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
 
 本地验收服务器固定绑定 `127.0.0.1`，只允许当前电脑访问。如果 Windows 首次运行 Node.js 时弹出防火墙网络放行或管理员密码提示，可以直接取消/不允许；不需要为本地验收创建公网或局域网放行规则。
 
@@ -186,9 +196,10 @@ npm run build:web
 
 - **阶段 0：仓库基线** - README、需求、技术栈、忽略规则与许可证策略（已完成）。
 - **阶段 1：第三世代 ID Generator** - `gen3id`、Worker Pool、三语界面和上游一致性夹具（已实现，待项目所有者完整验收）。
-- **阶段 2：第三世代 Static Generator** - `gen3static`、Method 1/4、游走缺陷、筛选和结果工作区（当前工作区已实现，待验证与提交）。
-- **阶段 3：Static Searcher** - 反向筛选流程、搜索边界和性能基线。
-- **阶段 4：应用基础与 Wild** - 三代档案、IndexedDB、遭遇数据和 Wild Generator/Searcher。
+- **阶段 2A：第三世代 Static Generator** - `gen3static`、Method 1/4、游走缺陷、筛选和结果工作区（已进入 Git 基线，待项目所有者完整验收）。
+- **阶段 2B：Static Searcher** - 反向 IV 恢复、搜索边界、独立 Worker Pool 和结果工作区（当前工作区已实现，待真实 Wasm 验证与提交）。
+- **阶段 3：三代存档信息** - IndexedDB、localStorage 兜底、导入导出、清除和悬浮窗（当前工作区已实现，待项目所有者验收）。
+- **阶段 4：Wild** - 遭遇数据和 Wild Generator/Searcher。
 - **阶段 5：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
 - **后续** - Egg、GameCube、PokeSpot、Jirachi 等三代能力；是否支持其他世代另行决策。
 

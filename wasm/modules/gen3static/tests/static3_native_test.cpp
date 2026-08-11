@@ -5,7 +5,7 @@
 
 int main()
 {
-    assert(gen3static_api_version() == 1);
+    assert(gen3static_api_version() == 2);
 
     const auto count = gen3static_generate(0x12345678, 0, 0, 0, 1, 150, 70, 255, 0, 0, 0, 0, 0, 0, 25,
                                            0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31);
@@ -49,5 +49,10 @@ int main()
                                32, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31)
            == 0);
     assert(gen3static_last_error() == 1);
+
+    const auto searchCount = gen3static_search(0, 1, 4, 383, 45, 255, 0, 12345, 54321, 0, 0, 0, 25,
+                                               31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31);
+    assert(searchCount == 4);
+    assert(gen3static_result_count() == 4);
     return 0;
 }

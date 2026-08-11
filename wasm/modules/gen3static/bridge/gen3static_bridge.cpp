@@ -23,7 +23,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maxStatesPerCall = 100000;
 
     enum ErrorCode : std::uint32_t
@@ -105,6 +105,100 @@ namespace
             }
         }
         return true;
+    }
+
+    struct RecoverySeeds
+    {
+        std::uint32_t count = 0;
+        std::array<std::uint32_t, 6> seeds {};
+    };
+
+    RecoverySeeds recoverMethod1(const std::array<std::uint8_t, 6> &ivs)
+    {
+        constexpr std::uint32_t lag0 = 0x6134;
+        constexpr std::uint32_t lag1 = 0xC907;
+        constexpr std::uint32_t lower = 0x64833CB0;
+        constexpr std::uint32_t upper = 0x6483CBBC;
+
+        const std::uint32_t first
+            = static_cast<std::uint32_t>((ivs[0] | (ivs[1] << 5) | (ivs[2] << 10)) << 16);
+        const std::uint32_t second
+            = static_cast<std::uint32_t>((ivs[5] | (ivs[3] << 5) | (ivs[4] << 10)) << 16);
+        const std::uint64_t tmp = ((PokeRNG::getMult() * first - second) >> 16) * static_cast<std::uint64_t>(lag1);
+        const std::uint32_t lo = static_cast<std::uint32_t>(((tmp + lower) >> 15) * lag0);
+        const std::uint32_t middle = lo + lag0;
+        const std::uint32_t up = static_cast<std::uint32_t>(((tmp + upper) >> 15) * lag0);
+
+        RecoverySeeds recovered;
+        const auto recover = [&](std::uint32_t start) {
+            for (std::uint32_t lowerBits = start % lag1; lowerBits < 0x10000; lowerBits += lag1)
+            {
+                const std::uint32_t seed = first | lowerBits;
+                PokeRNG rng(seed);
+                if ((rng.next() & 0x7fff0000) == second)
+                {
+                    recovered.seeds[recovered.count++] = seed;
+                    recovered.seeds[recovered.count++] = seed ^ 0x80000000;
+                }
+            }
+        };
+        recover(lo);
+        recover(middle);
+        if (middle != up)
+        {
+            recover(up);
+        }
+        return recovered;
+    }
+
+    RecoverySeeds recoverMethod4(const std::array<std::uint8_t, 6> &ivs)
+    {
+        constexpr std::uint32_t lag0 = 0x6C31;
+        constexpr std::uint32_t lag1 = 0x2E90;
+        constexpr std::uint32_t lower = 0x4B8CE21D;
+        constexpr std::uint32_t upper = 0x4B8D08D7;
+        constexpr std::uint32_t mult = PokeRNGR::getMult() * PokeRNGR::getMult();
+
+        const std::uint32_t first
+            = static_cast<std::uint32_t>((ivs[0] | (ivs[1] << 5) | (ivs[2] << 10)) << 16);
+        const std::uint32_t second
+            = static_cast<std::uint32_t>((ivs[5] | (ivs[3] << 5) | (ivs[4] << 10)) << 16);
+        const std::uint32_t tmp = ((first - second * mult) >> 16) * lag0;
+        const std::uint32_t lo = (tmp + lower) >> 15;
+        const std::uint32_t up = (tmp + upper) >> 15;
+
+        RecoverySeeds recovered;
+        const auto recover = [&](std::uint32_t start) {
+            for (std::uint32_t lowerBits = (start * lag1) % lag0; lowerBits < 0x10000; lowerBits += lag0)
+            {
+                const std::uint32_t seed = second | lowerBits;
+                PokeRNGR rng(seed, 2);
+                if ((rng.getSeed() & 0x7fff0000) == first)
+                {
+                    recovered.seeds[recovered.count++] = rng.getSeed();
+                    recovered.seeds[recovered.count++] = rng.getSeed() ^ 0x80000000;
+                }
+            }
+        };
+        recover(lo);
+        if (lo != up)
+        {
+            recover(up);
+        }
+        return recovered;
+    }
+
+    std::array<std::uint8_t, 6> ivsAtIndex(std::uint64_t index, const std::array<std::uint32_t, 6> &minimum,
+                                          const std::array<std::uint32_t, 6> &maximum)
+    {
+        std::array<std::uint8_t, 6> ivs {};
+        for (int stat = 5; stat >= 0; stat--)
+        {
+            const std::uint32_t size = maximum[stat] - minimum[stat] + 1;
+            ivs[stat] = static_cast<std::uint8_t>(minimum[stat] + index % size);
+            index /= size;
+        }
+        return ivs;
     }
 }
 
@@ -196,6 +290,87 @@ extern "C"
                                gender, level, static_cast<std::uint32_t>(nature) | (static_cast<std::uint32_t>(shiny) << 8) });
         }
 
+        return static_cast<std::uint32_t>(results.size());
+    }
+
+    POKERNGKIT_KEEPALIVE std::uint32_t gen3static_search(
+        std::uint32_t startIndex, std::uint32_t stateCount, std::uint32_t method, std::uint32_t species,
+        std::uint32_t level, std::uint32_t genderRatio, std::uint32_t buggedRoamer, std::uint32_t tid,
+        std::uint32_t sid, std::uint32_t shinyFilter, std::uint32_t genderFilter, std::uint32_t abilityFilter,
+        std::uint32_t natureFilter, std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
+        std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
+        std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax, std::uint32_t specialAttackMax,
+        std::uint32_t specialDefenseMax, std::uint32_t speedMax)
+    {
+        results.clear();
+        lastError = ErrorCode::None;
+        if (stateCount == 0 || stateCount > maxStatesPerCall || species == 0 || species > 1025 || level == 0
+            || level > 100 || genderRatio > 255 || tid > 0xffff || sid > 0xffff
+            || (method != static_cast<std::uint32_t>(Gen3StaticMethod::Method1)
+                && method != static_cast<std::uint32_t>(Gen3StaticMethod::Method4))
+            || shinyFilter > ShinySquare || genderFilter > Genderless || abilityFilter > AbilitySecond
+            || natureFilter > 25)
+        {
+            lastError = ErrorCode::InvalidInput;
+            return 0;
+        }
+        if (natureFilter == 25)
+        {
+            natureFilter = 0xffffffff;
+        }
+
+        const std::array<std::uint32_t, 6> minimum
+            = { hpMin, attackMin, defenseMin, specialAttackMin, specialDefenseMin, speedMin };
+        const std::array<std::uint32_t, 6> maximum
+            = { hpMax, attackMax, defenseMax, specialAttackMax, specialDefenseMax, speedMax };
+        std::uint64_t totalStates = 1;
+        for (std::size_t index = 0; index < minimum.size(); index++)
+        {
+            if (minimum[index] > 31 || maximum[index] > 31 || minimum[index] > maximum[index])
+            {
+                lastError = ErrorCode::InvalidInput;
+                return 0;
+            }
+            totalStates *= maximum[index] - minimum[index] + 1;
+        }
+        if (static_cast<std::uint64_t>(startIndex) + stateCount > totalStates)
+        {
+            lastError = ErrorCode::InvalidInput;
+            return 0;
+        }
+
+        const std::uint16_t tsv = static_cast<std::uint16_t>(tid ^ sid);
+        results.reserve(static_cast<std::size_t>(stateCount) * 2);
+        for (std::uint32_t offset = 0; offset < stateCount; offset++)
+        {
+            const auto recoveredIvs = ivsAtIndex(static_cast<std::uint64_t>(startIndex) + offset, minimum, maximum);
+            const RecoverySeeds recovered = method == static_cast<std::uint32_t>(Gen3StaticMethod::Method4)
+                ? recoverMethod4(recoveredIvs)
+                : recoverMethod1(recoveredIvs);
+            for (std::uint32_t index = 0; index < recovered.count; index++)
+            {
+                PokeRNGR rng(recovered.seeds[index]);
+                std::uint32_t pid = static_cast<std::uint32_t>(rng.nextUShort()) << 16;
+                pid |= rng.nextUShort();
+                const std::uint8_t nature = static_cast<std::uint8_t>(pid % 25);
+                const std::uint8_t ability = static_cast<std::uint8_t>(pid & 1);
+                const std::uint8_t gender = getGender(pid, genderRatio);
+                const std::uint8_t shiny = getShiny(pid, tsv);
+                if (!matchesShiny(shiny, shinyFilter) || !matchesGender(gender, genderFilter)
+                    || !matchesAbility(ability, abilityFilter)
+                    || (natureFilter != 0xffffffff && nature != natureFilter))
+                {
+                    continue;
+                }
+                const std::array<std::uint8_t, 6> displayedIvs = buggedRoamer
+                    ? std::array<std::uint8_t, 6> { recoveredIvs[0], static_cast<std::uint8_t>(recoveredIvs[1] & 7),
+                                                   0, 0, 0, 0 }
+                    : recoveredIvs;
+                results.push_back({ rng.next(), pid, displayedIvs[0], displayedIvs[1], displayedIvs[2],
+                                    displayedIvs[3], displayedIvs[4], displayedIvs[5], ability, gender, level,
+                                    static_cast<std::uint32_t>(nature) | (static_cast<std::uint32_t>(shiny) << 8) });
+            }
+        }
         return static_cast<std::uint32_t>(results.size());
     }
 

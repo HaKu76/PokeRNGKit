@@ -1,17 +1,21 @@
-# 第三世代 Static Generator 算法
+# 第三世代 Static Generator / Searcher 算法
 
-本文说明 `gen3static` 当前 Generator 的计算规则。实现对齐 PokeFinder 4.3.2 `StaticGenerator3::generate`；Static Searcher 尚未实现。
+本文说明 `gen3static` Generator 与 Searcher 的计算规则。实现对齐 PokeFinder 4.3.2 `StaticGenerator3`、`StaticSearcher3` 与 `LCRNGReverse::recoverPokeRNGIV`；浏览器编排使用同一版本化 Wasm 模块的两个独立 Worker Pool。
 
-## 1. 输入与推进
+## 1. PokeRNG
 
-定点生成使用第三世代 PokeRNG：
+第三世代定点乱数使用 32 位线性同余 RNG：
 
 ```text
 state[n + 1] = (state[n] * 0x41C64E6D + 0x6073) mod 2^32
 output16 = state[n + 1] >> 16
 ```
 
-生成器先把 Seed 推进 `Initial Advances + Offset` 次。每个候选帧复制当前基准状态完成 PID 和 IV 计算，随后外层基准状态推进一次。
+`PokeRNGR` 使用对应逆变换向前追溯 PID 和候选初始 Seed。所有乘法和加法都按无符号 32 位回绕。
+
+## 2. Generator 推进
+
+Generator 先把 Seed 推进 `Initial Advances + Offset` 次。每个候选帧复制当前基准状态完成 PID 和 IV 计算，随后外层基准状态推进一次。
 
 结果中的 Advances 为：
 
@@ -21,9 +25,9 @@ Initial Advances + candidateIndex
 
 `Offset` 参与 RNG 定位，但不加到显示帧数中。这一语义与 PokeFinder 保持一致。
 
-## 2. PID
+## 3. PID
 
-从候选状态连续读取两个 16 位输出，先低位、后高位：
+Generator 从候选状态连续读取两个 16 位输出，先低位、后高位：
 
 ```text
 pidLow  = nextUShort()
@@ -31,7 +35,9 @@ pidHigh = nextUShort()
 PID = pidLow OR (pidHigh << 16)
 ```
 
-## 3. Method 1 与 Method 4
+Searcher 从 IV 状态反向恢复后使用 `PokeRNGR`，按上游顺序先恢复 PID 高 16 位，再恢复低 16 位。
+
+## 4. Method 1 与 Method 4
 
 PID 之后读取第一组 IV 随机数 `iv1`：
 
@@ -53,7 +59,7 @@ SpD = (iv2 >> 10) AND 31
 Spe =  iv2        AND 31
 ```
 
-## 4. 游走宝可梦 IV 缺陷
+## 5. 游走宝可梦 IV 缺陷
 
 第三世代红蓝宝石的 Latios/Latias 游走个体存在 IV 读取缺陷。PokeFinder 的兼容规则是：
 
@@ -64,7 +70,9 @@ iv2 = 0
 
 因此只有 `iv1` 的低 8 位保留，其余位与第二组 IV 都为零。当前预设对 Latios、Latias 启用此规则，并限制为 Method 1。
 
-## 5. 性格、特性与性别
+Searcher 仍按用户输入的完整六项 IV 组合恢复原 RNG 状态，再按缺陷规则显示 `HP / (Atk AND 7) / 0 / 0 / 0 / 0`，与上游 `StaticSearcher3::search` 一致。
+
+## 6. 性格、特性与性别
 
 这些属性直接由 PID 和物种性别阈值计算：
 
@@ -80,7 +88,7 @@ Ability = PID AND 1
 - 阈值 `0`：固定雄性。
 - 其他阈值：`(PID AND 0xFF) < threshold` 为雌性，否则为雄性。
 
-## 6. 闪光
+## 7. 闪光
 
 第三世代定点闪光判断使用未右移的训练家异或值：
 
@@ -96,15 +104,66 @@ shinyXor = trainerXor XOR pidXor
 
 ID 模块展示的 `TSV = (TID XOR SID) >> 3` 不能直接代入这里。
 
-## 7. 筛选与结果
+## 8. Searcher 反向恢复
 
-IV、性格、特性、性别和闪光筛选在 C++ bridge 中对生成后的状态执行，不会反向改变 RNG 序列。每条结果以 48 字节定长记录返回，包含 Advances、PID、六项 IV、特性槽、性别、等级、性格和闪光类型。
+Searcher 不扫描完整 `2^32` Seed 空间，而是枚举筛选区间内的六项 IV 笛卡尔积。组合索引按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 展开，TypeScript 可以把连续索引范围稳定拆给多个 Worker。
 
-当前内置首批预设：Mewtwo、Rayquaza、Regirock、Regice、Registeel、Deoxys、Latios、Latias。预设只提供物种、等级、性别阈值和游走缺陷参数，不包含官方美术素材。
+每组 IV 先重新打包为两个 15 位观测值。反向恢复使用上游 `LCRNGReverse::recoverPokeRNGIV` 的整数关系：
 
-## 8. 固定夹具
+- Method 1 根据相邻两次 IV 输出恢复最多 6 个候选 RNG 状态。
+- Method 4 根据中间跳过一次推进的关系恢复最多 4 个候选 RNG 状态。
+- 15 位 IV 观测缺少最高位，因此每个有效低位候选同时检查相差 `0x80000000` 的状态。
 
-Seed `0x12345678`、Advances `0` 的基线结果：
+对每个候选状态使用 `PokeRNGR` 反向读取 PID，再计算性格、特性、性别和闪光并应用筛选。通过筛选后继续反推一次，得到结果表中的 Seed。
+
+Searcher 结果第一列是 Seed；Generator 结果第一列是 Advances。两者复用 48 字节 C ABI 记录时，只改变第一个 32 位字段的语义。
+
+## 9. 筛选与快捷设置
+
+IV、性格、特性、性别和闪光筛选在 C++ bridge 中执行，不会改变 RNG 序列或候选 Seed。Generator 的“取消筛选”将全部筛选替换为显式任意范围；Searcher 必须保留 IV 范围，因为它定义反向搜索空间。
+
+IV 名称按钮复用 PokeFinder `Filter.cpp` 行为：
+
+```text
+Click:          0..31
+Ctrl+Click:    31..31
+Alt+Click:     30..31
+Ctrl+Alt+Click: 0..0
+```
+
+## 10. 觉醒力量
+
+第三世代觉醒属性使用六项 IV 最低位，觉醒威力使用次低位。位顺序为 `HP, Atk, Def, Spe, SpA, SpD`：
+
+```text
+typeBits  = sum((IV[i] AND 1) << bit)
+powerBits = sum(((IV[i] >> 1) AND 1) << bit)
+
+typeIndex = floor(typeBits * 15 / 63)
+power     = 30 + floor(powerBits * 40 / 63)
+```
+
+属性索引按第三世代顺序从 Fighting 到 Dark，共 16 种。该计算只依赖结果 IV，在 TypeScript 展示层执行，不改变 Wasm RNG 结果。
+
+## 11. 输入限制
+
+输入限制已对照 PokeFinder `Form/Controls/TextBox.cpp`、`Form/Gen3/Static3.cpp` 和 `Form/Controls/Filter.cpp`：
+
+| 输入             | 上游类型与范围                               | Web 行为                                 |
+| ---------------- | -------------------------------------------- | ---------------------------------------- |
+| Seed             | `Seed32Bit`，`0..0xFFFFFFFF`，8 位十六进制   | 空输入解析为 `0`；只保留十六进制并转大写 |
+| Initial Advances | `Advance32Bit`，`0..4294967295`，10 位十进制 | 只保留十进制                             |
+| Max Advances     | `Advance32Bit`，`0..4294967295`，10 位十进制 | 含起点；浏览器任务最多 50,000,000 状态   |
+| Offset           | `Advance32Bit`，`0..4294967295`，10 位十进制 | 只保留十进制                             |
+| TID / SID        | `TIDSID`，`0..65535`，5 位十进制             | 从当前存档信息读取                       |
+| IV min / max     | `0..31`                                      | 最小值不得大于最大值                     |
+| Nature           | 任意或 `0..24`                               | 稳定协议值 `-1` 表示任意                 |
+
+Generator 还要求 `Initial Advances + Offset + Max Advances <= 0xFFFFFFFF`。Searcher 的 IV 组合总数不得超过 50,000,000。每次 C ABI 调用最多处理 100,000 个状态或 IV 组合。
+
+## 12. 结果与固定夹具
+
+Generator 的 Seed `0x12345678`、Advances `0` 基线：
 
 ```text
 PID:           0x84EA0B71
@@ -114,15 +173,32 @@ Roamer IVs:    10 / 4 / 0 / 0 / 0 / 0
 Nature index:  15
 ```
 
-## 9. Web 执行边界
+Searcher 的 Groudon、Method 4、`31/31/31/31/31/31` 固定夹具恢复 4 个候选结果。
 
-TypeScript 将范围拆成最多 100,000 个状态的分片。Worker Pool、批次排序、进度、取消和结果上限属于浏览器编排层，不属于 RNG 算法；调整 Worker 数量不能改变相同输入对应的状态内容与顺序。
+当前界面内置 Mewtwo、Rayquaza、Regirock、Regice、Registeel、Deoxys、Latios、Latias 首批预设。它们只提供物种、等级、性别阈值和游走缺陷参数，不包含官方美术素材。完整 PokeFinder encounter 表与按存档版本过滤仍是后续工作，不能把首批预设描述成完整定点数据。
 
-## 10. 验证入口
+## 13. Web 执行边界
 
-- C++ 固定夹具：`wasm/modules/gen3static/tests/static3_native_test.cpp`
-- TypeScript 边界测试：`src/features/static/domain.test.ts`
-- UI 预览测试：`src/features/static/preview/Gen3StaticUiPreviewEngine.test.ts`
+Generator 按 Advances 范围分片，Searcher 按 IV 组合索引分片，每片最多 100,000。两个 Pool 都使用多个独立单线程 Wasm 实例，以 `chunkIndex` 恢复批次顺序，并通过 transferable `ArrayBuffer` 返回结果。
+
+Worker Pool、批次排序、进度、取消和 250,000 条结果上限属于浏览器编排层，不属于 RNG 算法；调整 Worker 数量不能改变相同输入对应的结果内容。
+
+## 14. 上游与验证入口
+
+主要上游文件：
+
+- `Core/Gen3/Generators/StaticGenerator3.cpp`
+- `Core/Gen3/Searchers/StaticSearcher3.cpp`
+- `Core/RNG/LCRNGReverse.hpp`
+- `Form/Gen3/Static3.cpp`
+- `Form/Controls/Filter.cpp`
+- `Form/Controls/TextBox.cpp`
+
+仓库验证入口：
+
+- C++ Generator/Searcher 固定夹具：`wasm/modules/gen3static/tests/static3_native_test.cpp`
+- TypeScript 边界与觉醒力量：`src/features/static/domain.test.ts`
+- UI 预览：`src/features/static/preview/Gen3StaticUiPreviewEngine.test.ts`
 - 上游来源与校验和：`third_party/pokefinder/UPSTREAM.md`
 
 运行：

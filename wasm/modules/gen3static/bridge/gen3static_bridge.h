@@ -80,6 +80,32 @@ extern "C"
         std::uint32_t specialAttackMax,
         std::uint32_t specialDefenseMax,
         std::uint32_t speedMax);
+    std::uint32_t gen3static_search(
+        std::uint32_t startIndex,
+        std::uint32_t stateCount,
+        std::uint32_t method,
+        std::uint32_t species,
+        std::uint32_t level,
+        std::uint32_t genderRatio,
+        std::uint32_t buggedRoamer,
+        std::uint32_t tid,
+        std::uint32_t sid,
+        std::uint32_t shinyFilter,
+        std::uint32_t genderFilter,
+        std::uint32_t abilityFilter,
+        std::uint32_t natureFilter,
+        std::uint32_t hpMin,
+        std::uint32_t attackMin,
+        std::uint32_t defenseMin,
+        std::uint32_t specialAttackMin,
+        std::uint32_t specialDefenseMin,
+        std::uint32_t speedMin,
+        std::uint32_t hpMax,
+        std::uint32_t attackMax,
+        std::uint32_t defenseMax,
+        std::uint32_t specialAttackMax,
+        std::uint32_t specialDefenseMax,
+        std::uint32_t speedMax);
     std::uintptr_t gen3static_result_ptr();
     std::uint32_t gen3static_result_count();
     std::uint32_t gen3static_last_error();

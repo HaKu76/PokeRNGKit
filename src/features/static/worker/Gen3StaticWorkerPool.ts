@@ -5,6 +5,8 @@ import {
   GEN3_STATIC_MAX_RESULTS,
   type Gen3StaticChunk,
   type Gen3StaticRequest,
+  type Gen3StaticSearcherChunk,
+  type Gen3StaticSearcherRequest,
 } from "../domain";
 import type {
   Gen3StaticSearchEngine,
@@ -23,7 +25,7 @@ interface PendingChunk {
   reject(error: Error): void;
 }
 
-class Gen3StaticWorkerClient {
+export class Gen3StaticWorkerClient {
   private readonly worker: Worker;
   private readonly ready: Promise<void>;
   private pending?: PendingChunk;
@@ -61,6 +63,20 @@ class Gen3StaticWorkerClient {
     return new Promise((resolve, reject) => {
       this.pending = { taskId, resolve, reject };
       this.post({ type: "run", taskId, chunk, request });
+    });
+  }
+
+  async search(
+    taskId: string,
+    request: Gen3StaticSearcherRequest,
+    chunk: Gen3StaticSearcherChunk,
+  ): Promise<Gen3StaticWorkerBatchMessage> {
+    await this.ready;
+    if (this.pending)
+      throw new Error("Gen3 static Worker received overlapping chunks.");
+    return new Promise((resolve, reject) => {
+      this.pending = { taskId, resolve, reject };
+      this.post({ type: "search", taskId, chunk, request });
     });
   }
 
@@ -109,7 +125,7 @@ export function recommendedGen3StaticWorkerCount(): number {
   return Math.max(1, Math.min(8, hardwareConcurrency - 1));
 }
 
-function defaultModuleUrl(): string {
+export function defaultGen3StaticModuleUrl(): string {
   const relative = `${import.meta.env.BASE_URL}wasm/gen3static.mjs`;
   return new URL(relative, globalThis.location.href).href;
 }
@@ -119,7 +135,7 @@ export class Gen3StaticWorkerPool implements Gen3StaticSearchEngine {
   private running = false;
   private cancelActive?: () => void;
 
-  constructor(private readonly moduleUrl = defaultModuleUrl()) {}
+  constructor(private readonly moduleUrl = defaultGen3StaticModuleUrl()) {}
 
   async search(
     request: Gen3StaticRequest,

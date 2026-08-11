@@ -4,6 +4,7 @@ import {
   createId3Chunks,
   decodeId3States,
   id3FilterFlags,
+  parseHex,
   validateId3Request,
   type Id3Request,
 } from "./domain";
@@ -54,6 +55,11 @@ describe("ID3 domain", () => {
 
   it("builds combined exact filter flags", () => {
     expect(id3FilterFlags({ tid: 1, sid: 2, tsv: 3 })).toBe(7);
+  });
+
+  it("interprets an empty Seed as zero", () => {
+    expect(parseHex("")).toBe(0);
+    expect(parseHex("   ")).toBe(0);
   });
 
   it("rejects ranges that overflow the 32-bit advance counter", () => {

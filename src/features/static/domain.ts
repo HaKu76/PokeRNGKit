@@ -1,4 +1,4 @@
-export const GEN3_STATIC_API_VERSION = 1;
+export const GEN3_STATIC_API_VERSION = 2;
 export const GEN3_STATIC_CHUNK_SIZE = 100_000;
 export const GEN3_STATIC_MAX_TOTAL_STATES = 50_000_000;
 export const GEN3_STATIC_MAX_RESULTS = 250_000;
@@ -106,8 +106,27 @@ export interface Gen3StaticRequest {
   filters: Gen3StaticFilters;
 }
 
+export interface Gen3StaticSearcherRequest {
+  method: Gen3StaticMethod;
+  template: Gen3StaticTemplate;
+  tid: number;
+  sid: number;
+  filters: Gen3StaticFilters;
+}
+
 export interface Gen3StaticState {
   advances: number;
+  pid: number;
+  ivs: [number, number, number, number, number, number];
+  ability: number;
+  gender: number;
+  level: number;
+  nature: number;
+  shiny: number;
+}
+
+export interface Gen3StaticSearcherState {
+  seed: number;
   pid: number;
   ivs: [number, number, number, number, number, number];
   ability: number;
@@ -121,6 +140,12 @@ export interface Gen3StaticChunk {
   index: number;
   initialAdvances: number;
   maxAdvances: number;
+  stateCount: number;
+}
+
+export interface Gen3StaticSearcherChunk {
+  index: number;
+  startIndex: number;
   stateCount: number;
 }
 
@@ -142,6 +167,21 @@ export function staticAbilityFilterToWasm(
   filter: Gen3StaticAbilityFilter,
 ): number {
   return { any: 0, first: 1, second: 2 }[filter];
+}
+
+const hiddenPowerIvOrder = [0, 1, 2, 5, 3, 4] as const;
+
+export function gen3HiddenPower(ivs: readonly number[]) {
+  let typeBits = 0;
+  let powerBits = 0;
+  hiddenPowerIvOrder.forEach((ivIndex, bit) => {
+    typeBits |= (ivs[ivIndex] & 1) << bit;
+    powerBits |= ((ivs[ivIndex] >> 1) & 1) << bit;
+  });
+  return {
+    type: Math.floor((typeBits * 15) / 63),
+    power: 30 + Math.floor((powerBits * 40) / 63),
+  };
 }
 
 export function validateGen3StaticRequest(
@@ -207,6 +247,43 @@ export function validateGen3StaticRequest(
   return errors;
 }
 
+export function gen3StaticSearcherCombinationCount(
+  request: Gen3StaticSearcherRequest,
+) {
+  return request.filters.ivMin.reduce(
+    (total, minimum, index) =>
+      total * (request.filters.ivMax[index] - minimum + 1),
+    1,
+  );
+}
+
+export function validateGen3StaticSearcherRequest(
+  request: Gen3StaticSearcherRequest,
+): string[] {
+  const generatorShape: Gen3StaticRequest = {
+    ...request,
+    seed: 0,
+    initialAdvances: 0,
+    maxAdvances: 0,
+    offset: 0,
+  };
+  const errors = validateGen3StaticRequest(generatorShape).filter(
+    (error) =>
+      error !== "seed" &&
+      error !== "initialAdvances" &&
+      error !== "maxAdvances" &&
+      error !== "offset" &&
+      error !== "advanceRange",
+  );
+  if (
+    errors.length === 0 &&
+    gen3StaticSearcherCombinationCount(request) > GEN3_STATIC_MAX_TOTAL_STATES
+  ) {
+    errors.push("searchRange");
+  }
+  return errors;
+}
+
 export function createGen3StaticChunks(
   request: Gen3StaticRequest,
   chunkSize = GEN3_STATIC_CHUNK_SIZE,
@@ -231,6 +308,29 @@ export function createGen3StaticChunks(
       stateCount,
     });
     offset += stateCount;
+  }
+  return chunks;
+}
+
+export function createGen3StaticSearcherChunks(
+  request: Gen3StaticSearcherRequest,
+  chunkSize = GEN3_STATIC_CHUNK_SIZE,
+): Gen3StaticSearcherChunk[] {
+  if (
+    !Number.isInteger(chunkSize) ||
+    chunkSize < 1 ||
+    chunkSize > GEN3_STATIC_CHUNK_SIZE
+  ) {
+    throw new RangeError(
+      `Gen3 static searcher chunk size must be between 1 and ${GEN3_STATIC_CHUNK_SIZE}.`,
+    );
+  }
+  const chunks: Gen3StaticSearcherChunk[] = [];
+  const totalStates = gen3StaticSearcherCombinationCount(request);
+  for (let startIndex = 0, index = 0; startIndex < totalStates; index++) {
+    const stateCount = Math.min(chunkSize, totalStates - startIndex);
+    chunks.push({ index, startIndex, stateCount });
+    startIndex += stateCount;
   }
   return chunks;
 }
@@ -265,4 +365,11 @@ export function decodeGen3StaticStates(buffer: ArrayBuffer): Gen3StaticState[] {
     };
   }
   return states;
+}
+
+export function decodeGen3StaticSearcherStates(
+  buffer: ArrayBuffer,
+): Gen3StaticSearcherState[] {
+  const generated = decodeGen3StaticStates(buffer);
+  return generated.map(({ advances: seed, ...state }) => ({ seed, ...state }));
 }

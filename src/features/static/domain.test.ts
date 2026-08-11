@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   createGen3StaticChunks,
+  createGen3StaticSearcherChunks,
   decodeGen3StaticStates,
+  gen3StaticSearcherCombinationCount,
+  gen3HiddenPower,
   GEN3_STATIC_TEMPLATES,
   validateGen3StaticRequest,
   type Gen3StaticRequest,
+  type Gen3StaticSearcherRequest,
 } from "./domain";
 
 const request: Gen3StaticRequest = {
@@ -99,5 +103,34 @@ describe("Gen3 Static domain", () => {
         maxAdvances: 1,
       }),
     ).toContain("advanceRange");
+  });
+
+  it("splits the reverse IV space into deterministic chunks", () => {
+    const searcherRequest: Gen3StaticSearcherRequest = {
+      method: request.method,
+      template: request.template,
+      tid: request.tid,
+      sid: request.sid,
+      filters: {
+        ...request.filters,
+        ivMin: [30, 30, 30, 30, 30, 30],
+      },
+    };
+    expect(gen3StaticSearcherCombinationCount(searcherRequest)).toBe(64);
+    expect(createGen3StaticSearcherChunks(searcherRequest, 40)).toEqual([
+      { index: 0, startIndex: 0, stateCount: 40 },
+      { index: 1, startIndex: 40, stateCount: 24 },
+    ]);
+  });
+
+  it("calculates the Generation III Hidden Power type and strength", () => {
+    expect(gen3HiddenPower([10, 12, 22, 7, 29, 0])).toEqual({
+      type: 11,
+      power: 43,
+    });
+    expect(gen3HiddenPower([31, 31, 31, 31, 31, 31])).toEqual({
+      type: 15,
+      power: 70,
+    });
   });
 });
