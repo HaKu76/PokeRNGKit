@@ -4,8 +4,8 @@
 > - 当前阶段：阶段 1B，GitHub Pages 测试部署
 > - 当前模块：`gen3id`，第三世代 ID 乱数
 > - Git 基线：`b94f331 feat: 实现第三世代 ID 乱数模块`
-> - 工作区状态：Wasm 工具链检测修复尚未提交
-> - 部署状态：GitHub Actions 首次构建在工具链检测阶段失败，Pages 尚未部署
+> - 工作区状态：Pages 权限阻塞记录尚未提交
+> - 部署状态：工具链和站点构建已推进通过，Configure Pages 无权创建站点，Pages 尚未部署
 
 ## 1. 文档用途
 
@@ -152,6 +152,7 @@ Cloudflare job 已保留为可选路径；没有配置 `CLOUDFLARE_PROJECT_NAME`
 - `npm audit`：0 个已知漏洞
 - 修复后 `npm run verify`：格式、lint、类型、7 个测试与 Web/PWA 生产构建通过
 - `npm run wasm:doctor` 探测协议：使用临时 emsdk 命令替身时 5 项检查全部通过；该结果只验证命令编排，不代表实际 Emscripten 编译通过
+- GitHub Actions 运行 `31464729438`：工具链检测、应用验证、原生 parity 和 Wasm/Web 构建步骤已推进通过；仅 `Configure GitHub Pages` 因 GitHub Token 无权创建 Pages 站点而失败
 
 以上是工程检查，不代表项目所有者功能验收。
 
@@ -170,10 +171,8 @@ Cloudflare job 已保留为可选路径；没有配置 `CLOUDFLARE_PROJECT_NAME`
 
 ### 4.3 尚未验证
 
-- GitHub Actions 运行 `31462848222` 在 `npm run wasm:doctor` 失败：npm 的 Linux CMake/Ninja 二进制缺少可执行位，`emcmake --version` 探测也会产生误判。当前工作区已修复两处问题，等待下一次 Actions 验证。
-- Emscripten 实际生成 `gen3id.mjs` 与 `gen3id.wasm`。
-- 原生 C++ 固定夹具通过。
 - GitHub Pages 首次构建和部署。
+- GitHub Pages 站点是否已在仓库设置中启用。
 - Pages 环境中的 Worker/Wasm URL、PWA 安装和离线重载。
 - 项目所有者对三种模式、筛选、取消、CSV、三语和移动端的功能验收。
 - Cloudflare Pages 和 `hakuhiro.top` 正式域名。
@@ -214,17 +213,13 @@ fix: 修复 Wasm 工具链检测
 
 ### 5.3 GitHub Pages
 
-推送后查看仓库 `Actions -> Verify And Deploy`。工作流成功后，预计测试地址为：
+先在 GitHub 仓库 `Settings -> Pages` 中完成一次性启用：将 `Build and deployment -> Source` 设为 `GitHub Actions`。当前 Token 无权通过 API 自动创建 Pages 站点，因此 `Configure GitHub Pages` 会在未启用时失败。
+
+完成设置后，在 GitHub Desktop 推送最新提交，再查看仓库 `Actions -> Verify And Deploy`。工作流成功后，预计测试地址为：
 
 ```text
 https://haku76.github.io/PokeRNGKit/
 ```
-
-如果 Configure GitHub Pages 因仓库策略失败：
-
-1. 打开 `Settings -> Pages`。
-2. 将 `Build and deployment -> Source` 设为 `GitHub Actions`。
-3. 回到 Actions 重新运行失败工作流。
 
 不要选择从分支目录直接发布；本项目的 Wasm 和 Vite 产物由 Actions 构建后上传。
 
@@ -269,6 +264,7 @@ https://haku76.github.io/PokeRNGKit/
 
 - CI 是首次实际 Emscripten 构建，可能暴露 Linux 路径、CMake 或 Emscripten 6.0.6 参数问题。
 - Actions 运行 `31462848222` 提示 `actions/cache@v4`、`actions/checkout@v4`、`actions/setup-node@v4` 和 `mymindstorm/setup-emsdk@v14` 仍以 Node.js 20 runtime 构建并被 runner 强制使用 Node.js 24。该警告不是本次失败原因，待核实各 action 的稳定新版后统一升级。
+- GitHub Token 当前无法调用 Pages 创建接口；需要仓库所有者先在 `Settings -> Pages` 启用 GitHub Actions 来源。
 - `glob@11.1.0` 有上游弃用提示，来源为 `vite-plugin-pwa -> workbox-build`；当前审计为 0 个漏洞，等待上游升级，不使用未经验证的 override。
 - 多 Worker 会复制 Wasm 内存；低内存移动设备可能需要降低 Worker 数。
 - 取消依赖分片边界和 Worker 终止，实际延迟需要 Pages 实测。
