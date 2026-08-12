@@ -1815,6 +1815,72 @@ h1 {
 .wild-virtual-table {
   min-width: 1566px;
 }
+.gen4static-table.generator.dppt,
+.gen4static-table.generator.dppt .static-table-header,
+.gen4static-table.generator.dppt .static-table-row {
+  grid-template-columns:
+    90px 82px 108px 76px 92px 160px repeat(6, 72px) 110px 88px 92px
+    160px;
+  min-width: 1418px;
+}
+.gen4static-table.generator.hgss,
+.gen4static-table.generator.hgss .static-table-header,
+.gen4static-table.generator.hgss .static-table-row {
+  grid-template-columns:
+    90px 68px 82px 108px 76px 92px 160px repeat(6, 72px) 110px 88px 92px
+    160px;
+  min-width: 1486px;
+}
+.gen4static-table.searcher,
+.gen4static-table.searcher .static-table-header,
+.gen4static-table.searcher .static-table-row {
+  grid-template-columns:
+    100px 80px 72px 90px 108px 76px 92px 160px repeat(6, 72px) 110px 88px
+    92px 160px;
+  min-width: 1590px;
+}
+.gen4-profile-display dl {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.gen4-profile-editor {
+  width: min(680px, 100%);
+}
+.gen4-profile-checklist {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  padding: 10px;
+}
+.gen4-profile-checklist legend {
+  color: var(--muted);
+  font-size: 10px;
+}
+.gen4-unown-puzzle-grid,
+.gen4-unown-letter-grid {
+  display: grid;
+  gap: 6px;
+}
+.gen4-unown-puzzle-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.gen4-unown-letter-grid {
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+}
+.gen4-unown-puzzle-grid label,
+.gen4-unown-letter-grid label {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  color: var(--text);
+  font-size: 10px;
+}
+.gen4-unown-puzzle-grid input,
+.gen4-unown-letter-grid input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--brand);
+}
 .checkbox-field,
 .nature-check-grid label {
   display: flex;
@@ -2229,6 +2295,9 @@ h1 {
   }
   .profile-actions .danger-action {
     margin-left: 0;
+  }
+  .gen4-unown-letter-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
   .alert {
     margin-left: 16px;

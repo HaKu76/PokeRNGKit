@@ -1,0 +1,13 @@
+{
+  "id": "gen4static",
+  "generation": 4,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen4static",
+  "operations": ["generator", "searcher"],
+  "artifacts": {
+    "loader": "gen4static.mjs",
+    "wasm": "gen4static.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen IV StaticGenerator4/StaticSearcher4"
+}

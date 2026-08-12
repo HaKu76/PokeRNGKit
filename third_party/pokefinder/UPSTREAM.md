@@ -5,7 +5,7 @@
 - 本地核验来源：`C:\Users\Hakuhiro\Desktop\PokeFinder-master`
 - 导入日期：2026-08-11
 - 许可证：GNU GPL v3 or later
-- 导入范围：第三世代 ID Generator 所需的最小 Core、共享 LCRNG、ID 状态与筛选父类；Static、Wild、IVs to PID 与 Egg 以独立 bridge 对照上游源码实现；Encounter Lookup 以静态生成数据对照上游行为
+- 导入范围：第三世代 ID Generator 所需的最小 Core、共享 LCRNG、ID 状态与筛选父类；G3 Static、Wild、IVs to PID、Egg 与 G4 Static 以独立 bridge 对照上游源码实现；Encounter Lookup 以静态生成数据对照上游行为
 
 本地核验目录不是构建依赖。PokeRNGKit 构建只使用本目录内的 vendored snapshot；所有文件保留原始版权与 GPL 头部。
 
@@ -146,6 +146,40 @@ FE6A55570119A253DBD69946D86648E25910687D3B851CD92D4213548C028BE2  RNGRecovertest
 `wasm/modules/gen3egg/bridge/gen3egg_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `EggGenerator3`、`EggState3` 与 `Daycare` 的调用顺序提供第三世代 Egg Generator C ABI、亲代遗传、筛选和二进制结果布局；不修改 vendored 上游文件。
 
 `src/features/encounterlookup` 不复制或修改上游 Core；它使用由 EncounterTableGenerator 二进制资源生成的静态数据，并在 TypeScript domain 中复现上游 Encounter Lookup 的版本、图鉴上限、特殊遭遇组合和等级范围映射。
+
+## Gen IV Static 只读核验
+
+`wasm/modules/gen4static/bridge/gen4static_bridge.cpp` 使用 vendored `LCRNG.hpp`，并对照以下 PokeFinder 4.3.2 文件实现第四世代 Static Generator/Searcher 的独立 C ABI、筛选和固定宽度结果布局：
+
+```text
+Core/Gen4/Generators/StaticGenerator4.cpp
+Core/Gen4/Searchers/StaticSearcher4.cpp
+Core/Gen4/States/State4.hpp
+Core/RNG/LCRNG.hpp
+Core/RNG/LCRNGReverse.cpp
+Core/Util/Utilities.hpp
+Form/Gen4/Static4.cpp
+Form/Gen4/Static4.ui
+Form/Controls/TextBox.cpp
+Form/i18n/PokeFinder_zh.ts
+Test/Gen4/StaticGenerator4Test.cpp
+Test/Gen4/StaticSearcher4Test.cpp
+Test/Gen4/static4.json
+```
+
+- PokeFinder revision：`dd00fe7`。
+- EncounterTableGenerator Gen4 revision：`9a2ed62`。
+- `scripts/generate_gen4_static_data.mjs` 生成 99 条 `src/features/gen4static/encounters.ts` 定点模板。
+- `scripts/generate_gen4_iv_data.mjs` 生成 `src/features/gen4ivcalculator/gen4IvData.ts` 的个人数据和多语言显示资源。
+- G4 存档使用 IndexedDB 记录 `gen4-profiles` 与 localStorage 镜像 `pokerngkit-gen4-profiles-v1`；存档面板和 IV 计算器分别使用 `pokerngkit-gen4-profile-panel-expanded`、`pokerngkit-gen4-iv-calculator-expanded`，不复用 G3 键。
+
+### PokemonRNGGuides 交叉参考
+
+- 参考项目：[zaksabeast/PokemonRNGGuides](https://github.com/zaksabeast/PokemonRNGGuides)
+- 固定 revision：`c0b2bb664f04a4ef052e6dd4d831351703fa4047`
+- 核对范围：`rng_tools/src/generators/gen4/stationary/` 的 Generator/Searcher 分层，以及 `src/rngToolsUi/workbench/tools/gen4/static/` 的 React 工作台流程。
+- 使用结论：用于交叉核对 Method 1/J/K 路径、`iv1`/`iv2` 顺序读取、IV Seed 恢复与 SeedFilters 分层；定点模板、控件语义、推进数边界和固定结果仍以 PokeFinder `dd00fe7` 为准。
+- 集成边界：不复制、不编译、不 vendoring PokemonRNGGuides 源码，不把其 Rust 或 React 文件作为 PokeRNGKit 构建输入。
 
 ## IVs to PID 只读核验
 
