@@ -11,9 +11,9 @@ describe("Encounter Lookup domain", () => {
     expect(getEncounterLookupSpecies("ruby", "en")).toHaveLength(386);
     expect(getEncounterLookupSpecies("diamond", "en")).toHaveLength(493);
     expect(getEncounterLookupSpecies("black", "en")).toHaveLength(649);
-    expect(
-      getEncounterLookupSpecies("brilliant-diamond", "en"),
-    ).toHaveLength(493);
+    expect(getEncounterLookupSpecies("brilliant-diamond", "en")).toHaveLength(
+      493,
+    );
   });
 
   it("contains query data for every PokeFinder Encounter Lookup game", () => {

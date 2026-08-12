@@ -39,7 +39,12 @@ export const ENCOUNTER_LOOKUP_GAMES: readonly EncounterLookupGameOption[] = [
   { game: "pearl", generation: 4, locationGroup: "dppt", maxSpecies: 493 },
   { game: "platinum", generation: 4, locationGroup: "dppt", maxSpecies: 493 },
   { game: "heart-gold", generation: 4, locationGroup: "hgss", maxSpecies: 493 },
-  { game: "soul-silver", generation: 4, locationGroup: "hgss", maxSpecies: 493 },
+  {
+    game: "soul-silver",
+    generation: 4,
+    locationGroup: "hgss",
+    maxSpecies: 493,
+  },
   { game: "black", generation: 5, locationGroup: "bw", maxSpecies: 649 },
   { game: "white", generation: 5, locationGroup: "bw", maxSpecies: 649 },
   { game: "black-2", generation: 5, locationGroup: "bw2", maxSpecies: 649 },

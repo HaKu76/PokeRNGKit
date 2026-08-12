@@ -8,12 +8,12 @@
 
 “全世代”在本模块中仅指 PokeFinder 4.3.2 `Encounter Lookup` 实际支持的版本，不代表 PokeRNGKit 的 RNG Generator/Searcher 整体扩展到这些世代。当前支持：
 
-| 世代 | 游戏版本 | 图鉴上限 |
-| --- | --- | ---: |
-| III | Ruby、Sapphire、FireRed、LeafGreen、Emerald | 386 |
-| IV | Diamond、Pearl、Platinum、HeartGold、SoulSilver | 493 |
-| V | Black、White、Black 2、White 2 | 649 |
-| VIII | Brilliant Diamond、Shining Pearl | 493 |
+| 世代 | 游戏版本                                        | 图鉴上限 |
+| ---- | ----------------------------------------------- | -------: |
+| III  | Ruby、Sapphire、FireRed、LeafGreen、Emerald     |      386 |
+| IV   | Diamond、Pearl、Platinum、HeartGold、SoulSilver |      493 |
+| V    | Black、White、Black 2、White 2                  |      649 |
+| VIII | Brilliant Diamond、Shining Pearl                |      493 |
 
 不额外加入第六、七世代或 Sword/Shield。
 

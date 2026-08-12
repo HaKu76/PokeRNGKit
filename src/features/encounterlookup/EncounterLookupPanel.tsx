@@ -8,10 +8,7 @@ import {
   type EncounterLookupResult,
   type EncounterLookupType,
 } from "./domain";
-import type {
-  EncounterLookupGame,
-  EncounterLookupLanguage,
-} from "./data";
+import type { EncounterLookupGame, EncounterLookupLanguage } from "./data";
 
 const ENCOUNTER_LABELS: Record<EncounterLookupType, string> = {
   0: "encounterLookupGrass",

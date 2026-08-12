@@ -6,7 +6,7 @@
 > - Git 基线：`c48eb28 fix: 修复第三世代孵化构建与分片验证`
 > - 工作区状态：存在未提交的遇敌查询源码、静态数据与文档；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
-> - 验收状态：历史基线已完成本机工程检查、原生夹具与 Wasm 发布构建；遇敌查询未运行工程检查、浏览器检查或项目所有者验收
+> - 验收状态：遇敌查询已完成本机格式、lint、类型检查与定向单元测试；未完成完整 CI、部署页面回归或项目所有者验收
 
 ## 0. 当前工作区优先状态
 
@@ -109,7 +109,12 @@
 
 - 已完成：源码、生成数据结构、上游 16 个版本、世代图鉴上限、翻译词条与悬浮工具状态的静态审查。
 - 已确认：生成数据包含 16 个游戏键，等级范围未发现反向值或超过 100 的记录；该结论来自生成阶段的静态数据检查，不是测试或浏览器验收。
-- 未运行：`git diff --check`、Prettier、ESLint、TypeScript、Vitest、Vite 构建、Wasm、浏览器、性能、部署页面和项目所有者验收；原因是本轮未获具体检查授权。
+- 已通过：`npm exec prettier -- --check docs/modules/encounterlookup.md src/features/encounterlookup/domain.test.ts src/features/encounterlookup/domain.ts src/features/encounterlookup/EncounterLookupPanel.tsx`，修复 Actions run `31581467290` / job `94065275478` 指出的四个未格式化文件；随后 `npm run format:check` 全仓库通过。
+- 已通过：`npm run typecheck`。
+- 已通过：`npm run lint`；仅保留既有 `Gen3EggPanel.tsx` 与 `Gen3WildPanel.tsx` 的两条 TanStack Virtual / React Compiler 非阻断 warning。
+- 已通过：`npm test -- --run src/features/encounterlookup/domain.test.ts`，1 个文件、3 项测试通过。
+- 已通过：`git diff --check`。
+- 未运行：完整 `npm run verify`、Vite 构建、Wasm、浏览器、性能、部署页面和项目所有者验收；完整 CI 仍需在提交后的 Actions 中复核。
 
 ## 6. 已知风险与边界
 
