@@ -268,35 +268,6 @@ function personal(species: number) {
   return { genderRatio: value[0], type1: value[1], type2: value[2] };
 }
 
-function displayLocation(
-  language: string,
-  location: Pick<RawLocation, "name" | "zhName">,
-) {
-  if (language !== "zh") return location.name;
-  if (location.zhName !== location.name) return location.zhName;
-  const { name } = location;
-  if (/^Mt\. Pyre [1-3]F$/.test(name)) return "送神山1F-3F";
-  if (/^Mt\. Pyre [4-6]F$/.test(name)) return "送神山4F-6F";
-  if (/^Seafloor Cavern/.test(name)) return "海底洞窟";
-  if (/^Cave Of Origin/.test(name)) return "觉醒神殿1F-B3F";
-  if (/^Shoal Cave/.test(name))
-    return name.includes("Ice") ? "浅滩洞穴（冰之房间）" : "浅滩洞穴";
-  if (/^Abandoned Ship/.test(name)) return "弃船";
-  if (/^Magma Hideout/.test(name)) return "熔岩队基地";
-  if (/^Mirage Tower/.test(name)) return "幻影之塔";
-  if (/^Artisan Cave/.test(name)) return "工匠之穴";
-  if (/^Victory Road [13]F$/.test(name)) return "冠军之路1F/3F";
-  if (/^Pok.mon Mansion/.test(name)) return "宝可梦屋1F-3F";
-  if (/^Pok.mon Tower [45]F$/.test(name)) return "宝可梦塔4F-5F";
-  if (/^Mt\. Ember Summit Path [13]F$/.test(name))
-    return "灯火山（山腰洞窟）1F/3F";
-  if (/^Four Island Icefall Cave/.test(name)) return "冻瀑洞窟1F/B1F";
-  if (/^Five Island Lost Cave/.test(name)) return "不归之穴";
-  if (name === "Route 21 North") return "21号道路（北）";
-  if (name === "Route 21 South") return "21号道路（南）";
-  return name;
-}
-
 function buildArea(
   version: Gen3Profile["version"],
   location: RawLocation,
