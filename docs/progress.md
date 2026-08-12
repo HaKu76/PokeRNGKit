@@ -1,10 +1,10 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：合并 IVs to PID Worker 格式修复
-> - 当前模块：`gen3ivtopid`
-> - Git 基线：`ff16a5f merge: 合并第三世代野生检索功能`
-> - 工作区状态：正在合并 `origin/main` 的 `05aed435 fix: 修复 IVs to PID Worker 格式`；仅 `docs/progress.md` 发生内容冲突，已在工作目录解决，待项目所有者暂存并创建 merge commit
+> - 当前阶段：修复第三世代 Wild 面板 TypeScript 检查
+> - 当前模块：`gen3wild`
+> - Git 基线：`bc367aa fix: 修复 IVs to PID Worker 格式`
+> - 工作区状态：存在未提交的 Wild 面板静态修复；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
 > - 验收状态：本轮未运行工程检查、原生夹具、Wasm 构建、浏览器检查或算法验收
 
@@ -14,6 +14,7 @@
 - 当前正把远端 `05aed435` 的 `gen3ivtopid` Worker Prettier 格式修复合并到该基线；除本文件外，远端变更均已进入合并暂存区，必须一并保留。
 - Actions job `94007197147`：`npm run verify` 在 `prettier --check .` 阶段因 `src/features/ivtopid/worker/gen3ivtopid.worker.ts` 未按 Prettier 换行失败；远端提交已格式化该文件，本轮未运行本地 `verify` 复核。
 - Actions run `31564813848` / job `94014371292`：`build` 因 `src/features/wild/Gen3WildPanel.tsx` 的未使用 `displayLocation` 函数触发 ESLint 失败，部署步骤被跳过；已从工作目录移除该无调用点函数，未运行本地 `verify` 复核。
+- Actions run `31565396316` / job `94016055981`：`Verify TypeScript application` 失败，Wasm、原生夹具与部署均未执行。静态检查发现 `Gen3WildPanel.tsx` 含重复的 Ability/Gender 类型导入、`WildOperation` 类型别名和 `columns` 声明；已移除重复声明，未运行本地 `verify` 复核。
 - 当前模块集合：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`。
 - Egg 阶段已完成静态源码与上游文件核对、`git diff --check`、仓库 Markdown 本地链接与新文件尾随空白检查。当前合并未运行 npm、CMake、测试、原生夹具、Wasm 构建、UI 预览、浏览器或性能检查。
 - 算法验收规则不变：GitHub Actions 部署成功后，由项目所有者提供实际生产 URL 并明确授权，才可在该页面使用已记录夹具回归。Actions、本地 Wasm、UI 预览和工程检查都不能替代算法验收。
@@ -30,9 +31,9 @@
 
 ### 下一位开发者第一步
 
-1. 阅读 [`AGENTS.md`](../AGENTS.md)、[AI 开发一致性指南](ai-development.md)、本文、[Gen 3 IVs to PID](modules/gen3ivtopid.md) 和 [PokeFinder 上游记录](../third_party/pokefinder/UPSTREAM.md)。
-2. 在 GitHub Desktop 审查本次 merge 的所有暂存变更，确认 `docs/progress.md` 没有冲突标记且 `gen3ivtopid.worker.ts` 仅包含格式变更；不要覆盖或重置已有工作区内容。
-3. 由项目所有者创建并推送 merge commit，等待 GitHub Actions 重新执行 `npm run verify`、构建六个 Gen III Wasm 模块并部署 Pages。
+1. 阅读 [`AGENTS.md`](../AGENTS.md)、[AI 开发一致性指南](ai-development.md)、本文、[Gen 3 Wild](modules/gen3wild.md) 和 [PokeFinder 上游记录](../third_party/pokefinder/UPSTREAM.md)。
+2. 在 GitHub Desktop 审查 `Gen3WildPanel.tsx` 的未提交静态修复，确认仅移除重复声明和无调用点函数；不要覆盖或重置已有工作区内容。
+3. 由项目所有者提交并推送修复，等待 GitHub Actions 重新执行 `npm run verify`、构建六个 Gen III Wasm 模块并部署 Pages。
 4. Actions 部署成功后，项目所有者提供生产 URL 并明确授权；再使用 Egg、Wild、IVs to PID 和 Initial Seed 文档中的固定输入共同回归，并记录 URL、commit、Actions run、浏览器版本、输入、预期和实际结果。
 
 ## 当前可用模块
@@ -80,8 +81,8 @@
 
 ## 后续验收
 
-- 当前分支：`main`，HEAD `ff16a5f merge: 合并第三世代野生检索功能`。
-- 当前正在合并 `05aed435 fix: 修复 IVs to PID Worker 格式`；`docs/progress.md` 的内容冲突已在工作目录解决，仍待项目所有者创建 merge commit。
+- 当前分支：`main`，HEAD `bc367aa fix: 修复 IVs to PID Worker 格式`。
+- 当前无待完成 merge；Wild 面板静态修复保持未提交。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线

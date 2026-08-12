@@ -30,8 +30,6 @@ import {
   type Gen3WildFilters,
   type Gen3WildGenderFilter,
   type Gen3WildItem,
-  type Gen3WildAbilityFilter,
-  type Gen3WildGenderFilter,
   type Gen3WildLead,
   type Gen3WildMethod,
   type Gen3WildRequest,
@@ -56,7 +54,6 @@ import { Gen3WildWorkerPool } from "./worker/Gen3WildWorkerPool";
 type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
 type WildOperation = "generator" | "searcher";
 type DataGame = "ruby" | "sapphire" | "emerald" | "fire-red" | "leaf-green";
-type WildOperation = "generator" | "searcher";
 type IvKey =
   "hp" | "attack" | "defense" | "specialAttack" | "specialDefense" | "speed";
 type SortKey =
@@ -433,7 +430,6 @@ export function Gen3WildPanel({
       profile.version === "emerald");
   const leadAvailable = profile.version === "emerald";
   const fullEncounterSlotMask = area ? (1 << area.slots.length) - 1 : 0;
-  const columns = useMemo(() => wildColumns(operation), [operation]);
   const activeIvRanges = ivRanges[operation];
   const natureOptions = natureKeys.map((key, value) => ({
     label: t(key),
