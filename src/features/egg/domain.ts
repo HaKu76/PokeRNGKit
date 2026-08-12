@@ -106,10 +106,13 @@ export function eggGameToWasm(game: Gen3EggGame) {
 }
 
 export function eggMethodToWasm(game: Gen3EggGame, method: Gen3EggMethod) {
-  const code =
-    game === "emerald"
-      ? { normal: 0, split: 1, alternate: 2 }[method]
-      : { normal: 3, split: 4, alternate: 5, mixed: 6 }[method];
+  if (game === "emerald") {
+    if (method === "normal") return 0;
+    if (method === "split") return 1;
+    if (method === "alternate") return 2;
+    throw new RangeError(`Invalid ${game} egg method: ${method}.`);
+  }
+  const code = { normal: 3, split: 4, alternate: 5, mixed: 6 }[method];
   if (code === undefined) {
     throw new RangeError(`Invalid ${game} egg method: ${method}.`);
   }

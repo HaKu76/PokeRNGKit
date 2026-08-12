@@ -187,72 +187,6 @@ const gameData = GEN3_ENCOUNTERS as unknown as Record<
   readonly RawLocation[]
 >;
 
-function MultiCheckSelect({
-  anyLabel,
-  label,
-  mask,
-  onChange,
-  options,
-}: MultiCheckSelectProps) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const fullMask = options.reduce(
-    (value, option) => value | (1 << option.value),
-    0,
-  );
-  const selected = options.filter(
-    (option) => (mask & (1 << option.value)) !== 0,
-  );
-  const summary =
-    mask === 0 || mask === fullMask
-      ? anyLabel
-      : selected.map((option) => option.label).join(", ");
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
-  }, [open]);
-
-  return (
-    <div className="field multi-check-field" ref={rootRef}>
-      <span>{label}</span>
-      <button
-        aria-expanded={open}
-        className="multi-check-trigger"
-        onClick={() => setOpen((current) => !current)}
-        type="button"
-      >
-        <span>{summary}</span>
-        <span aria-hidden="true">▾</span>
-      </button>
-      {open && (
-        <div className="multi-check-menu">
-          {options.map((option) => (
-            <label key={option.value}>
-              <input
-                checked={(mask & (1 << option.value)) !== 0}
-                onChange={(event) =>
-                  onChange(
-                    event.target.checked
-                      ? mask | (1 << option.value)
-                      : mask & ~(1 << option.value),
-                  )
-                }
-                type="checkbox"
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function dataGame(version: Gen3Profile["version"]): DataGame {
   if (version === "firered") return "fire-red";
   if (version === "leafgreen") return "leaf-green";
@@ -337,7 +271,6 @@ export function Gen3WildPanel({
   const tableRef = useRef<HTMLDivElement>(null);
   const [operation, setOperation] = useState<WildOperation>("generator");
   const [encounter, setEncounter] = useState<Gen3WildEncounter>("land");
-  const [operation, setOperation] = useState<WildOperation>("generator");
   const [locationIndex, setLocationIndex] = useState(0);
   const [selectedSpecies, setSelectedSpecies] = useState(0);
   const [method, setMethod] = useState<Gen3WildMethod>("method1");
@@ -474,8 +407,6 @@ export function Gen3WildPanel({
     // Result values can be derived from the active stat display mode.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [results, showStats, sort]);
-  // TanStack Virtual exposes an imperative virtualizer object by design.
-  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: sortedResults.length,
     getScrollElement: () => tableRef.current,
@@ -492,9 +423,8 @@ export function Gen3WildPanel({
   );
   useEffect(() => {
     setLocationIndex(0);
-    setPokemonSlot("any");
-    setSpecies(0);
-    setSlotMask(0);
+    setSelectedSpecies(0);
+    setEncounterSlotMask(0);
     setFeebasTile(false);
     setBike(false);
     setItem("none");
