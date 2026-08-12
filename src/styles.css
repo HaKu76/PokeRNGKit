@@ -2001,6 +2001,64 @@ h1 {
   padding: 20px;
   border-bottom: 1px solid var(--line);
 }
+.encounter-lookup-pokemon-field {
+  position: relative;
+}
+.autocomplete-combobox {
+  position: relative;
+}
+.autocomplete-combobox input {
+  padding-right: 42px;
+}
+.autocomplete-combobox-trigger {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 38px;
+  height: calc(100% - 2px);
+  border: 0;
+  border-left: 1px solid var(--line);
+  background: var(--control-bg);
+  color: var(--muted);
+  cursor: pointer;
+}
+.autocomplete-combobox-trigger:hover {
+  color: var(--text);
+}
+.autocomplete-combobox-menu {
+  position: absolute;
+  z-index: 4;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: min(320px, calc(100vh - 230px));
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 12px 28px rgba(9, 10, 24, 0.22);
+}
+.autocomplete-combobox-menu button {
+  display: block;
+  width: 100%;
+  min-height: 36px;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+  color: var(--text);
+  padding: 8px 11px;
+  text-align: left;
+  cursor: pointer;
+}
+.autocomplete-combobox-menu button:last-child {
+  border-bottom: 0;
+}
+.autocomplete-combobox-menu button:hover,
+.autocomplete-combobox-menu button.active {
+  background: var(--surface-2);
+}
+.autocomplete-combobox-menu button[aria-selected="true"] {
+  box-shadow: inset 3px 0 0 var(--amber);
+}
 .encounter-lookup-submit {
   min-width: 88px;
   justify-content: center;

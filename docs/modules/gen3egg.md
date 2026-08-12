@@ -71,6 +71,8 @@ RS/FRLG Mixed:       iv1 skip 0, iv2 skip 0, inheritance skip 2
 
 浏览器的额外保护不改变上游字段含义：总状态数为 `(Held Max + 1) * (Pickup Max + 1) * Redraw count`，上限为 `150,060,006`，恰好容纳 PokeFinder Emerald 默认 `5000 / 5000 / 0..5`。每次 C ABI 调用还限制为 `100,000` 个 Held/Pickup/Redraw 组合；Worker 以 Held 范围切分后运行。
 
+蛋种类选择使用 `AutoCompleteComboBox.tsx`，对应 PokeFinder `Form/Controls/EggSettings.cpp:75` 的 `enableAutoComplete()` 调用；其可编辑、包含匹配、弹出候选和 `NoInsert` 行为与遇敌查询及个体值计算器一致。
+
 ## 4. Wasm 与 Worker 边界
 
 `wasm/modules/gen3egg` 是独立 CMake target 和 `module.json`，API 版本为 1。C ABI 使用 54 个 `uint32_t` 请求字，并返回 22 个 `uint32_t`、88 字节的连续记录：

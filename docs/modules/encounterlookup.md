@@ -21,7 +21,7 @@
 
 上游 `EncounterLookup.ui` 只有 `Pokémon`、`Game` 和 `Find` 三项控件，没有数值输入，因此不存在 `min`、`max` 或 `maxLength` 范围。`Game` 按上游固定顺序提供 16 个版本；切换版本时，`Pokémon` 候选按世代上限重建。
 
-上游 `ComboBox::enableAutoComplete()` 将宝可梦控件设为可编辑、`QComboBox::NoInsert`，补全使用包含匹配和弹出列表。本实现使用原生输入框与 `datalist` 提供候选；提交时只接受当前游戏候选中的精确物种名称，不接受不存在的自由文本。
+上游 `ComboBox::enableAutoComplete()` 将宝可梦控件设为可编辑、`QComboBox::NoInsert`，补全使用包含匹配和弹出列表。本实现使用受控组合框复现点击展开、包含匹配、弹出候选、方向键移动和 Enter 选择；提交时只接受当前游戏候选中的精确物种名称，不接受不存在的自由文本。
 
 控件标签遵循上游翻译规则：简体中文逐字使用 `PokeFinder_zh.ts` 的 `遇敌查询`、`宝可梦`、`游戏`、`查找`、`地点`、`遇敌种类`、`等级范围`、`草丛`、`冲浪`、`破旧钓竿`、`好钓竿`、`厉害钓竿`、`碎岩`、`撞树` 和 `捕虫大赛`；英文保持上游源标签；日文对应词条在上游为 unfinished 时保留英文。
 
@@ -57,7 +57,7 @@ python scripts\generate_encounter_lookup_data.py `
 
 ## 5. 实现边界
 
-`src/features/encounterlookup/domain.ts` 负责游戏版本、物种上限、语言资源和查询结果映射；`EncounterLookupPanel.tsx` 负责悬浮面板、候选输入、查询和结果表。个体值计算器与遇敌查询互斥展开，避免右下角工具重叠。
+`src/features/encounterlookup/domain.ts` 负责游戏版本、物种上限、语言资源和查询结果映射；`EncounterLookupPanel.tsx` 负责悬浮面板、候选输入、查询和结果表。`AutoCompleteComboBox.tsx` 复用 PokeFinder 的包含匹配、弹出补全和 `NoInsert` 行为；右下角的存档信息、个体值计算器和遇敌查询由 `App.tsx` 统一协调，任意展开一个会收起另外两个。
 
 本模块是用户明确批准的跨世代静态查询例外，不改变 `AGENTS.md` 中“RNG 算法模块先实现第三世代”的长期边界；后续世代 RNG 算法仍需单独决策和上游核对。
 
@@ -76,4 +76,8 @@ python scripts\generate_encounter_lookup_data.py `
 - `Form/i18n/PokeFinder_zh.ts`
 - `Form/i18n/PokeFinder_ja.ts`
 
-仓库内静态边界夹具位于 `src/features/encounterlookup/domain.test.ts`。本轮未获工程检查授权，因此未运行测试、构建、lint、typecheck 或浏览器检查；部署页面回归和项目所有者最终验收仍待后续完成。
+仓库内静态边界夹具位于 `src/features/encounterlookup/domain.test.ts`。本轮已核对上游 `Form/Util/EncounterLookup.cpp:57` 和 `Form/Controls/ComboBox.cpp:30`；`ComboBox::enableAutoComplete()` 使用可编辑、`NoInsert`、`MatchContains` 与 `PopupCompletion`。
+
+2026-08-12 经项目所有者授权，在外部 Chrome 对 `https://haku76.github.io/PokeRNGKit/` 的 `index-DC2qWhx2.js` 做了生产数据抽样：Emerald 的皮卡丘返回 Safari Zone Area 1/2 草丛 `25-27`，Diamond 与 Brilliant Diamond 均返回 Trophy Garden 草丛 `18-18`，Black 的皮卡丘返回空集。生产页仍是旧的 `datalist` 控件，只有通过原生候选的方向键/Enter 才会提交当前物种，鼠标候选弹窗不可验收；本地 UI 已验证新的受控组合框可点击展开、包含筛选、方向键/Enter 选择和无效自由文本保留当前有效物种。
+
+已通过：定向 Prettier、`npm run typecheck`、`npm run lint`（仅既有两条 TanStack Virtual warning）和 `src/features/encounterlookup/domain.test.ts` 的 3 项测试。完整 `npm run verify` 与部署后生产交互复验记录见 `docs/progress.md`；项目所有者最终验收仍待完成。

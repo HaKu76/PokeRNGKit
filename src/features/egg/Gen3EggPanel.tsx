@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
+import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { formatHex, parseDecimal, parseHex } from "../id/domain";
 import type { Gen3Profile } from "../profiles/domain";
 import { getGen3AbilityName } from "../shared/gen3Abilities";
@@ -187,6 +188,11 @@ export function Gen3EggPanel({
   const [maxRedraws, setMaxRedraws] = useState("5");
   const [compatibility, setCompatibility] = useState<20 | 50 | 70>(70);
   const [species, setSpecies] = useState(1);
+  const [speciesInput, setSpeciesInput] = useState({
+    language: i18n.language,
+    species: 1,
+    text: getGen3Species(i18n.language)[0]?.name ?? "",
+  });
   const [parentA, setParentA] = useState<Gen3EggParent>(emptyParent);
   const [parentB, setParentB] = useState<Gen3EggParent>({
     ...emptyParent(),
@@ -232,6 +238,18 @@ export function Gen3EggPanel({
   }>({ key: "advances", direction: "asc" });
 
   const personal = getGen3Personal(species);
+  const eggSpeciesOptions = useMemo(
+    () =>
+      getGen3Species(i18n.language).filter((entry) =>
+        GEN3_EGG_ALLOWED_SPECIES.has(entry.id),
+      ),
+    [i18n.language],
+  );
+
+  const displayedSpecies =
+    speciesInput.language === i18n.language && speciesInput.species === species
+      ? speciesInput.text
+      : (eggSpeciesOptions.find((entry) => entry.id === species)?.name ?? "");
   const alternateGenderRatio =
     species === 29
       ? getGen3Personal(32).genderRatio
@@ -831,18 +849,23 @@ export function Gen3EggPanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("eggSpecies")}</span>
-              <select
-                onChange={(event) => setSpecies(Number(event.target.value))}
+              <AutoCompleteComboBox
+                inputValue={displayedSpecies}
+                label={t("eggSpecies")}
+                onInputChange={(text) =>
+                  setSpeciesInput({
+                    language: i18n.language,
+                    species,
+                    text,
+                  })
+                }
+                onValueChange={setSpecies}
+                options={eggSpeciesOptions.map((entry) => ({
+                  label: entry.name,
+                  value: entry.id,
+                }))}
                 value={species}
-              >
-                {getGen3Species(i18n.language)
-                  .filter((entry) => GEN3_EGG_ALLOWED_SPECIES.has(entry.id))
-                  .map((entry) => (
-                    <option key={entry.id} value={entry.id}>
-                      {entry.name}
-                    </option>
-                  ))}
-              </select>
+              />
             </label>
             {parentPanel("a", parentA)}
             {parentPanel("b", parentB)}

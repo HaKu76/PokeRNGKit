@@ -60,6 +60,8 @@ Stat = floor((base + 5) * NatureModifier)
 
 个体值反推只枚举每项 32 个确定值，属于轻量工具逻辑，使用 TypeScript 可以直接复用到 Static 的“显示能力值”视图并保持即时响应。生产 RNG 算法仍保留在 C++/Emscripten Wasm Worker；本模块不改变该架构边界。
 
+宝可梦选择使用 `AutoCompleteComboBox.tsx`。其行为对应 PokeFinder `Form/Util/IVCalculator.cpp:39` 调用的 `ComboBox::enableAutoComplete()`：可编辑、禁止自由项插入、包含匹配与弹出候选。2026-08-12 的本地 UI 验收中，输入 `皮卡丘` 后可由候选列表和方向键/Enter 选择；生产页的值反推固定输入也已在外部 Chrome 验证。
+
 ## 7. 上游与验证入口
 
 主要上游文件：
@@ -88,3 +90,5 @@ npm run dev:ui
 ```
 
 自动化浏览器冒烟只验证界面交互和确定性计算；最终输入与结果验收由项目所有者执行。
+
+生产页 `https://haku76.github.io/PokeRNGKit/` 已验证：新增行后为两行、删除后回到一行；妙蛙种子、Lv.100、勤奋性格、能力值 `231/134/134/166/166/126` 返回六项 IV 均为 `31`，下一级均为 `100`。当前生产包仍待部署自动完成控件，候选点击交互须随本轮变更重新验收。

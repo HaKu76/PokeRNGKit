@@ -37,6 +37,8 @@
 
 `Initial Advances + Offset + Max Advances` 不得超过 `0xFFFFFFFF`。Generator 的 `Max Advances` 包含起点，状态总数为 `Max Advances + 1`，TypeScript 分片上限为 100,000 个状态。
 
+Generator/Searcher 的地点选择使用 `AutoCompleteComboBox.tsx`，对应 PokeFinder `Form/Gen3/Wild3.cpp:102-103` 的 `enableAutoComplete()` 调用；地点可点击展开完整候选，并使用包含匹配、弹出候选、方向键/Enter 选择和 `NoInsert` 语义。
+
 Searcher 不接收 Seed 或推进范围。它按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 枚举 IV 笛卡尔积，总组合不得超过 50,000,000，TypeScript 分片上限为 10,000 个组合。C ABI 对 Generator 状态和 Searcher 组合保留 100,000 的单次防御上限；单任务最多保留 250,000 条结果。
 
 全不选或全选的 CheckList 语义与 PokeFinder 一致：界面显示 `Any`，请求层发送完整掩码。定点与野生共用的多选控件均支持 `Ctrl + Click` 一键清空勾选并回到 `Any`。Ctrl 点击 IV 标签设置 `31..31`，Alt 设置 `30..31`，Ctrl+Alt 设置 `0..0`，普通点击恢复 `0..31`。

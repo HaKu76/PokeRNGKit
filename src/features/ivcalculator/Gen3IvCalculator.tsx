@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
+import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { getGen3Personal } from "../shared/gen3Personal";
 import { getGen3Species, getGen3SpeciesName } from "../shared/gen3Species";
 import type { Gen3StatValues } from "../shared/gen3Stats";
@@ -95,6 +96,11 @@ export function Gen3IvCalculator({
   const panelRef = useRef<HTMLElement>(null);
   const nextRowId = useRef(2);
   const [species, setSpecies] = useState(1);
+  const [speciesInput, setSpeciesInput] = useState({
+    language: i18n.language,
+    species: 1,
+    text: getGen3Species(i18n.language)[0]?.name ?? "",
+  });
   const [form, setForm] = useState(0);
   const [nature, setNature] = useState(-1);
   const [hiddenPower, setHiddenPower] = useState(-1);
@@ -107,6 +113,11 @@ export function Gen3IvCalculator({
   );
   const formCount = species === 386 ? 4 : 1;
   const personal = getGen3Personal(species, form);
+
+  const displayedSpecies =
+    speciesInput.language === i18n.language && speciesInput.species === species
+      ? speciesInput.text
+      : (speciesOptions.find((entry) => entry.id === species)?.name ?? "");
 
   useEffect(() => {
     if (!expanded) return;
@@ -202,19 +213,26 @@ export function Gen3IvCalculator({
             </label>
             <label className="field calculator-pokemon-field">
               <span>{t("pokemon")}</span>
-              <select
-                onChange={(event) => {
-                  setSpecies(Number(event.target.value));
+              <AutoCompleteComboBox
+                inputValue={displayedSpecies}
+                label={t("pokemon")}
+                onInputChange={(text) =>
+                  setSpeciesInput({
+                    language: i18n.language,
+                    species,
+                    text,
+                  })
+                }
+                onValueChange={(value) => {
+                  setSpecies(value);
                   setForm(0);
                 }}
+                options={speciesOptions.map((entry) => ({
+                  label: entry.name,
+                  value: entry.id,
+                }))}
                 value={species}
-              >
-                {speciesOptions.map((entry) => (
-                  <option key={entry.id} value={entry.id}>
-                    {entry.name}
-                  </option>
-                ))}
-              </select>
+              />
             </label>
             {formCount > 1 && (
               <label className="field">

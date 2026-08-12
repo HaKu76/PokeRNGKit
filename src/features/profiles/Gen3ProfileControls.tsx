@@ -29,16 +29,6 @@ const versionKeys: Record<Gen3GameVersion, string> = {
   colosseum: "gameColosseum",
 };
 
-const PROFILE_PANEL_EXPANDED_KEY = "pokerngkit-gen3-profile-panel-expanded";
-
-function initialProfilePanelExpanded() {
-  try {
-    return localStorage.getItem(PROFILE_PANEL_EXPANDED_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
-
 interface ProfileEditorProps {
   original?: Gen3Profile;
   onCancel(): void;
@@ -347,15 +337,18 @@ function ProfileManager({ controller, onClose }: ProfileManagerProps) {
 interface Gen3ProfileControlsProps {
   controller: Gen3ProfilesController;
   compatibleVersions: "all" | "handheld";
+  expanded: boolean;
+  onExpandedChange(expanded: boolean): void;
 }
 
 export function Gen3ProfileControls({
   compatibleVersions,
   controller,
+  expanded,
+  onExpandedChange,
 }: Gen3ProfileControlsProps) {
   const { t } = useTranslation();
   const [managerOpen, setManagerOpen] = useState(false);
-  const [expanded, setExpanded] = useState(initialProfilePanelExpanded);
   const profiles = useMemo(
     () =>
       controller.profiles.filter((profile) =>
@@ -380,17 +373,7 @@ export function Gen3ProfileControls({
           aria-expanded={expanded}
           aria-label={t(expanded ? "collapse" : "expand")}
           className="profile-float-heading"
-          onClick={() =>
-            setExpanded((current) => {
-              const next = !current;
-              try {
-                localStorage.setItem(PROFILE_PANEL_EXPANDED_KEY, String(next));
-              } catch {
-                // The panel remains usable when storage is unavailable.
-              }
-              return next;
-            })
-          }
+          onClick={() => onExpandedChange(!expanded)}
           title={t(expanded ? "collapse" : "expand")}
           type="button"
         >

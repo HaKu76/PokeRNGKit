@@ -1,36 +1,36 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：新增遇敌查询静态悬浮工具，等待工程检查与部署验收
+> - 当前阶段：全模块回归与交互复核已完成，等待本轮修复部署和项目所有者共同验收
 > - 当前模块：`encounterlookup`
-> - Git 基线：`c48eb28 fix: 修复第三世代孵化构建与分片验证`
-> - 工作区状态：存在未提交的遇敌查询源码、静态数据与文档；Codex 不暂存、不提交、不 push
-> - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
-> - 验收状态：遇敌查询已完成本机格式、lint、类型检查与定向单元测试；未完成完整 CI、部署页面回归或项目所有者验收
+> - Git 基线：`65e3aba feat: 增加全世代遇敌查询`
+> - 工作区状态：存在未提交的自动完成控件、悬浮工具互斥和验收文档更新；Codex 不暂存、不提交、不 push
+> - 部署状态：GitHub Pages 当前为 `index-DC2qWhx2.js` 的旧生产包；本轮修复尚未推送或部署
+> - 验收状态：本轮完整工程验证和已部署算法夹具已完成；生产交互复验与项目所有者最终验收待本轮部署后共同完成
 
 ## 0. 当前工作区优先状态
 
-- HEAD `c48eb28` 已包含此前 Egg/Wild 构建、分片、格式和类型修复；本轮工作区没有待完成 merge，也没有未提交的旧模块修改。
+- HEAD `65e3aba` 已包含全世代遇敌查询；本轮工作区在此基础上补齐 PokeFinder 自动完成控件和三个悬浮工具的互斥状态，不存在待完成 merge。
 - 当前模块集合：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`、`encounterlookup`。
-- 本轮新增 `encounterlookup`：右下角默认收起的全世代 Encounter Lookup，覆盖 PokeFinder 4.3.2 的 Gen III、Gen IV、Gen V 和 BDSP 共 16 个版本；静态数据由 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 生成，未运行工程检查。
+- 本轮新增 `encounterlookup`：右下角默认收起的全世代 Encounter Lookup，覆盖 PokeFinder 4.3.2 的 Gen III、Gen IV、Gen V 和 BDSP 共 16 个版本；静态数据由 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 生成。
 - 遇敌查询不进入左侧 RNG 导航，不使用 Wasm/Worker；宝可梦候选、游戏版本、地点、遇敌种类和等级范围均来自本地静态数据。
 - 已清理生成用 `.tmp-encounter-tables/` 与 `.tmp-encounter-tables.zip`；生成脚本和正式 `data.ts` 保留在工作区。
-- 本轮只完成源码、上游和数据结构静态审查；未获项目所有者授权，未运行测试、构建、lint、typecheck、浏览器、性能或部署页面检查。
+- 本轮新增 `AutoCompleteComboBox`，覆盖 Encounter Lookup 宝可梦、IV Calculator 宝可梦、Egg 蛋种类和 Wild 地点。行为对应 PokeFinder `enableAutoComplete()`：点击展开、包含匹配、弹出候选、方向键/Enter/Escape 和 `NoInsert`。
+- 本轮将存档信息、个体值计算器和遇敌查询纳入同一展开状态；任意时刻只展开一个，存档工具仍保留原有 localStorage 展开偏好。
 
 ### 当前工作区实现：`encounterlookup`
 
 - 新增 `src/features/encounterlookup`，包含查询 domain、边界测试、三语静态数据和右下角悬浮面板。
 - 支持 PokeFinder 4.3.2 实际支持的 16 个游戏版本；物种上限为 Gen III `386`、Gen IV `493`、Gen V `649`、BDSP `493`。
 - 查询覆盖时间、群聚、雷达、双槽、广播、季节、Feebas、HGSS Safari/撞树/捕虫大赛等上游 Encounter Lookup 组合。
-- 个体值计算器与遇敌查询从所有入口保持双向互斥展开；左侧 `ActiveModule` 与模块抽屉不包含 Encounter Lookup。
+- 个体值计算器、遇敌查询和存档信息从所有入口保持三方互斥展开；左侧 `ActiveModule` 与模块抽屉不包含 Encounter Lookup。
 - 生成脚本、精确 revision、输入行为和 GPL 来源记录见 [遇敌查询](modules/encounterlookup.md)与[上游记录](../third_party/pokefinder/UPSTREAM.md)。
 
 ### 下一位开发者第一步
 
-1. 阅读 [`AGENTS.md`](../AGENTS.md)、[AI 开发一致性指南](ai-development.md)、本文、[遇敌查询](modules/encounterlookup.md)、[Gen 3 Egg](modules/gen3egg.md)、[Gen 3 Wild](modules/gen3wild.md) 和 [PokeFinder 上游记录](../third_party/pokefinder/UPSTREAM.md)。
-2. 在 GitHub Desktop 审查遇敌查询面板、静态生成数据、生成脚本和文档；不要覆盖、重置或选择性丢弃工作区内容。
-3. 项目所有者如需本机工程检查，明确授权具体命令；否则由项目所有者提交并推送，等待 GitHub Actions 复核并部署 Pages。
-4. Actions 部署成功后，由项目所有者提供生产 URL 并明确授权外部浏览器检查，再共同验收 16 个版本切换、三语物种/地点、查询结果和移动端悬浮布局。
+1. 在 GitHub Desktop 审查本轮自动完成、三浮窗互斥和文档更新；不要覆盖、重置或选择性丢弃工作区内容。
+2. 项目所有者提交并推送后，等待 GitHub Actions 完成部署，再以新的 Pages URL 在外部 Chrome 复验。
+3. 复验 PokeFinder 自动完成的点击选项、三语、浅深主题、三浮窗互斥、16 游戏版本与移动视口布局；随后由项目所有者完成设备和发布验收。
 
 ## 当前可用模块
 
@@ -79,8 +79,8 @@
 
 ## 后续验收
 
-- 当前分支：`main`，HEAD `c48eb28 fix: 修复第三世代孵化构建与分片验证`。
-- 当前无待完成 merge；遇敌查询源码、静态数据、生成脚本和文档保持未提交。
+- 当前分支：`main`，HEAD `65e3aba feat: 增加全世代遇敌查询`。
+- 当前无待完成 merge；自动完成、悬浮工具互斥和验收文档保持未提交。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
@@ -93,28 +93,33 @@
 
 ## 5. 验证状态
 
-### 5.1 历史工程与页面证据
+### 5.1 已部署算法回归
 
-- 历史记录中包含前一阶段的 `format:check`、`lint`、`typecheck`、单元测试、UI 预览、原生夹具和生产页面回归证据；这些证据只覆盖对应提交，不能覆盖当前未提交的遇敌查询变更。
-- 历史生产页面回归曾验证 ID Searcher 与 Static Searcher 固定夹具；具体记录以 Git 历史和此前部署对应文档为准。
+- 经项目所有者授权，使用外部 Chrome 在 `https://haku76.github.io/PokeRNGKit/` 回归当前生产资源 `index-DC2qWhx2.js`；页面控制台未记录站点错误。
+- 已通过 Static Generator：`12345678 / 0` 的 Method 1 为 PID `84EA0B71`、IV `10/12/22/7/29/0`，Method 4 为 PID `84EA0B71`、IV `10/12/22/20/9/4`。
+- 已通过 Wild Generator：Emerald Route 111 Grass、Seed `1C71C71C`、`0..9` 返回 10 条；首条为 Slot `3`、Trapinch、Lv.21、PID `3C5ACFFA`、IV `12/31/4/27/8/20`、Nature `17`。Wild Searcher 全 31 IV 夹具计数为 Method 1/None `20`、Method 2/Synchronize `54`、Method 4/Cute Charm F `4`。
+- 已通过 IVs to PID：零 IV 为 Channel / PID `56654838` / Seed `DC2DA271` / SID `48333`；满 IV 为 Method 2 / PID `36E6808A` / Seed `02B0100B` / SID `8832`。
+- 已通过 Egg：Emerald `EBred`（亲代 B 为 Everstone）返回 50 条，首条 Advances `4294967278`、PID `F0425272`、IV `31/31/0/31/26/30`；Ruby Split 的两个 Seed `0000` 返回 60 条，首条 PID `0000E97F`、IV `30/11/31/31/31/16`。
+- 延用既有生产证据：ID Searcher 的 `48163 / 64377` 对应 `05A0 / 0`、`C19B / 36724`；XD/Colo、Initial Seed Finder 与 Static Searcher 的已记录固定夹具均通过。
 
 ### 5.2 基线工程验证
 
-- 已通过：`npm run verify`。Prettier、ESLint、`tsc -b`、15 个 Vitest 文件共 54 项测试、Vite 生产构建与 PWA 预缓存均已完成；ESLint 保留两条非阻断的 TanStack Virtual / React Compiler 警告。
+- 已通过：2026-08-12 运行 `npm run verify`。Prettier、ESLint、`tsc -b`、16 个 Vitest 文件共 57 项测试、Vite 生产构建与 PWA 预缓存均已完成；ESLint 仅保留 `Gen3EggPanel.tsx`、`Gen3WildPanel.tsx` 的两条既有 TanStack Virtual / React Compiler warning。
 - 已通过：在 Visual Studio 2026 Build Tools x64 开发环境中运行 `npm run wasm:test:native`，6/6 原生 Core 夹具通过。
 - 已通过：在用户级 emsdk `6.0.6` 环境中运行 `npm run wasm:doctor` 与 `npm run build`，六个 Gen III Wasm 模块、Vite 生产站点和 PWA 预缓存均成功生成。CMake `4.3.1` 报告 Emscripten shared library 支持警告，但当前模块均为独立可执行 Wasm target，构建未受阻。
-- GitHub Pages、真实 Worker/Wasm、移动端、PWA、离线、性能与算法回归：未运行，等待 Actions 部署和生产 URL 授权。
+- 受限终端首次复制 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一授权的 `npm run verify` 随后成功，确认该失败是受限文件访问环境，不是构建或源码错误。
 
 ### 5.3 遇敌查询本轮检查
 
 - 已完成：源码、生成数据结构、上游 16 个版本、世代图鉴上限、翻译词条与悬浮工具状态的静态审查。
 - 已确认：生成数据包含 16 个游戏键，等级范围未发现反向值或超过 100 的记录；该结论来自生成阶段的静态数据检查，不是测试或浏览器验收。
-- 已通过：`npm exec prettier -- --check docs/modules/encounterlookup.md src/features/encounterlookup/domain.test.ts src/features/encounterlookup/domain.ts src/features/encounterlookup/EncounterLookupPanel.tsx`，修复 Actions run `31581467290` / job `94065275478` 指出的四个未格式化文件；随后 `npm run format:check` 全仓库通过。
-- 已通过：`npm run typecheck`。
-- 已通过：`npm run lint`；仅保留既有 `Gen3EggPanel.tsx` 与 `Gen3WildPanel.tsx` 的两条 TanStack Virtual / React Compiler 非阻断 warning。
-- 已通过：`npm test -- --run src/features/encounterlookup/domain.test.ts`，1 个文件、3 项测试通过。
-- 已通过：`git diff --check`。
-- 未运行：完整 `npm run verify`、Vite 构建、Wasm、浏览器、性能、部署页面和项目所有者验收；完整 CI 仍需在提交后的 Actions 中复核。
+- 已通过：`npm run verify`，其中 Encounter Lookup 域测试覆盖 16 游戏键、四种图鉴上限和非法物种边界。
+- 已通过：本地 UI 模式的 Encounter Lookup 输入 `皮卡丘` 后可选中候选并返回 Emerald Safari Zone Area 1/2 草丛 `25-27`；IV Calculator 输入同一物种可由候选列表和方向键/Enter 选择；Wild 地点输入 `111` 可选择 Route 111 并联动更新物种列表；Egg 蛋种类自动完成已按同一上游调用路径复核。
+- 已通过：本地三语切换为中文、英文、日文；浅深主题切换为 `light -> dark -> light`；档案、IV Calculator 和 Encounter Lookup 依次展开时另外两项均收起。
+- 已通过：生产 Encounter Lookup 的皮卡丘抽样。Emerald 返回 Safari Zone Area 1/2 草丛 `25-27`；Diamond 和 Brilliant Diamond 返回 Trophy Garden 草丛 `18-18`；Black 返回空集。生产包仍使用原生 `datalist`，通过方向键/Enter 可提交当前候选，但点击候选 popup 无法可靠验收。
+- 已通过：生产 IV Calculator 新增/删除行可逆；妙蛙种子、Lv.100、勤奋、`231/134/134/166/166/126` 精确返回六项 `31`，下一级均为 `100`。
+- 待部署复验：当前生产页的语言和主题按钮在本轮 Chrome 自动化中没有改变状态，而本地当前源码可正常切换；三浮窗也仍可同时展开。当前 Pages 包未包含本轮修复，不能作为本轮交互验收。
+- 未运行：移动视口、离线/PWA、性能与取消延迟；这些需要新部署后由项目所有者共同完成。
 
 ## 6. 已知风险与边界
 

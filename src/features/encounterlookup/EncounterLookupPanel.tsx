@@ -1,5 +1,6 @@
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import {
   ENCOUNTER_LOOKUP_GAMES,
   findEncounterLookup,
@@ -101,10 +102,7 @@ export function EncounterLookupPanel({
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const match = speciesOptions.find(
-      (option) => option.name === displayedPokemon,
-    );
-    setQuery({ game, species: match?.id ?? 0 });
+    setQuery({ game, species });
   };
 
   return (
@@ -130,27 +128,25 @@ export function EncounterLookupPanel({
       {expanded && (
         <div className="encounter-lookup-body" id="encounter-lookup-body">
           <form className="encounter-lookup-form" onSubmit={submit}>
-            <label className="field">
+            <label className="field encounter-lookup-pokemon-field">
               <span>{t("encounterLookupPokemon")}</span>
-              <input
-                autoComplete="off"
-                list="encounter-lookup-pokemon-options"
-                onChange={(event) => {
-                  const value = event.target.value;
-                  const match = speciesOptions.find(
-                    (option) => option.name === value,
-                  );
-                  setPokemonInput({ language, text: value });
-                  setSpecies(match?.id ?? 0);
+              <AutoCompleteComboBox
+                inputValue={displayedPokemon}
+                label={t("encounterLookupPokemon")}
+                onInputChange={(text) => {
+                  setPokemonInput({ language, text });
                   setQuery(undefined);
                 }}
-                value={displayedPokemon}
+                onValueChange={(value) => {
+                  setSpecies(value);
+                  setQuery(undefined);
+                }}
+                options={speciesOptions.map((option) => ({
+                  label: option.name,
+                  value: option.id,
+                }))}
+                value={species}
               />
-              <datalist id="encounter-lookup-pokemon-options">
-                {speciesOptions.map((option) => (
-                  <option key={option.id} value={option.name} />
-                ))}
-              </datalist>
             </label>
             <label className="field">
               <span>{t("encounterLookupGame")}</span>

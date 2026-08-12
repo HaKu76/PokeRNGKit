@@ -24,6 +24,10 @@ import { EncounterLookupPanel } from "./features/encounterlookup/EncounterLookup
 import { Gen3IvCalculator } from "./features/ivcalculator/Gen3IvCalculator";
 import { Gen3ProfileControls } from "./features/profiles/Gen3ProfileControls";
 import {
+  initialGen3ProfilePanelExpanded,
+  persistGen3ProfilePanelExpanded,
+} from "./features/profiles/profilePanelState";
+import {
   gen3EggProfileOrDefault,
   gen3StaticProfileOrDefault,
 } from "./features/profiles/domain";
@@ -68,6 +72,9 @@ function App() {
   const [moduleRailOpen, setModuleRailOpen] = useState(false);
   const [ivCalculatorExpanded, setIvCalculatorExpanded] = useState(false);
   const [encounterLookupExpanded, setEncounterLookupExpanded] = useState(false);
+  const [profileExpanded, setProfileExpanded] = useState(
+    initialGen3ProfilePanelExpanded,
+  );
   const searchEngine = useMemo<Id3SearchEngine>(
     () =>
       uiPreviewMode ? new Gen3IdUiPreviewEngine() : new Gen3IdWorkerPool(),
@@ -158,6 +165,17 @@ function App() {
   const openIvCalculator = () => {
     setIvCalculatorExpanded(true);
     setEncounterLookupExpanded(false);
+    setProfileExpanded(false);
+    persistGen3ProfilePanelExpanded(false);
+  };
+
+  const changeProfileExpanded = (expanded: boolean) => {
+    setProfileExpanded(expanded);
+    persistGen3ProfilePanelExpanded(expanded);
+    if (expanded) {
+      setIvCalculatorExpanded(false);
+      setEncounterLookupExpanded(false);
+    }
   };
 
   const readRequest = (): Id3Request | undefined => {
@@ -940,14 +958,20 @@ function App() {
           expanded={ivCalculatorExpanded}
           onExpandedChange={(expanded) => {
             setIvCalculatorExpanded(expanded);
-            if (expanded) setEncounterLookupExpanded(false);
+            if (expanded) {
+              setEncounterLookupExpanded(false);
+              changeProfileExpanded(false);
+            }
           }}
         />
         <EncounterLookupPanel
           expanded={encounterLookupExpanded}
           onExpandedChange={(expanded) => {
             setEncounterLookupExpanded(expanded);
-            if (expanded) setIvCalculatorExpanded(false);
+            if (expanded) {
+              setIvCalculatorExpanded(false);
+              changeProfileExpanded(false);
+            }
           }}
         />
         <Gen3ProfileControls
@@ -959,6 +983,8 @@ function App() {
               : "all"
           }
           controller={profiles}
+          expanded={profileExpanded}
+          onExpandedChange={changeProfileExpanded}
         />
       </div>
       <footer className="legal-footer">

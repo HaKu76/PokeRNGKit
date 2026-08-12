@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import { formatHex, parseDecimal, parseHex } from "../id/domain";
 import type { Gen3Profile } from "../profiles/domain";
+import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { getGen3AbilityName } from "../shared/gen3Abilities";
 import { gen3HiddenPower } from "../shared/gen3HiddenPower";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
@@ -272,6 +273,11 @@ export function Gen3WildPanel({
   const [operation, setOperation] = useState<WildOperation>("generator");
   const [encounter, setEncounter] = useState<Gen3WildEncounter>("land");
   const [locationIndex, setLocationIndex] = useState(0);
+  const [locationInput, setLocationInput] = useState({
+    index: 0,
+    language: i18n.language,
+    text: "",
+  });
   const [selectedSpecies, setSelectedSpecies] = useState(0);
   const [method, setMethod] = useState<Gen3WildMethod>("method1");
   const [lead, setLead] = useState<Gen3WildLead>("none");
@@ -331,6 +337,21 @@ export function Gen3WildPanel({
     [encounter, profile.version],
   );
   const location = locations[locationIndex] ?? locations[0];
+  const locationOptions = useMemo(
+    () =>
+      locations.map((entry, index) => ({
+        label: getGen3WildLocationName(i18n.language, entry.name),
+        value: index,
+      })),
+    [i18n.language, locations],
+  );
+  const displayedLocation =
+    locationInput.language === i18n.language &&
+    locationInput.index === locationIndex
+      ? locationInput.text
+      : (locationOptions[locationIndex]?.label ??
+        locationOptions[0]?.label ??
+        "");
   const area = location
     ? buildArea(profile.version, location, encounter, feebasTile)
     : undefined;
@@ -926,18 +947,20 @@ export function Gen3WildPanel({
             </label>
             <label className="field">
               <span>{t("wildLocation")}</span>
-              <select
-                value={locationIndex}
-                onChange={(event) =>
-                  setLocationIndex(Number(event.target.value))
+              <AutoCompleteComboBox
+                inputValue={displayedLocation}
+                label={t("wildLocation")}
+                onInputChange={(text) =>
+                  setLocationInput({
+                    index: locationIndex,
+                    language: i18n.language,
+                    text,
+                  })
                 }
-              >
-                {locations.map((entry, index) => (
-                  <option key={`${entry.name}-${index}`} value={index}>
-                    {getGen3WildLocationName(i18n.language, entry.name)}
-                  </option>
-                ))}
-              </select>
+                onValueChange={setLocationIndex}
+                options={locationOptions}
+                value={locationIndex}
+              />
             </label>
             <label className="field">
               <span>{t("wildPokemon")}</span>
