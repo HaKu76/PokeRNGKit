@@ -5,13 +5,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代孵化乱数模块落地。** 当前工作区新增 `gen3egg`，并同步补充独立 Wasm/Worker、Emerald 与 RS/FRLG 结果表、算法文档和三语入口。真实 Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
+**当前里程碑：第三世代 Seed 查询时间模块落地。** 当前工作区新增 `gen3seedtotime`，并同步补充独立 Wasm/Worker、32 位 Seed 回推、固定夹具、算法文档和三语入口。真实 Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
-- 已有模块：ID Generator/Searcher、Initial Seed Finder、Static Generator/Searcher、Wild Generator/Searcher、IVs to PID、Egg Generator、三代存档信息、个体值计算器
-- 当前模块：Egg Generator；实现尚未提交，真实 Wasm 待 Actions 验证
+- 已有模块：ID Generator/Searcher、Initial Seed Finder、Seed to Time、Static Generator/Searcher、Wild Generator/Searcher、IVs to PID、Egg Generator、三代存档信息、个体值计算器
+- 当前模块：Seed to Time；实现尚未提交，真实 Wasm 待 Actions 验证
 - 上游核验基线：PokeFinder 4.3.2
-- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
@@ -37,6 +37,13 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - `gen3initialseed` Wasm C ABI、独立 Worker/Wasm 实例、分片进度、取消、稳定排序和 CSV
 - `Target Seed` 空值按项目统一 Seed 规则视为 `0`；`Max Results` 为 `1..65536`
 - 算法、输入边界和来源见 [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md)；本轮未构建或验收
+
+当前 Seed to Time 工作区包含：
+
+- PokeFinder `SeedToTime3` 的 16/32 位 Seed、年份、只读 Advances 和时间表
+- 32 位 Seed 使用 PokeRNGR 回推原始 16 位 Seed，保留上游 2000 年后的日历缺陷
+- 独立 `gen3seedtotime` Wasm、Dedicated Worker、固定夹具和三语界面；本轮未构建或验收
+- 算法、输入边界和来源见 [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md)
 
 当前 IVs to PID 工作区包含：
 
@@ -194,7 +201,7 @@ npm run verify
 
 ## 构建与测试
 
-`npm run build` 先生成 release 模式的 `gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
+`npm run build` 先生成 release 模式的 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
 
 测试规划分为五层：
 
@@ -204,7 +211,7 @@ npm run verify
 4. Worker + 真实 Wasm + IndexedDB 的浏览器集成测试（后续补充）。
 5. Playwright 覆盖核心流程、静态子路径部署和离线重载（Pages 预览稳定后引入）。
 
-当前验证门槛要求 `gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` 的固定输入结果对齐已记录夹具、长范围计算可汇报进度并响应取消、GitHub Pages 能加载六个 Worker/Wasm 模块，且离线重载可用。项目所有者负责提交并提供部署 URL；算法回归仅能在 Actions 部署完成、所有者给出生产 URL 并授权后执行，项目所有者保留界面、设备和正式发布的最终验收。
+当前验证门槛要求 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` 的固定输入结果对齐已记录夹具、长范围计算可汇报进度并响应取消、GitHub Pages 能加载七个 Worker/Wasm 模块，且离线重载可用。项目所有者负责提交并提供部署 URL；算法回归仅能在 Actions 部署完成、所有者给出生产 URL 并授权后执行，项目所有者保留界面、设备和正式发布的最终验收。
 
 ## 部署
 
@@ -239,11 +246,12 @@ npm run build:web
 - **阶段 1：第三世代 ID Generator/Searcher** - `gen3id` API v2、独立 Worker、三语界面、红蓝宝石 ID 反查和一致性夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 2A：第三世代 Static Generator** - `gen3static`、Method 1/4、游走缺陷、筛选和结果工作区（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2B：Static Searcher** - 反向 IV 恢复、搜索边界、独立 Worker Pool 和结果工作区（已进入 Git 基线，待部署回归与最终验收）。
+- **阶段 2C：`gen3seedtotime`** - 第三世代 Seed 到日期时间、32 位回推、独立 Wasm/Worker、固定夹具和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 兜底、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
 - **阶段 4A：Wild Generator** - 遭遇数据、独立 `gen3wild` Wasm/Worker、特殊地点规则、完整筛选和固定夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、上游方法和算法文档（已实现，待 Actions、部署回归与最终验收）。
-- **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 7：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
 - **后续** - Egg Searcher、Tanoby Chamber、GameCube、PokeSpot、Jirachi 等三代能力；第四世代仅保留接口，是否实现由项目所有者另行决定。
 

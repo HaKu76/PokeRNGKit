@@ -33,6 +33,7 @@ import {
 } from "./features/profiles/domain";
 import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
 import { Gen3InitialSeedPanel } from "./features/initialseed/Gen3InitialSeedPanel";
+import { Gen3SeedToTimePanel } from "./features/seedtotime/Gen3SeedToTimePanel";
 import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
 import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
@@ -42,7 +43,13 @@ import { useTheme } from "./theme";
 type SortKey = keyof Id3State;
 type SupportedLanguage = "zh" | "en" | "ja";
 type ActiveModule =
-  "id" | "initialseed" | "static" | "wild" | "ivtopid" | "egg";
+  | "id"
+  | "initialseed"
+  | "seedtotime"
+  | "static"
+  | "wild"
+  | "ivtopid"
+  | "egg";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -416,6 +423,22 @@ function App() {
           </button>
           <button
             className={
+              activeModule === "seedtotime" ? "module-entry active" : "module-entry"
+            }
+            onClick={() => {
+              setActiveModule("seedtotime");
+              setModuleRailOpen(false);
+            }}
+            type="button"
+          >
+            <span className="module-index">03</span>
+            <span>
+              <strong>{t("seedToTimeModule")}</strong>
+              <small>{t("seedToTimeVersion")}</small>
+            </span>
+          </button>
+          <button
+            className={
               activeModule === "static" ? "module-entry active" : "module-entry"
             }
             onClick={() => {
@@ -424,7 +447,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">03</span>
+            <span className="module-index">04</span>
             <span>
               <strong>{t("staticModule")}</strong>
               <small>{t("staticVersion")}</small>
@@ -440,7 +463,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">04</span>
+            <span className="module-index">05</span>
             <span>
               <strong>{t("wildModule")}</strong>
               <small>{t("wildVersion")}</small>
@@ -458,7 +481,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">05</span>
+            <span className="module-index">06</span>
             <span>
               <strong>{t("ivToPidModule")}</strong>
               <small>{t("ivToPidVersion")}</small>
@@ -474,7 +497,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">06</span>
+            <span className="module-index">07</span>
             <span>
               <strong>{t("eggModule")}</strong>
               <small>{t("eggVersion")}</small>
@@ -496,6 +519,8 @@ function App() {
                     ? "engine"
                     : activeModule === "initialseed"
                       ? "initialSeedEngine"
+                      : activeModule === "seedtotime"
+                        ? "seedToTimeEngine"
                       : activeModule === "static"
                         ? "staticEngine"
                         : activeModule === "wild"
@@ -512,6 +537,8 @@ function App() {
                   ? "version"
                   : activeModule === "initialseed"
                     ? "initialSeedVersion"
+                    : activeModule === "seedtotime"
+                      ? "seedToTimeVersion"
                     : activeModule === "static"
                       ? "staticVersion"
                       : activeModule === "wild"
@@ -930,6 +957,8 @@ function App() {
             </>
           ) : activeModule === "initialseed" ? (
             <Gen3InitialSeedPanel uiPreviewMode={uiPreviewMode} />
+          ) : activeModule === "seedtotime" ? (
+            <Gen3SeedToTimePanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "static" ? (
             <Gen3StaticPanel
               onOpenIvCalculator={openIvCalculator}

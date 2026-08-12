@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：遇敌查询待工程检查与部署验收
+> - 状态：遇敌查询与 `gen3seedtotime` 待工程检查与部署验收
 > - 更新日期：2026-08-12
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Static/Wild Generator/Searcher、IVs to PID、Egg、存档信息和个体值计算器已进入 Git 基线；当前工作区新增右下角遇敌查询悬浮工具。
+当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Static/Wild Generator/Searcher、IVs to PID、Egg、存档信息和个体值计算器已进入 Git 基线；当前工作区新增右下角遇敌查询悬浮工具和第三世代 `SeedToTime3`。
 
 ## 2. 已确认边界
 
@@ -61,6 +61,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 ### 3.8 第三世代孵化乱数用户
 
 用户选择 Emerald 或 Ruby/Sapphire/FireRed/LeafGreen 的孵化生成方式，填写 Held/Pickup Seed、推进范围、校准值、查看图鉴次数、好感度、蛋种类、亲代和存档信息，生成孵化结果；用户可以按性格、觉醒力量、IV、能力、性别、特性和异色筛选，并查看遗传来源。当前只提供 Generator，不承诺 Egg Searcher 或 Masuda 规则。
+
+### 3.9 第三世代 Seed 到时间用户
+
+用户输入 16 位初始 Seed 或 32 位 PokeRNG 状态与年份，查看可产生该 Seed 的日期和分钟。32 位 Seed 会按 PokeFinder 的 PokeRNGR 规则回推到原始 Seed，并显示回推帧数。
 
 ## 4. 当前功能需求：`gen3id`
 
@@ -302,7 +306,17 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细算法、来源、输入限制和验收夹具见 [Gen 3 Initial Seed Finder](modules/gen3initialseed.md)。
 
-## 8.2 当前功能需求：`gen3ivtopid` IVs to PID
+## 8.2 当前功能需求：`gen3seedtotime` Seed to Time
+
+- **FR-SEEDTOTIME-01** 提供 PokeFinder `Gen 3 Seed to Time` 的 `16/32-Bit Seed`、`Year`、只读 `Advances` 与 `Find`；结果表仅显示 `Time`。
+- **FR-SEEDTOTIME-02** Seed 为最多 8 位十六进制 `0..0xFFFFFFFF`，空值按 `0`；Year 为十进制 `2000..2037`。浏览器输入允许临时清空，但无效年份不得启动 Worker。
+- **FR-SEEDTOTIME-03** 输入 32 位 Seed 时，必须用 PokeRNGR 逆推到最接近的 16 位初始 Seed，回写 Seed 输入并显示完整推进次数；随后枚举该年份的日期和分钟。年份大于 `2000` 时必须保留 PokeFinder 的游戏日历缺陷。
+- **FR-SEEDTOTIME-04** 使用独立 `gen3seedtotime` Wasm API v1、C ABI 与 Dedicated Worker；全年分钟枚举只在 Wasm 内执行，取消时终止当前 Worker，React/TypeScript 不得复制生产算法。
+- **FR-SEEDTOTIME-05** 简体中文逐字复用 `PokeFinder_zh.ts` 的 `第三世代Seed查询时间`、`16/32位Seed`、`年份`、`帧数`、`查找` 和 `时间`；`PokeFinder_ja.ts` 对应词条均为 unfinished，因此日文保留英文源标签。
+
+详细算法、来源、输入限制和验收夹具见 [Gen 3 Seed to Time](modules/gen3seedtotime.md)。
+
+## 8.3 当前功能需求：`gen3ivtopid` IVs to PID
 
 - **FR-IVTOPID-01** 提供 PokeFinder `IVs to PID` 的六项 IV、Nature 和 TID 输入；六项 IV 为 `0..31`，Nature 为 `0..24`，TID 为 `0..65535`，空 TID 作为 `0`。
 - **FR-IVTOPID-02** 计算第三世代 Method 1、Reverse Method 1、Method 2、Method 4、XD/Colo 和 Channel；不输出第四世代 Cute Charm。
@@ -313,7 +327,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细算法、来源、输入限制和验收夹具见 [Gen 3 IVs to PID](modules/gen3ivtopid.md)。
 
-## 8.3 当前功能需求：`gen3egg` Egg Generator
+## 8.4 当前功能需求：`gen3egg` Egg Generator
 
 - **FR-EGG-01** 支持 Emerald 的 `EBred`、`EBredSplit`、`EBredAlternate`，以及 Ruby/Sapphire/FireRed/LeafGreen 的 `RSFRLGBred`、`RSFRLGBredSplit`、`RSFRLGBredAlternate`、`RSFRLGBredMixed`；Emerald 固定使用上游初始 RNG 状态 `0`。
 - **FR-EGG-02** RS/FRLG 接受 Held Seed 与 Pickup Seed 的 16 位十六进制输入，范围 `0..0xFFFF`，空值按 `0` 处理；Emerald 不显示这两项 Seed。
@@ -326,7 +340,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细算法、来源、输入限制和验收夹具见 [Gen 3 Egg](modules/gen3egg.md)。
 
-## 8.4 当前功能需求：`encounterlookup` 遇敌查询
+## 8.5 当前功能需求：`encounterlookup` 遇敌查询
 
 - **FR-ENCOUNTER-01** 在右下角悬浮工具区提供默认收起的 `Encounter Lookup`，不进入左侧主模块导航；展开时与个体值计算器互斥，点击外部可收起。
 - **FR-ENCOUNTER-02** 支持 PokeFinder 4.3.2 实际提供的 16 个版本：Ruby、Sapphire、FireRed、LeafGreen、Emerald、Diamond、Pearl、Platinum、HeartGold、SoulSilver、Black、White、Black 2、White 2、Brilliant Diamond、Shining Pearl。
@@ -360,7 +374,7 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 
 ### 11.1 正确性
 
-- `gen3id`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致；`gen3initialseed` 的 RS ID 输入与公开算法参考的固定候选必须一致。
+- `gen3id`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致；`gen3initialseed` 的 RS ID 输入与公开算法参考的固定候选必须一致。
 - TypeScript 只负责输入规范化、分片和解码，不改变 Core 的 RNG 规则。
 - C ABI 和 Worker 协议必须带显式 API 版本；版本不匹配时拒绝运行。
 - 上游源码文件、版本、SHA-256、修改边界和许可证必须可追溯。
@@ -407,8 +421,8 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
-3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、Egg Emerald/RSFRLG 固定结果及错误边界。
-4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` 的 MJS/Wasm 产物。
+3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、Egg Emerald/RSFRLG 固定结果及错误边界。
+4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` 的 MJS/Wasm 产物。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
@@ -426,9 +440,10 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 7. 大范围任务的进度、取消、页面响应和结果上限提示。
 8. ID、Initial Seed、Static、Wild、IVs to PID 与 Egg 的结果排序、CSV 内容、清空结果和移动端横向滚动。
 9. Wild Generator/Searcher 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
-10. IVs to PID 使用 `0/0/0/0/0/0`、Nature `0`、TID `12345` 核对 Channel 的 `56654838 / DC2DA271 / 48333`，并使用 `31/31/31/0/31/31`、Nature `0`、TID `12345` 核对 Method 2 的 `36E6808A / 02B0100B / 8832`；确认空 TID 等价于 `0` 且不显示第四世代 Cute Charm。
-11. GitHub Pages 在线加载六个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
-12. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
+10. Seed to Time 使用 `00000000 / 2000` 核对 7 条时间、首条 `2000-03-30 18:22:00` 和末条 `2000-12-29 02:10:00`；再以 `40000000 / 2000` 核对回写原始 Seed `1AA5` 与 Advances `66861`。
+11. IVs to PID 使用 `0/0/0/0/0/0`、Nature `0`、TID `12345` 核对 Channel 的 `56654838 / DC2DA271 / 48333`，并使用 `31/31/31/0/31/31`、Nature `0`、TID `12345` 核对 Method 2 的 `36E6808A / 02B0100B / 8832`；确认空 TID 等价于 `0` 且不显示第四世代 Cute Charm。
+12. GitHub Pages 在线加载七个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
+13. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
 
 算法回归必须使用真实生产 Wasm，不能使用 `ui` 预览模式。无法从部署页面确认的原生夹具、移动设备性能或离线安装行为必须明确列为未覆盖。
 
@@ -447,6 +462,7 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 - **阶段 2A：`gen3static` Generator** - 独立 Wasm/Worker、Method 1/4、游走缺陷、筛选和结果（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2B：Static Searcher** - 反向恢复、搜索协议、结果边界和上游一致性测试（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2C：`gen3initialseed`** - RS TID/SID 与目标 Seed 初始种子反推、独立 Wasm/Worker、分片、进度、取消、排序和 CSV（已进入 Git 基线，待部署回归与最终验收）。
+- **阶段 2D：`gen3seedtotime`** - 第三世代 Seed 到日期时间、32 位回推、独立 Wasm/Worker、固定夹具和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 镜像、CRUD、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
 - **阶段 4A：`gen3wild` Generator** - 遭遇数据、独立 Wasm/Worker、特殊规则、完整筛选和一致性夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整 Wild 筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。

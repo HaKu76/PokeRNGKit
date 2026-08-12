@@ -132,7 +132,7 @@ function runNativeTestsInWindowsDevEnvironment() {
 async function loadModules() {
   const moduleNames = (
     process.env.POKERNGKIT_WASM_MODULES ??
-    "gen3id,gen3initialseed,gen3static,gen3wild,gen3ivtopid,gen3egg"
+    "gen3id,gen3initialseed,gen3seedtotime,gen3static,gen3wild,gen3ivtopid,gen3egg"
   )
     .split(",")
     .map((value) => value.trim())
