@@ -1063,6 +1063,111 @@ h1 {
   gap: 6px;
   margin-bottom: 6px;
 }
+.gen3egg-control-grid {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(250px, 290px) minmax(300px, 1fr) minmax(340px, 1.1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.egg-rng-panel .compact-field-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.egg-rng-panel .compact-field-row .field {
+  min-width: 0;
+}
+.egg-rng-panel .field > span,
+.egg-settings-panel .field > span {
+  display: block;
+}
+.egg-rng-panel .field small {
+  margin-top: 2px;
+}
+.egg-parent-fields {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  padding: 7px;
+}
+.egg-parent-fields legend {
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.egg-parent-meta,
+.egg-parent-ivs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+.egg-parent-ivs {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-top: 6px;
+}
+.egg-parent-fields .field {
+  min-width: 0;
+}
+.egg-parent-fields input,
+.egg-parent-fields select {
+  width: 100%;
+}
+.egg-parent-ivs input {
+  text-align: center;
+}
+.egg-rng-panel .field:has(input[aria-label]) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 55px 55px;
+  align-items: center;
+  column-gap: 4px;
+}
+.egg-rng-panel .field:has(input[aria-label]) > span {
+  grid-column: 1 / -1;
+}
+.egg-dual-field,
+.egg-redraw-field {
+  display: grid;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+.egg-dual-field {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+.egg-dual-field legend,
+.egg-redraw-field legend {
+  grid-column: 1 / -1;
+  padding: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+.egg-dual-field small {
+  grid-column: 1 / -1;
+  margin-top: -1px;
+}
+.egg-redraw-field {
+  grid-template-columns: 55px 55px;
+  align-content: end;
+  justify-content: start;
+  gap: 4px;
+}
+.egg-table-layout-emerald,
+.egg-table-layout-rsfrlg {
+  min-width: max-content;
+}
+.egg-table-layout-emerald .egg-table-header,
+.egg-table-layout-emerald .egg-table-row {
+  grid-template-columns: 100px 108px 66px 104px 82px 88px 150px repeat(6, 58px) 100px 74px 72px;
+}
+.egg-table-layout-rsfrlg .egg-table-header,
+.egg-table-layout-rsfrlg .egg-table-row {
+  grid-template-columns: 100px 108px 104px 82px 88px 150px repeat(6, 58px) 100px 74px 72px;
+}
+.egg-table-header,
+.egg-table-row {
+  min-width: max-content;
+}
 .initial-seed-control-grid {
   display: grid;
   grid-template-columns: minmax(280px, 360px) minmax(280px, 1fr);

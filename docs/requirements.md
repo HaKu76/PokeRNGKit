@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：第三世代 IVs to PID 待工程检查与部署验收
+> - 状态：第三世代 Egg Generator 待工程检查与部署验收
 > - 更新日期：2026-08-12
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。ID、Static/Wild Generator/Searcher、三代存档信息和个体值计算器已进入 Git 基线；当前工作区新增 `gen3initialseed` 与 `gen3ivtopid`，并同步完善 Wild 地点本地化与 Static/Wild 筛选布局。
+当前按 PokeFinder 功能模块逐个落地。ID、Static/Wild Generator/Searcher、三代存档信息、个体值计算器和 `gen3ivtopid` 已进入 Git 基线；当前工作区新增 `gen3initialseed` 与 `gen3egg`，并同步完善 Wild 地点本地化与 Static/Wild 筛选布局。
 
 ## 2. 已确认边界
 
@@ -57,6 +57,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 ### 3.7 第三世代野生乱数用户
 
 用户从当前掌机存档对应版本的遭遇表中选择遭遇类型和地点，输入 Seed、推进范围、Method、队首和特殊地点条件，生成野生宝可梦的槽位、等级、PID、IV、性格与闪光状态；也可以输入目标 IV 范围，反向检索满足同一遭遇规则和筛选的候选 Seed。两种大范围计算都必须在独立 `gen3wild` Worker Pool 中运行。
+
+### 3.8 第三世代孵化乱数用户
+
+用户选择 Emerald 或 Ruby/Sapphire/FireRed/LeafGreen 的孵化生成方式，填写 Held/Pickup Seed、推进范围、校准值、查看图鉴次数、好感度、蛋种类、亲代和存档信息，生成孵化结果；用户可以按性格、觉醒力量、IV、能力、性别、特性和异色筛选，并查看遗传来源。当前只提供 Generator，不承诺 Egg Searcher 或 Masuda 规则。
 
 ## 4. 当前功能需求：`gen3id`
 
@@ -309,6 +313,19 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细算法、来源、输入限制和验收夹具见 [Gen 3 IVs to PID](modules/gen3ivtopid.md)。
 
+## 8.3 当前功能需求：`gen3egg` Egg Generator
+
+- **FR-EGG-01** 支持 Emerald 的 `EBred`、`EBredSplit`、`EBredAlternate`，以及 Ruby/Sapphire/FireRed/LeafGreen 的 `RSFRLGBred`、`RSFRLGBredSplit`、`RSFRLGBredAlternate`、`RSFRLGBredMixed`；Emerald 固定使用上游初始 RNG 状态 `0`。
+- **FR-EGG-02** RS/FRLG 接受 Held Seed 与 Pickup Seed 的 16 位十六进制输入，范围 `0..0xFFFF`，空值按 `0` 处理；Emerald 不显示这两项 Seed。
+- **FR-EGG-03** 支持 Initial Advances、Max Advances、Offset、Calibration、Redraws、Compatibility、Egg Specie、当前存档 TID/SID，以及双方亲代的六项 IV、性别、性格和道具；所有范围与组合约束必须记录在模块文档并与上游 Form/Core 一致。
+- **FR-EGG-04** 亲代组合必须遵守第三世代 Daycare 兼容性，非法组合不得启动 Wasm 任务；Emerald 的 Everstone 与性格匹配尝试次数遵循 `EggGenerator3`。
+- **FR-EGG-05** 结果包含 Advances、Pickup Advances（适用时）、Redraws（Emerald）、PID、Ability、Gender、Nature、Shiny、六项 IV、六项遗传来源、Hidden Power 和 Hidden Power Strength；帧数保持原始十进制，不加入千位分隔符。
+- **FR-EGG-06** 提供性格、觉醒力量、IV、能力、性别、特性和异色筛选；性格与觉醒力量均为多选，未选择或全选表示 `Any`；提供取消筛选、排序、虚拟化结果表和带 UTF-8 BOM 的 CSV。
+- **FR-EGG-07** 使用独立 `gen3egg` Wasm API、C ABI、Dedicated Worker 和 Worker Pool；长范围任务分片运行，显示进度、结果上限和取消状态，不阻塞 React 主线程，不依赖 `SharedArrayBuffer`。
+- **FR-EGG-08** Emerald 与 RS/FRLG 使用各自与 PokeFinder `EggModel3` 对齐的结果表列布局；翻译优先逐字复用 `PokeFinder_zh.ts`，无简中词条时保留英文源标签。
+
+详细算法、来源、输入限制和验收夹具见 [Gen 3 Egg](modules/gen3egg.md)。
+
 ## 9. 后续 MVP
 
 当前工作区通过工程检查、部署页面回归与项目所有者最终验收后，按以下顺序推进：
@@ -317,7 +334,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 2. Tanoby Chamber form 数据、来源记录与固定夹具。
 3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
-Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估。Gen IV 及其他世代不属于当前承诺；仓库只保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口与[开发交接](gen4-development.md)，没有第四世代算法或 UI。
+Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估。Gen IV 及其他世代不属于当前承诺；仓库只保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口与[开发交接](gen4-development.md)，没有第四世代算法或 UI。
 
 ## 10. 非目标
 
@@ -332,7 +349,7 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 
 ### 11.1 正确性
 
-- `gen3id`、`gen3static`、`gen3wild` 与 `gen3ivtopid` C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致；`gen3initialseed` 的 RS ID 输入与公开算法参考的固定候选必须一致。
+- `gen3id`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致；`gen3initialseed` 的 RS ID 输入与公开算法参考的固定候选必须一致。
 - TypeScript 只负责输入规范化、分片和解码，不改变 Core 的 RNG 规则。
 - C ABI 和 Worker 协议必须带显式 API 版本；版本不匹配时拒绝运行。
 - 上游源码文件、版本、SHA-256、修改边界和许可证必须可追溯。
@@ -379,8 +396,8 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
-3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2 固定结果及错误边界。
-4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3static`、`gen3wild` 与 `gen3ivtopid` 的 MJS/Wasm 产物。
+3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、Egg Emerald/RSFRLG 固定结果及错误边界。
+4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` 的 MJS/Wasm 产物。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
@@ -396,10 +413,10 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 5. Wild Generator/Searcher 使用 Route 111、Feebas 或 RSE 特殊规则固定输入核对槽位、等级、PID、IV 与筛选。
 6. ID 的 TID、SID、TSV 筛选，以及 Static/Wild 的 IV、性格、特性、性别、闪光、觉醒力量和遭遇槽位筛选。
 7. 大范围任务的进度、取消、页面响应和结果上限提示。
-8. ID、Initial Seed、Static、Wild 与 IVs to PID 的结果排序、CSV 内容、清空结果和移动端横向滚动。
+8. ID、Initial Seed、Static、Wild、IVs to PID 与 Egg 的结果排序、CSV 内容、清空结果和移动端横向滚动。
 9. Wild Generator/Searcher 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
 10. IVs to PID 使用 `0/0/0/0/0/0`、Nature `0`、TID `12345` 核对 Channel 的 `56654838 / DC2DA271 / 48333`，并使用 `31/31/31/0/31/31`、Nature `0`、TID `12345` 核对 Method 2 的 `36E6808A / 02B0100B / 8832`；确认空 TID 等价于 `0` 且不显示第四世代 Cute Charm。
-11. GitHub Pages 在线加载五个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
+11. GitHub Pages 在线加载六个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
 12. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
 
 算法回归必须使用真实生产 Wasm，不能使用 `ui` 预览模式。无法从部署页面确认的原生夹具、移动设备性能或离线安装行为必须明确列为未覆盖。
@@ -422,8 +439,9 @@ Egg、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 镜像、CRUD、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
 - **阶段 4A：`gen3wild` Generator** - 遭遇数据、独立 Wasm/Worker、特殊规则、完整筛选和一致性夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整 Wild 筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。
-- **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、九列结果、输入校验和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
-- **阶段 6：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
+- **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、九列结果、输入校验和算法文档（已实现，待 Actions、部署回归与最终验收）。
+- **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 7：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项
 

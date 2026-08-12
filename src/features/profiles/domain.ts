@@ -75,6 +75,22 @@ export function gen3StaticProfileOrDefault(profile?: Gen3Profile) {
     : DEFAULT_GEN3_PROFILE;
 }
 
+export function isGen3EggVersion(version: Gen3GameVersion) {
+  return (
+    version === "ruby" ||
+    version === "sapphire" ||
+    version === "firered" ||
+    version === "leafgreen" ||
+    version === "emerald"
+  );
+}
+
+export function gen3EggProfileOrDefault(profile?: Gen3Profile) {
+  return profile && isGen3EggVersion(profile.version)
+    ? profile
+    : DEFAULT_GEN3_PROFILE;
+}
+
 function createId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();

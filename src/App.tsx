@@ -19,9 +19,13 @@ import type {
   Id3SearchSummary,
 } from "./features/id/search";
 import { Gen3IdWorkerPool } from "./features/id/worker/Gen3IdWorkerPool";
+import { Gen3EggPanel } from "./features/egg/Gen3EggPanel";
 import { Gen3IvCalculator } from "./features/ivcalculator/Gen3IvCalculator";
 import { Gen3ProfileControls } from "./features/profiles/Gen3ProfileControls";
-import { gen3StaticProfileOrDefault } from "./features/profiles/domain";
+import {
+  gen3EggProfileOrDefault,
+  gen3StaticProfileOrDefault,
+} from "./features/profiles/domain";
 import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
 import { Gen3InitialSeedPanel } from "./features/initialseed/Gen3InitialSeedPanel";
 import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
@@ -32,7 +36,13 @@ import { useTheme } from "./theme";
 
 type SortKey = keyof Id3State;
 type SupportedLanguage = "zh" | "en" | "ja";
-type ActiveModule = "id" | "initialseed" | "static" | "wild" | "ivtopid";
+type ActiveModule =
+  | "id"
+  | "initialseed"
+  | "static"
+  | "wild"
+  | "ivtopid"
+  | "egg";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -434,6 +444,22 @@ function App() {
               <small>{t("ivToPidVersion")}</small>
             </span>
           </button>
+          <button
+            className={
+              activeModule === "egg" ? "module-entry active" : "module-entry"
+            }
+            onClick={() => {
+              setActiveModule("egg");
+              setModuleRailOpen(false);
+            }}
+            type="button"
+          >
+            <span className="module-index">06</span>
+            <span>
+              <strong>{t("eggModule")}</strong>
+              <small>{t("eggVersion")}</small>
+            </span>
+          </button>
           <div className="rail-footer">
             <span className="rail-dot" />
             {t("localOnly")}
@@ -454,7 +480,9 @@ function App() {
                         ? "staticEngine"
                         : activeModule === "wild"
                           ? "wildEngine"
-                          : "ivToPidEngine",
+                          : activeModule === "ivtopid"
+                            ? "ivToPidEngine"
+                            : "eggEngine",
                 )}
               </h1>
             </div>
@@ -468,7 +496,9 @@ function App() {
                       ? "staticVersion"
                       : activeModule === "wild"
                         ? "wildVersion"
-                        : "ivToPidVersion",
+                        : activeModule === "ivtopid"
+                          ? "ivToPidVersion"
+                          : "eggVersion",
               )}
             </div>
           </div>
@@ -892,6 +922,12 @@ function App() {
               profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
               uiPreviewMode={uiPreviewMode}
             />
+          ) : activeModule === "egg" ? (
+            <Gen3EggPanel
+              onOpenIvCalculator={() => setIvCalculatorExpanded(true)}
+              profile={gen3EggProfileOrDefault(profiles.selectedProfile)}
+              uiPreviewMode={uiPreviewMode}
+            />
           ) : (
             <Gen3IvToPidPanel uiPreviewMode={uiPreviewMode} />
           )}
@@ -904,7 +940,9 @@ function App() {
         />
         <Gen3ProfileControls
           compatibleVersions={
-            activeModule === "static" || activeModule === "wild"
+            activeModule === "static" ||
+            activeModule === "wild" ||
+            activeModule === "egg"
               ? "handheld"
               : "all"
           }

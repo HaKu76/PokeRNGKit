@@ -1,47 +1,52 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：第三世代 IVs to PID 模块落地
-> - 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`profiles`、`ivcalculator`
-> - Git 基线：`4810cbb fix: 统一第三世代筛选器布局`
-> - 工作区状态：存在 CI 格式与 ESLint 修复的未提交修改；Codex 不暂存、不提交、不 push
+> - 当前阶段：第三世代 Egg Generator 模块落地
+> - 当前模块：`gen3egg`
+> - Git 基线：`b97ae07 feat: 增加第三世代个体值查询PID`
+> - 工作区状态：孵化模块及相关项目文档未提交；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
-> - 验收状态：ID Searcher 与 Static Searcher 固定夹具已在项目所有者授权的 GitHub Pages 页面回归；本轮特性显示和布局待部署后共同验收
+> - 验收状态：本轮未运行工程检查、原生夹具、Wasm 构建、浏览器检查或算法验收
 
 ## 0. 当前工作区优先状态
 
-- 最近更新：2026-08-12；Git 基线为 `4810cbb fix: 统一第三世代筛选器布局`。
-- 当前未提交内容：CI 格式化、生成脚本 ESLint 修复、Initial Seed 面板的第三方 virtualizer 规则豁免、`gen3ivtopid` Wasm/Worker/UI 和对应文档。
-- 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`profiles`、`ivcalculator`。
-- 自动化状态：此前 CI 修复曾复核 `npm run format:check`、`npm run lint`、`npm run typecheck`；本轮新增与收尾 `gen3ivtopid` 后只完成静态审查与 `git diff --check`，未重新运行工程检查、测试、CMake、原生夹具、构建、浏览器检查或部署。算法和 UI 均未验收。
-- 项目所有者验收规则保持不变：必须先由 GitHub Actions 完成部署，再由所有者提供生产 URL 并明确授权，才能做算法回归；本地 Wasm 或 UI 预览不能替代验收。
+- 当前未提交内容包含 `gen3egg` 的 C++/Emscripten Wasm target、C ABI、Worker Pool、React 工作区、三语词条、样式、模块文档和上游追溯；此前遗留的 `gen3initialseed`、CI 格式和界面修复也仍在同一工作区，必须一并保留。
+- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`。
+- 本轮完成静态源码与上游文件核对，以及 `git diff --check`、仓库 Markdown 本地链接、Egg 新文件尾随空白检查。未运行 npm、CMake、测试、原生夹具、Wasm 构建、UI 预览、浏览器或性能检查。
+- 算法验收规则不变：GitHub Actions 部署成功后，由项目所有者提供实际生产 URL 并明确授权，才可在该页面使用已记录夹具回归。Actions、本地 Wasm、UI 预览和工程检查都不能替代算法验收。
 
-### 本轮实现
+### 本轮实现：`gen3egg`
 
-- `gen3ivtopid`：按 PokeFinder 4.3.2 `IVToPIDCalculator` 实现 Method 1/Reverse Method 1/2/4、XD/Colo、Channel 的六项 IV 反推；新增独立 Wasm API v1、Dedicated Worker、三语入口、九列结果、排序、CSV、输入校验和算法文档 [`docs/modules/gen3ivtopid.md`](modules/gen3ivtopid.md)。Worker 在复制结果前校验 128 条上限、`uint32_t` 对齐和 Wasm 堆边界；取消、组件卸载或异常后销毁旧实例。已写入上游固定夹具的原生测试文件，但本轮未运行。
-
-- `gen3initialseed`：RS TID/SID 全候选反推、FRLG/RSE 目标 Seed 分片反推、固定宽度 C ABI、独立 Worker/Wasm、稳定排序、进度、取消和 CSV；原生夹具覆盖 `48163/64377 -> 05A0/0、C19B/36724` 与 `00006073 -> 0000/1`，本轮未运行。
-- `gen3wild`：地点选择框使用 PokeFinder 4.3.2 `en/zh` 地点资源；不匹配的 EncounterTableGenerator 细分名称保留英文，日文沿用上游英文。
-- `gen3wild` 与 `gen3static`：筛选项统一使用 `gen3-filter-selects` 和共享的 `MultiCheckSelect`；两者保留上游 `Filter.ui` 的左侧 IV/工具与右侧标签-控件紧凑行。Wild 只在固定顺序中额外显示 Encounter Slot 和 Level，Static 移除这两项。
-- CI 修复：格式化 12 个本次变更文件，移除生成脚本多余转义，并为 Initial Seed 使用的 TanStack Virtual 添加与 Static/Wild 一致的局部 ESLint 豁免。
-- 参考记录：Real96 两个 GPL-3.0 初始 Seed 项目用于算法研究；StarfBerry/PokeRNG 仅登记参考，未复制代码。
+- 新增独立 `wasm/modules/gen3egg` target、API v1、`gen3egg_*` C ABI、原生夹具和 `module.json`，已注册到顶层 CMake 与 `scripts/wasm.mjs`。
+- 新增 `src/features/egg`：领域校验、请求编码、结果解码、UI 预览引擎、Worker 协议、Worker Pool 和 React 面板。生产 RNG 仅在 Worker 内的 Wasm 实例运行。
+- 支持 PokeFinder 4.3.2 `EggGenerator3` 的 Emerald `EBred`、`EBredSplit`、`EBredAlternate`，以及 RS/FRLG `RSFRLGBred`、`RSFRLGBredSplit`、`RSFRLGBredAlternate`、`RSFRLGBredMixed`。
+- 支持亲代 IV/性别、Emerald 不变之石与性格、Held/Pickup Seed、推进范围、校准值、查看图鉴次数、好感度、蛋种类、当前存档 TID/SID、完整筛选、遗传来源显示、排序、CSV、进度和取消。
+- Emerald 与 RS/FRLG 使用不同结果列布局。空 16 位 Seed 按上游无符号输入行为视为 `0`；输入范围、组合约束与固定夹具记录在 [Gen 3 Egg](modules/gen3egg.md)。
+- 浏览器任务总组合上限为 `150,060,006`，保留 PokeFinder Emerald 默认 `5000 / 5000 / 0..5` 范围；Worker 在读取结果前核对 API 版本、记录上限、对齐和 Wasm 堆边界。
+- 静态审查修正 Egg 性格全选掩码为 25 位 `0x1FF_FFFF`，防止第 22 至 25 种性格被错误排除；已补充 domain 边界断言，未运行测试。
 
 ### 下一位开发者第一步
 
-1. 阅读 [`docs/modules/gen3ivtopid.md`](modules/gen3ivtopid.md)、[`docs/modules/gen3initialseed.md`](modules/gen3initialseed.md) 与 [`third_party/pokefinder/UPSTREAM.md`](../third_party/pokefinder/UPSTREAM.md)。
-2. 在具备项目所有者授权后，按 `.github/workflows/ci.yml` 和 `package-lock.json` 检查五个 Gen III Wasm target；当前 Codex 不执行这些命令。
-3. 项目所有者在 GitHub Desktop 审查当前 CI 修复后自行提交，建议标题：`fix: 修复 CI 格式与检查错误`。
-4. 推送并等待 Actions 部署；项目所有者提供 URL 后，再共同验收 IVs to PID 固定输入、Initial Seed 结果、地点中文名和野生/定点筛选布局。
+1. 阅读 [`AGENTS.md`](../AGENTS.md)、[AI 开发一致性指南](ai-development.md)、本文、[Gen 3 Egg](modules/gen3egg.md) 和 [PokeFinder 上游记录](../third_party/pokefinder/UPSTREAM.md)。
+2. 使用 GitHub Desktop 审查当前全部未提交修改，确认没有混入生成物；不要覆盖或重置已有工作区内容。
+3. 项目所有者提交后推送 `main`，等待 GitHub Actions 以锁定工具链构建全部六个 Gen III Wasm 模块并部署 Pages。
+4. Actions 部署成功后，项目所有者提供生产 URL 并明确授权；再用 Egg 文档的 Emerald 与 RSFRLG 固定夹具共同回归，并记录 URL、commit、Actions run、浏览器版本、输入、预期和实际结果。
+
+建议 GitHub Desktop 提交标题：
+
+```text
+feat: 增加第三世代孵化乱数
+```
 
 ## 1. 恢复入口
 
-本文是跨会话和跨机器恢复入口。新环境按以下顺序阅读：
+新环境按以下顺序阅读：
 
 1. [`AGENTS.md`](../AGENTS.md)
 2. [AI 开发一致性指南](ai-development.md)
 3. 本文
 4. [README](../README.md)、[产品需求](requirements.md)与[技术方案](tech-stack.md)
-5. 当前模块文档：[Gen 3 IVs to PID](modules/gen3ivtopid.md)
+5. 当前模块文档：[Gen 3 Egg](modules/gen3egg.md)
 6. 第四世代后续交接：[Gen 4 Development](gen4-development.md)
 7. [上游记录](../third_party/pokefinder/UPSTREAM.md)
 8. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)
@@ -51,113 +56,61 @@
 ## 2. 已确认决策
 
 - 正式英文工程名为 PokeRNGKit，不设置中文名。
-- 当前产品仍只做第三世代；第四世代仅保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口和 AI 交接，不实现算法或 UI。
+- 当前产品只做第三世代；第四世代只保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口和 AI 交接，不实现算法或 UI。
 - 只使用 npm，不增加 pnpm、Yarn 或 Bun 元数据。
-- React + TypeScript 负责 UI、校验、Worker 编排、结果与持久化。
-- PokeFinder RNG 规则使用 C++ -> Emscripten -> Wasm，生产算法不在 TypeScript 主线程运行。
+- React + TypeScript 负责 UI、输入校验、Worker 编排、结果与持久化；PokeFinder RNG 规则使用 C++ -> Emscripten -> Wasm，生产算法不在 TypeScript 主线程运行。
 - 多核使用多个独立单线程 Worker/Wasm 实例，不依赖 Wasm pthread、`SharedArrayBuffer`、COOP/COEP 或跨源隔离。
 - IndexedDB 保存存档，localStorage 提供镜像兜底并保存语言、主题和悬浮窗状态。
 - 界面只支持简体中文、英文和日文；有上游简中翻译时逐字复用，没有时保留英文。
 - 正式 Wasm 与站点产物由 GitHub Actions 自动生成，不提交 `public/wasm/`、`wasm/build/` 或 `dist/`。
-- 未获项目所有者明确授权时，Codex 不运行测试、构建、算法回归、性能检查或浏览器检查。获得具体命令或 URL 授权后，检查结果只作为工程证据；部署后的 UI 由 Codex 报告结果并与项目所有者共同验收。
-- 算法结果的验收只能在 GitHub Actions 部署完成、项目所有者提供实际站点 URL 并明确授权后进行。原生夹具、本地 Wasm、UI 预览和 Actions 状态不构成算法验收。
-- Codex 不自动暂存、提交、push、部署或发布，只提供 GitHub Desktop 操作说明和一条提交标题。
+- 未获项目所有者对具体命令或 URL 的明确授权时，Codex 不运行测试、构建、算法回归、性能检查或浏览器检查。
+- Codex 不自动暂存、提交、push、部署或发布；完成模块后只提供一条 GitHub Desktop 提交标题。
 
 ## 3. Git 与部署状态
 
-- 当前分支：`main`，HEAD `4810cbb`。
-- 当前没有待完成的 merge 状态；本轮工作区修改均保持未提交。
-- 远端和仓库目录沿用现有设置，不在本轮重命名或修改远端。
+- 当前分支：`main`，HEAD `b97ae07 feat: 增加第三世代个体值查询PID`。
+- 当前没有待完成的 merge 状态；所有本轮修改保持未提交。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
 
-### 4.1 工程与应用基础
+- 工程基础：React 19、TypeScript 6、Vite 8、Vitest、ESLint、Prettier、PWA 和中英日三语；npm 是唯一包管理器。
+- 构建基线：Node.js `24.19.0`、npm `12.0.2`、Emscripten `6.0.6`、CMake runtime `4.3.1`、Ninja runtime `1.13.2`。
+- 法律边界：GPL-3.0-or-later、PokeFinder 署名、对应源码记录和站点免责声明。
+- 已有工作区：`gen3id`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、三代存档信息、个体值计算器、`gen3ivtopid`。
+- UI 基础：默认收起的模块抽屉、全局存档悬浮窗、浅色/深色主题和系统默认字体。
 
-- React 19、TypeScript 6、Vite 8、Vitest、ESLint、Prettier、PWA 和中英日三语基础。
-- Node.js `24.19.0`、npm `12.0.2`、Emscripten `6.0.6`、CMake runtime `4.3.1`、Ninja runtime `1.13.2` 的构建基线。
-- GPL-3.0-or-later、PokeFinder 署名、对应源码记录和站点免责声明。
-- 默认收起的模块抽屉、全局存档悬浮窗、浅色/深色主题和系统默认字体。
+## 5. 验证状态
 
-### 4.2 已有功能
+### 5.1 历史工程与页面证据
 
-- `gen3id`：XD/Colosseum、FRLG/E、RS ID Generator，筛选、Worker Pool、进度、取消、排序和 CSV。
-- `gen3static`：67 条掌机模板、Generator/Searcher、Method 1/4、游走 IV 缺陷、完整定点筛选、觉醒力量、能力值、Worker Pool、排序和 CSV。
-- `gen3wild`：Generator/Searcher、掌机遭遇数据、特殊地点规则、完整筛选、Worker Pool、排序和 CSV。
-- `profiles`：IndexedDB 主存储、localStorage 镜像、新建、编辑、复制、删除、选择、JSON 导入导出和全部清除。
-- `ivcalculator`：第三世代物种、性格、觉醒力量、多行能力值交集和下一级提示。
-- 右侧悬浮工具列：存档信息和个体值计算器按固定纵向按钮列收起，展开后向左延展；点击页面空白不会收起存档信息。
+- 历史记录中包含前一阶段的 `format:check`、lint、typecheck、单元测试、UI 预览、原生夹具和生产页面回归证据；这些证据仅覆盖当时的构建与模块，不能覆盖当前未提交的 Egg 实现。
+- 历史生产页面回归曾验证 ID Searcher 与 Static Searcher 固定夹具；具体记录以 Git 历史和此前部署对应文档为准。
 
-## 5. 当前未提交工作区：CI 格式与检查修复
+### 5.2 本轮未运行
 
-### 5.1 已实现
+- `npm run format:check`、`npm run lint`、`npm run typecheck`、`npm test` 与 `npm run build:ui`：未运行，等待项目所有者对具体命令授权。
+- `npm run wasm:test:native` 与 `npm run wasm:build`：未运行，等待项目所有者授权；本机工具链与 `emcmake` 状态未在本轮检查。
+- GitHub Pages、真实 Worker/Wasm、移动端、PWA、离线、性能与算法回归：未运行，等待 Actions 部署和生产 URL 授权。
 
-- 本次 Actions 失败涉及的 12 个文件已统一通过 Prettier，生成地点名称文件保持可复现输出。
-- `scripts/generate_gen3_wild_location_names.mjs` 已移除模板字符串中的多余转义，ESLint `no-useless-escape` 错误已修复。
-- `Gen3InitialSeedPanel` 的 TanStack Virtual 调用已添加与 Static/Wild 一致的局部 `react-hooks/incompatible-library` 豁免。
-- 本地 `format:check`、`lint` 和 `typecheck` 均已通过；未将这些结果写成算法或页面验收。
+### 5.3 本轮静态检查
 
-### 5.2 明确未完成
+- 已通过：`git diff --check`。
+- 已通过：README、`docs/` 与 `third_party/pokefinder/UPSTREAM.md` 的本地 Markdown 链接目标存在性检查。
+- 已通过：`docs/modules/gen3egg.md`、`src/features/egg/` 与 `wasm/modules/gen3egg/` 的尾随空白检查。
+- 上述检查不包含 TypeScript 编译、C++ 编译、原生夹具、Wasm 构建或算法验收。
 
-- 本轮未运行测试、构建、算法回归或浏览器检查；CI 修复尚未进入新的 Pages 产物。
-- 本轮部署后的 UI 复核与项目所有者最终验收。
-- 第四世代算法、数据、存档、Wasm、Worker 和界面；未得到项目所有者单独指示前不得开始。
+## 6. 已知风险与边界
 
-## 6. 验证状态
+- `gen3egg` 当前只实现 Egg Generator；Egg Searcher、Masuda 和第四世代孵化规则不在范围内。
+- 多 Worker 会复制 Wasm 线性内存，低内存移动设备可能需要在 Pages 实测后降低 Worker 数。
+- PWA 旧缓存可能造成 UI/Wasm API 短暂错配；Worker API 握手会拒绝版本不一致，但更新体验仍需在部署后验证。
+- Wild 遭遇数据的精确 `EncounterTableGenerator` revision 与 Tanoby Chamber form 数据仍待后续处理，不属于 Egg 模块。
+- 公开部署 Wasm 时必须向用户提供对应完整源码、构建脚本和 GPL 许可材料。
 
-### 6.1 历史自动检查（规则生效前，不构成验收）
+## 7. 新环境恢复
 
-- 本轮已通过：`npm run format:check`、`npm run lint`、`npm run typecheck`。
-- 本轮已通过：`npm test -- --run`，13 个测试文件、48 项测试。
-- 本轮已通过：`npm run build:ui` 与 `npm run verify`；生产 PWA 构建生成 Service Worker，保留主 JS 超过 500 kB 的既有警告。
-- 本轮 UI 预览已人工触发 SID 与 PID 固定样例：SID 显示 `05A0/0`、`C19B/36724` 两条；PID 显示 7 条，含方块闪和星闪。该预览不加载 Wasm，且不构成验收。
-- 本轮已通过：`git diff --check`；17 个 Markdown 文件的本地链接目标均存在。
-- 本轮已运行：`npm run wasm:doctor`，Node.js、CMake、Ninja 可用，Emscripten 与 `emcmake` 缺失，因此命令按预期失败。
-- 本轮已通过：`npm run wasm:test:native`，`gen3id_native_parity`、`gen3static_native_parity`、`gen3wild_native_parity` 共 3 项原生夹具。
-
-### 6.2 Actions 失败与本地复核
-
-- Actions job [`93968467038`](https://github.com/HaKu76/PokeRNGKit/actions/runs/31549358903/job/93968467038) 在 `Verify TypeScript application` 步骤失败；公开页面未提供具体日志，但本地复现确认失败点是 `prettier --check .`，不是 TypeScript 编译或 Wasm 工具链。
-- 修复后本地已通过：`npm run format:check`、`npm run lint`、`npm run typecheck`。
-- 同一 Actions 页面提示 Node.js 20 弃用警告；本轮未升级第三方 Actions，避免扩大范围。
-
-### 6.3 当前未运行或等待授权
-
-- `npm run wasm:build`：本机没有已激活的 Emscripten `emcmake`。
-- GitHub Pages 和真实 Worker/Wasm 集成：待项目所有者授权并提供部署 URL 后检查。
-- 移动端性能、取消延迟、PWA 安装与离线：待项目所有者明确授权的验收范围。
-
-当前终端实际为 Node.js `24.13.0`、npm `11.6.2`，低于仓库锁定的 Node.js `24.19.0`、npm `12.0.2`。上述前端检查已通过，但原生/Wasm 和发布结论必须以锁定工具链的 Actions 为准。
-
-右侧悬浮工具列的本轮实现尚未运行任何检查；等待项目所有者指定授权的 UI 检查范围后再执行。
-
-## 7. 2026-08-12 生产页面回归
-
-- 验证站点：`https://haku76.github.io/PokeRNGKit/`。项目所有者已明确授权本轮在该生产页面检查算法和界面；未运行本地算法验收、构建或测试。
-- 已验证：Gen III ID Searcher 输入 TID `48163`、SID `64377`，返回 `05A0 / Frame 0 / TSV 2283` 与 `C19B / Frame 36724 / TSV 2283`；输入 TID `48163`、PID `0000475A` 返回 7 条，其中 2 条方块闪、5 条星闪。
-- 已验证：Gen III Static Searcher 在 Emerald 的“传说 / 固拉多 / Method 4 / 六项 IV 31 / 其余筛选任意”夹具返回 4 条候选，符合 `docs/modules/gen3static.md` 的固定夹具预期；结果首列为 Seed。
-- 发现：ID 切换至 Searcher 后，Generator 表单和结果仍显示。原因是 `.control-grid` 的 `display: grid` 覆盖浏览器默认的 `[hidden]` 样式。本地已在 `src/styles.css` 强制遵循 `[hidden]`，待部署页面复核。
-- 优化：本地已压缩 `static-control-grid` 的最小列宽、间距、内边距、控件高度和 IV 行高，参考上游 `Form/Gen3/Static3.ui` 的 `spacing=6`、`margin=11`。当前生产站点仍是旧 CSS，必须在下一次部署后与项目所有者共同验收。
-
-## 8. 下一步
-
-1. 项目所有者在 GitHub Desktop 审查未提交的 CI 修复，并创建提交：`fix: 修复 CI 格式与检查错误`。
-2. 推送后等待 GitHub Actions 部署，再由项目所有者提供更新后的站点 URL；本轮筛选布局和 Initial Seed 仍需在新产物上共同验收。
-3. UI 复核重点：Static 特性列显示 `槽位: 名称`；三栏在桌面和侧栏展开状态下不横向溢出；输入框不再占满整栏，筛选布局接近 PokeFinder。
-4. 项目所有者决定是否授权移动端、PWA、离线和性能检查的范围。
-5. 两阶段验收通过后再决定 Tanoby Chamber 数据或发布加固；第四世代仍等待项目所有者指定具体模块。
-
-## 8. 已知风险
-
-- 遭遇数据的精确 `EncounterTableGenerator` revision 尚未记录；全地点一致性仍需抽样验收。
-- Tanoby Chamber 因缺少 form 被排除，在数据补齐前不能开放。
-- 多 Worker 会复制 Wasm 线性内存，低内存移动设备可能需要降低 Worker 数。
-- ID Searcher 当前只枚举 2000 年并返回每个 Seed 的第一组日期；扩大年份范围前需重新确定产品语义与结果规模。
-- PWA 旧缓存可能造成 UI/Wasm API 短暂错配；`gen3id` v2、Static/Wild v3 握手会拒绝运行，但更新体验仍需实测。
-- 第四世代 reservation 没有 API 版本和运行时实现；其他 AI 不得把接口存在误写成产品支持。
-- 公开部署 Wasm 时必须能向用户提供对应的完整源码、构建脚本和 GPL 许可材料。
-
-## 9. 新环境恢复
+以下命令仅在项目所有者对具体范围授权后执行：
 
 ```bash
 git status --short --branch
@@ -174,7 +127,7 @@ npm run wasm:doctor
 npm run dev:ui
 ```
 
-完整验证：
+完整工程验证：
 
 ```bash
 npm run verify
@@ -184,12 +137,10 @@ npm run wasm:build
 
 后两项需要 C++ 编译器与已激活的 Emscripten。缺少工具链时保留失败信息，由 Actions 补齐，不把未运行项写成已通过。
 
-## 10. 维护规则
+## 8. 维护规则
 
 - 每个功能、部署、阻塞、依赖或工具链变化后更新本文。
-- 验证结果区分“历史自动检查”“经授权检查”“未运行”和“待项目所有者共同验收”；自动检查不能替代项目所有者验收。
-- 未获得项目所有者对具体命令或 URL 的明确授权时，不执行任何测试、构建、算法回归、性能检查或浏览器检查。
+- 验证结果必须区分“历史证据”“经授权检查”“未运行”和“待项目所有者共同验收”。
 - 依赖变化同步更新 `package.json`、lockfile 和技术栈版本表。
-- 每个 RNG 功能更新 `docs/modules/<module>.md`。
-- 控件名和输入限制必须重新核对 PokeFinder Form、Core 与翻译文件。
+- 每个 RNG 功能更新 `docs/modules/<module>.md`，重新核对 PokeFinder Form、Core、翻译和输入限制。
 - README、进度、提交、构建和发布说明使用 `hakuhiro-project-style`。

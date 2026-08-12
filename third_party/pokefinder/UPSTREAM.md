@@ -5,7 +5,7 @@
 - 本地核验来源：`C:\Users\Hakuhiro\Desktop\PokeFinder-master`
 - 导入日期：2026-08-11
 - 许可证：GNU GPL v3 or later
-- 导入范围：第三世代 ID Generator 所需的最小 Core、共享 LCRNG、ID 状态与筛选父类；Static 与 Wild Generator 复用共享 LCRNG，并以独立 bridge 对照上游源码实现
+- 导入范围：第三世代 ID Generator 所需的最小 Core、共享 LCRNG、ID 状态与筛选父类；Static、Wild、IVs to PID 与 Egg 以独立 bridge 对照上游源码实现
 
 本地核验目录不是构建依赖。PokeRNGKit 构建只使用本目录内的 vendored snapshot；所有文件保留原始版权与 GPL 头部。
 
@@ -108,6 +108,8 @@ FE6A55570119A253DBD69946D86648E25910687D3B851CD92D4213548C028BE2  RNGRecovertest
 
 当前 vendored 文件未修改。PokeRNGKit 通过独立的 `wasm/modules/gen3id/bridge/gen3id_bridge.cpp` 提供 ID C ABI；`wasm/modules/gen3initialseed/bridge/gen3initialseed_bridge.cpp` 复用 vendored `LCRNG.hpp`，按已登记的 Real96 工作流提供初始 Seed C ABI；`wasm/modules/gen3static/bridge/gen3static_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `StaticGenerator3.cpp` 与 `Utilities.hpp` 的规则提供 Static C ABI、筛选和二进制结果布局；`wasm/modules/gen3wild/bridge/gen3wild_bridge.cpp` 复用同一 LCRNG，并按 Wild Generator、Encounter Area 与 Encounter Slot 规则提供独立 Wild C ABI；`wasm/modules/gen3ivtopid/bridge/gen3ivtopid_bridge.cpp` 复用 vendored LCRNG 参数，并按 `LCRNGReverse.cpp` 与 `IVToPIDCalculator.cpp` 的常量和调用顺序提供第三世代 IVs to PID C ABI。
 
+`wasm/modules/gen3egg/bridge/gen3egg_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `EggGenerator3`、`EggState3` 与 `Daycare` 的调用顺序提供第三世代 Egg Generator C ABI、亲代遗传、筛选和二进制结果布局；不修改 vendored 上游文件。
+
 ## IVs to PID 只读核验
 
 以下上游文件用于核验 `gen3ivtopid` 的算法、输入、翻译、结果列和固定夹具，未复制到 vendored snapshot：
@@ -125,4 +127,23 @@ C9B5AEBF9EA87A381B4F04E3DBDC15AF751C05413789E99B09F70061F2205050  Form/Util/IVTo
 D0B5DCBF392E5090CABED326D44A7E6C370E577EEC3AA6E447E3FFF767993D5A  Model/Util/IVToPIDModel.cpp
 5DE280596558910172C7DBFFD4162A23E342EE294E3F59D257456AF94C903BA5  Test/Util/IVToPIDCalculatorTest.cpp
 E617C4445F3B4C57C8E087B079661C2DE1DD95983C36D0028362D97DCAC76F33  Test/Util/ivtopidcalculator.json
+```
+
+## Egg 只读核验
+
+以下上游文件用于核验 `gen3egg` 的算法、输入、翻译、结果列和固定夹具，未复制到 vendored snapshot：
+
+```text
+2D650A647CA89A524CD64974337B13BCB2BD024483A463877367070F2AE13F1A  Core/Gen3/Generators/EggGenerator3.cpp
+B3257E90E23F14AFA7D122CB112B9DD33374C8548E08251E64704DA550300BF7  Core/Gen3/Generators/EggGenerator3.hpp
+E7C6DF17CC8DDAA652F1344DAF9B713B7AD76C302FE2BB3C3AE956A293714FFF  Core/Gen3/States/EggState3.hpp
+2C7281D92537FBFF5BD1F4385607F32DBEF4C72E7B3C3BC73EEE3D741C7F5B4D  Core/Parents/Daycare.hpp
+B0D73EC844F4DEAF628DA00805A950BB0627B00123CE1D9AA2569DCEE9A99914  Form/Gen3/Eggs3.cpp
+5D83DBB303CBB39B1522E3E58AB1CCBF279928645BCBBA6D8AA7BD3BF4FE189B  Form/Gen3/Eggs3.ui
+C8A8F14C039A49E799B073971CE5A09B5160FE489641D6D741200700DBF86DD3  Form/Controls/EggSettings.cpp
+3B7A337B09907F667FDD87ED04B1A936047745F20143316E1258C89ABC1B74B6  Form/Controls/EggSettings.ui
+340180968236B0CD29FEE6CFF07AFE6001C3D72F85B1024DC90DA8E2A240B22A  Model/Gen3/EggModel3.cpp
+9F0EB6D4987DEA1E2D472F96FC6C3ECCB837EE050687D40A5CCE75C51B719002  Model/Gen3/EggModel3.hpp
+340ADEF105CE40DB19F93BA2C6546F8C320A7F79BFA0A9053BACD39994CBA055  Test/Gen3/EggGenerator3Test.cpp
+244527C1E8BE240CF59E1B31A1B45A6F0CA0425FB98494CE6BD339B7D84B3810  Test/Gen3/egg3.json
 ```

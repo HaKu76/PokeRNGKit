@@ -1,8 +1,8 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：`gen3id` Generator/Searcher、Initial Seed Finder、Static 与 Wild 已接入独立 Wasm/Worker；真实 Wasm 与部署回归待完成
+> - 状态：`gen3id` Generator/Searcher、Initial Seed Finder、Static、Wild、IVs to PID 与 Egg 已接入独立 Wasm/Worker；真实 Wasm 与部署回归待完成
 > - 更新日期：2026-08-12
-> - 当前范围：第三世代 ID、Initial Seed Finder、Static Generator/Searcher、Wild Generator/Searcher、IVs to PID 与存档信息
+> - 当前范围：第三世代 ID、Initial Seed Finder、Static Generator/Searcher、Wild Generator/Searcher、IVs to PID、Egg Generator 与存档信息
 > - 包管理器：npm
 
 ## 1. 技术结论
@@ -45,7 +45,8 @@ React UI
         |-- Gen3StaticSearcherWorkerPool -+-> gen3static.mjs + gen3static.wasm
         |-- Gen3WildWorkerPool ---------+
         |-- Gen3WildSearcherWorkerPool -+-> gen3wild.mjs + gen3wild.wasm
-        `-- Gen3IvToPidWorkerPool ------> gen3ivtopid.mjs + gen3ivtopid.wasm
+        |-- Gen3IvToPidWorkerPool ------> gen3ivtopid.mjs + gen3ivtopid.wasm
+        `-- Gen3EggWorkerPool ----------> gen3egg.mjs + gen3egg.wasm
                                            |
                                            `-- narrow C ABI bridges
                                             `-- PokeFinder 4.3.2 Gen III rules
@@ -96,7 +97,7 @@ Vite 的 `ui` mode 在编译期选择本地 UI 预览引擎。该引擎只生成
 
 React 负责高交互表单、进度状态和虚拟化结果视图。TypeScript 为 RNG 请求、Worker 消息、Wasm 解码和状态机提供静态边界。
 
-当前有 ID、Initial Seed、Static、Wild 与 IVs to PID 五个工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。存档信息由 `useGen3Profiles` 与 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；当多个模块出现复杂共享任务或列配置时再评估。
+当前有 ID、Initial Seed、Static、Wild、IVs to PID 与 Egg 六个工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。存档信息由 `useGen3Profiles` 与 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；当多个模块出现复杂共享任务或列配置时再评估。
 
 ### 5.2 路由
 
@@ -160,12 +161,13 @@ gen3initialseed
 gen3static
 gen3wild
 gen3ivtopid
+gen3egg
 gen4id
 gen4static
 gen4wild
 ```
 
-每个模块必须拥有独立目录、manifest、构建 target、C ABI 前缀、Worker client 和测试，避免一个 Wasm 文件吸收所有世代和功能。当前 `gen3ivtopid` 也是独立 target；它每次输入只恢复有限候选，不创建多 Worker 分片。
+每个模块必须拥有独立目录、manifest、构建 target、C ABI 前缀、Worker client 和测试，避免一个 Wasm 文件吸收所有世代和功能。当前 `gen3ivtopid` 每次输入只恢复有限候选，不创建多 Worker 分片；`gen3egg` 只提供 Generator，Searcher 保留为后续独立工作流。
 
 `src/features/shared/rngModuleContract.ts` 保留跨世代的 manifest、Worker 信封和第四世代模块标识。`gen4id`、`gen4static`、`gen4wild` 当前只有 reservation，没有 API 版本、产物、导航或运行时注册；实施要求见[第四世代扩展接口与 AI 交接](gen4-development.md)。
 
@@ -196,7 +198,12 @@ wasm/
     |   |-- module.json
     |   |-- bridge/
     |   `-- tests/
-    `-- gen3ivtopid/
+    |-- gen3ivtopid/
+        |-- CMakeLists.txt
+        |-- module.json
+        |-- bridge/
+        `-- tests/
+    `-- gen3egg/
         |-- CMakeLists.txt
         |-- module.json
         |-- bridge/
@@ -212,14 +219,16 @@ public/wasm/                        # 生成物，忽略
 |-- gen3wild.mjs
 |-- gen3wild.wasm
 |-- gen3ivtopid.mjs
-`-- gen3ivtopid.wasm
+|-- gen3ivtopid.wasm
+|-- gen3egg.mjs
+`-- gen3egg.wasm
 ```
 
 `scripts/wasm.mjs` 读取 `module.json`，选择模块、调用 npm 提供的 CMake/Ninja、执行原生测试或通过 emsdk 构建 Wasm，并检查声明的产物是否存在。
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 2，`gen3initialseed` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 3，`gen3ivtopid` API 版本为 1。ID C ABI 为：
+当前 `gen3id` API 版本为 2，`gen3initialseed` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 3，`gen3ivtopid` API 版本为 1，`gen3egg` API 版本为 1。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -300,6 +309,23 @@ uint32_t gen3ivtopid_last_error();
 
 每条记录为九个连续 `uint32_t`：`seed / pid / sid / method / ability / gender12.5 / gender25 / gender50 / gender75`。候选恢复只使用一个 Dedicated Worker，不拆分任务。
 
+Egg C ABI v1 使用 54 个 `uint32_t` 请求字，按 Held Advances 分片生成并返回 22 个连续 `uint32_t`：
+
+```c
+uint32_t gen3egg_api_version();
+uint32_t gen3egg_generate(
+  const uint32_t* request, uint32_t requestWords,
+  uint32_t initialAdvancesHeld, uint32_t maxAdvancesHeld,
+  uint32_t maxResults
+);
+uintptr_t gen3egg_result_ptr();
+uint32_t gen3egg_result_count();
+uint32_t gen3egg_result_truncated();
+uint32_t gen3egg_last_error();
+```
+
+记录布局为 `heldAdvances / pickupAdvances / redraws / pid / ability / gender / nature / shiny / hp / atk / def / spa / spd / spe / inheritanceHP / inheritanceAtk / inheritanceDef / inheritanceSpA / inheritanceSpD / inheritanceSpe / hiddenPower / hiddenPowerStrength`。每次 Wasm 调用最多处理 100,000 个 Held/Pickup/Redraw 组合；浏览器任务总组合上限为 `150,060,006`，以覆盖上游 Emerald 默认范围。
+
 Static C ABI 使用同一结果生命周期，并提供 `gen3static_generate` 与 `gen3static_search`。Generator 传入 Seed、推进范围、Offset、Method、预设属性、TID/SID 和筛选；Searcher 传入 IV 组合 `startIndex`、`stateCount`、Method、预设属性、TID/SID 和筛选。两者都返回连续 48 字节记录：
 
 ```text
@@ -326,7 +352,7 @@ uint32 encounterSlot / species / form
 边界原则：
 
 - 只传递固定宽度整数、指针和长度，不暴露 C++ 对象、STL 或 Qt 类型。
-- 每次 C ABI 调用最多处理 100,000 个 Generator 状态；Wild Searcher 的 TypeScript 分片上限为 10,000 个 IV 组合，C ABI 保留 100,000 的防御上限。
+- 每次 C ABI 调用最多处理 100,000 个 Generator 状态；Egg 以 Held 范围分片且每次最多处理 100,000 个 Held/Pickup/Redraw 组合；Wild Searcher 的 TypeScript 分片上限为 10,000 个 IV 组合，C ABI 保留 100,000 的防御上限。
 - `gen3initialseed` 目标 Seed 每次 C ABI 调用最多处理 500,000 个反推状态；UI 的 `Max Results` 上限为 65,536 条。
 - `gen3wild` API v3 的 Generator/Searcher 筛选都在 C++/Wasm 内完成，Worker 不复制第二套 RNG 筛选逻辑。
 - `gen3initialseed` 的正向/反向 LCRNG 计算只在 C++/Wasm 中执行，TypeScript 不复写生产 RNG。
@@ -399,7 +425,7 @@ type ModuleWorkerResponse =
 - 批次缓冲区使用 transfer list 移交所有权。
 - 取消通过终止 Pool 中的 Worker 实现，下一任务重新初始化。
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
-- ID、Initial Seed、Static、Wild 与 IVs to PID 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；IVs to PID 每次输入是一个有限候选任务，不拆分 chunk。
+- ID、Initial Seed、Static、Wild、IVs to PID 与 Egg 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；IVs to PID 每次输入是一个有限候选任务，不拆分 chunk；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入。
 
 第四世代新模块使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`，任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`。这一契约只约束未来模块，不改写已验证的三代消息类型。
 
@@ -409,7 +435,7 @@ type ModuleWorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3egg_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 
@@ -426,7 +452,8 @@ docs/
 |   |-- gen3profiles.md
 |   |-- gen3static.md
 |   |-- gen3wild.md
-|   `-- gen3ivtopid.md
+|   |-- gen3ivtopid.md
+|   `-- gen3egg.md
 |-- ai-development.md
 |-- gen4-development.md
 |-- progress.md
@@ -468,9 +495,15 @@ src/
     |   |-- gen3Data.ts
     |   |-- search.ts
     |   `-- worker/
-    `-- ivtopid/
+    |-- ivtopid/
         |-- domain.ts
         |-- Gen3IvToPidPanel.tsx
+        |-- search.ts
+        |-- preview/
+        `-- worker/
+    `-- egg/
+        |-- domain.ts
+        |-- Gen3EggPanel.tsx
         |-- search.ts
         |-- preview/
         `-- worker/
@@ -482,7 +515,8 @@ wasm/modules/
 |-- gen3initialseed/
 |-- gen3static/
 |-- gen3wild/
-`-- gen3ivtopid/
+|-- gen3ivtopid/
+`-- gen3egg/
 ```
 
 后续模块沿用同一结构。Static 与 Wild 的 Generator/Searcher 各自共享同一个版本化模块，但使用独立请求、Pool 和任务生命周期；不要把 `gen4id` 或其他世代逻辑塞进现有模块。
@@ -523,10 +557,10 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 ### 12.1 当前已实现
 
-- **C++ 原生夹具**：ID 三种模式，Initial Seed 的 RS TID/SID 固定候选，Static Generator Method 1/4、Searcher 反向恢复、游走缺陷、筛选和错误码，Wild Route 111 Generator/Searcher 固定结果，以及 IVs to PID 的 Channel 与 Method 2 固定结果。Initial Seed 与 IVs to PID 夹具已写入工作区，本轮尚未运行。
-- **TypeScript 单元测试**：ID/Static/Wild/IVs to PID 输入边界、Generator/Searcher 分片、固定宽度结果解码、觉醒力量、输入规范化、主题和红蓝宝石 Seed 推导。
+- **C++ 原生夹具**：ID 三种模式，Initial Seed 的 RS TID/SID 固定候选，Static Generator Method 1/4、Searcher 反向恢复、游走缺陷、筛选和错误码，Wild Route 111 Generator/Searcher 固定结果，IVs to PID 的 Channel 与 Method 2 固定结果，以及 Egg Emerald/RSFRLG 固定结果。Initial Seed、IVs to PID 与 Egg 夹具已写入工作区，本轮尚未运行。
+- **TypeScript 单元测试**：ID/Static/Wild/IVs to PID/Egg 输入边界、Generator/Searcher 分片、固定宽度结果解码、觉醒力量、输入规范化、主题和红蓝宝石 Seed 推导。
 - **持久化单元测试**：存档 JSON schema、合并边界、IndexedDB 主存储抽象与 localStorage 兜底。
-- **UI 预览引擎测试**：ID/Static/Wild Generator/Searcher 与 IVs to PID 的确定性样例、进度和取消。Initial Seed 预览引擎已实现，组件测试待后续补充。
+- **UI 预览引擎测试**：ID/Static/Wild Generator/Searcher、IVs to PID 与 Egg Generator 的确定性样例、进度和取消。Initial Seed 预览引擎已实现，组件测试待后续补充。
 - **静态检查**：Prettier、ESLint、TypeScript project build。
 - **生产 Web 构建**：Vite Worker、PWA、相对 base 和法律文件。
 
@@ -534,14 +568,14 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 - Testing Library：模块切换、表单校验、取消、排序、CSV 和语言切换。
 - Worker + 真实 Wasm 浏览器集成：API 握手、批次顺序、错误、取消和内存边界。
-- Playwright：GitHub Pages 子路径、ID/Initial Seed/Static/Wild/IVs to PID 冒烟、离线重载和移动视口。
+- Playwright：GitHub Pages 子路径、ID/Initial Seed/Static/Wild/IVs to PID/Egg 冒烟、离线重载和移动视口。
 - 性能基线：记录设备、浏览器、状态数、Worker 数、吞吐、取消耗时和峰值内存。
 
 测试数量不代替上游一致性。优先保证 C++ 固定夹具、协议边界和真实 Pages 加载路径。
 
 ## 13. 当前模块技术验证门槛
 
-当前 `gen3initialseed` 与 `gen3ivtopid` 进入部署页面算法回归前必须完成：
+当前 `gen3initialseed`、`gen3ivtopid` 与 `gen3egg` 进入部署页面算法回归前必须完成：
 
 1. 原生夹具验证 TID `48163`、SID `64377` 返回 `05A0 / 0` 与 `C19B / 36724`，并覆盖 C ABI 的 TID/SID 和分片边界错误码。
 2. RS IDs 以 65,536 个低位状态完成扫描，所有返回记录的初始 Seed 不大于 `0xFFFF` 且按稳定帧顺序提交。
@@ -555,6 +589,8 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 10. 项目所有者完成并记录界面、真实设备、PWA 和正式发布验收。
 
 `gen3ivtopid` 额外门槛：原生夹具必须覆盖 IV `0/0/0/0/0/0` 的 Channel 结果和 IV `31/31/31/0/31/31` 的 Method 2 结果；Worker 必须拒绝超过 128 条、未按 `uint32_t` 对齐或超出 Wasm 堆边界的结果缓冲区；浏览器页面必须显示九列结果，空 TID 必须等价于 `0`，且不出现第四世代 Cute Charm。
+
+`gen3egg` 额外门槛：原生夹具必须覆盖 `EBred` Bulbasaur 的 50 条结果与 `RSFRLGBredSplit` Bulbasaur 的 60 条结果，并核对首条 Advances、PID 和六项 IV；Worker 必须拒绝超过 100,000 条、未按 `uint32_t` 对齐或超出 Wasm 堆边界的结果缓冲区；浏览器页面必须按游戏显示 Emerald 的 16 列或 RS/FRLG 的 15 列，空 16 位 Seed 必须等价于 `0000`。
 
 ## 14. GitHub Actions 与 Pages
 
