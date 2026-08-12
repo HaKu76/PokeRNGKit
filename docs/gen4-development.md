@@ -1,11 +1,11 @@
 # 第四世代扩展接口与 AI 交接
 
-> - 状态：仅保留接口，未实现第四世代算法、数据、存档或界面
-> - 更新日期：2026-08-11
+> - 状态：第四世代 Static Generator/Searcher、独立存档和独立个体值计算器已实现；生产回归待部署
+> - 更新日期：2026-08-12
 > - 上游基线：PokeFinder 4.3.2
-> - 当前产品范围：仍为第三世代
+> - 当前产品范围：第三世代既有模块与第四世代 Static
 
-本文用于另一位开发者或 AI 在新会话中启动第四世代模块。接口预留不代表第四世代已经进入产品范围；开始具体模块前仍需项目所有者明确指定模块。
+本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前只落地 `gen4static`；`gen4id` 与 `gen4wild` 仍仅保留共享接口，不得据此推断已支持其他第四世代功能。
 
 ## 1. 已保留接口
 
@@ -18,7 +18,17 @@
 - `RngWorkerReadyMessage`、`RngWorkerBatchMessage`、`RngWorkerErrorMessage`：握手、批次和失败信封。
 - `GEN4_MODULE_RESERVATIONS`：只保留 `gen4id`、`gen4static`、`gen4wild` 三个标识及 Generator/Searcher 能力。
 
-预留项没有 `apiVersion`、Wasm 产物或运行时注册。不要为尚未实现的模块填写假版本、加入导航、修改默认 Wasm 构建列表或在 UI 中显示不可用入口。
+`gen4id` 与 `gen4wild` 仍没有运行时注册。`gen4static` 已使用 API 版本 `1`、独立 Wasm target、Worker Pool、导航入口和 UI 预览引擎。
+
+## 2.1 当前已实现：`gen4static`
+
+- 覆盖 PokeFinder 第四世代 Static 的 Generator/Searcher、Method 1/J/K、Synchronize 和 Cute Charm 分支。
+- 内置 99 条 DPPt/HGSS 定点模板，按 Starters、Fossils、Gifts、Game Corner、Stationary、Legends、Events、Roamers 分类；数据由 `scripts/generate_gen4_static_data.mjs` 生成。
+- Generator 与 Searcher 六项 IV 最小/最大值均默认 `0..31`，IV 名称按钮沿用 G3 的单击、Ctrl、Alt、Ctrl+Alt 快捷键。
+- 结果表使用固定列宽并显示觉醒属性、觉醒威力、个性、电话和音高；Searcher 的首列为 Seed，Generator 的首列为 Advances。
+- G4 存档和个体值计算器使用独立 React 模块、schema、IndexedDB/localStorage 键，不读取或覆盖 G3 控件状态。
+
+Generator 的 `Max Advances` 与 PokeFinder 一致，包含起点，因此输入 `N` 计算 `N + 1` 个状态；Searcher 的 IV 组合按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 的闭区间笛卡尔积枚举。
 
 ## 2. 模块边界
 

@@ -1,7 +1,7 @@
 # PokeRNGKit 产品需求
 
-> - 状态：遇敌查询与 `gen3seedtotime` 待工程检查与部署验收
-> - 更新日期：2026-08-12
+> - 状态：PR #3 合并冲突已处理；合并结果待工程检查与部署验收
+> - 更新日期：2026-08-13
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
 
@@ -11,12 +11,12 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Static/Wild Generator/Searcher、IVs to PID、Egg、存档信息和个体值计算器已进入 Git 基线；当前工作区新增右下角遇敌查询悬浮工具、第三世代 `SeedToTime3` 与 `SpindaPainter`。
+当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、存档信息和个体值计算器已进入主分支；当前合并工作区加入第四世代 Static Generator/Searcher、独立 G4 存档和独立 G4 个体值计算器。Encounter Lookup 是跨世代静态查询工具。
 
 ## 2. 已确认边界
 
 - 英文工程名为 PokeRNGKit，不设置中文名。
-- RNG Generator/Searcher 第一阶段只覆盖第三世代，不扩展到其他世代；遇敌查询是用户明确批准的跨世代静态工具例外。
+- RNG Generator/Searcher 当前覆盖第三世代既有模块与用户明确指定的第四世代 Static；Encounter Lookup 是跨世代静态工具。
 - 只使用 npm 管理 JavaScript 依赖和工程命令。
 - RNG Core 采用 C++ -> Emscripten -> Wasm，不在 TypeScript 中重写上游算法。
 - TypeScript 负责界面、校验、任务编排、Worker 协议、持久化和导出。
@@ -65,6 +65,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 ### 3.9 第三世代 Seed 到时间用户
 
 用户输入 16 位初始 Seed 或 32 位 PokeRNG 状态与年份，查看可产生该 Seed 的日期和分钟。32 位 Seed 会按 PokeFinder 的 PokeRNGR 规则回推到原始 Seed，并显示回推帧数。
+
+### 3.10 第四世代定点乱数用户
+
+用户选择 Diamond、Pearl、Platinum、HeartGold 或 SoulSilver 存档与定点模板，使用 Method 1/J/K、Synchronize 或 Cute Charm 生成结果，也可以输入六项 IV 闭区间反向检索候选 Seed。G4 使用独立存档和独立个体值计算器，但控件布局、IV 快捷操作、排序、CSV 和结果表行为与 G3 Static 保持一致。
 
 ## 4. 当前功能需求：`gen3id`
 
@@ -361,15 +365,28 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细映射、输入边界、资源与固定夹具见 [Gen 3 Spinda Painter](modules/gen3spindapainter.md)。
 
+## 8.7 当前功能需求：`gen4static`
+
+- **FR-G4STATIC-01** 支持 Diamond、Pearl、Platinum、HeartGold、SoulSilver 的 Static Generator/Searcher，以及 Method 1、Method J、Method K。
+- **FR-G4STATIC-02** 支持 None、Synchronize、Cute Charm 队首规则；具体可用组合、PID 循环和 Seed 恢复以 PokeFinder 4.3.2 为准。
+- **FR-G4STATIC-03** Generator 与 Searcher 六项 IV 默认均为 `0..31`，输入控件、IV 快捷操作、筛选、排序、CSV 和结果虚拟表风格与 G3 Static 对齐。
+- **FR-G4STATIC-04** Generator 的 `Max Advances=N` 包含起点并处理 `N+1` 个状态；Searcher 按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 枚举 IV 闭区间笛卡尔积。
+- **FR-G4STATIC-05** 结果显示 Advances 或 Seed、PID、异色、性格、特性、性别、六项 IV、觉醒属性、觉醒威力、个性、电话和音高；中文术语固定为“觉醒力量”“觉醒属性”“觉醒威力”。
+- **FR-G4STATIC-06** 使用独立 `gen4static` Wasm API v1、C ABI、Worker 和 Worker Pool，不在 React 主线程或 TypeScript 中重写生产 RNG。
+- **FR-G4STATIC-07** G4 存档与个体值计算器使用独立 schema、IndexedDB/localStorage 键和 React 状态，不读取、覆盖或删除 G3 控件。
+- **FR-G4STATIC-08** G3/G4 页面均保留 Encounter Lookup；当前页面的存档、个体值计算器与 Encounter Lookup 三个悬浮工具必须互斥展开。
+
+详细算法、输入、数据来源和结果布局见 [Gen 4 Static](modules/gen4static.md)、[Gen 4 Profiles](modules/gen4profiles.md)和[Gen 4 IV Calculator](modules/gen4ivcalculator.md)。
+
 ## 9. 后续 MVP
 
-遇敌查询通过工程检查、部署页面回归与项目所有者最终验收后，按以下顺序推进：
+第四世代 Static 与 Encounter Lookup 通过工程检查、部署页面回归和项目所有者最终验收后，按以下顺序推进：
 
 1. Wild Generator/Searcher 的 Actions、Pages 部署回归和项目所有者最终验收。
 2. Tanoby Chamber form 数据、来源记录与固定夹具。
 3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
-Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估。Gen IV 及其他世代不属于当前承诺；仓库只保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口与[开发交接](gen4-development.md)，没有第四世代算法或 UI。
+Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 后评估。第四世代当前只承诺 `gen4static`；`gen4id`、`gen4wild` 和其他第四世代功能仍只保留扩展接口或候选边界。
 
 ## 10. 非目标
 
@@ -431,8 +448,8 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
-3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、Egg Emerald/RSFRLG 固定结果及错误边界。
-4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` 的 MJS/Wasm 产物。
+3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、G3 Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、Egg Emerald/RSFRLG，以及 G4 Static Method 1/J/K、Synchronize、Cute Charm、Searcher 与错误边界夹具。
+4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg` 与 `gen4static` 的 MJS/Wasm 产物。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
@@ -448,12 +465,13 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 5. Wild Generator/Searcher 使用 Route 111、Feebas 或 RSE 特殊规则固定输入核对槽位、等级、PID、IV 与筛选。
 6. ID 的 TID、SID、TSV 筛选，以及 Static/Wild 的 IV、性格、特性、性别、闪光、觉醒力量和遭遇槽位筛选。
 7. 大范围任务的进度、取消、页面响应和结果上限提示。
-8. ID、Initial Seed、Static、Wild、IVs to PID 与 Egg 的结果排序、CSV 内容、清空结果和移动端横向滚动。
+8. ID、Initial Seed、G3/G4 Static、Wild、IVs to PID 与 Egg 的结果排序、CSV 内容、清空结果和移动端横向滚动。
 9. Wild Generator/Searcher 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
 10. Seed to Time 使用 `00000000 / 2000` 核对 7 条时间、首条 `2000-03-30 18:22:00` 和末条 `2000-12-29 02:10:00`；再以 `40000000 / 2000` 核对回写原始 Seed `1AA5` 与 Advances `66861`。
 11. IVs to PID 使用 `0/0/0/0/0/0`、Nature `0`、TID `12345` 核对 Channel 的 `56654838 / DC2DA271 / 48333`，并使用 `31/31/31/0/31/31`、Nature `0`、TID `12345` 核对 Method 2 的 `36E6808A / 02B0100B / 8832`；确认空 TID 等价于 `0` 且不显示第四世代 Cute Charm。
-12. GitHub Pages 在线加载七个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
-13. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
+12. G4 Static 使用已记录固定输入核对 Method 1/J/K、Synchronize、Cute Charm、`Max Advances + 1`、Searcher Seed、PID 和六项 IV；同时确认 G3/G4 存档与个体值计算器相互独立。
+13. GitHub Pages 在线加载 8 个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
+14. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
 
 算法回归必须使用真实生产 Wasm，不能使用 `ui` 预览模式。无法从部署页面确认的原生夹具、移动设备性能或离线安装行为必须明确列为未覆盖。
 
@@ -478,9 +496,10 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整 Wild 筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、九列结果、输入校验和算法文档（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（已进入 Git 基线，待部署回归与最终验收）。
-- **静态工具：`encounterlookup`** - PokeFinder 4.3.2 支持的 Gen III、Gen IV、Gen V 与 BDSP 遇敌查询（当前工作区，待工程检查、Actions、部署回归与最终验收）。
-- **阶段 6B：`gen3spindapainter`** - PID 与晃晃斑斑点双向映射、原始 PNG、拖动和键盘交互、输入边界及模块文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
-- **阶段 7：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
+- **静态工具：`encounterlookup`** - PokeFinder 4.3.2 支持的 Gen III、Gen IV、Gen V 与 BDSP 遇敌查询（已进入上游基线，待部署回归与最终验收）。
+- **阶段 6B：`gen3spindapainter`** - PID 与晃晃斑斑点双向映射、原始 PNG、拖动和键盘交互、输入边界及模块文档（已进入主分支，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 7：`gen4static` Static Generator/Searcher** - 第四世代 Method 1/J/K、独立 G4 存档与个体值计算器、Wasm/Worker 和算法文档（当前合并工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 8：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项
 

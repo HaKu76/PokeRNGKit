@@ -132,7 +132,7 @@ function runNativeTestsInWindowsDevEnvironment() {
 async function loadModules() {
   const moduleNames = (
     process.env.POKERNGKIT_WASM_MODULES ??
-    "gen3id,gen3initialseed,gen3seedtotime,gen3static,gen3wild,gen3ivtopid,gen3egg"
+    "gen3id,gen3initialseed,gen3seedtotime,gen3static,gen3wild,gen3ivtopid,gen3egg,gen4static"
   )
     .split(",")
     .map((value) => value.trim())
@@ -204,7 +204,10 @@ async function configureWasm(modules) {
 
 async function verifyArtifacts(modules) {
   for (const module of modules) {
-    for (const artifact of module.artifacts) {
+    const artifacts = Array.isArray(module.artifacts)
+      ? module.artifacts
+      : Object.values(module.artifacts);
+    for (const artifact of artifacts) {
       await access(path.join(outputRoot, artifact), constants.R_OK);
     }
   }
