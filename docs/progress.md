@@ -1,49 +1,36 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：修复第三世代 Egg 构建与分片验证问题
-> - 当前模块：`gen3egg`、`gen3wild`
-> - Git 基线：`1ec3a69 fix: 修复第三世代 Wild Worker lint 错误`
-> - 工作区状态：存在未提交的 Egg 分片测试、C++ bridge、格式与验证记录修复；Codex 不暂存、不提交、不 push
+> - 当前阶段：新增遇敌查询静态悬浮工具，等待工程检查与部署验收
+> - 当前模块：`encounterlookup`
+> - Git 基线：`c48eb28 fix: 修复第三世代孵化构建与分片验证`
+> - 工作区状态：存在未提交的遇敌查询源码、静态数据与文档；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
-> - 验收状态：已完成本机工程检查、原生夹具与 Wasm 发布构建；未完成部署页面回归或项目所有者算法验收
+> - 验收状态：历史基线已完成本机工程检查、原生夹具与 Wasm 发布构建；遇敌查询未运行工程检查、浏览器检查或项目所有者验收
 
 ## 0. 当前工作区优先状态
 
-- 本地 `ff16a5f` 已合并第三世代野生检索功能；其中包括 Wild Searcher、地点中文、筛选布局、CI 格式与生成脚本修复，以及此前 `e447e79` 的 `gen3egg` 实现。
-- 当前正把远端 `05aed435` 的 `gen3ivtopid` Worker Prettier 格式修复合并到该基线；除本文件外，远端变更均已进入合并暂存区，必须一并保留。
-- Actions job `94007197147`：`npm run verify` 在 `prettier --check .` 阶段因 `src/features/ivtopid/worker/gen3ivtopid.worker.ts` 未按 Prettier 换行失败；远端提交已格式化该文件，本轮未运行本地 `verify` 复核。
-- Actions run `31564813848` / job `94014371292`：`build` 因 `src/features/wild/Gen3WildPanel.tsx` 的未使用 `displayLocation` 函数触发 ESLint 失败，部署步骤被跳过；已从工作目录移除该无调用点函数，未运行本地 `verify` 复核。
-- Actions run `31565396316` / job `94016055981`：`Verify TypeScript application` 失败，Wasm、原生夹具与部署均未执行。静态检查发现 `Gen3WildPanel.tsx` 含重复的 Ability/Gender 类型导入、`WildOperation` 类型别名和 `columns` 声明；已移除重复声明，未运行本地 `verify` 复核。
-- Actions run `31565728175` / job `94017012800`：`npm run verify` 在 `prettier --check .` 阶段失败，列出 `docs/modules/gen3egg.md`、`src/App.tsx`、8 个 Egg 文件及 `src/styles.css` 共 10 个文件。已用锁定的 Prettier `3.9.6` 格式化该清单；未运行完整 `verify`、Wasm、原生夹具、构建或算法验收。
-- Actions run `31566082714` / job `94018049518`：`prettier --check .` 已通过；ESLint 仅报告两个无效的 `react-hooks/incompatible-library` 禁用注释；`tsc -b` 报告 10 个 TypeScript 错误，均来自 Egg/Wild 合并残留。当前工作区已删除 Egg 的重复 `useVirtualizer` 导入和两处无效禁用注释，按游戏版本收窄 Egg Method 到 Wasm 的映射，移除 Wild 的重复本地 `MultiCheckSelect`、重复 `operation` 状态及旧 setter 调用，并移除 Worker 的旧 API 签名、前端二次筛选和重复 `search()` 实现。
-- Actions run `31566752956` / job `94020020424`：Prettier 已通过；`tsc -b` 尚未执行，因为 ESLint 在 `src/features/wild/worker/gen3wild.worker.ts` 报告 `Gen3WildRequest` 与 `Gen3WildSearcherRequest` 两个未使用类型导入。本地已移除它们。Egg/Wild 的 `useVirtualizer()` 仍各有一条 `react-hooks/incompatible-library` 警告，表示 React Compiler 跳过对此 hook 的自动 memoization；该警告没有使 job 失败，不作为本轮算法或 UI 验收结论。
-- Actions run `31567004267` / job `94020776039`：Prettier、ESLint 和 TypeScript 已通过；Vitest 的 `src/features/egg/domain.test.ts` 有一项过期断言失败。实现会根据单次 Wasm 最多 `100,000` 个 Held/Pickup/Redraw 组合的防护上限分片，在 Emerald Pickup `0..0`、Redraw `0..5` 时每块 Held 上限为 `16,666`，测试原先错误断言为固定 `20,000`。已更新断言为 `16,666 + 3,335`，不改变生产分片逻辑。
-- 本地工程验证已获项目所有者授权并完成：`npm run verify` 通过，包含 Prettier、ESLint、`tsc -b`、15 个 Vitest 文件共 54 项测试、Vite 生产构建和 PWA 预缓存生成。ESLint 仍有 Egg/Wild 各一条 `useVirtualizer()` 的非阻断 React Compiler 警告。
-- 本地原生 Core 夹具已在 Visual Studio 2026 Build Tools x64 开发环境中通过：`npm run wasm:test:native` 通过 6/6（`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`）。修复 Egg bridge 的 lambda 捕获、数字常量兼容性和临时状态 ABI 字段初始化，未改变 RNG 规则。第一次从普通 PowerShell 调用失败是未加载 MSVC 头文件环境，不是源码错误。
-- 已将官方 emsdk 安装到用户级目录 `C:\Users\Hakuhiro\AppData\Local\pokerngkit-emsdk` 并激活 Emscripten `6.0.6`。在 `emsdk_env.bat` 环境中，`npm run wasm:doctor` 与正式 `npm run build` 均通过，六个 Gen III Wasm 模块和 Vite/PWA 生产站点已成功生成；SDK 未写入仓库，也未永久修改系统环境变量。
-- 本机系统 Node.js `24.13.0`、npm `11.6.2` 仍低于项目/CI 锁定的 Node.js `24.19.0`、npm `12.0.2`；emsdk 自带 Node.js `24.19.0`，但本轮 npm 命令仍由系统 Node.js 执行。因此本地完整构建仅作上传前工程证据，Actions 仍须在锁定 Node/npm 环境复核。
-- 已静态核对 `gen3wild` API v3：`src/features/wild/worker/gen3wild.worker.ts` 的 `gen3wild_search` 调用参数顺序与 `wasm/modules/gen3wild/bridge/gen3wild_bridge.h/.cpp` 一致；全部筛选参数传入 Wasm，并直接 transfer 结果缓冲区。
-- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`。
-- Egg 阶段已完成静态源码与上游文件核对、`git diff --check`、仓库 Markdown 本地链接与新文件尾随空白检查、本机 Web 工程验证、原生夹具和 Emscripten Wasm 发布构建。UI 预览、浏览器、性能和生产算法回归仍未执行。
-- 算法验收规则不变：GitHub Actions 部署成功后，由项目所有者提供实际生产 URL 并明确授权，才可在该页面使用已记录夹具回归。Actions、本地 Wasm、UI 预览和工程检查都不能替代算法验收。
+- HEAD `c48eb28` 已包含此前 Egg/Wild 构建、分片、格式和类型修复；本轮工作区没有待完成 merge，也没有未提交的旧模块修改。
+- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`、`encounterlookup`。
+- 本轮新增 `encounterlookup`：右下角默认收起的全世代 Encounter Lookup，覆盖 PokeFinder 4.3.2 的 Gen III、Gen IV、Gen V 和 BDSP 共 16 个版本；静态数据由 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 生成，未运行工程检查。
+- 遇敌查询不进入左侧 RNG 导航，不使用 Wasm/Worker；宝可梦候选、游戏版本、地点、遇敌种类和等级范围均来自本地静态数据。
+- 已清理生成用 `.tmp-encounter-tables/` 与 `.tmp-encounter-tables.zip`；生成脚本和正式 `data.ts` 保留在工作区。
+- 本轮只完成源码、上游和数据结构静态审查；未获项目所有者授权，未运行测试、构建、lint、typecheck、浏览器、性能或部署页面检查。
 
-### 本地提交实现：`gen3egg`
+### 当前工作区实现：`encounterlookup`
 
-- 新增独立 `wasm/modules/gen3egg` target、API v1、`gen3egg_*` C ABI、原生夹具和 `module.json`，已注册到顶层 CMake 与 `scripts/wasm.mjs`。
-- 新增 `src/features/egg`：领域校验、请求编码、结果解码、UI 预览引擎、Worker 协议、Worker Pool 和 React 面板。生产 RNG 仅在 Worker 内的 Wasm 实例运行。
-- 支持 PokeFinder 4.3.2 `EggGenerator3` 的 Emerald `EBred`、`EBredSplit`、`EBredAlternate`，以及 RS/FRLG `RSFRLGBred`、`RSFRLGBredSplit`、`RSFRLGBredAlternate`、`RSFRLGBredMixed`。
-- 支持亲代 IV/性别、Emerald 不变之石与性格、Held/Pickup Seed、推进范围、校准值、查看图鉴次数、好感度、蛋种类、当前存档 TID/SID、完整筛选、遗传来源显示、排序、CSV、进度和取消。
-- Emerald 与 RS/FRLG 使用不同结果列布局。空 16 位 Seed 按上游无符号输入行为视为 `0`；输入范围、组合约束与固定夹具记录在 [Gen 3 Egg](modules/gen3egg.md)。
-- 浏览器任务总组合上限为 `150,060,006`，保留 PokeFinder Emerald 默认 `5000 / 5000 / 0..5` 范围；Worker 在读取结果前核对 API 版本、记录上限、对齐和 Wasm 堆边界。
-- 静态审查修正 Egg 性格全选掩码为 25 位 `0x1FF_FFFF`，防止第 22 至 25 种性格被错误排除；已补充 domain 边界断言，未运行测试。
+- 新增 `src/features/encounterlookup`，包含查询 domain、边界测试、三语静态数据和右下角悬浮面板。
+- 支持 PokeFinder 4.3.2 实际支持的 16 个游戏版本；物种上限为 Gen III `386`、Gen IV `493`、Gen V `649`、BDSP `493`。
+- 查询覆盖时间、群聚、雷达、双槽、广播、季节、Feebas、HGSS Safari/撞树/捕虫大赛等上游 Encounter Lookup 组合。
+- 个体值计算器与遇敌查询从所有入口保持双向互斥展开；左侧 `ActiveModule` 与模块抽屉不包含 Encounter Lookup。
+- 生成脚本、精确 revision、输入行为和 GPL 来源记录见 [遇敌查询](modules/encounterlookup.md)与[上游记录](../third_party/pokefinder/UPSTREAM.md)。
 
 ### 下一位开发者第一步
 
-1. 阅读 [`AGENTS.md`](../AGENTS.md)、[AI 开发一致性指南](ai-development.md)、本文、[Gen 3 Egg](modules/gen3egg.md)、[Gen 3 Wild](modules/gen3wild.md) 和 [PokeFinder 上游记录](../third_party/pokefinder/UPSTREAM.md)。
-2. 在 GitHub Desktop 审查 Egg 分片测试、Egg C++ bridge、Prettier 格式化和本文更新；不要覆盖、重置或选择性丢弃已有工作区内容。
-3. 由项目所有者提交并推送修复，等待 GitHub Actions 在锁定 Node.js `24.19.0`、npm `12.0.2` 与 Emscripten `6.0.6` 环境复核本地已通过的工程检查、六个 Gen III Wasm 模块构建并部署 Pages。
-4. Actions 部署成功后，项目所有者提供生产 URL 并明确授权；再使用 Egg、Wild、IVs to PID 和 Initial Seed 文档中的固定输入共同回归，并记录 URL、commit、Actions run、浏览器版本、输入、预期和实际结果。
+1. 阅读 [`AGENTS.md`](../AGENTS.md)、[AI 开发一致性指南](ai-development.md)、本文、[遇敌查询](modules/encounterlookup.md)、[Gen 3 Egg](modules/gen3egg.md)、[Gen 3 Wild](modules/gen3wild.md) 和 [PokeFinder 上游记录](../third_party/pokefinder/UPSTREAM.md)。
+2. 在 GitHub Desktop 审查遇敌查询面板、静态生成数据、生成脚本和文档；不要覆盖、重置或选择性丢弃工作区内容。
+3. 项目所有者如需本机工程检查，明确授权具体命令；否则由项目所有者提交并推送，等待 GitHub Actions 复核并部署 Pages。
+4. Actions 部署成功后，由项目所有者提供生产 URL 并明确授权外部浏览器检查，再共同验收 16 个版本切换、三语物种/地点、查询结果和移动端悬浮布局。
 
 ## 当前可用模块
 
@@ -54,6 +41,7 @@
 - `gen3ivtopid`：第三世代 IVs to PID 查询。
 - `gen3egg`：第三世代 Egg Generator。
 - `profiles`、`ivcalculator`：全局存档与个体值计算器。
+- `encounterlookup`：右下角遇敌查询悬浮工具，覆盖 PokeFinder 4.3.2 实际支持的 16 个游戏版本。
 
 新环境按以下顺序阅读：
 
@@ -61,7 +49,7 @@
 2. [AI 开发一致性指南](ai-development.md)
 3. 本文
 4. [README](../README.md)、[产品需求](requirements.md)与[技术方案](tech-stack.md)
-5. 当前模块文档：[Gen 3 Egg](modules/gen3egg.md)
+5. 当前模块文档：[遇敌查询](modules/encounterlookup.md)
 6. 第四世代后续交接：[Gen 4 Development](gen4-development.md)
 7. [上游记录](../third_party/pokefinder/UPSTREAM.md)
 8. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)
@@ -78,7 +66,7 @@
 ## 验证记录
 
 - 正式英文工程名为 PokeRNGKit，不设置中文名。
-- 当前产品只做第三世代；第四世代只保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口和 AI 交接，不实现算法或 UI。
+- 当前 RNG 产品只做第三世代；第四世代只保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口和 AI 交接，不实现 RNG 算法或主模块 UI。`encounterlookup` 是用户明确批准的跨世代静态查询例外。
 - 只使用 npm，不增加 pnpm、Yarn 或 Bun 元数据。
 - React + TypeScript 负责 UI、输入校验、Worker 编排、结果与持久化；PokeFinder RNG 规则使用 C++ -> Emscripten -> Wasm，生产算法不在 TypeScript 主线程运行。
 - 多核使用多个独立单线程 Worker/Wasm 实例，不依赖 Wasm pthread、`SharedArrayBuffer`、COOP/COEP 或跨源隔离。
@@ -91,8 +79,8 @@
 
 ## 后续验收
 
-- 当前分支：`main`，HEAD `1ec3a69 fix: 修复第三世代 Wild Worker lint 错误`。
-- 当前无待完成 merge；Egg 分片测试、C++ bridge、格式与验证记录修复保持未提交。
+- 当前分支：`main`，HEAD `c48eb28 fix: 修复第三世代孵化构建与分片验证`。
+- 当前无待完成 merge；遇敌查询源码、静态数据、生成脚本和文档保持未提交。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
@@ -100,36 +88,35 @@
 - 工程基础：React 19、TypeScript 6、Vite 8、Vitest、ESLint、Prettier、PWA 和中英日三语；npm 是唯一包管理器。
 - 构建基线：Node.js `24.19.0`、npm `12.0.2`、Emscripten `6.0.6`、CMake runtime `4.3.1`、Ninja runtime `1.13.2`。
 - 法律边界：GPL-3.0-or-later、PokeFinder 署名、对应源码记录和站点免责声明。
-- 已有模块：`gen3id`、`gen3initialseed`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、三代存档信息和个体值计算器。
+- 已有模块：`gen3id`、`gen3initialseed`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、三代存档信息和个体值计算器；`encounterlookup` 当前仍在未提交工作区。
 - UI 基础：默认收起的模块抽屉、全局存档悬浮窗、浅色/深色主题和系统默认字体。
 
 ## 5. 验证状态
 
 ### 5.1 历史工程与页面证据
 
-- 历史记录中包含前一阶段的 `format:check`、`lint`、`typecheck`、单元测试、UI 预览、原生夹具和生产页面回归证据；这些证据仅覆盖当时的构建与模块，不能覆盖本地 `e447e79` 的 Egg 实现或当前合并中的 Wild 变更。
+- 历史记录中包含前一阶段的 `format:check`、`lint`、`typecheck`、单元测试、UI 预览、原生夹具和生产页面回归证据；这些证据只覆盖对应提交，不能覆盖当前未提交的遇敌查询变更。
 - 历史生产页面回归曾验证 ID Searcher 与 Static Searcher 固定夹具；具体记录以 Git 历史和此前部署对应文档为准。
 
-### 5.2 本轮工程验证
+### 5.2 基线工程验证
 
 - 已通过：`npm run verify`。Prettier、ESLint、`tsc -b`、15 个 Vitest 文件共 54 项测试、Vite 生产构建与 PWA 预缓存均已完成；ESLint 保留两条非阻断的 TanStack Virtual / React Compiler 警告。
 - 已通过：在 Visual Studio 2026 Build Tools x64 开发环境中运行 `npm run wasm:test:native`，6/6 原生 Core 夹具通过。
 - 已通过：在用户级 emsdk `6.0.6` 环境中运行 `npm run wasm:doctor` 与 `npm run build`，六个 Gen III Wasm 模块、Vite 生产站点和 PWA 预缓存均成功生成。CMake `4.3.1` 报告 Emscripten shared library 支持警告，但当前模块均为独立可执行 Wasm target，构建未受阻。
 - GitHub Pages、真实 Worker/Wasm、移动端、PWA、离线、性能与算法回归：未运行，等待 Actions 部署和生产 URL 授权。
 
-### 5.3 本轮静态检查
+### 5.3 遇敌查询本轮检查
 
-- 已通过：`git diff --check`。
-- 已通过：README、`docs/` 与 `third_party/pokefinder/UPSTREAM.md` 的本地 Markdown 链接目标存在性检查。
-- 已通过：`docs/modules/gen3egg.md`、`src/features/egg/` 与 `wasm/modules/gen3egg/` 的尾随空白检查。
-- 上述检查不包含 TypeScript 编译、C++ 编译、原生夹具、Wasm 构建或算法验收。
+- 已完成：源码、生成数据结构、上游 16 个版本、世代图鉴上限、翻译词条与悬浮工具状态的静态审查。
+- 已确认：生成数据包含 16 个游戏键，等级范围未发现反向值或超过 100 的记录；该结论来自生成阶段的静态数据检查，不是测试或浏览器验收。
+- 未运行：`git diff --check`、Prettier、ESLint、TypeScript、Vitest、Vite 构建、Wasm、浏览器、性能、部署页面和项目所有者验收；原因是本轮未获具体检查授权。
 
 ## 6. 已知风险与边界
 
 - `gen3egg` 当前只实现 Egg Generator；Egg Searcher、Masuda 和第四世代孵化规则不在范围内。
 - 多 Worker 会复制 Wasm 线性内存，低内存移动设备可能需要在 Pages 实测后降低 Worker 数。
 - PWA 旧缓存可能造成 UI/Wasm API 短暂错配；Worker API 握手会拒绝版本不一致，但更新体验仍需在部署后验证。
-- Wild 遭遇数据的精确 `EncounterTableGenerator` revision 与 Tanoby Chamber form 数据仍待后续处理，不属于 Egg 模块。
+- Wild 遭遇数据的 Tanoby Chamber form 数据仍待后续处理；本轮 `encounterlookup` 已锁定 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 并生成 16 个版本的静态查询数据。
 - 公开部署 Wasm 时必须向用户提供对应完整源码、构建脚本和 GPL 许可材料。
 
 ## 7. 新环境恢复

@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：第三世代 Egg Generator 待工程检查与部署验收
+> - 状态：遇敌查询待工程检查与部署验收
 > - 更新日期：2026-08-12
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,12 +11,12 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。ID、Static/Wild Generator/Searcher、三代存档信息、个体值计算器和 `gen3ivtopid` 已进入 Git 基线；当前工作区新增 `gen3initialseed` 与 `gen3egg`，并同步完善 Wild 地点本地化与 Static/Wild 筛选布局。
+当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Static/Wild Generator/Searcher、IVs to PID、Egg、存档信息和个体值计算器已进入 Git 基线；当前工作区新增右下角遇敌查询悬浮工具。
 
 ## 2. 已确认边界
 
 - 英文工程名为 PokeRNGKit，不设置中文名。
-- 第一阶段只覆盖第三世代，不扩展到其他世代。
+- RNG Generator/Searcher 第一阶段只覆盖第三世代，不扩展到其他世代；遇敌查询是用户明确批准的跨世代静态工具例外。
 - 只使用 npm 管理 JavaScript 依赖和工程命令。
 - RNG Core 采用 C++ -> Emscripten -> Wasm，不在 TypeScript 中重写上游算法。
 - TypeScript 负责界面、校验、任务编排、Worker 协议、持久化和导出。
@@ -326,9 +326,20 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细算法、来源、输入限制和验收夹具见 [Gen 3 Egg](modules/gen3egg.md)。
 
+## 8.4 当前功能需求：`encounterlookup` 遇敌查询
+
+- **FR-ENCOUNTER-01** 在右下角悬浮工具区提供默认收起的 `Encounter Lookup`，不进入左侧主模块导航；展开时与个体值计算器互斥，点击外部可收起。
+- **FR-ENCOUNTER-02** 支持 PokeFinder 4.3.2 实际提供的 16 个版本：Ruby、Sapphire、FireRed、LeafGreen、Emerald、Diamond、Pearl、Platinum、HeartGold、SoulSilver、Black、White、Black 2、White 2、Brilliant Diamond、Shining Pearl。
+- **FR-ENCOUNTER-03** 按版本提供宝可梦自动补全候选，图鉴上限分别为 Gen III `386`、Gen IV `493`、Gen V `649`、BDSP `493`；输入不存在的自由文本时不得返回结果。
+- **FR-ENCOUNTER-04** 结果至少包含 `Location`、`Encounter Type` 和 `Level Range`，并覆盖上游对应世代的草丛、冲浪、钓竿、碎岩、撞树、捕虫大赛及 BDSP/DPPt/HGSS/Gen V 的特殊遭遇组合。
+- **FR-ENCOUNTER-05** 使用本地静态生成数据，不增加后端、账号、遥测、运行时 CDN、Wasm 或 Worker；数据生成命令、EncounterTableGenerator revision、许可证和上游文件记录在模块文档与上游记录中。
+- **FR-ENCOUNTER-06** 简体中文控件与结果列逐字复用 `PokeFinder_zh.ts`；日文未完成词条保留英文源标签，不自行扩展第六、七世代或 Sword/Shield。
+
+详细数据规则、输入行为、来源和未运行验证项见 [遇敌查询](modules/encounterlookup.md)。
+
 ## 9. 后续 MVP
 
-当前工作区通过工程检查、部署页面回归与项目所有者最终验收后，按以下顺序推进：
+遇敌查询通过工程检查、部署页面回归与项目所有者最终验收后，按以下顺序推进：
 
 1. Wild Generator/Searcher 的 Actions、Pages 部署回归和项目所有者最终验收。
 2. Tanoby Chamber form 数据、来源记录与固定夹具。
@@ -435,12 +446,13 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 - **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 2A：`gen3static` Generator** - 独立 Wasm/Worker、Method 1/4、游走缺陷、筛选和结果（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2B：Static Searcher** - 反向恢复、搜索协议、结果边界和上游一致性测试（已进入 Git 基线，待部署回归与最终验收）。
-- **阶段 2C：`gen3initialseed`** - RS TID/SID 与目标 Seed 初始种子反推、独立 Wasm/Worker、分片、进度、取消、排序和 CSV（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 2C：`gen3initialseed`** - RS TID/SID 与目标 Seed 初始种子反推、独立 Wasm/Worker、分片、进度、取消、排序和 CSV（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 镜像、CRUD、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
 - **阶段 4A：`gen3wild` Generator** - 遭遇数据、独立 Wasm/Worker、特殊规则、完整筛选和一致性夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整 Wild 筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、九列结果、输入校验和算法文档（已实现，待 Actions、部署回归与最终验收）。
-- **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（已进入 Git 基线，待部署回归与最终验收）。
+- **静态工具：`encounterlookup`** - PokeFinder 4.3.2 支持的 Gen III、Gen IV、Gen V 与 BDSP 遇敌查询（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 7：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

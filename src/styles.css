@@ -1966,6 +1966,85 @@ h1 {
 .table-row span {
   padding: 0 20px;
 }
+.encounter-lookup-display {
+  width: min(760px, calc(100vw - 36px));
+  max-height: calc(100vh - 92px);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-right: 3px solid var(--amber);
+  border-radius: 4px;
+  background: var(--surface);
+  box-shadow: 0 12px 34px rgba(9, 10, 24, 0.25);
+  transition:
+    width 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.encounter-lookup-display.collapsed {
+  width: min(176px, calc(100vw - 36px));
+}
+.encounter-lookup-display.collapsed .floating-tool-heading {
+  border-bottom: 0;
+}
+.encounter-lookup-display:not(.collapsed) {
+  animation: floating-tool-open 180ms ease-out;
+}
+.encounter-lookup-body {
+  max-height: calc(100vh - 138px);
+  overflow: auto;
+}
+.encounter-lookup-form {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.encounter-lookup-submit {
+  min-width: 88px;
+  justify-content: center;
+}
+.encounter-lookup-table-shell {
+  height: min(420px, calc(100vh - 260px));
+  min-height: 180px;
+  overflow: auto;
+  background: var(--table-bg);
+}
+.encounter-lookup-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.encounter-lookup-table th,
+.encounter-lookup-table td {
+  border-right: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 12px;
+}
+.encounter-lookup-table th {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.encounter-lookup-table th:first-child {
+  width: 52%;
+}
+.encounter-lookup-table th:nth-child(2) {
+  width: 28%;
+}
+.encounter-lookup-table tbody tr:hover {
+  background: var(--surface-2);
+}
 .empty-state {
   height: 100%;
   display: grid;
@@ -2125,6 +2204,13 @@ h1 {
   .iv-calculator-display.collapsed {
     width: 128px;
   }
+  .encounter-lookup-display {
+    width: 100%;
+    max-height: calc(100vh - 78px);
+  }
+  .encounter-lookup-display.collapsed {
+    width: min(176px, calc(100vw - 20px));
+  }
   .calculator-settings-grid,
   .calculator-output-grid {
     grid-template-columns: 1fr;
@@ -2148,15 +2234,24 @@ h1 {
     margin-left: 16px;
     margin-right: 16px;
   }
+  .encounter-lookup-form {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+  .encounter-lookup-submit {
+    width: 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .profile-display,
-  .iv-calculator-display {
+  .iv-calculator-display,
+  .encounter-lookup-display {
     transition: none;
   }
   .profile-display:not(.collapsed),
-  .iv-calculator-display:not(.collapsed) {
+  .iv-calculator-display:not(.collapsed),
+  .encounter-lookup-display:not(.collapsed) {
     animation: none;
   }
 }

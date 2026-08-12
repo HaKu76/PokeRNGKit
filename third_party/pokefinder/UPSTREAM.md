@@ -5,7 +5,7 @@
 - 本地核验来源：`C:\Users\Hakuhiro\Desktop\PokeFinder-master`
 - 导入日期：2026-08-11
 - 许可证：GNU GPL v3 or later
-- 导入范围：第三世代 ID Generator 所需的最小 Core、共享 LCRNG、ID 状态与筛选父类；Static、Wild、IVs to PID 与 Egg 以独立 bridge 对照上游源码实现
+- 导入范围：第三世代 ID Generator 所需的最小 Core、共享 LCRNG、ID 状态与筛选父类；Static、Wild、IVs to PID 与 Egg 以独立 bridge 对照上游源码实现；Encounter Lookup 以静态生成数据对照上游行为
 
 本地核验目录不是构建依赖。PokeRNGKit 构建只使用本目录内的 vendored snapshot；所有文件保留原始版权与 GPL 头部。
 
@@ -66,6 +66,41 @@ D145C24D2CA64AECF86A1BC4EEE80909F15AB1B9A81C9F004702DA6FD31D5AEC  Test/Gen3/Wild
 
 PokeFinder 将 `Core/Resources/EncounterTables` 声明为 [Admiral-Fish/EncounterTableGenerator](https://github.com/Admiral-Fish/EncounterTableGenerator) 子模块。当前本地 4.3.2 归档未包含该子模块内容；PR #1 的 `gen3Data.ts` 与生成脚本尚未记录所用子模块的精确 revision。补齐 revision、生成命令和数据许可证记录前，不把全地点数据描述为已完成来源审计。
 
+上段只描述既有 `gen3wild` 数据来源状态；下方 `encounterlookup` 使用独立生成流程，已记录精确 revision。
+
+## Encounter Lookup 静态数据
+
+本轮遇敌查询已锁定以下可复现来源：
+
+- PokeFinder `v4.3.2`：`2d5c6afed9240f2bdb98634b5b8b1fab352aefa5`
+- EncounterTableGenerator：`7769c1df80be93761fe6479d51cbf2fe7a7dc4f9`
+- 上游行为：`Form/Util/EncounterLookup.cpp`、`Form/Util/EncounterLookup.ui`、`Form/Controls/ComboBox.cpp`、`Form/Controls/ComboBoxProxy.cpp`、`Core/Gen3/Encounters3.cpp`、`Core/Gen4/Encounters4.cpp`、`Core/Gen5/Encounters5.cpp`、`Core/Gen8/Encounters8.cpp`
+- 上游控件行为：宝可梦使用可编辑自动补全、`QComboBox::NoInsert`、包含匹配和弹出列表；版本固定提供 16 个游戏。
+
+只读核验文件 SHA-256：
+
+```text
+7B98A76E223C64E4B4A70CDB6F65133B497FA3059C3E68B82C1733CDD310F538  Form/Util/EncounterLookup.cpp
+2C3BE95F607BE7504B89CCE0FC52DA863D9C47429849EB7751365FBD9EA05652  Form/Util/EncounterLookup.ui
+83A93A8C18957D45CF391A14E92036E7D158D8DD812BC24BCB27EF60D30D6794  Form/Controls/ComboBox.cpp
+79322B24F8154319DD519F4744D6A43916A8D094EEDC818AA6B0A025A11F46EC  Form/Controls/ComboBoxProxy.cpp
+1256E0B868146F558793A1DADA929793000A88FD9D239115FCB7C7A5CF996F3F  Core/Gen3/Encounters3.cpp
+ED78E866AA3E7F21193505637E171EBEAFAFE593F7360B8814F71CC18633F6FF  Core/Gen4/Encounters4.cpp
+C233B3AF820C2824217DB0B6645E1BD6298E37CD21D1FDB3FF4180949683A5AA  Core/Gen5/Encounters5.cpp
+5E77BC4910859F473FF6714EA426A82F75533028A75F422AEDF93FDD2E8EF046  Core/Gen8/Encounters8.cpp
+```
+
+生成命令：
+
+```powershell
+python scripts\generate_encounter_lookup_data.py `
+  --generated .tmp-encounter-tables `
+  --i18n C:\Users\Hakuhiro\Desktop\PokeFinder-master\Core\Resources\i18n `
+  --output src\features\encounterlookup\data.ts
+```
+
+生成数据文件 `src/features/encounterlookup/data.ts` 保留 PokeFinder 与 EncounterTableGenerator 的 GPL-3.0-or-later 署名。`.tmp-encounter-tables/` 与压缩包只用于生成，不是运行时依赖，不应提交。
+
 ## Gen III Wild 地点本地化
 
 `src/features/wild/locationNames.ts` 是由 `scripts/generate_gen3_wild_location_names.mjs` 生成的只读显示资源。脚本将 `gen3Data.ts` 中的 EncounterTableGenerator 地点名与 PokeFinder 英文/简体中文地点资源匹配；精确匹配或明确前缀匹配时显示上游中文，未匹配的细分地点保留 EncounterTableGenerator 英文原名。日文地点资源当前上游仍为英文，因此日文界面同样显示上游英文，而不自行翻译。
@@ -109,6 +144,8 @@ FE6A55570119A253DBD69946D86648E25910687D3B851CD92D4213548C028BE2  RNGRecovertest
 当前 vendored 文件未修改。PokeRNGKit 通过独立的 `wasm/modules/gen3id/bridge/gen3id_bridge.cpp` 提供 ID C ABI；`wasm/modules/gen3initialseed/bridge/gen3initialseed_bridge.cpp` 复用 vendored `LCRNG.hpp`，按已登记的 Real96 工作流提供初始 Seed C ABI；`wasm/modules/gen3static/bridge/gen3static_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `StaticGenerator3.cpp` 与 `Utilities.hpp` 的规则提供 Static C ABI、筛选和二进制结果布局；`wasm/modules/gen3wild/bridge/gen3wild_bridge.cpp` 复用同一 LCRNG，并按 Wild Generator、Encounter Area 与 Encounter Slot 规则提供独立 Wild C ABI；`wasm/modules/gen3ivtopid/bridge/gen3ivtopid_bridge.cpp` 复用 vendored LCRNG 参数，并按 `LCRNGReverse.cpp` 与 `IVToPIDCalculator.cpp` 的常量和调用顺序提供第三世代 IVs to PID C ABI。
 
 `wasm/modules/gen3egg/bridge/gen3egg_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `EggGenerator3`、`EggState3` 与 `Daycare` 的调用顺序提供第三世代 Egg Generator C ABI、亲代遗传、筛选和二进制结果布局；不修改 vendored 上游文件。
+
+`src/features/encounterlookup` 不复制或修改上游 Core；它使用由 EncounterTableGenerator 二进制资源生成的静态数据，并在 TypeScript domain 中复现上游 Encounter Lookup 的版本、图鉴上限、特殊遭遇组合和等级范围映射。
 
 ## IVs to PID 只读核验
 

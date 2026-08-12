@@ -20,6 +20,7 @@ import type {
 } from "./features/id/search";
 import { Gen3IdWorkerPool } from "./features/id/worker/Gen3IdWorkerPool";
 import { Gen3EggPanel } from "./features/egg/Gen3EggPanel";
+import { EncounterLookupPanel } from "./features/encounterlookup/EncounterLookupPanel";
 import { Gen3IvCalculator } from "./features/ivcalculator/Gen3IvCalculator";
 import { Gen3ProfileControls } from "./features/profiles/Gen3ProfileControls";
 import {
@@ -66,6 +67,7 @@ function App() {
   const [activeModule, setActiveModule] = useState<ActiveModule>("id");
   const [moduleRailOpen, setModuleRailOpen] = useState(false);
   const [ivCalculatorExpanded, setIvCalculatorExpanded] = useState(false);
+  const [encounterLookupExpanded, setEncounterLookupExpanded] = useState(false);
   const searchEngine = useMemo<Id3SearchEngine>(
     () =>
       uiPreviewMode ? new Gen3IdUiPreviewEngine() : new Gen3IdWorkerPool(),
@@ -151,6 +153,11 @@ function App() {
     void i18n.changeLanguage(nextLanguage);
     localStorage.setItem("pokerngkit-language", nextLanguage);
     setLanguage(nextLanguage);
+  };
+
+  const openIvCalculator = () => {
+    setIvCalculatorExpanded(true);
+    setEncounterLookupExpanded(false);
   };
 
   const readRequest = (): Id3Request | undefined => {
@@ -907,19 +914,19 @@ function App() {
             <Gen3InitialSeedPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "static" ? (
             <Gen3StaticPanel
-              onOpenIvCalculator={() => setIvCalculatorExpanded(true)}
+              onOpenIvCalculator={openIvCalculator}
               profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "wild" ? (
             <Gen3WildPanel
-              onOpenIvCalculator={() => setIvCalculatorExpanded(true)}
+              onOpenIvCalculator={openIvCalculator}
               profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "egg" ? (
             <Gen3EggPanel
-              onOpenIvCalculator={() => setIvCalculatorExpanded(true)}
+              onOpenIvCalculator={openIvCalculator}
               profile={gen3EggProfileOrDefault(profiles.selectedProfile)}
               uiPreviewMode={uiPreviewMode}
             />
@@ -931,7 +938,17 @@ function App() {
       <div className="floating-tools">
         <Gen3IvCalculator
           expanded={ivCalculatorExpanded}
-          onExpandedChange={setIvCalculatorExpanded}
+          onExpandedChange={(expanded) => {
+            setIvCalculatorExpanded(expanded);
+            if (expanded) setEncounterLookupExpanded(false);
+          }}
+        />
+        <EncounterLookupPanel
+          expanded={encounterLookupExpanded}
+          onExpandedChange={(expanded) => {
+            setEncounterLookupExpanded(expanded);
+            if (expanded) setIvCalculatorExpanded(false);
+          }}
         />
         <Gen3ProfileControls
           compatibleVersions={
