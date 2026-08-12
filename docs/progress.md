@@ -12,6 +12,7 @@
 
 - 最近更新：2026-08-12；Git 基线为 `4810cbb fix: 统一第三世代筛选器布局`。
 - PR #2 合并：已在 `main` 合并 `c006813 docs: 记录第三世代野生 PR`。野生模块、Wasm API、筛选界面、翻译与样例引擎的冲突均保留当前 `main` 侧实现；本轮未运行测试、构建、原生夹具或浏览器检查。
+- Actions job `94007197147`：`npm run verify` 在 `prettier --check .` 阶段因 `src/features/ivtopid/worker/gen3ivtopid.worker.ts` 未按 Prettier 换行失败；已用 Prettier 格式化该文件，未运行本地 `verify` 复核。
 - 当前未提交内容：CI 格式化、生成脚本 ESLint 修复、Initial Seed 面板的第三方 virtualizer 规则豁免、`gen3ivtopid` Wasm/Worker/UI 和对应文档。
 - 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`profiles`、`ivcalculator`。
 - 自动化状态：此前 CI 修复曾复核 `npm run format:check`、`npm run lint`、`npm run typecheck`；本轮新增与收尾 `gen3ivtopid` 后只完成静态审查与 `git diff --check`，未重新运行工程检查、测试、CMake、原生夹具、构建、浏览器检查或部署。算法和 UI 均未验收。

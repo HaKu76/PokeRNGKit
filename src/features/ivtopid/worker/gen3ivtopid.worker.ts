@@ -91,7 +91,9 @@ function run(message: Extract<Gen3IvToPidWorkerRequest, { type: "run" }>) {
     bytePointer / Uint32Array.BYTES_PER_ELEMENT + wordCount >
       wasm.HEAPU32.length
   ) {
-    throw new RangeError("Gen3 IVs to PID core returned an invalid result range.");
+    throw new RangeError(
+      "Gen3 IVs to PID core returned an invalid result range.",
+    );
   }
   const pointer = bytePointer / Uint32Array.BYTES_PER_ELEMENT;
   const words = wasm.HEAPU32.slice(pointer, pointer + wordCount);
