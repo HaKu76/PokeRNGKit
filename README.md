@@ -5,13 +5,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代 Seed 查询时间模块落地。** 当前工作区新增 `gen3seedtotime`，并同步补充独立 Wasm/Worker、32 位 Seed 回推、固定夹具、算法文档和三语入口。真实 Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
+**当前里程碑：第三世代晃晃斑斑点模块落地。** 当前工作区新增 `gen3spindapainter`，以 PokeFinder 的 PID 半字节规则双向还原四个斑点，保留原始 PNG 资源、鼠标拖动和键盘网格移动。工程检查、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
-- 已有模块：ID Generator/Searcher、Initial Seed Finder、Seed to Time、Static Generator/Searcher、Wild Generator/Searcher、IVs to PID、Egg Generator、三代存档信息、个体值计算器
-- 当前模块：Seed to Time；实现尚未提交，真实 Wasm 待 Actions 验证
+- 已有模块：ID Generator/Searcher、Initial Seed Finder、Seed to Time、Static Generator/Searcher、Wild Generator/Searcher、IVs to PID、Egg Generator、Spinda Painter、三代存档信息、个体值计算器
+- 当前模块：Spinda Painter；实现尚未提交，工程检查和部署回归待授权
 - 上游核验基线：PokeFinder 4.3.2
-- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
@@ -60,6 +60,13 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - 性格、觉醒力量、IV、能力、性别、特性和异色筛选；遗传来源显示、排序、CSV、进度与取消
 - 独立 `gen3egg` Wasm、Worker Pool、Emerald 与 RS/FRLG 不同结果列布局；当前只提供 Generator，不包含 Egg Searcher
 - 算法、输入边界和固定夹具见 [Gen 3 Egg](docs/modules/gen3egg.md)；本轮未构建或验收
+
+当前 Spinda Painter 工作区包含：
+
+- PID 的四字节半字节位置映射，空 PID 按 `0` 显示；拖动斑点后回写无前导零十六进制 PID
+- PokeFinder 原始 `512x512` 晃晃斑底图与四张各自尺寸的斑点 PNG，鼠标拖动和方向键均按 8 像素网格移动
+- 由 PID 显示性格、性别和特性；不使用 Wasm/Worker，也不含 RNG 搜索
+- 算法、输入边界和资源来源见 [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md)；本轮未构建或验收
 
 当前 Static 工作区包含：
 
@@ -247,6 +254,7 @@ npm run build:web
 - **阶段 2A：第三世代 Static Generator** - `gen3static`、Method 1/4、游走缺陷、筛选和结果工作区（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2B：Static Searcher** - 反向 IV 恢复、搜索边界、独立 Worker Pool 和结果工作区（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2C：`gen3seedtotime`** - 第三世代 Seed 到日期时间、32 位回推、独立 Wasm/Worker、固定夹具和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 2D：`gen3spindapainter`** - PID 与晃晃斑斑点双向映射、原始图像资源、拖动与键盘交互、输入边界和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 兜底、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
 - **阶段 4A：Wild Generator** - 遭遇数据、独立 `gen3wild` Wasm/Worker、特殊地点规则、完整筛选和固定夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。

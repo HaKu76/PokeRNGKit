@@ -34,6 +34,7 @@ import {
 import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
 import { Gen3InitialSeedPanel } from "./features/initialseed/Gen3InitialSeedPanel";
 import { Gen3SeedToTimePanel } from "./features/seedtotime/Gen3SeedToTimePanel";
+import { Gen3SpindaPainterPanel } from "./features/spindapainter/Gen3SpindaPainterPanel";
 import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
 import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
@@ -49,7 +50,8 @@ type ActiveModule =
   | "static"
   | "wild"
   | "ivtopid"
-  | "egg";
+  | "egg"
+  | "spindapainter";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -503,6 +505,24 @@ function App() {
               <small>{t("eggVersion")}</small>
             </span>
           </button>
+          <button
+            className={
+              activeModule === "spindapainter"
+                ? "module-entry active"
+                : "module-entry"
+            }
+            onClick={() => {
+              setActiveModule("spindapainter");
+              setModuleRailOpen(false);
+            }}
+            type="button"
+          >
+            <span className="module-index">08</span>
+            <span>
+              <strong>{t("spindaPainterModule")}</strong>
+              <small>{t("spindaPainterVersion")}</small>
+            </span>
+          </button>
           <div className="rail-footer">
             <span className="rail-dot" />
             {t("localOnly")}
@@ -527,7 +547,9 @@ function App() {
                           ? "wildEngine"
                           : activeModule === "ivtopid"
                             ? "ivToPidEngine"
-                            : "eggEngine",
+                            : activeModule === "egg"
+                              ? "eggEngine"
+                              : "spindaPainterEngine",
                 )}
               </h1>
             </div>
@@ -545,7 +567,9 @@ function App() {
                         ? "wildVersion"
                         : activeModule === "ivtopid"
                           ? "ivToPidVersion"
-                          : "eggVersion",
+                          : activeModule === "egg"
+                            ? "eggVersion"
+                            : "spindaPainterVersion",
               )}
             </div>
           </div>
@@ -977,6 +1001,8 @@ function App() {
               profile={gen3EggProfileOrDefault(profiles.selectedProfile)}
               uiPreviewMode={uiPreviewMode}
             />
+          ) : activeModule === "spindapainter" ? (
+            <Gen3SpindaPainterPanel />
           ) : (
             <Gen3IvToPidPanel uiPreviewMode={uiPreviewMode} />
           )}

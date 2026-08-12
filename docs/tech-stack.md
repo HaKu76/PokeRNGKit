@@ -142,7 +142,7 @@ PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等�
 - `localStorage`：存档完整镜像、语言、主题和存档悬浮窗折叠状态。
 - Worker/Wasm：任务期间的临时计算状态。
 - 页面刷新：终止任务并重建 Worker，不持久化结果。
-- UI 预览：ID、Initial Seed、Static、Wild 与 IVs to PID 各自使用同一搜索接口的确定性样例引擎，不读取或生成 Wasm；预览结果只用于界面交互验收。
+- UI 预览：ID、Initial Seed、Static、Wild 与 IVs to PID 各自使用同一搜索接口的确定性样例引擎，不读取或生成 Wasm；预览结果只用于界面交互验收。`gen3spindapainter` 是不涉及 RNG 的确定性 PID/坐标映射，直接由 React domain 计算，不创建 Wasm 或 Worker。
 
 ### 6.2 存档 repository
 
@@ -331,6 +331,10 @@ uint32_t gen3ivtopid_last_error();
 ```
 
 每条记录为九个连续 `uint32_t`：`seed / pid / sid / method / ability / gender12.5 / gender25 / gender50 / gender75`。候选恢复只使用一个 Dedicated Worker，不拆分任务。
+
+### 6.5 Spinda Painter
+
+`src/features/spindapainter/domain.ts` 保存 PokeFinder 的四个斑点偏移、边界和 8 像素 PID 网格。面板使用静态导入的 `spinda.png` 与 `spinda_spot1..4.png`，在相对比例画布中保持上游原始 `512x512` 坐标系；指针移动以实际图片左上角为锚点，仅作上游边界钳制，反向 PID 对坐标除以 8 截断。键盘方向键每次移动一个网格。此模块不调度 Worker，不访问 Wasm，且通过 Workbox 的 `png` 预缓存模式与其他离线资源一起缓存。
 
 Egg C ABI v1 使用 54 个 `uint32_t` 请求字，按 Held Advances 分片生成并返回 22 个连续 `uint32_t`：
 
@@ -589,7 +593,7 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 ### 12.1 当前已实现
 
 - **C++ 原生夹具**：ID 三种模式，Initial Seed 的 RS TID/SID 固定候选，Static Generator Method 1/4、Searcher 反向恢复、游走缺陷、筛选和错误码，Wild Route 111 Generator/Searcher 固定结果，IVs to PID 的 Channel 与 Method 2 固定结果，以及 Egg Emerald/RSFRLG 固定结果。Initial Seed、IVs to PID 与 Egg 夹具已写入工作区，本轮尚未运行。
-- **TypeScript 单元测试**：ID/Static/Wild/IVs to PID/Egg 输入边界、Generator/Searcher 分片、固定宽度结果解码、觉醒力量、输入规范化、主题和红蓝宝石 Seed 推导。
+- **TypeScript 单元测试**：ID/Static/Wild/IVs to PID/Egg/Spinda Painter 输入边界、Generator/Searcher 分片、固定宽度结果解码、PID/斑点双向映射、觉醒力量、输入规范化、主题和红蓝宝石 Seed 推导。
 - **持久化单元测试**：存档 JSON schema、合并边界、IndexedDB 主存储抽象与 localStorage 兜底。
 - **UI 预览引擎测试**：ID/Static/Wild Generator/Searcher、IVs to PID 与 Egg Generator 的确定性样例、进度和取消。Initial Seed 预览引擎已实现，组件测试待后续补充。
 - **静态检查**：Prettier、ESLint、TypeScript project build。
@@ -599,7 +603,7 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 - Testing Library：模块切换、表单校验、取消、排序、CSV 和语言切换。
 - Worker + 真实 Wasm 浏览器集成：API 握手、批次顺序、错误、取消和内存边界。
-- Playwright：GitHub Pages 子路径、ID/Initial Seed/Seed to Time/Static/Wild/IVs to PID/Egg 冒烟、离线重载和移动视口。
+- Playwright：GitHub Pages 子路径、ID/Initial Seed/Seed to Time/Static/Wild/IVs to PID/Egg/Spinda Painter 冒烟、离线重载和移动视口。
 - 性能基线：记录设备、浏览器、状态数、Worker 数、吞吐、取消耗时和峰值内存。
 
 测试数量不代替上游一致性。优先保证 C++ 固定夹具、协议边界和真实 Pages 加载路径。

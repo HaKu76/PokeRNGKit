@@ -1,17 +1,17 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：新增 `gen3seedtotime` 待工程检查、Actions 部署和项目所有者共同验收
-> - 当前模块：`gen3seedtotime`
+> - 当前阶段：新增 `gen3spindapainter` 待工程检查、Actions 部署和项目所有者共同验收
+> - 当前模块：`gen3spindapainter`
 > - Git 基线：`65e3aba feat: 增加全世代遇敌查询`
-> - 工作区状态：存在未提交的自动完成控件、悬浮工具互斥和 `gen3seedtotime` 模块及文档更新；Codex 不暂存、不提交、不 push
-> - 部署状态：GitHub Pages 当前为 `index-DC2qWhx2.js` 的旧生产包；自动完成修复与 `gen3seedtotime` 尚未推送或部署
-> - 验收状态：既有模块的历史工程/部署证据保持有效；`gen3seedtotime` 未运行工程检查、原生夹具、Wasm 构建、浏览器检查或生产算法回归
+> - 工作区状态：存在未提交的自动完成控件、悬浮工具互斥、`gen3seedtotime` 和 `gen3spindapainter` 模块及文档更新；Codex 不暂存、不提交、不 push
+> - 部署状态：GitHub Pages 当前为 `index-DC2qWhx2.js` 的旧生产包；自动完成修复、`gen3seedtotime` 与 `gen3spindapainter` 尚未推送或部署
+> - 验收状态：既有模块的历史工程/部署证据保持有效；`gen3seedtotime` 与 `gen3spindapainter` 未运行本轮工程检查、浏览器检查或生产回归
 
 ## 0. 当前工作区优先状态
 
 - HEAD `65e3aba` 已包含全世代遇敌查询；本轮工作区在此基础上补齐 PokeFinder 自动完成控件和三个悬浮工具的互斥状态，不存在待完成 merge。
-- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`、`encounterlookup`。
+- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3spindapainter`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`、`encounterlookup`。
 - 本轮新增 `encounterlookup`：右下角默认收起的全世代 Encounter Lookup，覆盖 PokeFinder 4.3.2 的 Gen III、Gen IV、Gen V 和 BDSP 共 16 个版本；静态数据由 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 生成。
 - 遇敌查询不进入左侧 RNG 导航，不使用 Wasm/Worker；宝可梦候选、游戏版本、地点、遇敌种类和等级范围均来自本地静态数据。
 - 已清理生成用 `.tmp-encounter-tables/` 与 `.tmp-encounter-tables.zip`；生成脚本和正式 `data.ts` 保留在工作区。
@@ -34,17 +34,26 @@
 - 已静态复核 PokeFinder Form/Core/Model/Test/翻译与 `DateTime` 上游 SHA-256：简体中文逐字使用 `第三世代Seed查询时间`、`16/32位Seed`、`年份`、`帧数`、`查找`、`时间`；原生夹具逐条覆盖 `seedtotime3.json` 的四组时间表和四组 32 位回推结果。输入边界、测试位置和来源见 [Gen 3 Seed to Time](modules/gen3seedtotime.md) 与 [上游记录](../third_party/pokefinder/UPSTREAM.md)。
 - 本轮未执行任何 npm、原生、Wasm、浏览器或生产算法检查，等待项目所有者对具体命令或部署 URL 授权。
 
+### 当前工作区实现：`gen3spindapainter`
+
+- 新增左侧第三世代 `Spinda Painter` 模块，对应 PokeFinder 4.3.2 `SpindaPainter`；简体中文逐字使用 `晃晃斑的斑点`，不放入右下角静态工具菜单。
+- PID 使用最多 8 位十六进制 `0..FFFFFFFF`，空值按 `0`；由四个 PID 字节的低/高半字节和 PokeFinder 固定偏移计算四个斑点坐标。拖动只按上游边界钳制，回写 PID 时截断位置除以 8；方向键作为无障碍扩展按 8 像素移动并回写无前导零 PID。
+- 复制 PokeFinder 原始 `512x512` 底图和四张斑点 PNG 到 feature assets；显示 PID 派生的性格、性别和特性。模块是确定性映射，不增加 Wasm/Worker。
+- 静态核验 PokeFinder Form、控件、翻译、Personal 数据和图像 SHA-256；输入边界、资源清单和固定夹具记录见 [Gen 3 Spinda Painter](modules/gen3spindapainter.md) 与 [上游记录](../third_party/pokefinder/UPSTREAM.md)。
+- 本轮未执行 npm、测试、构建、浏览器或生产页面检查，等待项目所有者对具体命令或部署 URL 授权。
+
 ### 下一位开发者第一步
 
 1. 在 GitHub Desktop 审查本轮自动完成、三浮窗互斥、`gen3seedtotime` 和文档更新；不要覆盖、重置或选择性丢弃工作区内容。
-2. 获得项目所有者对具体命令的授权后，运行 `npm run verify`、`npm run wasm:test:native` 与 `npm run wasm:build`，确认 TypeScript、七个原生夹具和 Wasm 产物。
-3. 项目所有者提交并推送后，等待 GitHub Actions 完成部署，再以新的 Pages URL 在外部 Chrome 复验自动完成与 Seed to Time 固定夹具；随后由项目所有者完成设备和发布验收。
+2. 获得项目所有者对具体命令的授权后，运行 `npm run verify`、`npm run wasm:test:native` 与 `npm run wasm:build`，确认 TypeScript、Spinda Painter domain 测试、七个原生夹具和 Wasm 产物。
+3. 项目所有者提交并推送后，等待 GitHub Actions 完成部署，再以新的 Pages URL 在外部 Chrome 复验自动完成、Seed to Time 固定夹具与 Spinda Painter 的 PID 输入/拖动/键盘网格移动；随后由项目所有者完成设备和发布验收。
 
 ## 当前可用模块
 
 - `gen3id`：第三世代 ID Generator/Searcher。
 - `gen3initialseed`：第三世代 Initial Seed 反推。
 - `gen3seedtotime`：第三世代 Seed 到日期时间查询。
+- `gen3spindapainter`：第三世代晃晃斑的斑点 PID/坐标双向工具。
 - `gen3static`：第三世代定点 Generator/Searcher。
 - `gen3wild`：第三世代野生 Generator/Searcher、地点选择、完整筛选、Worker Pool、CSV、UI 预览与真实 Wasm 运行。
 - `gen3ivtopid`：第三世代 IVs to PID 查询。
@@ -89,7 +98,7 @@
 ## 后续验收
 
 - 当前分支：`main`，HEAD `65e3aba feat: 增加全世代遇敌查询`。
-- 当前无待完成 merge；自动完成、悬浮工具互斥和验收文档保持未提交。
+- 当前无待完成 merge；自动完成、悬浮工具互斥、`gen3seedtotime`、`gen3spindapainter` 和验收文档保持未提交。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
@@ -97,7 +106,7 @@
 - 工程基础：React 19、TypeScript 6、Vite 8、Vitest、ESLint、Prettier、PWA 和中英日三语；npm 是唯一包管理器。
 - 构建基线：Node.js `24.19.0`、npm `12.0.2`、Emscripten `6.0.6`、CMake runtime `4.3.1`、Ninja runtime `1.13.2`。
 - 法律边界：GPL-3.0-or-later、PokeFinder 署名、对应源码记录和站点免责声明。
-- 已有模块：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、三代存档信息和个体值计算器；`encounterlookup` 与 `gen3seedtotime` 当前仍在未提交工作区。
+- 已有模块：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3spindapainter`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、三代存档信息和个体值计算器；`encounterlookup`、`gen3seedtotime` 与 `gen3spindapainter` 当前仍在未提交工作区。
 - UI 基础：默认收起的模块抽屉、全局存档悬浮窗、浅色/深色主题和系统默认字体。
 
 ## 5. 验证状态
@@ -113,7 +122,7 @@
 
 ### 5.2 基线工程验证
 
-- 已通过：2026-08-12 运行 `npm run verify`。Prettier、ESLint、`tsc -b`、16 个 Vitest 文件共 57 项测试、Vite 生产构建与 PWA 预缓存均已完成；ESLint 仅保留 `Gen3EggPanel.tsx`、`Gen3WildPanel.tsx` 的两条既有 TanStack Virtual / React Compiler warning。
+- 已通过：2026-08-12 运行 `npm run verify`。Prettier、ESLint、`tsc -b`、16 个 Vitest 文件共 57 项测试、Vite 生产构建与 PWA 预缓存均已完成；ESLint 仅保留 `Gen3EggPanel.tsx`、`Gen3WildPanel.tsx` 的两条既有 TanStack Virtual / React Compiler warning。此证据早于本轮 `gen3spindapainter`，不能代替其工程检查。
 - 已通过：在 Visual Studio 2026 Build Tools x64 开发环境中运行 `npm run wasm:test:native`，6/6 原生 Core 夹具通过。
 - 历史已通过：在用户级 emsdk `6.0.6` 环境中运行 `npm run wasm:doctor` 与 `npm run build`，当时六个 Gen III Wasm 模块、Vite 生产站点和 PWA 预缓存均成功生成。新增 `gen3seedtotime` 后需重新运行构建，不能沿用该历史证据宣称七个模块已通过。
 - 受限终端首次复制 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一授权的 `npm run verify` 随后成功，确认该失败是受限文件访问环境，不是构建或源码错误。

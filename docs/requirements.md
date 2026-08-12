@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Static/Wild Generator/Searcher、IVs to PID、Egg、存档信息和个体值计算器已进入 Git 基线；当前工作区新增右下角遇敌查询悬浮工具和第三世代 `SeedToTime3`。
+当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Static/Wild Generator/Searcher、IVs to PID、Egg、存档信息和个体值计算器已进入 Git 基线；当前工作区新增右下角遇敌查询悬浮工具、第三世代 `SeedToTime3` 与 `SpindaPainter`。
 
 ## 2. 已确认边界
 
@@ -351,6 +351,16 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细数据规则、输入行为、来源和未运行验证项见 [遇敌查询](modules/encounterlookup.md)。
 
+## 8.6 当前功能需求：`gen3spindapainter` 晃晃斑的斑点
+
+- **FR-SPINDA-01** 在第三世代左侧模块导航提供 PokeFinder `Spinda Painter`；简体中文逐字使用 `晃晃斑的斑点`，不放入右下角悬浮工具。
+- **FR-SPINDA-02** `PID` 为最多 8 位的十六进制 `0..0xFFFFFFFF`，空值按上游 `TextBox::getUInt()` 行为作为 `0`；输入不会补齐前导零。
+- **FR-SPINDA-03** PID 驱动的四个斑点位置必须按各字节低/高半字节、PokeFinder 固定偏移和 8 像素网格映射。鼠标拖动被钳制在每个斑点的上游边界，反向 PID 取位置除以 8 的截断值；键盘方向键按 8 像素移动。
+- **FR-SPINDA-04** 画布使用 PokeFinder 4.3.2 原始晃晃斑底图与四张斑点 PNG；显示 PID 派生的性格、性别和特性。性别比较 `PID & 0xFF` 与 Gen III 晃晃斑性别比例，特性槽取 `PID & 1`。
+- **FR-SPINDA-05** 模块是确定性 UI 映射，不新增 Wasm、Worker、后端、账号、遥测或运行时 CDN；上游资源和 SHA-256 必须记录在模块文档与上游记录中。
+
+详细映射、输入边界、资源与固定夹具见 [Gen 3 Spinda Painter](modules/gen3spindapainter.md)。
+
 ## 9. 后续 MVP
 
 遇敌查询通过工程检查、部署页面回归与项目所有者最终验收后，按以下顺序推进：
@@ -374,7 +384,7 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 
 ### 11.1 正确性
 
-- `gen3id`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致；`gen3initialseed` 的 RS ID 输入与公开算法参考的固定候选必须一致。
+- `gen3id`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid` 与 `gen3egg` C++ bridge 的固定输入结果必须与已记录的 PokeFinder 4.3.2 夹具逐字段一致；`gen3initialseed` 的 RS ID 输入与公开算法参考的固定候选必须一致；`gen3spindapainter` 的 PID/位置双向映射与斑点边界必须与 `SpindaPainter` 一致。
 - TypeScript 只负责输入规范化、分片和解码，不改变 Core 的 RNG 规则。
 - C ABI 和 Worker 协议必须带显式 API 版本；版本不匹配时拒绝运行。
 - 上游源码文件、版本、SHA-256、修改边界和许可证必须可追溯。
@@ -469,6 +479,7 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 - **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、九列结果、输入校验和算法文档（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（已进入 Git 基线，待部署回归与最终验收）。
 - **静态工具：`encounterlookup`** - PokeFinder 4.3.2 支持的 Gen III、Gen IV、Gen V 与 BDSP 遇敌查询（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 6B：`gen3spindapainter`** - PID 与晃晃斑斑点双向映射、原始 PNG、拖动和键盘交互、输入边界及模块文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 7：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

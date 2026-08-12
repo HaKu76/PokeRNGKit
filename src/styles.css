@@ -1047,6 +1047,73 @@ h1 {
   overflow: hidden;
 }
 
+.spinda-painter-panel {
+  display: grid;
+  gap: 18px;
+  max-width: 900px;
+}
+.spinda-painter-heading {
+  display: grid;
+  grid-template-columns: minmax(180px, 230px) minmax(0, 1fr);
+  align-items: end;
+  gap: 20px;
+}
+.spinda-painter-info {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-left: 1px solid var(--line);
+}
+.spinda-painter-info div {
+  min-width: 0;
+  padding: 4px 12px;
+}
+.spinda-painter-info dt {
+  color: var(--muted);
+  font-size: 10px;
+}
+.spinda-painter-info dd {
+  overflow: hidden;
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.spinda-painter-canvas {
+  position: relative;
+  width: min(100%, 768px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px var(--line);
+  touch-action: none;
+}
+.spinda-painter-base {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+.spinda-painter-spot {
+  position: absolute;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  touch-action: none;
+}
+.spinda-painter-spot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+.spinda-painter-spot:focus-visible {
+  outline: 2px solid var(--brand-strong);
+  outline-offset: 2px;
+}
+
 .static-control-grid {
   display: grid;
   align-items: start;
@@ -2359,6 +2426,17 @@ h1 {
   }
   .encounter-lookup-submit {
     width: 100%;
+  }
+  .spinda-painter-heading,
+  .spinda-painter-info {
+    grid-template-columns: 1fr;
+  }
+  .spinda-painter-info {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .spinda-painter-info div {
+    padding: 8px 0;
   }
 }
 
