@@ -1,9 +1,4 @@
-import {
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type PointerEvent,
-} from "react";
+import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeHexInput } from "../../input";
 import { getGen3AbilityName } from "../shared/gen3Abilities";
@@ -87,7 +82,9 @@ export function Gen3SpindaPainterPanel() {
       spotIndex === index ? clampSpindaSpotPosition(index, next) : spot,
     ) as SpindaSpotPositions;
     setSpots(positions);
-    setPidInput(spindaPidFromSpotPositions(positions).toString(16).toUpperCase());
+    setPidInput(
+      spindaPidFromSpotPositions(positions).toString(16).toUpperCase(),
+    );
   };
 
   const updatePidInput = (value: string) => {
@@ -117,7 +114,10 @@ export function Gen3SpindaPainterPanel() {
     event: PointerEvent<HTMLButtonElement>,
     index: number,
   ) => {
-    if (!event.currentTarget.hasPointerCapture(event.pointerId) || !boardRef.current)
+    if (
+      !event.currentTarget.hasPointerCapture(event.pointerId) ||
+      !boardRef.current
+    )
       return;
     const rect = boardRef.current.getBoundingClientRect();
     const offset = dragOffsetRef.current ?? { x: 0, y: 0 };
@@ -131,7 +131,10 @@ export function Gen3SpindaPainterPanel() {
     });
   };
 
-  const onSpotKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const onSpotKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
     const current = spots[index];
     const delta = arrowDeltas[event.key];
     if (!delta) return;
@@ -173,7 +176,12 @@ export function Gen3SpindaPainterPanel() {
         className="spinda-painter-canvas"
         ref={boardRef}
       >
-        <img alt="" className="spinda-painter-base" draggable={false} src={spinda} />
+        <img
+          alt=""
+          className="spinda-painter-base"
+          draggable={false}
+          src={spinda}
+        />
         {spots.map((spot, index) => (
           <button
             aria-label={`${t("pid")} ${index + 1}`}

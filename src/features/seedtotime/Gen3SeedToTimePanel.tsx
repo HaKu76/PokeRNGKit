@@ -171,7 +171,7 @@ export function Gen3SeedToTimePanel({
         </div>
         <div className="metrics-row">
           <span>
-            {t("seedToTimeSeed")} {" "}
+            {t("seedToTimeSeed")}{" "}
             <strong>
               {summary ? summary.originSeed.toString(16).toUpperCase() : "-"}
             </strong>
@@ -180,7 +180,7 @@ export function Gen3SeedToTimePanel({
             {t("workers")} <strong>{summary?.workerCount ?? "-"}</strong>
           </span>
           <span>
-            {t("elapsed")} {" "}
+            {t("elapsed")}{" "}
             <strong>
               {summary ? `${summary.elapsedMs.toFixed(0)} ms` : "-"}
             </strong>

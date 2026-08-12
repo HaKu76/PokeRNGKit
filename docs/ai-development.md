@@ -74,18 +74,31 @@
 
 当前通用上游限制：32 位 Seed 为 `0..0xFFFFFFFF`、8 位十六进制；16 位 Seed 为 `0..0xFFFF`、4 位十六进制；TID/SID 为 `0..65535`、5 位十进制；32 位 Advances 为 `0..4294967295`、10 位十进制。具体模块仍必须重新核对上游 Form。
 
-## 6. 完成门槛
+## 6. 编辑收尾与完成门槛
 
-未经项目所有者明确授权，不得自行执行以下命令、算法回归、性能检查或 UI 预览。获得授权后按指定范围执行：
+格式化属于文件编辑的机械收尾，不属于测试、构建或验收。每批代码或文档修改完成后必须立即执行：
 
 ```bash
+# 工作区包含无关改动时，只格式化本任务触及的文件
+npm run format:files -- <file...>
+
+# 任务开始时工作区干净、当前改动全部属于本任务时可使用
+npm run format:changed
+
 npm run format:check
+git diff --check
+```
+
+`format:changed` 使用 Git 收集相对 `HEAD` 的已跟踪修改和未跟踪文件，通过 `--ignore-unknown` 跳过 PNG、Wasm 等非 Prettier 文件，并在写入后对同一文件批次执行只读检查。全仓 `format:check` 仍是提交前闭环，用于发现已经进入基线但尚未修正的格式问题。不得把 `git diff --check` 当成 Prettier 替代品；前者只能发现空白错误，不能发现换行、缩进和排版差异。
+
+完成格式收尾后，再按授权范围执行工程检查。未经项目所有者明确授权，不得自行执行以下测试、构建、算法回归、性能检查或 UI 预览命令：
+
+```bash
 npm run lint
 npm run typecheck
 npm test
 npm run build:ui
 npm run verify
-git diff --check
 ```
 
 具备本地 C++ 与已激活 emsdk 时，经授权再运行 `npm run verify:full`。缺少工具链时如实记录“未运行”，由锁定工具链的 GitHub Actions 补齐，不得把前端构建成功写成真实 Wasm 已验证。

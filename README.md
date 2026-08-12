@@ -190,6 +190,8 @@ npm run build:web
 npm run preview:ui
 npm test
 npm run lint
+npm run format:files -- <file...>
+npm run format:changed
 npm run format:check
 npm run wasm:build
 npm run wasm:test:native

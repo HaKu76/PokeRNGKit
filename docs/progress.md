@@ -1,16 +1,23 @@
 # PokeRNGKit 项目进度与交接
 
-> - 最近更新：2026-08-12
-> - 当前阶段：新增 `gen3spindapainter` 待工程检查、Actions 部署和项目所有者共同验收
-> - 当前模块：`gen3spindapainter`
-> - Git 基线：`65e3aba feat: 增加全世代遇敌查询`
-> - 工作区状态：存在未提交的自动完成控件、悬浮工具互斥、`gen3seedtotime` 和 `gen3spindapainter` 模块及文档更新；Codex 不暂存、不提交、不 push
-> - 部署状态：GitHub Pages 当前为 `index-DC2qWhx2.js` 的旧生产包；自动完成修复、`gen3seedtotime` 与 `gen3spindapainter` 尚未推送或部署
-> - 验收状态：既有模块的历史工程/部署证据保持有效；`gen3seedtotime` 与 `gen3spindapainter` 未运行本轮工程检查、浏览器检查或生产回归
+> - 最近更新：2026-08-13
+> - 当前阶段：修复重复格式失败并优化提交前与 Actions SOP
+> - 当前模块：工程工作流
+> - Git 基线：`d45399e feat: 增加第三世代晃晃斑斑点`
+> - 工作区状态：存在未提交的格式修复、格式收尾脚本、Actions 顺序和 SOP 文档更新；Codex 不暂存、不提交、不 push
+> - 部署状态：Actions run `31614337208` 在 `npm run format:check` 失败，未构建或部署；GitHub Pages 保持上一成功生产包
+> - 验收状态：已通过外部 Chrome 读取 #25 与 #30 Job 日志并确认重复根因；本轮未运行本地测试、构建、Wasm 或生产回归
 
 ## 0. 当前工作区优先状态
 
-- HEAD `65e3aba` 已包含全世代遇敌查询；本轮工作区在此基础上补齐 PokeFinder 自动完成控件和三个悬浮工具的互斥状态，不存在待完成 merge。
+- Actions run `31581467290`（#25）与 `31614337208`（#30）均在 `Verify TypeScript application -> prettier --check .` 失败，分别报告 4 个和 13 个未格式化文件；两次都不是算法、Wasm 或 TypeScript 编译错误。
+- 原 SOP 只在未获测试/构建授权时执行 `git diff --check`，无法发现 Prettier 排版差异；同时 Actions 在格式检查前先安装 Emscripten，#30 为必然失败的提交额外消耗约 34 秒。
+- 新增 `npm run format:files -- <file...>` 与 `npm run format:changed`。格式化改为每批编辑后的强制机械收尾，不需要测试/构建授权；工作区存在无关改动时必须限定到本任务文件。
+- Actions 改为 npm 安装后先运行完整 `npm run verify`，通过后才安装和缓存 Emscripten、检查 Wasm 工具链并运行原生/Wasm 构建。
+- 已执行并通过：对 #30 日志中的 13 个文件运行定向 `npm run format:files -- ...`，随后运行新版 `npm run format:changed`、全仓 `npm run format:check` 与 `git diff --check`。新版脚本会对 Git 改动文件先写入再只读复查。
+- 未运行：ESLint、TypeScript 类型检查、Vitest、Web/Wasm 构建、原生夹具、浏览器 UI 或生产回归；本轮授权范围仅为 Actions 日志诊断和格式/SOP 修复。
+
+- HEAD `d45399e` 已包含自动完成控件、悬浮工具互斥、`gen3seedtotime` 与 `gen3spindapainter`；本轮只修复其格式并调整工程 SOP，不存在待完成 merge。
 - 当前模块集合：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3spindapainter`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`、`encounterlookup`。
 - 本轮新增 `encounterlookup`：右下角默认收起的全世代 Encounter Lookup，覆盖 PokeFinder 4.3.2 的 Gen III、Gen IV、Gen V 和 BDSP 共 16 个版本；静态数据由 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 生成。
 - 遇敌查询不进入左侧 RNG 导航，不使用 Wasm/Worker；宝可梦候选、游戏版本、地点、遇敌种类和等级范围均来自本地静态数据。
@@ -97,8 +104,8 @@
 
 ## 后续验收
 
-- 当前分支：`main`，HEAD `65e3aba feat: 增加全世代遇敌查询`。
-- 当前无待完成 merge；自动完成、悬浮工具互斥、`gen3seedtotime`、`gen3spindapainter` 和验收文档保持未提交。
+- 当前分支：`main`，HEAD `d45399e feat: 增加第三世代晃晃斑斑点`。
+- 当前无待完成 merge；格式修复、格式收尾脚本、Actions 顺序和 SOP 文档保持未提交。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线

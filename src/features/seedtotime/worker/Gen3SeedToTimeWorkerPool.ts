@@ -26,10 +26,13 @@ class Client {
   private rejectReady?: (error: Error) => void;
 
   constructor(moduleUrl: string) {
-    this.worker = new Worker(new URL("./gen3seedtotime.worker.ts", import.meta.url), {
-      type: "module",
-      name: "pokerngkit-gen3seedtotime",
-    });
+    this.worker = new Worker(
+      new URL("./gen3seedtotime.worker.ts", import.meta.url),
+      {
+        type: "module",
+        name: "pokerngkit-gen3seedtotime",
+      },
+    );
     this.ready = new Promise((resolve, reject) => {
       this.resolveReady = resolve;
       this.rejectReady = reject;
@@ -38,7 +41,9 @@ class Client {
       data,
     }: MessageEvent<Gen3SeedToTimeWorkerResponse>) => this.handle(data);
     this.worker.onerror = (event) =>
-      this.fail(new Error(event.message || "Gen3 Seed to Time Worker crashed."));
+      this.fail(
+        new Error(event.message || "Gen3 Seed to Time Worker crashed."),
+      );
     this.post({ type: "init", moduleUrl });
   }
 
@@ -78,7 +83,9 @@ class Client {
       return;
     }
     if (!this.pending || this.pending.taskId !== message.taskId) {
-      this.fail(new Error("Gen3 Seed to Time Worker returned an unknown task."));
+      this.fail(
+        new Error("Gen3 Seed to Time Worker returned an unknown task."),
+      );
       return;
     }
     const pending = this.pending;
@@ -157,7 +164,9 @@ export class Gen3SeedToTimeWorkerPool implements Gen3SeedToTimeSearchEngine {
         );
       }
       if (batch.originSeed > 0xffff) {
-        throw new RangeError("Gen3 Seed to Time Worker returned an invalid origin Seed.");
+        throw new RangeError(
+          "Gen3 Seed to Time Worker returned an invalid origin Seed.",
+        );
       }
       return {
         originSeed: batch.originSeed,

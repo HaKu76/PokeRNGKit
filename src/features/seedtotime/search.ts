@@ -1,7 +1,4 @@
-import type {
-  Gen3SeedToTimeRequest,
-  Gen3SeedToTimeResult,
-} from "./domain";
+import type { Gen3SeedToTimeRequest, Gen3SeedToTimeResult } from "./domain";
 
 export interface Gen3SeedToTimeSearchSummary extends Gen3SeedToTimeResult {
   elapsedMs: number;

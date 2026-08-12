@@ -22,14 +22,20 @@ describe("Gen3 Seed to Time domain", () => {
   it("decodes and formats the fixed PokeFinder time layout", () => {
     const words = new Uint32Array([2000, 3, 30, 18, 22]);
     const [state] = decodeGen3SeedToTimeStates(words.buffer);
-    expect(state).toEqual({ year: 2000, month: 3, day: 30, hour: 18, minute: 22 });
+    expect(state).toEqual({
+      year: 2000,
+      month: 3,
+      day: 30,
+      hour: 18,
+      minute: 22,
+    });
     expect(formatGen3SeedToTime(state)).toBe("2000-03-30 18:22:00");
   });
 
   it("rejects incomplete and invalid packed states", () => {
-    expect(() => decodeGen3SeedToTimeStates(new Uint32Array([2000]).buffer)).toThrow(
-      "result buffer length",
-    );
+    expect(() =>
+      decodeGen3SeedToTimeStates(new Uint32Array([2000]).buffer),
+    ).toThrow("result buffer length");
     expect(() =>
       decodeGen3SeedToTimeStates(new Uint32Array([2000, 13, 1, 0, 0]).buffer),
     ).toThrow("invalid time");

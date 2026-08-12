@@ -425,7 +425,9 @@ function App() {
           </button>
           <button
             className={
-              activeModule === "seedtotime" ? "module-entry active" : "module-entry"
+              activeModule === "seedtotime"
+                ? "module-entry active"
+                : "module-entry"
             }
             onClick={() => {
               setActiveModule("seedtotime");
@@ -541,15 +543,15 @@ function App() {
                       ? "initialSeedEngine"
                       : activeModule === "seedtotime"
                         ? "seedToTimeEngine"
-                      : activeModule === "static"
-                        ? "staticEngine"
-                        : activeModule === "wild"
-                          ? "wildEngine"
-                          : activeModule === "ivtopid"
-                            ? "ivToPidEngine"
-                            : activeModule === "egg"
-                              ? "eggEngine"
-                              : "spindaPainterEngine",
+                        : activeModule === "static"
+                          ? "staticEngine"
+                          : activeModule === "wild"
+                            ? "wildEngine"
+                            : activeModule === "ivtopid"
+                              ? "ivToPidEngine"
+                              : activeModule === "egg"
+                                ? "eggEngine"
+                                : "spindaPainterEngine",
                 )}
               </h1>
             </div>
@@ -561,15 +563,15 @@ function App() {
                     ? "initialSeedVersion"
                     : activeModule === "seedtotime"
                       ? "seedToTimeVersion"
-                    : activeModule === "static"
-                      ? "staticVersion"
-                      : activeModule === "wild"
-                        ? "wildVersion"
-                        : activeModule === "ivtopid"
-                          ? "ivToPidVersion"
-                          : activeModule === "egg"
-                            ? "eggVersion"
-                            : "spindaPainterVersion",
+                      : activeModule === "static"
+                        ? "staticVersion"
+                        : activeModule === "wild"
+                          ? "wildVersion"
+                          : activeModule === "ivtopid"
+                            ? "ivToPidVersion"
+                            : activeModule === "egg"
+                              ? "eggVersion"
+                              : "spindaPainterVersion",
               )}
             </div>
           </div>

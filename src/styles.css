@@ -1255,7 +1255,9 @@ h1 {
 }
 .seed-to-time-form-grid {
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) minmax(130px, 0.75fr) minmax(120px, 0.65fr) auto;
+  grid-template-columns:
+    minmax(150px, 1fr) minmax(130px, 0.75fr) minmax(120px, 0.65fr)
+    auto;
   align-items: end;
   gap: 8px;
   margin-top: 10px;

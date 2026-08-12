@@ -580,6 +580,9 @@ npm run build            # Wasm + TypeScript + Vite
 npm run build:ui         # 生成本地 UI 预览静态文件
 npm run build:web        # 不重建 Wasm
 npm run preview:ui       # 构建并预览 UI 模式
+npm run format:files -- <file...> # 格式化本任务指定文件
+npm run format:changed   # 格式化相对 HEAD 的 Git 改动文件
+npm run format:check     # Prettier 只读检查
 npm run wasm:test:native # 原生 C++ 夹具
 npm run wasm:build       # 生成 public/wasm
 npm run verify           # 格式、lint、类型、单元测试、Web 构建
@@ -637,10 +640,10 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 checkout
   -> Node 24.19.0
   -> npm 12.0.2
-  -> Emscripten 6.0.6
   -> npm ci --engine-strict
-  -> wasm:doctor
   -> npm run verify
+  -> Emscripten 6.0.6
+  -> wasm:doctor
   -> npm run wasm:test:native
   -> npm run build (BASE_PATH=./，构建所有 module.json)
   -> configure Pages
@@ -649,6 +652,8 @@ checkout
 ```
 
 Pull request 不执行 configure/upload/deploy。主分支部署 job 不重新编译，只部署 build job 上传的 artifact。
+
+前端验证刻意放在 Emscripten 安装之前。格式、lint、类型、单元测试或 Web 构建失败时，Actions 会在进入约 30 秒的 emsdk 安装阶段前停止；Wasm 工具链只为已通过前端门槛的提交初始化。
 
 相对 `BASE_PATH=./` 让同一产物同时适配：
 

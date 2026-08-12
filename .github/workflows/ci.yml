@@ -32,6 +32,12 @@ jobs:
       - name: Setup npm
         run: npm install --global npm@12.0.2
 
+      - name: Install npm dependencies
+        run: npm ci --engine-strict
+
+      - name: Verify TypeScript application
+        run: npm run verify
+
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
         with:
@@ -45,14 +51,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-emscripten-6.0.6-
 
-      - name: Install npm dependencies
-        run: npm ci --engine-strict
-
       - name: Verify Wasm toolchain
         run: npm run wasm:doctor
-
-      - name: Verify TypeScript application
-        run: npm run verify
 
       - name: Verify native Core parity
         run: npm run wasm:test:native

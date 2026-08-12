@@ -20,12 +20,12 @@ y = (yNibble + offsetY + 6) * 8
 
 反向移动时按相同公式还原四个半字节。`GraphicsPixmapItem` 仅将位置钳制在对应斑点的边界，`updatePID()` 以 `static_cast<u32>(position / 8)` 截断坐标；Web 实现保留这一指针行为。方向键移动使用 8 像素步进，便于无障碍操作。
 
-| 斑点 | X 范围 | Y 范围 | 上游来源 |
-| --- | --- | --- | --- |
-| 1 | `64..184` | `48..168` | `Form/Gen3/Tools/SpindaPainter.cpp` |
-| 2 | `256..376` | `56..176` | `Form/Gen3/Tools/SpindaPainter.cpp` |
-| 3 | `112..232` | `192..312` | `Form/Gen3/Tools/SpindaPainter.cpp` |
-| 4 | `208..328` | `200..320` | `Form/Gen3/Tools/SpindaPainter.cpp` |
+| 斑点 | X 范围     | Y 范围     | 上游来源                            |
+| ---- | ---------- | ---------- | ----------------------------------- |
+| 1    | `64..184`  | `48..168`  | `Form/Gen3/Tools/SpindaPainter.cpp` |
+| 2    | `256..376` | `56..176`  | `Form/Gen3/Tools/SpindaPainter.cpp` |
+| 3    | `112..232` | `192..312` | `Form/Gen3/Tools/SpindaPainter.cpp` |
+| 4    | `208..328` | `200..320` | `Form/Gen3/Tools/SpindaPainter.cpp` |
 
 | 控件 | 进制与范围 | 宽度 | 空值 | 上游来源 |
 | --- | --- | --- | --- |

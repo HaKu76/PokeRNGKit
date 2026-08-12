@@ -61,7 +61,8 @@ export function clampSpindaSpotPosition(
   position: SpindaSpotPosition,
 ): SpindaSpotPosition {
   const bounds = SPINDA_SPOT_BOUNDS[index];
-  if (!bounds) throw new RangeError("Spinda spot index must be between 0 and 3.");
+  if (!bounds)
+    throw new RangeError("Spinda spot index must be between 0 and 3.");
   return {
     x: clamp(position.x, bounds.minX, bounds.maxX),
     y: clamp(position.y, bounds.minY, bounds.maxY),
@@ -74,12 +75,14 @@ export function spindaPidFromSpotPositions(
   if (positions.length !== 4) {
     throw new RangeError("Exactly four Spinda spot positions are required.");
   }
-  return positions.reduce((pid, position, index) => {
-    const clamped = clampSpindaSpotPosition(index, position);
-    const x =
-      Math.trunc(clamped.x / SPINDA_GRID_SIZE) - offsets[index].x - origin.x;
-    const y =
-      Math.trunc(clamped.y / SPINDA_GRID_SIZE) - offsets[index].y - origin.y;
-    return pid | (x << (index * 8)) | (y << (index * 8 + 4));
-  }, 0) >>> 0;
+  return (
+    positions.reduce((pid, position, index) => {
+      const clamped = clampSpindaSpotPosition(index, position);
+      const x =
+        Math.trunc(clamped.x / SPINDA_GRID_SIZE) - offsets[index].x - origin.x;
+      const y =
+        Math.trunc(clamped.y / SPINDA_GRID_SIZE) - offsets[index].y - origin.y;
+      return pid | (x << (index * 8)) | (y << (index * 8 + 4));
+    }, 0) >>> 0
+  );
 }

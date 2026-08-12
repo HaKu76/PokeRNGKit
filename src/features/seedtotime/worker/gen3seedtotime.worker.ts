@@ -56,7 +56,8 @@ async function initialize(moduleUrl: string) {
 }
 
 function run(message: Extract<Gen3SeedToTimeWorkerRequest, { type: "run" }>) {
-  if (!wasm) throw new Error("Gen3 Seed to Time Wasm module is not initialized.");
+  if (!wasm)
+    throw new Error("Gen3 Seed to Time Wasm module is not initialized.");
   const startedAt = performance.now();
   const resultCount = wasm._gen3seedtotime_calculate(
     message.request.seed,
@@ -72,9 +73,12 @@ function run(message: Extract<Gen3SeedToTimeWorkerRequest, { type: "run" }>) {
   const wordCount = resultCount * GEN3_SEED_TO_TIME_RESULT_WORDS;
   if (
     bytePointer % Uint32Array.BYTES_PER_ELEMENT !== 0 ||
-    bytePointer / Uint32Array.BYTES_PER_ELEMENT + wordCount > wasm.HEAPU32.length
+    bytePointer / Uint32Array.BYTES_PER_ELEMENT + wordCount >
+      wasm.HEAPU32.length
   ) {
-    throw new RangeError("Gen3 Seed to Time core returned an invalid result range.");
+    throw new RangeError(
+      "Gen3 Seed to Time core returned an invalid result range.",
+    );
   }
   const pointer = bytePointer / Uint32Array.BYTES_PER_ELEMENT;
   const words = wasm.HEAPU32.slice(pointer, pointer + wordCount);
@@ -102,7 +106,8 @@ workerScope.onmessage = async ({
     post({
       type: "error",
       taskId: data.type === "init" ? undefined : data.taskId,
-      code: data.type === "init" ? "initialization_failed" : "calculation_failed",
+      code:
+        data.type === "init" ? "initialization_failed" : "calculation_failed",
       message: error instanceof Error ? error.message : String(error),
     });
   }

@@ -26,7 +26,9 @@ describe("Spinda Painter domain", () => {
 
   it("reconstructs the PID from clamped spot positions", () => {
     const pid = 0x6c3a07f1;
-    expect(spindaPidFromSpotPositions(spindaSpotPositionsFromPid(pid))).toBe(pid);
+    expect(spindaPidFromSpotPositions(spindaSpotPositionsFromPid(pid))).toBe(
+      pid,
+    );
   });
 
   it("clamps a dragged spot to its upstream bounds without snapping it", () => {

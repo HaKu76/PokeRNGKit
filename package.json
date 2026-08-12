@@ -24,6 +24,8 @@
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "format:changed": "node scripts/format-changed.mjs",
+    "format:files": "prettier --write --ignore-unknown",
     "format:check": "prettier --check .",
     "wasm:doctor": "node scripts/wasm.mjs doctor",
     "wasm:configure": "node scripts/wasm.mjs configure",

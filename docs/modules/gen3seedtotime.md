@@ -19,11 +19,11 @@
 
 ## 输入限制
 
-| 控件 | 进制与范围 | 宽度 | 空值 | 上游来源 |
-| --- | --- | --- | --- | --- |
-| `16/32-Bit Seed` | 十六进制 `0..0xFFFFFFFF` | 最多 8 位（可输入 `0x` 前缀） | `TextBox::getUInt()` 解释为 `0` | `Form/Gen3/Tools/SeedToTime3.cpp`、`Form/Controls/TextBox.cpp` 的 `InputType::Seed32Bit` |
-| `Year` | 十进制 `2000..2037` | 最多 4 位 | Qt 空文本会转换为 `0`；Web 表单拒绝空值，避免把无效年份传入 Wasm | `Form/Gen3/Tools/SeedToTime3.cpp` |
-| `Advances` | 只读无符号十进制结果文本框 | 不适用 | 计算前为空 | `Form/Gen3/Tools/SeedToTime3.ui`、`Form/Gen3/Tools/SeedToTime3.cpp` |
+| 控件             | 进制与范围                 | 宽度                          | 空值                                                             | 上游来源                                                                                 |
+| ---------------- | -------------------------- | ----------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `16/32-Bit Seed` | 十六进制 `0..0xFFFFFFFF`   | 最多 8 位（可输入 `0x` 前缀） | `TextBox::getUInt()` 解释为 `0`                                  | `Form/Gen3/Tools/SeedToTime3.cpp`、`Form/Controls/TextBox.cpp` 的 `InputType::Seed32Bit` |
+| `Year`           | 十进制 `2000..2037`        | 最多 4 位                     | Qt 空文本会转换为 `0`；Web 表单拒绝空值，避免把无效年份传入 Wasm | `Form/Gen3/Tools/SeedToTime3.cpp`                                                        |
+| `Advances`       | 只读无符号十进制结果文本框 | 不适用                        | 计算前为空                                                       | `Form/Gen3/Tools/SeedToTime3.ui`、`Form/Gen3/Tools/SeedToTime3.cpp`                      |
 
 简体中文界面逐字复用 `PokeFinder_zh.ts`：`第三世代Seed查询时间`、`16/32位Seed`、`年份`、`帧数`、`查找`、`时间`。`PokeFinder_ja.ts` 的对应词条均为 unfinished，因此日文界面按项目规则保留英文源标签。
 

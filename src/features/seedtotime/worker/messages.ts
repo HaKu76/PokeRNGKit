@@ -12,8 +12,7 @@ export interface Gen3SeedToTimeWorkerRunMessage {
 }
 
 export type Gen3SeedToTimeWorkerRequest =
-  | Gen3SeedToTimeWorkerInitMessage
-  | Gen3SeedToTimeWorkerRunMessage;
+  Gen3SeedToTimeWorkerInitMessage | Gen3SeedToTimeWorkerRunMessage;
 
 export interface Gen3SeedToTimeWorkerReadyMessage {
   type: "ready";
