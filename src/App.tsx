@@ -43,13 +43,7 @@ import { useTheme } from "./theme";
 type SortKey = keyof Id3State;
 type SupportedLanguage = "zh" | "en" | "ja";
 type ActiveModule =
-  | "id"
-  | "initialseed"
-  | "static"
-  | "wild"
-  | "ivtopid"
-  | "egg"
-  | "gen4static";
+  "id" | "initialseed" | "static" | "wild" | "ivtopid" | "egg" | "gen4static";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
