@@ -51,19 +51,19 @@ const request: Gen3EggRequest = {
 };
 
 describe("Gen3 Egg domain", () => {
-  it("splits inclusive held advances while retaining the pickup range", () => {
+  it("splits inclusive held advances within the Wasm pair limit", () => {
     expect(createGen3EggChunks(request)).toEqual([
       {
         index: 0,
         initialAdvancesHeld: 0,
-        maxAdvancesHeld: 19_999,
-        stateCount: 20_000,
+        maxAdvancesHeld: 16_665,
+        stateCount: 16_666,
       },
       {
         index: 1,
-        initialAdvancesHeld: 20_000,
-        maxAdvancesHeld: 0,
-        stateCount: 1,
+        initialAdvancesHeld: 16_666,
+        maxAdvancesHeld: 3_334,
+        stateCount: 3_335,
       },
     ]);
   });

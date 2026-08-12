@@ -1,5 +1,5 @@
 import { access, readFile } from "node:fs/promises";
-import { chmodSync, constants, statSync } from "node:fs";
+import { chmodSync, constants, existsSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import path from "node:path";
@@ -14,6 +14,7 @@ const wasmRoot = path.join(projectRoot, "wasm");
 const outputRoot = path.join(projectRoot, "public", "wasm");
 const buildRoot = path.join(wasmRoot, "build");
 const require = createRequire(import.meta.url);
+const scriptPath = fileURLToPath(import.meta.url);
 
 function runtimeCommand(packageName, executableName) {
   let command;
@@ -72,6 +73,60 @@ function probe(command, args = ["--version"]) {
     stdio: "ignore",
   });
   return !result.error && result.status === 0;
+}
+
+function windowsVsDevCmd() {
+  if (process.platform !== "win32" || process.env.VSCMD_VER) return;
+  const vswhere = path.join(
+    process.env["ProgramFiles(x86)"] ?? "C:\\Program Files (x86)",
+    "Microsoft Visual Studio",
+    "Installer",
+    "vswhere.exe",
+  );
+  if (!existsSync(vswhere)) return;
+  const result = spawnSync(
+    vswhere,
+    [
+      "-latest",
+      "-products",
+      "*",
+      "-requires",
+      "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
+      "-property",
+      "installationPath",
+    ],
+    { encoding: "utf8" },
+  );
+  const installationPath = result.stdout?.trim();
+  if (!installationPath) return;
+  const devCommand = path.join(
+    installationPath,
+    "Common7",
+    "Tools",
+    "VsDevCmd.bat",
+  );
+  return existsSync(devCommand) ? devCommand : undefined;
+}
+
+function runNativeTestsInWindowsDevEnvironment() {
+  const devCommand = windowsVsDevCmd();
+  if (!devCommand) return false;
+  process.stdout.write(
+    "Activating the Visual Studio x64 developer environment.\n",
+  );
+  run("cmd.exe", [
+    "/d",
+    "/c",
+    "call",
+    devCommand,
+    "-arch=x64",
+    "-host_arch=x64",
+    "&&",
+    process.execPath,
+    scriptPath,
+    "test-native",
+  ]);
+  return true;
 }
 
 async function loadModules() {
@@ -219,6 +274,7 @@ switch (command) {
     if (!probe(cmakeCommand) || !probe(ninjaCommand)) {
       throw new Error("Native tests require CMake and Ninja.");
     }
+    if (runNativeTestsInWindowsDevEnvironment()) break;
     await testNative(modules);
     break;
   default:

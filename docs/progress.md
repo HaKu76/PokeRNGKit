@@ -1,12 +1,12 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：修复第三世代 Egg 与 Wild 的 TypeScript 合并残留
+> - 当前阶段：修复第三世代 Egg 构建与分片验证问题
 > - 当前模块：`gen3egg`、`gen3wild`
-> - Git 基线：`5d4e124 style: 修复第三世代孵化模块格式`
-> - 工作区状态：存在五个未提交的 Egg/Wild TypeScript 与 lint 修复；Codex 不暂存、不提交、不 push
+> - Git 基线：`1ec3a69 fix: 修复第三世代 Wild Worker lint 错误`
+> - 工作区状态：存在未提交的 Egg 分片测试、C++ bridge、格式与验证记录修复；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
-> - 验收状态：本轮未运行工程检查、原生夹具、Wasm 构建、浏览器检查或算法验收
+> - 验收状态：已完成本机工程检查、原生夹具与 Wasm 发布构建；未完成部署页面回归或项目所有者算法验收
 
 ## 0. 当前工作区优先状态
 
@@ -18,9 +18,14 @@
 - Actions run `31565728175` / job `94017012800`：`npm run verify` 在 `prettier --check .` 阶段失败，列出 `docs/modules/gen3egg.md`、`src/App.tsx`、8 个 Egg 文件及 `src/styles.css` 共 10 个文件。已用锁定的 Prettier `3.9.6` 格式化该清单；未运行完整 `verify`、Wasm、原生夹具、构建或算法验收。
 - Actions run `31566082714` / job `94018049518`：`prettier --check .` 已通过；ESLint 仅报告两个无效的 `react-hooks/incompatible-library` 禁用注释；`tsc -b` 报告 10 个 TypeScript 错误，均来自 Egg/Wild 合并残留。当前工作区已删除 Egg 的重复 `useVirtualizer` 导入和两处无效禁用注释，按游戏版本收窄 Egg Method 到 Wasm 的映射，移除 Wild 的重复本地 `MultiCheckSelect`、重复 `operation` 状态及旧 setter 调用，并移除 Worker 的旧 API 签名、前端二次筛选和重复 `search()` 实现。
 - Actions run `31566752956` / job `94020020424`：Prettier 已通过；`tsc -b` 尚未执行，因为 ESLint 在 `src/features/wild/worker/gen3wild.worker.ts` 报告 `Gen3WildRequest` 与 `Gen3WildSearcherRequest` 两个未使用类型导入。本地已移除它们。Egg/Wild 的 `useVirtualizer()` 仍各有一条 `react-hooks/incompatible-library` 警告，表示 React Compiler 跳过对此 hook 的自动 memoization；该警告没有使 job 失败，不作为本轮算法或 UI 验收结论。
-- 已静态核对 `gen3wild` API v3：`src/features/wild/worker/gen3wild.worker.ts` 的 `gen3wild_search` 调用参数顺序与 `wasm/modules/gen3wild/bridge/gen3wild_bridge.h/.cpp` 一致；全部筛选参数传入 Wasm，并直接 transfer 结果缓冲区。未执行本地 TypeScript、Wasm 或算法检查。
+- Actions run `31567004267` / job `94020776039`：Prettier、ESLint 和 TypeScript 已通过；Vitest 的 `src/features/egg/domain.test.ts` 有一项过期断言失败。实现会根据单次 Wasm 最多 `100,000` 个 Held/Pickup/Redraw 组合的防护上限分片，在 Emerald Pickup `0..0`、Redraw `0..5` 时每块 Held 上限为 `16,666`，测试原先错误断言为固定 `20,000`。已更新断言为 `16,666 + 3,335`，不改变生产分片逻辑。
+- 本地工程验证已获项目所有者授权并完成：`npm run verify` 通过，包含 Prettier、ESLint、`tsc -b`、15 个 Vitest 文件共 54 项测试、Vite 生产构建和 PWA 预缓存生成。ESLint 仍有 Egg/Wild 各一条 `useVirtualizer()` 的非阻断 React Compiler 警告。
+- 本地原生 Core 夹具已在 Visual Studio 2026 Build Tools x64 开发环境中通过：`npm run wasm:test:native` 通过 6/6（`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`）。修复 Egg bridge 的 lambda 捕获、数字常量兼容性和临时状态 ABI 字段初始化，未改变 RNG 规则。第一次从普通 PowerShell 调用失败是未加载 MSVC 头文件环境，不是源码错误。
+- 已将官方 emsdk 安装到用户级目录 `C:\Users\Hakuhiro\AppData\Local\pokerngkit-emsdk` 并激活 Emscripten `6.0.6`。在 `emsdk_env.bat` 环境中，`npm run wasm:doctor` 与正式 `npm run build` 均通过，六个 Gen III Wasm 模块和 Vite/PWA 生产站点已成功生成；SDK 未写入仓库，也未永久修改系统环境变量。
+- 本机系统 Node.js `24.13.0`、npm `11.6.2` 仍低于项目/CI 锁定的 Node.js `24.19.0`、npm `12.0.2`；emsdk 自带 Node.js `24.19.0`，但本轮 npm 命令仍由系统 Node.js 执行。因此本地完整构建仅作上传前工程证据，Actions 仍须在锁定 Node/npm 环境复核。
+- 已静态核对 `gen3wild` API v3：`src/features/wild/worker/gen3wild.worker.ts` 的 `gen3wild_search` 调用参数顺序与 `wasm/modules/gen3wild/bridge/gen3wild_bridge.h/.cpp` 一致；全部筛选参数传入 Wasm，并直接 transfer 结果缓冲区。
 - 当前模块集合：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`。
-- Egg 阶段已完成静态源码与上游文件核对、`git diff --check`、仓库 Markdown 本地链接与新文件尾随空白检查。当前合并未运行 npm、CMake、测试、原生夹具、Wasm 构建、UI 预览、浏览器或性能检查。
+- Egg 阶段已完成静态源码与上游文件核对、`git diff --check`、仓库 Markdown 本地链接与新文件尾随空白检查、本机 Web 工程验证、原生夹具和 Emscripten Wasm 发布构建。UI 预览、浏览器、性能和生产算法回归仍未执行。
 - 算法验收规则不变：GitHub Actions 部署成功后，由项目所有者提供实际生产 URL 并明确授权，才可在该页面使用已记录夹具回归。Actions、本地 Wasm、UI 预览和工程检查都不能替代算法验收。
 
 ### 本地提交实现：`gen3egg`
@@ -36,8 +41,8 @@
 ### 下一位开发者第一步
 
 1. 阅读 [`AGENTS.md`](../AGENTS.md)、[AI 开发一致性指南](ai-development.md)、本文、[Gen 3 Egg](modules/gen3egg.md)、[Gen 3 Wild](modules/gen3wild.md) 和 [PokeFinder 上游记录](../third_party/pokefinder/UPSTREAM.md)。
-2. 在 GitHub Desktop 审查四个未提交文件的 TypeScript 合并修复；不要覆盖、重置或选择性丢弃已有工作区内容。
-3. 由项目所有者提交并推送修复，等待 GitHub Actions 重新执行 `npm run verify`、构建六个 Gen III Wasm 模块并部署 Pages。
+2. 在 GitHub Desktop 审查 Egg 分片测试、Egg C++ bridge、Prettier 格式化和本文更新；不要覆盖、重置或选择性丢弃已有工作区内容。
+3. 由项目所有者提交并推送修复，等待 GitHub Actions 在锁定 Node.js `24.19.0`、npm `12.0.2` 与 Emscripten `6.0.6` 环境复核本地已通过的工程检查、六个 Gen III Wasm 模块构建并部署 Pages。
 4. Actions 部署成功后，项目所有者提供生产 URL 并明确授权；再使用 Egg、Wild、IVs to PID 和 Initial Seed 文档中的固定输入共同回归，并记录 URL、commit、Actions run、浏览器版本、输入、预期和实际结果。
 
 ## 当前可用模块
@@ -86,8 +91,8 @@
 
 ## 后续验收
 
-- 当前分支：`main`，HEAD `5d4e124 style: 修复第三世代孵化模块格式`。
-- 当前无待完成 merge；Egg/Wild TypeScript 合并修复保持未提交。
+- 当前分支：`main`，HEAD `1ec3a69 fix: 修复第三世代 Wild Worker lint 错误`。
+- 当前无待完成 merge；Egg 分片测试、C++ bridge、格式与验证记录修复保持未提交。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
@@ -105,10 +110,11 @@
 - 历史记录中包含前一阶段的 `format:check`、`lint`、`typecheck`、单元测试、UI 预览、原生夹具和生产页面回归证据；这些证据仅覆盖当时的构建与模块，不能覆盖本地 `e447e79` 的 Egg 实现或当前合并中的 Wild 变更。
 - 历史生产页面回归曾验证 ID Searcher 与 Static Searcher 固定夹具；具体记录以 Git 历史和此前部署对应文档为准。
 
-### 5.2 本轮未运行
+### 5.2 本轮工程验证
 
-- `npm run format:check`、`npm run lint`、`npm run typecheck`、`npm test` 与 `npm run build:ui`：未运行，等待项目所有者对具体命令授权。
-- `npm run wasm:test:native` 与 `npm run wasm:build`：未运行，等待项目所有者授权；本机工具链与 `emcmake` 状态未在本轮检查。
+- 已通过：`npm run verify`。Prettier、ESLint、`tsc -b`、15 个 Vitest 文件共 54 项测试、Vite 生产构建与 PWA 预缓存均已完成；ESLint 保留两条非阻断的 TanStack Virtual / React Compiler 警告。
+- 已通过：在 Visual Studio 2026 Build Tools x64 开发环境中运行 `npm run wasm:test:native`，6/6 原生 Core 夹具通过。
+- 已通过：在用户级 emsdk `6.0.6` 环境中运行 `npm run wasm:doctor` 与 `npm run build`，六个 Gen III Wasm 模块、Vite 生产站点和 PWA 预缓存均成功生成。CMake `4.3.1` 报告 Emscripten shared library 支持警告，但当前模块均为独立可执行 Wasm target，构建未受阻。
 - GitHub Pages、真实 Worker/Wasm、移动端、PWA、离线、性能与算法回归：未运行，等待 Actions 部署和生产 URL 授权。
 
 ### 5.3 本轮静态检查
@@ -153,7 +159,15 @@ npm run wasm:test:native
 npm run wasm:build
 ```
 
-后两项需要 C++ 编译器与已激活的 Emscripten。缺少工具链时保留失败信息，由 Actions 补齐，不把未运行项写成已通过。
+后两项需要 C++ 编译器与已激活的 Emscripten。当前 Windows 本机可先执行：
+
+```bat
+call C:\Users\Hakuhiro\AppData\Local\pokerngkit-emsdk\emsdk_env.bat
+npm run wasm:doctor
+npm run build
+```
+
+emsdk 环境只对当前终端会话生效。新电脑缺少工具链时保留失败信息，由 Actions 补齐，不把未运行项写成已通过。
 
 ## 8. 维护规则
 

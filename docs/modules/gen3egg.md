@@ -2,7 +2,7 @@
 
 > - 模块：`gen3egg`
 > - 上游基线：PokeFinder 4.3.2 `EggGenerator3`
-> - 状态：已实现，未运行工程检查、原生夹具、Wasm 构建、部署回归或项目所有者验收
+> - 状态：已通过本机 Web 工程检查、原生 Core 夹具与 Wasm 发布构建；未运行部署回归或项目所有者验收
 > - 范围：第三世代 Egg Generator；不包含 Egg Searcher、第四世代或 Masuda 规则
 
 ## 1. 功能范围
@@ -122,9 +122,11 @@ Held/Pickup Seed 0000，Held/Pickup 0..9，Compatibility 70
 60 条；首条 Advances 0、PID 59775、IV 30/11/31/31/31/16
 ```
 
-TypeScript 域测试位于 `src/features/egg/domain.test.ts`，覆盖分片、亲代兼容、Seed 边界、Method 归属和 22 字结果解码。
+TypeScript 域测试位于 `src/features/egg/domain.test.ts`，覆盖分片、亲代兼容、Seed 边界、Method 归属和 22 字结果解码。Held 分片除 `20,000` 帧常规块大小外，还按单次 C ABI 的 `100,000` 个 Held/Pickup/Redraw 组合上限收窄；例如 Emerald Pickup `0..0`、Redraw `0..5` 时，每块最多 `16,666` 个 Held 帧。
 
-本轮不得将上述夹具写成“已通过”。按项目规则，工程检查、原生夹具、Wasm 构建和 UI 预览均未运行；算法验收必须等 GitHub Actions 部署完成、项目所有者提供实际生产 URL 并明确授权后，才在该页面回归。
+本地工程证据：已通过 `npm run verify`（Prettier、ESLint、`tsc -b`、15 个测试文件共 54 项测试、Vite/PWA 构建），并在 Visual Studio 2026 Build Tools x64 开发环境中通过 `npm run wasm:test:native` 的 6/6 原生 Core 夹具。Egg bridge 同时修复 lambda 捕获、数字常量兼容性和临时状态 ABI 字段初始化，原生夹具覆盖 Emerald `EBred` 与 Ruby `RSFRLGBredSplit` 固定输入。
+
+已将官方 emsdk 安装到用户级目录并激活 Emscripten `6.0.6`；`npm run wasm:doctor` 与正式 `npm run build` 已通过，`gen3egg.mjs/.wasm` 与其余五个 Gen III Wasm 模块、Vite/PWA 生产站点均成功生成。本机系统 Node.js `24.13.0`、npm `11.6.2` 仍低于 CI 锁定的 Node.js `24.19.0`、npm `12.0.2`，因此上述结果仅是上传前工程证据，不构成算法验收。算法验收必须等 GitHub Actions 部署完成、项目所有者提供实际生产 URL 并明确授权后，才在该页面回归。
 
 ## 7. 上游依据
 

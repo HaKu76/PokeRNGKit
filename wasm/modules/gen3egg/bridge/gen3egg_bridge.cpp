@@ -169,8 +169,16 @@ namespace
         const auto second = rng.nextUShort();
         ivs = decodeIvs(first, second);
         rng.advance(inheritCount);
-        const std::array<std::uint8_t, 3> inh = { rng.nextUShort(6), rng.nextUShort(5), rng.nextUShort(4) };
-        const std::array<std::uint8_t, 3> par = { rng.nextUShort(2), rng.nextUShort(2), rng.nextUShort(2) };
+        const std::array<std::uint8_t, 3> inh = {
+            static_cast<std::uint8_t>(rng.nextUShort(6)),
+            static_cast<std::uint8_t>(rng.nextUShort(5)),
+            static_cast<std::uint8_t>(rng.nextUShort(4)),
+        };
+        const std::array<std::uint8_t, 3> par = {
+            static_cast<std::uint8_t>(rng.nextUShort(2)),
+            static_cast<std::uint8_t>(rng.nextUShort(2)),
+            static_cast<std::uint8_t>(rng.nextUShort(2)),
+        };
         if (emerald)
         {
             constexpr std::uint8_t available1[6] = { 0, 1, 2, 5, 3, 4 };
@@ -187,9 +195,8 @@ namespace
         {
             constexpr std::uint8_t order[6] = { 0, 1, 2, 5, 3, 4 };
             std::array<std::uint8_t, 6> available = { 0, 1, 2, 3, 4, 5 };
-            const auto apply = [&request, &available, &ivs, &source, &par](std::uint8_t inheritIndex,
-                                                                          std::uint8_t parentStep,
-                                                                          std::uint8_t size) {
+            const auto apply = [&request, &available, &ivs, &source, &par, &order](
+                                   std::uint8_t inheritIndex, std::uint8_t parentStep, std::uint8_t size) {
                 const std::uint8_t stat = available[inheritIndex];
                 const std::uint8_t ordered = order[stat];
                 ivs[ordered] = request.parentIv(par[parentStep], ordered);
@@ -233,7 +240,7 @@ namespace
             || request.alternateGenderRatio() > 255 || request.tid() > 0xffff || request.sid() > 0xffff
             || request.compatibility() != 20 && request.compatibility() != 50 && request.compatibility() != 70
             || request.shinyFilter() > 3 || request.genderFilter() > 2 || request.abilityFilter() > 2
-            || request.natureFilter() == 0 || request.natureFilter() > 0x1ff_ffff
+            || request.natureFilter() == 0 || request.natureFilter() > 0x1ffffff
             || request.hiddenPowerFilter() == 0 || request.hiddenPowerFilter() > 0xffff
             || request.calibration() > 255 || request.minRedraw() > request.maxRedraw() || request.maxRedraw() > 255)
         {
@@ -244,9 +251,9 @@ namespace
             return false;
         }
         if (request.game() == 1 && (request.seedHeld() > 0xffff || request.seedPickup() > 0xffff)) return false;
-        if (static_cast<std::uint64_t>(heldStart) + request.offsetHeld() + heldCount - 1 > 0xffff_ffffULL
+        if (static_cast<std::uint64_t>(heldStart) + request.offsetHeld() + heldCount - 1 > 0xffffffffULL
             || static_cast<std::uint64_t>(request.initialPickup()) + request.offsetPickup() + request.maxPickup()
-                   > 0xffff_ffffULL)
+                   > 0xffffffffULL)
             return false;
         const std::uint64_t redrawCount = request.game() == 0 ? request.maxRedraw() - request.minRedraw() + 1 : 1;
         const std::uint64_t pickupStates = static_cast<std::uint64_t>(request.maxPickup()) + 1;
@@ -360,8 +367,12 @@ extern "C"
                 const auto gender = getGender(low, ratio);
                 if (!matchesAbility(static_cast<std::uint8_t>(low & 1), request.abilityFilter())
                     || !matchesGender(gender, request.genderFilter())) continue;
-                heldStates.push_back({ initialAdvancesHeld + countHeld, 0, 0, low, static_cast<std::uint8_t>(low & 1), gender,
-                                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+                Gen3EggPackedState held {};
+                held.advances = initialAdvancesHeld + countHeld;
+                held.pid = low;
+                held.ability = static_cast<std::uint8_t>(low & 1);
+                held.gender = gender;
+                heldStates.push_back(held);
             }
         }
 
