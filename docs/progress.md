@@ -1,21 +1,22 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：第三世代 Egg Generator 模块落地
-> - 当前模块：`gen3egg`
-> - Git 基线：`b97ae07 feat: 增加第三世代个体值查询PID`
-> - 工作区状态：孵化模块及相关项目文档未提交；Codex 不暂存、不提交、不 push
+> - 当前阶段：合并第三世代野生检索功能
+> - 当前模块：`gen3egg` 已本地提交；正在合并 `gen3wild` 变更
+> - Git 基线：`e447e79 feat: 增加第三世代孵化乱数`
+> - 工作区状态：正在合并 `origin/main` 的 `5892606 feat: 合并第三世代野生检索功能`；`docs/progress.md` 的内容冲突已在工作目录解决，待项目所有者暂存并创建 merge commit
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
 > - 验收状态：本轮未运行工程检查、原生夹具、Wasm 构建、浏览器检查或算法验收
 
 ## 0. 当前工作区优先状态
 
-- 当前未提交内容包含 `gen3egg` 的 C++/Emscripten Wasm target、C ABI、Worker Pool、React 工作区、三语词条、样式、模块文档和上游追溯；此前遗留的 `gen3initialseed`、CI 格式和界面修复也仍在同一工作区，必须一并保留。
+- 本地 `e447e79` 已提交 `gen3egg` 的 C++/Emscripten Wasm target、C ABI、Worker Pool、React 工作区、三语词条、样式、模块文档和上游追溯。
+- 当前正把远端 `5892606` 的 Wild Searcher、地点中文、筛选布局、CI 格式与生成脚本修复合并到该 Egg 提交；除本文件外，远端变更均已进入合并暂存区，必须一并保留。
 - 当前模块集合：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`。
-- 本轮完成静态源码与上游文件核对，以及 `git diff --check`、仓库 Markdown 本地链接、Egg 新文件尾随空白检查。未运行 npm、CMake、测试、原生夹具、Wasm 构建、UI 预览、浏览器或性能检查。
+- Egg 阶段已完成静态源码与上游文件核对、`git diff --check`、仓库 Markdown 本地链接与新文件尾随空白检查。当前合并未运行 npm、CMake、测试、原生夹具、Wasm 构建、UI 预览、浏览器或性能检查。
 - 算法验收规则不变：GitHub Actions 部署成功后，由项目所有者提供实际生产 URL 并明确授权，才可在该页面使用已记录夹具回归。Actions、本地 Wasm、UI 预览和工程检查都不能替代算法验收。
 
-### 本轮实现：`gen3egg`
+### 本地提交实现：`gen3egg`
 
 - 新增独立 `wasm/modules/gen3egg` target、API v1、`gen3egg_*` C ABI、原生夹具和 `module.json`，已注册到顶层 CMake 与 `scripts/wasm.mjs`。
 - 新增 `src/features/egg`：领域校验、请求编码、结果解码、UI 预览引擎、Worker 协议、Worker Pool 和 React 面板。生产 RNG 仅在 Worker 内的 Wasm 实例运行。
@@ -27,18 +28,20 @@
 
 ### 下一位开发者第一步
 
-1. 阅读 [`AGENTS.md`](../AGENTS.md)、[AI 开发一致性指南](ai-development.md)、本文、[Gen 3 Egg](modules/gen3egg.md) 和 [PokeFinder 上游记录](../third_party/pokefinder/UPSTREAM.md)。
-2. 使用 GitHub Desktop 审查当前全部未提交修改，确认没有混入生成物；不要覆盖或重置已有工作区内容。
-3. 项目所有者提交后推送 `main`，等待 GitHub Actions 以锁定工具链构建全部六个 Gen III Wasm 模块并部署 Pages。
-4. Actions 部署成功后，项目所有者提供生产 URL 并明确授权；再用 Egg 文档的 Emerald 与 RSFRLG 固定夹具共同回归，并记录 URL、commit、Actions run、浏览器版本、输入、预期和实际结果。
+1. 阅读 [`AGENTS.md`](../AGENTS.md)、[AI 开发一致性指南](ai-development.md)、本文、[Gen 3 Egg](modules/gen3egg.md)、[Gen 3 Wild](modules/gen3wild.md) 和 [PokeFinder 上游记录](../third_party/pokefinder/UPSTREAM.md)。
+2. 在 GitHub Desktop 审查本次 merge 的所有暂存变更，确认 `docs/progress.md` 没有冲突标记且没有混入生成物；不要覆盖或重置已有工作区内容。
+3. 由项目所有者创建并推送 merge commit，等待 GitHub Actions 以锁定工具链构建六个 Gen III Wasm 模块并部署 Pages。
+4. Actions 部署成功后，项目所有者提供生产 URL 并明确授权；再使用 Egg、Wild、IVs to PID 和 Initial Seed 文档中的固定输入共同回归，并记录 URL、commit、Actions run、浏览器版本、输入、预期和实际结果。
 
-建议 GitHub Desktop 提交标题：
+## 当前可用模块
 
-```text
-feat: 增加第三世代孵化乱数
-```
-
-## 1. 恢复入口
+- `gen3id`：第三世代 ID Generator/Searcher。
+- `gen3initialseed`：第三世代 Initial Seed 反推。
+- `gen3static`：第三世代定点 Generator/Searcher。
+- `gen3wild`：第三世代野生 Generator/Searcher、地点选择、完整筛选、Worker Pool、CSV、UI 预览与真实 Wasm 运行。
+- `gen3ivtopid`：第三世代 IVs to PID 查询。
+- `gen3egg`：第三世代 Egg Generator。
+- `profiles`、`ivcalculator`：全局存档与个体值计算器。
 
 新环境按以下顺序阅读：
 
@@ -51,9 +54,16 @@ feat: 增加第三世代孵化乱数
 7. [上游记录](../third_party/pokefinder/UPSTREAM.md)
 8. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)
 
-聊天记录不是项目状态的事实来源。功能、依赖、工具链、构建、部署或阻塞变化后更新本文。
+### 本次合并带入的 Wild 变更
 
-## 2. 已确认决策
+- 在遭遇生成数据中写入 PokeFinder 简体中文地点名，并为反编译地点标签补充同源名称映射。
+- 为 Wild 增加 Searcher 操作页：Method、队首、遭遇地点、性格和六维 IV 最小/最大范围；任务依旧在独立 Worker/Wasm 实例中分片。
+- 补齐觉醒力量、异色、性别、特性、宝可梦和遭遇槽位筛选，并移除 Wild 生成区旁的个体值计算器入口。
+- 将六项 IV 最大值默认设为 31；Wild 结果表按 Static 的通用列顺序显示并追加槽位、宝可梦和等级，CSV 复用同一列定义，槽位按 PokeFinder 的 0 基值显示和导出。
+- UI 模式提供明确标识的确定性样例引擎，方便先验收界面，且不把样例结果伪装成 Wasm 计算。
+- 安装并激活项目锁定的 Emscripten 6.0.6，修复 Windows 下 `emcc.exe`/`emcmake.exe` 探测，并排除本地 SDK 与生成 Wasm 的格式和 lint 扫描。
+
+## 验证记录
 
 - 正式英文工程名为 PokeRNGKit，不设置中文名。
 - 当前产品只做第三世代；第四世代只保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口和 AI 交接，不实现算法或 UI。
@@ -66,10 +76,10 @@ feat: 增加第三世代孵化乱数
 - 未获项目所有者对具体命令或 URL 的明确授权时，Codex 不运行测试、构建、算法回归、性能检查或浏览器检查。
 - Codex 不自动暂存、提交、push、部署或发布；完成模块后只提供一条 GitHub Desktop 提交标题。
 
-## 3. Git 与部署状态
+## 后续验收
 
-- 当前分支：`main`，HEAD `b97ae07 feat: 增加第三世代个体值查询PID`。
-- 当前没有待完成的 merge 状态；所有本轮修改保持未提交。
+- 当前分支：`main`，HEAD `e447e79 feat: 增加第三世代孵化乱数`。
+- 当前正在合并 `5892606 feat: 合并第三世代野生检索功能`；`docs/progress.md` 的内容冲突已在工作目录解决，仍待项目所有者创建 merge commit。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
@@ -77,14 +87,14 @@ feat: 增加第三世代孵化乱数
 - 工程基础：React 19、TypeScript 6、Vite 8、Vitest、ESLint、Prettier、PWA 和中英日三语；npm 是唯一包管理器。
 - 构建基线：Node.js `24.19.0`、npm `12.0.2`、Emscripten `6.0.6`、CMake runtime `4.3.1`、Ninja runtime `1.13.2`。
 - 法律边界：GPL-3.0-or-later、PokeFinder 署名、对应源码记录和站点免责声明。
-- 已有工作区：`gen3id`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、三代存档信息、个体值计算器、`gen3ivtopid`。
+- 已有模块：`gen3id`、`gen3initialseed`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、三代存档信息和个体值计算器。
 - UI 基础：默认收起的模块抽屉、全局存档悬浮窗、浅色/深色主题和系统默认字体。
 
 ## 5. 验证状态
 
 ### 5.1 历史工程与页面证据
 
-- 历史记录中包含前一阶段的 `format:check`、lint、typecheck、单元测试、UI 预览、原生夹具和生产页面回归证据；这些证据仅覆盖当时的构建与模块，不能覆盖当前未提交的 Egg 实现。
+- 历史记录中包含前一阶段的 `format:check`、`lint`、`typecheck`、单元测试、UI 预览、原生夹具和生产页面回归证据；这些证据仅覆盖当时的构建与模块，不能覆盖本地 `e447e79` 的 Egg 实现或当前合并中的 Wild 变更。
 - 历史生产页面回归曾验证 ID Searcher 与 Static Searcher 固定夹具；具体记录以 Git 历史和此前部署对应文档为准。
 
 ### 5.2 本轮未运行

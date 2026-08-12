@@ -6,7 +6,7 @@
 > - API 版本：`3`
 > - 当前范围：第三世代掌机 Wild；Tanoby Chamber 暂不开放
 
-## 1. 当前能力
+## 能力与边界
 
 - 按全局存档的 Ruby、Sapphire、Emerald、FireRed 或 LeafGreen 版本切换遭遇数据，并使用存档 TID/SID 判断闪光。
 - 支持 Grass、Rock Smash、Surfing、Old Rod、Good Rod、Super Rod 和上游 `Wild 1`、`Wild 2`、`Wild 4`。

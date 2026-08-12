@@ -13,6 +13,7 @@ import {
   wildSearcherLeadToWasm,
   wildShinyFilterToWasm,
 } from "../domain";
+import type { Gen3WildRequest, Gen3WildSearcherRequest } from "../domain";
 import type { Gen3WildWorkerRequest, Gen3WildWorkerResponse } from "./messages";
 
 interface Gen3WildEmscriptenModule {
@@ -98,6 +99,35 @@ interface Gen3WildEmscriptenModule {
     specialDefenseMax: number,
     speedMax: number,
   ): number;
+  _gen3wild_search(
+    slots: number,
+    slotCount: number,
+    startIndex: number,
+    stateCount: number,
+    method: number,
+    lead: number,
+    encounter: number,
+    rate: number,
+    rse: number,
+    feebasTile: number,
+    feebasLocation: number,
+    safariZone: number,
+    tid: number,
+    sid: number,
+    natureMask: number,
+    hpMin: number,
+    attackMin: number,
+    defenseMin: number,
+    specialAttackMin: number,
+    specialDefenseMin: number,
+    speedMin: number,
+    hpMax: number,
+    attackMax: number,
+    defenseMax: number,
+    specialAttackMax: number,
+    specialDefenseMax: number,
+    speedMax: number,
+  ): number;
   _gen3wild_result_ptr(): number;
   _gen3wild_result_count(): number;
   _gen3wild_last_error(): number;
@@ -109,6 +139,51 @@ type Gen3WildModuleFactory = (options: {
 
 const workerScope = self as DedicatedWorkerGlobalScope;
 let wasm: Gen3WildEmscriptenModule | undefined;
+
+function hiddenPowerType(words: Uint32Array, offset: number) {
+  const bits =
+    (words[offset + 2] & 1) +
+    2 * (words[offset + 3] & 1) +
+    4 * (words[offset + 4] & 1) +
+    8 * (words[offset + 7] & 1) +
+    16 * (words[offset + 5] & 1) +
+    32 * (words[offset + 6] & 1);
+  return Math.floor((bits * 15) / 63);
+}
+
+function filterWords(
+  words: Uint32Array,
+  request: Gen3WildRequest | Gen3WildSearcherRequest,
+): Uint32Array {
+  const output: number[] = [];
+  const { filters } = request;
+  const shinyFilter = { any: 0, star: 1, square: 2, "star-square": 3 }[
+    filters.shiny
+  ];
+  const genderFilter = { any: -1, male: 0, female: 1 }[filters.gender];
+  const abilityFilter = { any: -1, first: 0, second: 1 }[filters.ability];
+  for (let offset = 0; offset < words.length; offset += 15) {
+    const nature = words[offset + 11] & 0xff;
+    const shiny = words[offset + 11] >>> 8;
+    if (
+      (filters.natureMask & (1 << nature)) === 0 ||
+      (filters.hiddenPowerMask & (1 << hiddenPowerType(words, offset))) === 0 ||
+      (shinyFilter !== 0 && (shinyFilter & shiny) === 0) ||
+      (genderFilter !== -1 && words[offset + 9] !== genderFilter) ||
+      (abilityFilter !== -1 && words[offset + 8] !== abilityFilter) ||
+      (filters.species !== 0 && words[offset + 13] !== filters.species) ||
+      (filters.slotMask & (1 << words[offset + 12])) === 0 ||
+      filters.ivMin.some(
+        (minimum, index) =>
+          words[offset + 2 + index] < minimum ||
+          words[offset + 2 + index] > filters.ivMax[index],
+      )
+    )
+      continue;
+    output.push(...words.subarray(offset, offset + 15));
+  }
+  return Uint32Array.from(output);
+}
 
 function post(message: Gen3WildWorkerResponse, transfer: Transferable[] = []) {
   workerScope.postMessage(message, transfer);
@@ -244,17 +319,73 @@ function search(message: Extract<Gen3WildWorkerRequest, { type: "search" }>) {
       resultPointer,
       resultPointer + resultCount * 15,
     );
+    const filtered = filterWords(words, request);
     post(
       {
         type: "batch",
         taskId: message.taskId,
         chunkIndex: message.chunk.index,
         stateCount: message.chunk.stateCount,
-        resultCount,
+        resultCount: filtered.length / 15,
         elapsedMs: performance.now() - startedAt,
-        buffer: words.buffer,
+        buffer: filtered.buffer as ArrayBuffer,
       },
-      [words.buffer],
+      [filtered.buffer as ArrayBuffer],
+    );
+  } finally {
+    wasm._free(pointer);
+  }
+}
+
+function search(message: Extract<Gen3WildWorkerRequest, { type: "search" }>) {
+  if (!wasm) throw new Error("Gen3 wild Wasm module is not initialized.");
+  const packedSlots = packGen3WildSlots(message.request.area.slots);
+  const pointer = wasm._malloc(packedSlots.byteLength);
+  const startedAt = performance.now();
+  try {
+    wasm.HEAPU32.set(packedSlots, pointer >>> 2);
+    const request = message.request;
+    const resultCount = wasm._gen3wild_search(
+      pointer,
+      request.area.slots.length,
+      message.chunk.startIndex,
+      message.chunk.stateCount,
+      wildMethodToWasm(request.method),
+      wildLeadToWasm(request.lead, 0),
+      wildEncounterToWasm(request.area.encounter),
+      request.area.rate,
+      isRseVersion(request.version) ? 1 : 0,
+      request.feebasTile ? 1 : 0,
+      request.area.feebasLocation ? 1 : 0,
+      request.area.safariZone ? 1 : 0,
+      request.tid,
+      request.sid,
+      request.filters.natureMask,
+      ...request.filters.ivMin,
+      ...request.filters.ivMax,
+    );
+    const errorCode = wasm._gen3wild_last_error();
+    if (errorCode !== 0)
+      throw new Error(`Gen3 wild Wasm core returned error ${errorCode}.`);
+    if (resultCount !== wasm._gen3wild_result_count())
+      throw new Error("Gen3 wild result count changed before copy.");
+    const resultPointer = wasm._gen3wild_result_ptr() >>> 2;
+    const words = wasm.HEAPU32.slice(
+      resultPointer,
+      resultPointer + resultCount * 15,
+    );
+    const filtered = filterWords(words, request);
+    post(
+      {
+        type: "batch",
+        taskId: message.taskId,
+        chunkIndex: message.chunk.index,
+        stateCount: message.chunk.stateCount,
+        resultCount: filtered.length / 15,
+        elapsedMs: performance.now() - startedAt,
+        buffer: filtered.buffer as ArrayBuffer,
+      },
+      [filtered.buffer as ArrayBuffer],
     );
   } finally {
     wasm._free(pointer);

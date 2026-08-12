@@ -38,7 +38,7 @@ const ctestCommand = runtimeCommand("cmake-runtime", "ctest");
 const ninjaCommand = runtimeCommand("ninja-runtime", "ninja");
 
 function executable(name) {
-  return process.platform === "win32" ? `${name}.bat` : name;
+  return process.platform === "win32" ? `${name}.exe` : name;
 }
 
 function usesShell(command) {
@@ -103,7 +103,17 @@ async function doctor() {
     ["CMake", cmakeCommand, ["--version"]],
     ["Ninja", ninjaCommand, ["--version"]],
     ["Emscripten", executable("emcc"), ["--version"]],
-    ["emcmake", executable("emcmake"), [cmakeCommand, "--version"]],
+    [
+      "emcmake",
+      executable("emcmake"),
+      [
+        cmakeCommand,
+        "-G",
+        "Ninja",
+        `-DCMAKE_MAKE_PROGRAM=${ninjaCommand}`,
+        "--version",
+      ],
+    ],
   ];
 
   const missing = [];
