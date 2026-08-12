@@ -13,6 +13,7 @@ import { formatHex, parseDecimal, parseHex } from "../id/domain";
 import type { Gen3Profile } from "../profiles/domain";
 import { getGen3AbilityName } from "../shared/gen3Abilities";
 import { gen3HiddenPower } from "../shared/gen3HiddenPower";
+import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import { getGen3Personal } from "../shared/gen3Personal";
 import { getGen3SpeciesName } from "../shared/gen3Species";
 import { computeGen3Stats } from "../shared/gen3Stats";
@@ -38,6 +39,7 @@ import {
   type Gen3WildState,
 } from "./domain";
 import { GEN3_ENCOUNTERS, GEN3_PERSONAL } from "./gen3Data";
+import { getGen3WildLocationName } from "./locationNames";
 import { Gen3WildUiPreviewEngine } from "./preview/Gen3WildUiPreviewEngine";
 import { Gen3WildSearcherUiPreviewEngine } from "./preview/Gen3WildSearcherUiPreviewEngine";
 import type {
@@ -83,16 +85,6 @@ interface Gen3WildPanelProps {
   profile: Gen3Profile;
   uiPreviewMode: boolean;
   onOpenIvCalculator(): void;
-}
-
-interface MultiCheckSelectProps {
-  disabled?: boolean;
-  label: string;
-  anyLabel: string;
-  mask: number;
-  onChange(mask: number): void;
-  options: readonly { label: string; value: number }[];
-  resetHint: string;
 }
 
 const NATURE_MASK_ALL = 0x1ff_ffff;
@@ -193,84 +185,6 @@ const gameData = GEN3_ENCOUNTERS as unknown as Record<
   DataGame,
   readonly RawLocation[]
 >;
-
-function MultiCheckSelect({
-  anyLabel,
-  disabled,
-  label,
-  mask,
-  onChange,
-  options,
-  resetHint,
-}: MultiCheckSelectProps) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const fullMask = options.reduce(
-    (value, option) => value | (1 << option.value),
-    0,
-  );
-  const selected = options.filter(
-    (option) => (mask & (1 << option.value)) !== 0,
-  );
-  const summary =
-    mask === 0 || mask === fullMask
-      ? anyLabel
-      : selected.map((option) => option.label).join(", ");
-
-  useEffect(() => {
-    if (!open) return;
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", closeOnOutsidePointer);
-    return () =>
-      document.removeEventListener("pointerdown", closeOnOutsidePointer);
-  }, [open]);
-
-  return (
-    <div className="field multi-check-field" ref={rootRef}>
-      <span>{label}</span>
-      <button
-        aria-expanded={open}
-        className="multi-check-trigger"
-        disabled={disabled}
-        onClick={(event) => {
-          if (event.ctrlKey) {
-            onChange(0);
-            setOpen(false);
-          } else {
-            setOpen((current) => !current);
-          }
-        }}
-        title={resetHint}
-        type="button"
-      >
-        <span>{summary}</span>
-        <span aria-hidden="true">▾</span>
-      </button>
-      {open && (
-        <div className="multi-check-menu">
-          {options.map((option) => (
-            <label key={option.value}>
-              <input
-                checked={(mask & (1 << option.value)) !== 0}
-                onChange={(event) =>
-                  onChange(
-                    event.target.checked
-                      ? mask | (1 << option.value)
-                      : mask & ~(1 << option.value),
-                  )
-                }
-                type="checkbox"
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function dataGame(version: Gen3Profile["version"]): DataGame {
   if (version === "firered") return "fire-red";
@@ -816,7 +730,7 @@ export function Gen3WildPanel({
           </button>
         ))}
       </div>
-      <form className="static-control-grid" onSubmit={run}>
+      <form className="static-control-grid gen3static-control-grid" onSubmit={run}>
         <section className="panel static-panel static-rng-panel">
           <div className="panel-heading">
             <div>
@@ -1016,7 +930,7 @@ export function Gen3WildPanel({
               >
                 {locations.map((entry, index) => (
                   <option key={`${entry.name}-${index}`} value={index}>
-                    {entry.name}
+                    {getGen3WildLocationName(i18n.language, entry.name)}
                   </option>
                 ))}
               </select>
@@ -1095,15 +1009,41 @@ export function Gen3WildPanel({
             className="filter-controls"
             disabled={operation === "generator" && filtersDisabled}
           >
-            <div className="static-filter-selects wild-filter-selects">
+            <div className="gen3-filter-selects">
+              <label className="field">
+                <span>{t("ability")}</span>
+                <select
+                  value={ability}
+                  onChange={(event) =>
+                    setAbility(event.target.value as Gen3WildAbilityFilter)
+                  }
+                >
+                  <option value="any">{t("any")}</option>
+                  <option value="first">0</option>
+                  <option value="second">1</option>
+                </select>
+              </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
-                label={t("nature")}
-                mask={natureMask}
-                onChange={setNatureMask}
-                options={natureOptions}
+                label={t("wildEncounterSlot")}
+                mask={encounterSlotMask}
+                onChange={setEncounterSlotMask}
+                options={encounterSlotOptions}
                 resetHint={t("checkListResetHint")}
               />
+              <label className="field">
+                <span>{t("gender")}</span>
+                <select
+                  value={gender}
+                  onChange={(event) =>
+                    setGender(event.target.value as Gen3WildGenderFilter)
+                  }
+                >
+                  <option value="any">{t("any")}</option>
+                  <option value="male">{t("male")}</option>
+                  <option value="female">{t("female")}</option>
+                </select>
+              </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
                 label={t("hiddenPower")}
@@ -1112,12 +1052,41 @@ export function Gen3WildPanel({
                 options={hiddenPowerOptions}
                 resetHint={t("checkListResetHint")}
               />
+              <div className="wild-level-filter">
+                <span>{t("level")}</span>
+                <input
+                  aria-label={`${t("level")} ${t("minimum")}`}
+                  inputMode="numeric"
+                  max="100"
+                  min="1"
+                  onChange={(event) =>
+                    setLevelMin(
+                      normalizeDecimalInput(event.target.value, 100, 3),
+                    )
+                  }
+                  type="number"
+                  value={levelMin}
+                />
+                <input
+                  aria-label={`${t("level")} ${t("maximum")}`}
+                  inputMode="numeric"
+                  max="100"
+                  min="1"
+                  onChange={(event) =>
+                    setLevelMax(
+                      normalizeDecimalInput(event.target.value, 100, 3),
+                    )
+                  }
+                  type="number"
+                  value={levelMax}
+                />
+              </div>
               <MultiCheckSelect
                 anyLabel={t("any")}
-                label={t("wildEncounterSlot")}
-                mask={encounterSlotMask}
-                onChange={setEncounterSlotMask}
-                options={encounterSlotOptions}
+                label={t("nature")}
+                mask={natureMask}
+                onChange={setNatureMask}
+                options={natureOptions}
                 resetHint={t("checkListResetHint")}
               />
               <label className="field">
@@ -1134,57 +1103,6 @@ export function Gen3WildPanel({
                   <option value="star-square">{t("shinyStarSquare")}</option>
                 </select>
               </label>
-              <label className="field">
-                <span>{t("gender")}</span>
-                <select
-                  value={gender}
-                  onChange={(event) =>
-                    setGender(event.target.value as Gen3WildGenderFilter)
-                  }
-                >
-                  <option value="any">{t("any")}</option>
-                  <option value="male">{t("male")}</option>
-                  <option value="female">{t("female")}</option>
-                </select>
-              </label>
-              <label className="field">
-                <span>{t("ability")}</span>
-                <select
-                  value={ability}
-                  onChange={(event) =>
-                    setAbility(event.target.value as Gen3WildAbilityFilter)
-                  }
-                >
-                  <option value="any">{t("any")}</option>
-                  <option value="first">0</option>
-                  <option value="second">1</option>
-                </select>
-              </label>
-            </div>
-            <div className="wild-level-filter">
-              <span>{t("level")}</span>
-              <input
-                aria-label={`${t("level")} ${t("minimum")}`}
-                inputMode="numeric"
-                max="100"
-                min="1"
-                onChange={(event) =>
-                  setLevelMin(normalizeDecimalInput(event.target.value, 100, 3))
-                }
-                type="number"
-                value={levelMin}
-              />
-              <input
-                aria-label={`${t("level")} ${t("maximum")}`}
-                inputMode="numeric"
-                max="100"
-                min="1"
-                onChange={(event) =>
-                  setLevelMax(normalizeDecimalInput(event.target.value, 100, 3))
-                }
-                type="number"
-                value={levelMax}
-              />
             </div>
             <div className="iv-filter">
               <div className="iv-filter-header">

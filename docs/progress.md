@@ -1,12 +1,34 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：第三世代 Static 特性名称与紧凑布局
-> - 当前模块：`gen3id`、`gen3static`、`gen3wild`、`profiles`、`ivcalculator`
-> - Git 基线：`b6dc62e fix: 修复第三世代检索界面与定点布局`
-> - 工作区状态：Static 特性名称与控制区布局存在未提交修改；Codex 不暂存、不提交、不 push
+> - 当前阶段：第三世代 Initial Seed Finder、Wild 地点本地化与筛选布局统一
+> - 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`profiles`、`ivcalculator`
+> - Git 基线：`309dedf feat: 显示第三世代特性名称并优化定点布局`
+> - 工作区状态：Initial Seed Finder、Wild 地点本地化和筛选布局存在未提交修改；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
 > - 验收状态：ID Searcher 与 Static Searcher 固定夹具已在项目所有者授权的 GitHub Pages 页面回归；本轮特性显示和布局待部署后共同验收
+
+## 0. 当前工作区优先状态
+
+- 最近更新：2026-08-12；Git 基线为 `309dedf feat: 显示第三世代特性名称并优化定点布局`。
+- 当前未提交内容：`gen3initialseed` 初始 Seed Finder、Wild 地点中英资源生成与显示、Wild/Static 统一紧凑筛选网格、Wasm 构建清单、模块文档和上游来源记录。
+- 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`profiles`、`ivcalculator`。
+- 自动化状态：本轮未运行 npm、CMake、原生夹具、TypeScript 测试、构建、浏览器检查或部署；算法和 UI 均未验收。
+- 项目所有者验收规则保持不变：必须先由 GitHub Actions 完成部署，再由所有者提供生产 URL 并明确授权，才能做算法回归；本地 Wasm 或 UI 预览不能替代验收。
+
+### 本轮实现
+
+- `gen3initialseed`：RS TID/SID 全候选反推、FRLG/RSE 目标 Seed 分片反推、固定宽度 C ABI、独立 Worker/Wasm、稳定排序、进度、取消和 CSV；原生夹具覆盖 `48163/64377 -> 05A0/0、C19B/36724` 与 `00006073 -> 0000/1`，本轮未运行。
+- `gen3wild`：地点选择框使用 PokeFinder 4.3.2 `en/zh` 地点资源；不匹配的 EncounterTableGenerator 细分名称保留英文，日文沿用上游英文。
+- `gen3wild` 与 `gen3static`：筛选项统一使用 `gen3-filter-selects` 和共享的 `MultiCheckSelect`；两者保留上游 `Filter.ui` 的左侧 IV/工具与右侧标签-控件紧凑行。Wild 只在固定顺序中额外显示 Encounter Slot 和 Level，Static 移除这两项。
+- 参考记录：Real96 两个 GPL-3.0 初始 Seed 项目用于算法研究；StarfBerry/PokeRNG 仅登记参考，未复制代码。
+
+### 下一位开发者第一步
+
+1. 阅读 [`docs/modules/gen3initialseed.md`](modules/gen3initialseed.md) 与 [`third_party/pokefinder/UPSTREAM.md`](../third_party/pokefinder/UPSTREAM.md)。
+2. 在具备项目所有者授权后，按 `.github/workflows/ci.yml` 和 `package-lock.json` 检查四个 Gen III Wasm target；当前 Codex 不执行这些命令。
+3. 项目所有者在 GitHub Desktop 审查后自行提交，建议标题：`feat: 集成第三世代初始种子检索`。
+4. 推送并等待 Actions 部署；项目所有者提供 URL 后，再共同验收 Initial Seed 结果、地点中文名和野生/定点筛选布局。
 
 ## 1. 恢复入口
 
@@ -40,7 +62,7 @@
 
 ## 3. Git 与部署状态
 
-- 当前分支：`main`，HEAD `b6dc62e`。
+- 当前分支：`main`，HEAD `309dedf`。
 - 当前没有待完成的 merge 状态；本轮工作区修改均保持未提交。
 - 远端和仓库目录沿用现有设置，不在本轮重命名或修改远端。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
@@ -63,14 +85,15 @@
 - `ivcalculator`：第三世代物种、性格、觉醒力量、多行能力值交集和下一级提示。
 - 右侧悬浮工具列：存档信息和个体值计算器按固定纵向按钮列收起，展开后向左延展；点击页面空白不会收起存档信息。
 
-## 5. 当前未提交工作区：Static 特性名称与紧凑布局
+## 5. 当前未提交工作区：Initial Seed Finder、地点本地化与筛选布局
 
 ### 5.1 已实现
 
 - Static 结果的特性列由纯槽位数字改为 PokeFinder 格式 `0/1: 特性名称`；物种特性 ID 来自 `personal_rsefrlg.bin`，名称复用上游中英日资源。
 - Wild 已使用同一共享 Personal 与特性名称表，本轮不修改其算法或筛选协议。
 - `static-control-grid` 保留 PokeFinder 的 RNG Info / Settings / Filters 三栏结构；RNG 与设置控件改为标签在左、控件在右的紧凑行布局。
-- Filters 改为 PokeFinder `Filter.ui` 同类左右分栏：IV 范围与工具位于左侧，性格、觉醒力量、异色、性别和特性位于右侧。
+- Filters 改为 PokeFinder `Filter.ui` 同类左右分栏：IV 范围与工具位于左侧，性格、觉醒力量、异色、性别和特性位于右侧；Wild 额外的遭遇槽位和等级筛选也复用同一右侧紧凑行。
+- `gen3wild` 与 `gen3static` 的筛选项共用 `gen3-filter-selects` 桌面布局和控件间距，移动端统一降为单栏，避免两种模块再次出现不同的筛选器排列方式。
 - 桌面控件限制最大宽度，窄屏恢复单栏，避免输入框随面板无上限拉伸。
 
 ### 5.2 明确未完成

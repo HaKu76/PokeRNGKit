@@ -16,6 +16,7 @@
 - Location、Pokemon、Encounter Slot 和等级范围按当前存档版本联动。
 - 筛选支持 PokeFinder 的 Nature、Hidden Power、Encounter Slot 多选，Level、六项 IV 闭区间，Shiny、Gender 和 Ability。
 - Generator 提供“取消筛选”；Searcher 始终使用有效 IV 范围。
+- 筛选器桌面布局复用上游 `Form/Controls/Filter.ui`：左侧为六项 IV 与工具，右侧按 Ability、Encounter Slot、Gender、Hidden Power、Level、Nature、Shiny 的上游顺序排列紧凑行；Static 复用其中相同的布局和多选控件，只移除不适用的 Encounter Slot、Level。窄屏统一降为单列。
 - 结果表对齐 `WildGeneratorModel3` / `WildSearcherModel3` 的 16 列；Searcher 第一列为 Seed，Generator 第一列为 Advances。
 - 支持 IV/能力值显示切换、个体值计算器入口、数值排序、虚拟化显示、CSV、进度和取消。
 - 本地 `ui` 模式提供确定性样例，只用于表单和交互验收，不代表 Wasm RNG 结果。
@@ -38,7 +39,7 @@
 
 Searcher 不接收 Seed 或推进范围。它按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 枚举 IV 笛卡尔积，总组合不得超过 50,000,000，TypeScript 分片上限为 10,000 个组合。C ABI 对 Generator 状态和 Searcher 组合保留 100,000 的单次防御上限；单任务最多保留 250,000 条结果。
 
-全不选或全选的 CheckList 语义与 PokeFinder 一致：界面显示 `Any`，请求层发送完整掩码。Ctrl 点击 IV 标签设置 `31..31`，Alt 设置 `30..31`，Ctrl+Alt 设置 `0..0`，普通点击恢复 `0..31`。
+全不选或全选的 CheckList 语义与 PokeFinder 一致：界面显示 `Any`，请求层发送完整掩码。定点与野生共用的多选控件均支持 `Ctrl + Click` 一键清空勾选并回到 `Any`。Ctrl 点击 IV 标签设置 `31..31`，Alt 设置 `30..31`，Ctrl+Alt 设置 `0..0`，普通点击恢复 `0..31`。
 
 ## 3. Generator 算法顺序
 

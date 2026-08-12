@@ -1,0 +1,7 @@
+{
+  "id": "gen3initialseed",
+  "apiVersion": 1,
+  "target": "gen3initialseed",
+  "artifacts": ["gen3initialseed.mjs", "gen3initialseed.wasm"],
+  "source": "PokeFinder 4.3.2 PokeRNG / PokeRNGR; Real96 initial seed workflows"
+}

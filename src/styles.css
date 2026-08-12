@@ -1063,6 +1063,51 @@ h1 {
   gap: 6px;
   margin-bottom: 6px;
 }
+.initial-seed-control-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(280px, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.initial-seed-control-grid .static-form-stack > .field {
+  display: grid;
+  grid-template-columns: minmax(96px, 1fr) minmax(140px, 220px);
+  align-items: center;
+  column-gap: 8px;
+}
+.initial-seed-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 6px;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+.initial-seed-details > div {
+  min-width: 0;
+  padding: 8px;
+  background: var(--control-bg);
+}
+.initial-seed-details span,
+.initial-seed-details strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.initial-seed-details span {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.initial-seed-details strong {
+  margin-top: 4px;
+  color: var(--text);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
 .operation-tabs {
   display: inline-grid;
   grid-template-columns: repeat(2, minmax(120px, 1fr));
@@ -1246,20 +1291,20 @@ h1 {
   font-size: 10px;
   line-height: 1.55;
 }
-.static-filter-selects {
+.gen3-filter-selects {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
   margin-top: 9px;
 }
-.gen3static-control-grid .static-filter-selects {
+.gen3static-control-grid .gen3-filter-selects {
   grid-column: 2;
   grid-row: 1 / span 2;
   grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   margin-top: 6px;
 }
-.gen3static-control-grid .static-filter-selects .field {
+.gen3static-control-grid .gen3-filter-selects .field {
   display: grid;
   grid-template-columns: minmax(72px, 1fr) minmax(112px, 166px);
   align-items: center;
@@ -1386,6 +1431,16 @@ h1 {
 .wild-level-display input:disabled {
   opacity: 0.65;
 }
+.gen3static-control-grid .wild-level-filter {
+  grid-template-columns: minmax(72px, 1fr) minmax(52px, 83px) minmax(52px, 83px);
+  gap: 6px;
+  margin-top: 0;
+  border: 0;
+  padding: 0;
+}
+.gen3static-control-grid .wild-level-filter input {
+  min-height: 32px;
+}
 .iv-filter {
   margin-top: 9px;
   overflow: hidden;
@@ -1446,6 +1501,57 @@ h1 {
 }
 .static-table-shell {
   height: 560px;
+}
+.initial-seed-table-shell {
+  height: 420px;
+}
+.initial-seed-virtual-table {
+  position: relative;
+  min-width: 360px;
+}
+.initial-seed-table-header,
+.initial-seed-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-width: 360px;
+  align-items: center;
+}
+.initial-seed-table-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 38px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.initial-seed-table-header button {
+  height: 100%;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  padding: 0 10px;
+  font-size: 9px;
+  text-align: left;
+}
+.initial-seed-table-header button:hover {
+  color: var(--teal);
+}
+.initial-seed-table-row {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 42px;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+}
+.initial-seed-table-row span {
+  overflow: hidden;
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .static-virtual-table {
   position: relative;
@@ -1707,6 +1813,9 @@ h1 {
   .static-control-grid {
     grid-template-columns: 1fr;
   }
+  .initial-seed-control-grid {
+    grid-template-columns: 1fr;
+  }
   .floating-tools {
     gap: 7px;
   }
@@ -1758,20 +1867,21 @@ h1 {
   .gen3static-control-grid .static-rng-panel .static-form-stack > .field,
   .gen3static-control-grid .static-rng-panel .compact-field-row > .field,
   .gen3static-control-grid .static-settings-panel .static-form-stack > .field,
-  .gen3static-control-grid .static-filter-selects .field {
+  .gen3static-control-grid .gen3-filter-selects .field,
+  .initial-seed-control-grid .static-form-stack > .field {
     grid-template-columns: minmax(0, 1fr);
   }
   .gen3static-control-grid .static-filter-panel .filter-controls {
     grid-template-columns: minmax(0, 1fr);
   }
-  .gen3static-control-grid .static-filter-selects,
+  .gen3static-control-grid .gen3-filter-selects,
   .gen3static-control-grid .static-filter-panel .iv-filter,
   .gen3static-control-grid .static-filter-panel .filter-tool-row {
     grid-column: 1;
     grid-row: auto;
   }
   .compact-field-row,
-  .static-filter-selects {
+  .gen3-filter-selects {
     grid-template-columns: 1fr;
   }
   .results-heading {

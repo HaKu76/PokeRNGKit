@@ -23,6 +23,7 @@ import { Gen3IvCalculator } from "./features/ivcalculator/Gen3IvCalculator";
 import { Gen3ProfileControls } from "./features/profiles/Gen3ProfileControls";
 import { gen3StaticProfileOrDefault } from "./features/profiles/domain";
 import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
+import { Gen3InitialSeedPanel } from "./features/initialseed/Gen3InitialSeedPanel";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
 import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
@@ -30,7 +31,7 @@ import { useTheme } from "./theme";
 
 type SortKey = keyof Id3State;
 type SupportedLanguage = "zh" | "en" | "ja";
-type ActiveModule = "id" | "static" | "wild";
+type ActiveModule = "id" | "initialseed" | "static" | "wild";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -366,6 +367,24 @@ function App() {
           </button>
           <button
             className={
+              activeModule === "initialseed"
+                ? "module-entry active"
+                : "module-entry"
+            }
+            onClick={() => {
+              setActiveModule("initialseed");
+              setModuleRailOpen(false);
+            }}
+            type="button"
+          >
+            <span className="module-index">02</span>
+            <span>
+              <strong>{t("initialSeedModule")}</strong>
+              <small>{t("initialSeedVersion")}</small>
+            </span>
+          </button>
+          <button
+            className={
               activeModule === "static" ? "module-entry active" : "module-entry"
             }
             onClick={() => {
@@ -374,7 +393,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">02</span>
+            <span className="module-index">03</span>
             <span>
               <strong>{t("staticModule")}</strong>
               <small>{t("staticVersion")}</small>
@@ -390,7 +409,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">03</span>
+            <span className="module-index">04</span>
             <span>
               <strong>{t("wildModule")}</strong>
               <small>{t("wildVersion")}</small>
@@ -410,7 +429,9 @@ function App() {
                 {t(
                   activeModule === "id"
                     ? "engine"
-                    : activeModule === "static"
+                    : activeModule === "initialseed"
+                      ? "initialSeedEngine"
+                      : activeModule === "static"
                       ? "staticEngine"
                       : "wildEngine",
                 )}
@@ -420,7 +441,9 @@ function App() {
               {t(
                 activeModule === "id"
                   ? "version"
-                  : activeModule === "static"
+                  : activeModule === "initialseed"
+                    ? "initialSeedVersion"
+                    : activeModule === "static"
                     ? "staticVersion"
                     : "wildVersion",
               )}
@@ -832,6 +855,8 @@ function App() {
                 </div>
               </section>
             </>
+          ) : activeModule === "initialseed" ? (
+            <Gen3InitialSeedPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "static" ? (
             <Gen3StaticPanel
               onOpenIvCalculator={() => setIvCalculatorExpanded(true)}
@@ -853,7 +878,11 @@ function App() {
           onExpandedChange={setIvCalculatorExpanded}
         />
         <Gen3ProfileControls
-          compatibleVersions={activeModule === "id" ? "all" : "handheld"}
+          compatibleVersions={
+            activeModule === "static" || activeModule === "wild"
+              ? "handheld"
+              : "all"
+          }
           controller={profiles}
         />
       </div>

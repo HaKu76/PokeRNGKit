@@ -5,13 +5,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代功能集成验证。** 当前工作区为 `gen3id` 增加红蓝宝石 ID Searcher，可通过 TID/SID 或 TID/PID 反查 Seed、帧数、日期、TSV 和异色类型。真实 Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
+**当前里程碑：第三世代 Initial Seed Finder、Wild 地点本地化与筛选布局统一。** 当前工作区新增 `gen3initialseed`，并让 Wild 复用 Static 的紧凑筛选网格。真实 Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
-- 已有模块：ID Generator/Searcher、Static Generator/Searcher、Wild Generator/Searcher、三代存档信息、个体值计算器
-- 当前模块：Wild Generator/Searcher；实现尚未提交，真实 Wasm 待 Actions 验证
+- 已有模块：ID Generator/Searcher、Initial Seed Finder、Static Generator/Searcher、Wild Generator/Searcher、三代存档信息、个体值计算器
+- 当前模块：Initial Seed Finder；实现尚未提交，真实 Wasm 待 Actions 验证
 - 上游核验基线：PokeFinder 4.3.2
-- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
@@ -30,6 +30,14 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - Web Worker Pool 并行调度、进度、取消和错误状态
 - 虚拟化结果表、数值排序和 CSV 导出
 
+当前 Initial Seed Finder 工作区包含：
+
+- `RS IDs`：由 TID/SID 枚举全部 Ruby/Sapphire 初始 16 位 Seed 候选及帧数
+- `FRLG / RSE`：从目标 32 位 Seed 反向 PokeRNG，按 `Max Results` 返回初始 Seed 与帧数
+- `gen3initialseed` Wasm C ABI、独立 Worker/Wasm 实例、分片进度、取消、稳定排序和 CSV
+- `Target Seed` 空值按项目统一 Seed 规则视为 `0`；`Max Results` 为 `1..65536`
+- 算法、输入边界和来源见 [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md)；本轮未构建或验收
+
 当前 Static 工作区包含：
 
 - PokeFinder 第三世代掌机 Static 的 67 条模板，按 8 类组织并随当前存档版本过滤
@@ -43,6 +51,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 当前 Wild 模块包含：
 
 - Ruby、Sapphire、Emerald、FireRed 与 LeafGreen 的陆地、冲浪、碎岩和三种鱼竿遭遇表
+- 地点按 PokeFinder 上游中英资源显示；上游无精确细分地点时保留 EncounterTableGenerator 英文原名，日文资源当前同样保留上游英文
 - Method 1、Method 2、Method 4，以及 Emerald 的同步、迷人身躯、等级修正和槽位修正队首规则
 - RSE 碎岩遭遇率修正、Route 119 丑丑鱼钓点和 Safari Zone 额外 RNG 推进
 - 当前全局掌机存档的版本、TID、SID 联动，以及性格多选筛选
@@ -58,7 +67,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - IndexedDB 主存储与 localStorage 镜像兜底
 - JSON 导入、导出与同时清除两处缓存
 - 全局右下角小型悬浮窗、默认收起、折叠状态记忆和当前存档摘要
-- 点击悬浮窗以外区域自动收起，不中断存档信息管理器
+- 悬浮窗展开后点击页面其他区域不会自动收起，避免误触中断存档信息管理。
 
 全局个体值计算器对齐 PokeFinder `IVChecker` 与 `Nature`，支持第三世代物种、性格、觉醒力量、多行能力值交集和下一级提示。该轻量确定性工具使用 TypeScript；大范围 RNG 计算仍只在 C++/Wasm Worker 中执行。
 
@@ -95,6 +104,7 @@ React UI
         `-- Web Worker
               `-- Worker Pool
                     |-- Emscripten gen3id module
+                    |-- Emscripten gen3initialseed module
                     |-- Emscripten gen3static module
                     `-- Emscripten gen3wild module
                           `-- PokeFinder Gen III C++ Core + thin adapter
@@ -127,7 +137,7 @@ npm run preview:ui
 
 打开 <http://127.0.0.1:4173/>。
 
-UI 预览模式使用确定性样例数据，可以验收 ID Generator/Searcher、Static Generator/Searcher、Wild Generator/Searcher、存档信息、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
+UI 预览模式使用确定性样例数据，可以验收 ID Generator/Searcher、Initial Seed Finder、Static Generator/Searcher、Wild Generator/Searcher、存档信息、输入、筛选、进度、取消、结果表、排序、CSV、三语和响应式布局。页面会持续显示“UI 预览”提示；该模式不加载 Wasm、不注册 PWA Service Worker，不能用于验证 RNG 结果、Worker 性能、大范围计算速度或离线能力。
 
 本地验收服务器固定绑定 `127.0.0.1`，只允许当前电脑访问。如果 Windows 首次运行 Node.js 时弹出防火墙网络放行或管理员密码提示，可以直接取消/不允许；不需要为本地验收创建公网或局域网放行规则。
 
@@ -166,7 +176,7 @@ npm run verify
 
 ## 构建与测试
 
-`npm run build` 先生成 release 模式的 `gen3id`、`gen3static` 与 `gen3wild` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
+`npm run build` 先生成 release 模式的 `gen3id`、`gen3initialseed`、`gen3static` 与 `gen3wild` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
 
 测试规划分为五层：
 
@@ -176,7 +186,7 @@ npm run verify
 4. Worker + 真实 Wasm + IndexedDB 的浏览器集成测试（后续补充）。
 5. Playwright 覆盖核心流程、静态子路径部署和离线重载（Pages 预览稳定后引入）。
 
-当前验证门槛要求 `gen3id`、`gen3static` 与 `gen3wild` 固定输入结果对齐上游、长范围计算可汇报进度并响应取消、GitHub Pages 能加载三个 Worker/Wasm 模块，且离线重载可用。项目所有者负责提交并提供部署 URL；Codex 在已部署页面执行算法与功能回归并记录证据，项目所有者保留界面、设备和正式发布的最终验收。
+当前验证门槛要求 `gen3id`、`gen3initialseed`、`gen3static` 与 `gen3wild` 的固定输入结果对齐已记录夹具、长范围计算可汇报进度并响应取消、GitHub Pages 能加载四个 Worker/Wasm 模块，且离线重载可用。项目所有者负责提交并提供部署 URL；算法回归仅能在 Actions 部署完成、所有者给出生产 URL 并授权后执行，项目所有者保留界面、设备和正式发布的最终验收。
 
 ## 部署
 
@@ -189,7 +199,7 @@ CI/CD 使用 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：
 
 当前首要目标是 GitHub Pages 测试部署。GitHub 仓库重命名为 `PokeRNGKit` 后，项目所有者提交并推送 `main`，Actions 会尝试启用 Pages、构建 Wasm 和站点，并部署到预计地址 <https://haku76.github.io/PokeRNGKit/>。如果仓库策略阻止自动启用，在 GitHub `Settings -> Pages -> Build and deployment` 中将 Source 设为 `GitHub Actions`，再重新运行工作流。
 
-生产构建使用相对资源路径，以同时支持 `/PokeRNGKit/` 测试路径和 Cloudflare 自定义域名根路径。Cloudflare 域名未确定前不硬编码 URL。`dist/legal/` 会包含 GPL 文本和上游记录，页面页脚同时提供源码入口。
+生产构建使用相对资源路径，以同时支持 `/PokeRNGKit/` 测试路径和 Cloudflare 自定义域名根路径。Cloudflare 正式部署将使用 `hakuhiro.top` 下的地址；具体主机名确定前不硬编码 URL。`dist/legal/` 会包含 GPL 文本和上游记录，页面页脚同时提供源码入口。
 
 ### 构建职责
 

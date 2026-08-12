@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import type { Gen3Profile } from "../profiles/domain";
 import { getGen3AbilityName } from "../shared/gen3Abilities";
+import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import { getGen3Personal } from "../shared/gen3Personal";
 import { getGen3SpeciesName } from "../shared/gen3Species";
 import { computeGen3Stats } from "../shared/gen3Stats";
@@ -73,15 +74,6 @@ interface Gen3StaticPanelProps {
   profile: Gen3Profile;
   uiPreviewMode: boolean;
   onOpenIvCalculator(): void;
-}
-
-interface MultiCheckSelectProps {
-  disabled?: boolean;
-  label: string;
-  anyLabel: string;
-  mask: number;
-  onChange(mask: number): void;
-  options: readonly { label: string; value: number }[];
 }
 
 const NATURE_MASK_ALL = 0x1ff_ffff;
@@ -154,75 +146,6 @@ const commonStaticColumns: Array<{ key: StaticSortKey; label: string }> = [
   { key: "hiddenPowerStrength", label: "hiddenPowerStrength" },
   { key: "gender", label: "gender" },
 ];
-
-function MultiCheckSelect({
-  anyLabel,
-  disabled,
-  label,
-  mask,
-  onChange,
-  options,
-}: MultiCheckSelectProps) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const fullMask = options.reduce(
-    (value, option) => value | (1 << option.value),
-    0,
-  );
-  const selected = options.filter(
-    (option) => (mask & (1 << option.value)) !== 0,
-  );
-  const summary =
-    mask === 0 || mask === fullMask
-      ? anyLabel
-      : selected.map((option) => option.label).join(", ");
-
-  useEffect(() => {
-    if (!open) return;
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", closeOnOutsidePointer);
-    return () =>
-      document.removeEventListener("pointerdown", closeOnOutsidePointer);
-  }, [open]);
-
-  return (
-    <div className="field multi-check-field" ref={rootRef}>
-      <span>{label}</span>
-      <button
-        aria-expanded={open}
-        className="multi-check-trigger"
-        disabled={disabled}
-        onClick={() => setOpen((current) => !current)}
-        type="button"
-      >
-        <span>{summary}</span>
-        <span aria-hidden="true">▾</span>
-      </button>
-      {open && (
-        <div className="multi-check-menu">
-          {options.map((option) => (
-            <label key={option.value}>
-              <input
-                checked={(mask & (1 << option.value)) !== 0}
-                onChange={(event) =>
-                  onChange(
-                    event.target.checked
-                      ? mask | (1 << option.value)
-                      : mask & ~(1 << option.value),
-                  )
-                }
-                type="checkbox"
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function staticColumns(operation: StaticOperation) {
   return [
@@ -822,33 +745,18 @@ export function Gen3StaticPanel({
             className="filter-controls"
             disabled={operation === "generator" && filtersDisabled}
           >
-            <div className="static-filter-selects">
-              <MultiCheckSelect
-                anyLabel={t("any")}
-                label={t("nature")}
-                mask={natureMask}
-                onChange={setNatureMask}
-                options={natureOptions}
-              />
-              <MultiCheckSelect
-                anyLabel={t("any")}
-                label={t("hiddenPower")}
-                mask={hiddenPowerMask}
-                onChange={setHiddenPowerMask}
-                options={hiddenPowerOptions}
-              />
+            <div className="gen3-filter-selects">
               <label className="field">
-                <span>{t("shiny")}</span>
+                <span>{t("ability")}</span>
                 <select
                   onChange={(event) =>
-                    setShiny(event.target.value as Gen3StaticShinyFilter)
+                    setAbility(event.target.value as Gen3StaticAbilityFilter)
                   }
-                  value={shiny}
+                  value={ability}
                 >
                   <option value="any">{t("any")}</option>
-                  <option value="star">{t("shinyStar")}</option>
-                  <option value="square">{t("shinySquare")}</option>
-                  <option value="star-square">{t("shinyStarSquare")}</option>
+                  <option value="first">0</option>
+                  <option value="second">1</option>
                 </select>
               </label>
               <label className="field">
@@ -864,17 +772,34 @@ export function Gen3StaticPanel({
                   <option value="female">{t("female")}</option>
                 </select>
               </label>
+              <MultiCheckSelect
+                anyLabel={t("any")}
+                label={t("hiddenPower")}
+                mask={hiddenPowerMask}
+                onChange={setHiddenPowerMask}
+                options={hiddenPowerOptions}
+                resetHint={t("checkListResetHint")}
+              />
+              <MultiCheckSelect
+                anyLabel={t("any")}
+                label={t("nature")}
+                mask={natureMask}
+                onChange={setNatureMask}
+                options={natureOptions}
+                resetHint={t("checkListResetHint")}
+              />
               <label className="field">
-                <span>{t("ability")}</span>
+                <span>{t("shiny")}</span>
                 <select
                   onChange={(event) =>
-                    setAbility(event.target.value as Gen3StaticAbilityFilter)
+                    setShiny(event.target.value as Gen3StaticShinyFilter)
                   }
-                  value={ability}
+                  value={shiny}
                 >
                   <option value="any">{t("any")}</option>
-                  <option value="first">0</option>
-                  <option value="second">1</option>
+                  <option value="star">{t("shinyStar")}</option>
+                  <option value="square">{t("shinySquare")}</option>
+                  <option value="star-square">{t("shinyStarSquare")}</option>
                 </select>
               </label>
             </div>

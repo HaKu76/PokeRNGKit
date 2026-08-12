@@ -66,6 +66,27 @@ D145C24D2CA64AECF86A1BC4EEE80909F15AB1B9A81C9F004702DA6FD31D5AEC  Test/Gen3/Wild
 
 PokeFinder 将 `Core/Resources/EncounterTables` 声明为 [Admiral-Fish/EncounterTableGenerator](https://github.com/Admiral-Fish/EncounterTableGenerator) 子模块。当前本地 4.3.2 归档未包含该子模块内容；PR #1 的 `gen3Data.ts` 与生成脚本尚未记录所用子模块的精确 revision。补齐 revision、生成命令和数据许可证记录前，不把全地点数据描述为已完成来源审计。
 
+## Gen III Wild 地点本地化
+
+`src/features/wild/locationNames.ts` 是由 `scripts/generate_gen3_wild_location_names.mjs` 生成的只读显示资源。脚本将 `gen3Data.ts` 中的 EncounterTableGenerator 地点名与 PokeFinder 英文/简体中文地点资源匹配；精确匹配或明确前缀匹配时显示上游中文，未匹配的细分地点保留 EncounterTableGenerator 英文原名。日文地点资源当前上游仍为英文，因此日文界面同样显示上游英文，而不自行翻译。
+
+```text
+937EAC9F4E417FB76739ABD11F23EBF8280B9EB0BC640B23EAC9F23385AD1EE6  Core/Resources/i18n/en/rs_en.txt
+47786792131B8115EDB84CA52BD677FE3D22A82E9765546EA9898F4F63CFD526  Core/Resources/i18n/en/e_en.txt
+C9CE53561052F9AD5FF47BCFC389BBA2CE7E89D71B34986DDA298DA1EE209405  Core/Resources/i18n/en/frlg_en.txt
+E8E381E905174138B916622312BC46555CDC19D12E2BD0263238785BF6727D2F  Core/Resources/i18n/zh/rs_zh.txt
+EF302CD9F65403FD105F6E8E6CE738AFB9D6340C20E04C1521BFD15AD90F8E13  Core/Resources/i18n/zh/e_zh.txt
+EC090E7D122B7EE064C68CFA4FC9D49CEBFBD0319C7AC88F0B561E8F583F7E94  Core/Resources/i18n/zh/frlg_zh.txt
+```
+
+## Initial Seed Finder 参考
+
+- [Real96/RSIDsInitialSeedFinder](https://github.com/Real96/RSIDsInitialSeedFinder) `be3a160a1a17d390f0d53887c5110412c786bd31`，GPL-3.0：TID/SID 到 RS 初始 Seed 的公开算法参考。
+- [Real96/FRLGRSEInitialSeedsFinder](https://github.com/Real96/FRLGRSEInitialSeedsFinder) `2150f22d25f5c90fdcbfbd64de14a22d6a447df8`，GPL-3.0：目标 Seed 反推初始 Seed 的公开算法参考。
+- [StarfBerry/PokeRNG](https://github.com/StarfBerry/PokeRNG)：仅作为算法研究资料登记。
+
+三者都不是本项目的 vendored 构建输入。`wasm/modules/gen3initialseed/bridge/gen3initialseed_bridge.cpp` 是独立实现，只引用已 vendored 的 PokeFinder `Core/RNG/LCRNG.hpp`；不复制、编译或分发上述参考仓库的源文件。
+
 ## 红蓝宝石 ID 帧检索行为参考
 
 - 参考项目：[HaKu76/RS-TID-SID-Frame-Finder_CHN](https://github.com/HaKu76/RS-TID-SID-Frame-Finder_CHN)
@@ -85,4 +106,4 @@ FE6A55570119A253DBD69946D86648E25910687D3B851CD92D4213548C028BE2  RNGRecovertest
 
 ## PokeRNGKit 修改
 
-当前 vendored 文件未修改。PokeRNGKit 通过独立的 `wasm/modules/gen3id/bridge/gen3id_bridge.cpp` 提供 ID C ABI；`wasm/modules/gen3static/bridge/gen3static_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `StaticGenerator3.cpp` 与 `Utilities.hpp` 的规则提供 Static C ABI、筛选和二进制结果布局；`wasm/modules/gen3wild/bridge/gen3wild_bridge.cpp` 复用同一 LCRNG，并按 Wild Generator、Encounter Area 与 Encounter Slot 规则提供独立 Wild C ABI。
+当前 vendored 文件未修改。PokeRNGKit 通过独立的 `wasm/modules/gen3id/bridge/gen3id_bridge.cpp` 提供 ID C ABI；`wasm/modules/gen3initialseed/bridge/gen3initialseed_bridge.cpp` 复用 vendored `LCRNG.hpp`，按已登记的 Real96 工作流提供初始 Seed C ABI；`wasm/modules/gen3static/bridge/gen3static_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `StaticGenerator3.cpp` 与 `Utilities.hpp` 的规则提供 Static C ABI、筛选和二进制结果布局；`wasm/modules/gen3wild/bridge/gen3wild_bridge.cpp` 复用同一 LCRNG，并按 Wild Generator、Encounter Area 与 Encounter Slot 规则提供独立 Wild C ABI。

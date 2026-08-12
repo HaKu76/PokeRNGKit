@@ -125,9 +125,12 @@ Searcher 结果第一列是 Seed；Generator 结果第一列是 Advances。两�
 
 IV、性格、觉醒力量、特性、性别和异色筛选在 C++ bridge 中执行，不会改变 RNG 序列或候选 Seed。`gen3static` API 3 使用 25 位性格掩码和 16 位觉醒力量掩码；界面没有勾选或全部勾选时均按 PokeFinder `CheckList` 的 `Any` 语义提交完整掩码。
 
+筛选器布局复用上游 `Form/Controls/Filter.ui`：桌面端左侧放六项 IV 与工具，右侧以紧凑行排列 Ability、Gender、Hidden Power、Nature、Shiny；窄屏降为单列。该结构与 `gen3wild` 复用同一 React 多选控件和网格，Wild 仅在上游对应位置额外插入 Encounter Slot 与 Level。
+
 筛选控件已逐项对照 `Filter.ui` 与 `CheckList.cpp`：
 
 - 性格和觉醒力量为多选。
+- 定点与野生共用的多选控件均支持 `Ctrl + Click` 一键清空勾选，显示和请求都回到 `Any` 语义。
 - 异色只有 `Any`、`Star`、`Square`、`Star/Square`。
 - 性别只有 `Any`、`Male`、`Female`；无性别只作为结果值显示，不是筛选项。
 - 特性只有 `Any`、`0`、`1`。
