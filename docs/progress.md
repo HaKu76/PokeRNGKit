@@ -3,17 +3,17 @@
 > - 最近更新：2026-08-12
 > - 当前阶段：第三世代 Initial Seed Finder、Wild 地点本地化与筛选布局统一
 > - 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`profiles`、`ivcalculator`
-> - Git 基线：`309dedf feat: 显示第三世代特性名称并优化定点布局`
-> - 工作区状态：Initial Seed Finder、Wild 地点本地化和筛选布局存在未提交修改；Codex 不暂存、不提交、不 push
+> - Git 基线：`4810cbb fix: 统一第三世代筛选器布局`
+> - 工作区状态：存在 CI 格式与 ESLint 修复的未提交修改；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
 > - 验收状态：ID Searcher 与 Static Searcher 固定夹具已在项目所有者授权的 GitHub Pages 页面回归；本轮特性显示和布局待部署后共同验收
 
 ## 0. 当前工作区优先状态
 
-- 最近更新：2026-08-12；Git 基线为 `309dedf feat: 显示第三世代特性名称并优化定点布局`。
-- 当前未提交内容：`gen3initialseed` 初始 Seed Finder、Wild 地点中英资源生成与显示、Wild/Static 统一紧凑筛选网格、Wasm 构建清单、模块文档和上游来源记录。
+- 最近更新：2026-08-12；Git 基线为 `4810cbb fix: 统一第三世代筛选器布局`。
+- 当前未提交内容：CI 格式化、生成脚本 ESLint 修复、Initial Seed 面板的第三方 virtualizer 规则豁免及对应模块文件格式化。
 - 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`profiles`、`ivcalculator`。
-- 自动化状态：本轮未运行 npm、CMake、原生夹具、TypeScript 测试、构建、浏览器检查或部署；算法和 UI 均未验收。
+- 自动化状态：本轮已按 Actions 失败 job 复核 `npm run format:check`、`npm run lint`、`npm run typecheck` 并通过；未运行测试、CMake、原生夹具、构建、浏览器检查或部署；算法和 UI 均未验收。
 - 项目所有者验收规则保持不变：必须先由 GitHub Actions 完成部署，再由所有者提供生产 URL 并明确授权，才能做算法回归；本地 Wasm 或 UI 预览不能替代验收。
 
 ### 本轮实现
@@ -21,13 +21,14 @@
 - `gen3initialseed`：RS TID/SID 全候选反推、FRLG/RSE 目标 Seed 分片反推、固定宽度 C ABI、独立 Worker/Wasm、稳定排序、进度、取消和 CSV；原生夹具覆盖 `48163/64377 -> 05A0/0、C19B/36724` 与 `00006073 -> 0000/1`，本轮未运行。
 - `gen3wild`：地点选择框使用 PokeFinder 4.3.2 `en/zh` 地点资源；不匹配的 EncounterTableGenerator 细分名称保留英文，日文沿用上游英文。
 - `gen3wild` 与 `gen3static`：筛选项统一使用 `gen3-filter-selects` 和共享的 `MultiCheckSelect`；两者保留上游 `Filter.ui` 的左侧 IV/工具与右侧标签-控件紧凑行。Wild 只在固定顺序中额外显示 Encounter Slot 和 Level，Static 移除这两项。
+- CI 修复：格式化 12 个本次变更文件，移除生成脚本多余转义，并为 Initial Seed 使用的 TanStack Virtual 添加与 Static/Wild 一致的局部 ESLint 豁免。
 - 参考记录：Real96 两个 GPL-3.0 初始 Seed 项目用于算法研究；StarfBerry/PokeRNG 仅登记参考，未复制代码。
 
 ### 下一位开发者第一步
 
 1. 阅读 [`docs/modules/gen3initialseed.md`](modules/gen3initialseed.md) 与 [`third_party/pokefinder/UPSTREAM.md`](../third_party/pokefinder/UPSTREAM.md)。
 2. 在具备项目所有者授权后，按 `.github/workflows/ci.yml` 和 `package-lock.json` 检查四个 Gen III Wasm target；当前 Codex 不执行这些命令。
-3. 项目所有者在 GitHub Desktop 审查后自行提交，建议标题：`feat: 集成第三世代初始种子检索`。
+3. 项目所有者在 GitHub Desktop 审查当前 CI 修复后自行提交，建议标题：`fix: 修复 CI 格式与检查错误`。
 4. 推送并等待 Actions 部署；项目所有者提供 URL 后，再共同验收 Initial Seed 结果、地点中文名和野生/定点筛选布局。
 
 ## 1. 恢复入口
@@ -62,7 +63,7 @@
 
 ## 3. Git 与部署状态
 
-- 当前分支：`main`，HEAD `309dedf`。
+- 当前分支：`main`，HEAD `4810cbb`。
 - 当前没有待完成的 merge 状态；本轮工作区修改均保持未提交。
 - 远端和仓库目录沿用现有设置，不在本轮重命名或修改远端。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
@@ -85,20 +86,18 @@
 - `ivcalculator`：第三世代物种、性格、觉醒力量、多行能力值交集和下一级提示。
 - 右侧悬浮工具列：存档信息和个体值计算器按固定纵向按钮列收起，展开后向左延展；点击页面空白不会收起存档信息。
 
-## 5. 当前未提交工作区：Initial Seed Finder、地点本地化与筛选布局
+## 5. 当前未提交工作区：CI 格式与检查修复
 
 ### 5.1 已实现
 
-- Static 结果的特性列由纯槽位数字改为 PokeFinder 格式 `0/1: 特性名称`；物种特性 ID 来自 `personal_rsefrlg.bin`，名称复用上游中英日资源。
-- Wild 已使用同一共享 Personal 与特性名称表，本轮不修改其算法或筛选协议。
-- `static-control-grid` 保留 PokeFinder 的 RNG Info / Settings / Filters 三栏结构；RNG 与设置控件改为标签在左、控件在右的紧凑行布局。
-- Filters 改为 PokeFinder `Filter.ui` 同类左右分栏：IV 范围与工具位于左侧，性格、觉醒力量、异色、性别和特性位于右侧；Wild 额外的遭遇槽位和等级筛选也复用同一右侧紧凑行。
-- `gen3wild` 与 `gen3static` 的筛选项共用 `gen3-filter-selects` 桌面布局和控件间距，移动端统一降为单栏，避免两种模块再次出现不同的筛选器排列方式。
-- 桌面控件限制最大宽度，窄屏恢复单栏，避免输入框随面板无上限拉伸。
+- 本次 Actions 失败涉及的 12 个文件已统一通过 Prettier，生成地点名称文件保持可复现输出。
+- `scripts/generate_gen3_wild_location_names.mjs` 已移除模板字符串中的多余转义，ESLint `no-useless-escape` 错误已修复。
+- `Gen3InitialSeedPanel` 的 TanStack Virtual 调用已添加与 Static/Wild 一致的局部 `react-hooks/incompatible-library` 豁免。
+- 本地 `format:check`、`lint` 和 `typecheck` 均已通过；未将这些结果写成算法或页面验收。
 
 ### 5.2 明确未完成
 
-- 本轮未运行测试、构建、算法回归或浏览器检查；Static 特性名称和新布局尚未进入 Pages 产物。
+- 本轮未运行测试、构建、算法回归或浏览器检查；CI 修复尚未进入新的 Pages 产物。
 - 本轮部署后的 UI 复核与项目所有者最终验收。
 - 第四世代算法、数据、存档、Wasm、Worker 和界面；未得到项目所有者单独指示前不得开始。
 
@@ -114,7 +113,13 @@
 - 本轮已运行：`npm run wasm:doctor`，Node.js、CMake、Ninja 可用，Emscripten 与 `emcmake` 缺失，因此命令按预期失败。
 - 本轮已通过：`npm run wasm:test:native`，`gen3id_native_parity`、`gen3static_native_parity`、`gen3wild_native_parity` 共 3 项原生夹具。
 
-### 6.2 当前未运行或等待授权
+### 6.2 Actions 失败与本地复核
+
+- Actions job [`93968467038`](https://github.com/HaKu76/PokeRNGKit/actions/runs/31549358903/job/93968467038) 在 `Verify TypeScript application` 步骤失败；公开页面未提供具体日志，但本地复现确认失败点是 `prettier --check .`，不是 TypeScript 编译或 Wasm 工具链。
+- 修复后本地已通过：`npm run format:check`、`npm run lint`、`npm run typecheck`。
+- 同一 Actions 页面提示 Node.js 20 弃用警告；本轮未升级第三方 Actions，避免扩大范围。
+
+### 6.3 当前未运行或等待授权
 
 - `npm run wasm:build`：本机没有已激活的 Emscripten `emcmake`。
 - GitHub Pages 和真实 Worker/Wasm 集成：待项目所有者授权并提供部署 URL 后检查。
@@ -134,8 +139,8 @@
 
 ## 8. 下一步
 
-1. 项目所有者在 GitHub Desktop 审查未提交修改并创建提交：`feat: 显示第三世代特性名称并优化定点布局`。
-2. 推送后等待 GitHub Actions 部署，再由项目所有者提供更新后的站点 URL；本轮本地 UI 修复必须在新产物上复核。
+1. 项目所有者在 GitHub Desktop 审查未提交的 CI 修复，并创建提交：`fix: 修复 CI 格式与检查错误`。
+2. 推送后等待 GitHub Actions 部署，再由项目所有者提供更新后的站点 URL；本轮筛选布局和 Initial Seed 仍需在新产物上共同验收。
 3. UI 复核重点：Static 特性列显示 `槽位: 名称`；三栏在桌面和侧栏展开状态下不横向溢出；输入框不再占满整栏，筛选布局接近 PokeFinder。
 4. 项目所有者决定是否授权移动端、PWA、离线和性能检查的范围。
 5. 两阶段验收通过后再决定 Tanoby Chamber 数据或发布加固；第四世代仍等待项目所有者指定具体模块。

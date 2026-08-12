@@ -41,13 +41,13 @@ previous(seed) = 0xEEB9EB65 * seed + 0x0A3561A1 mod 2^32
 
 ## 输入限制
 
-| 控件 | 进制与范围 | 空值 | 核验来源 |
-| --- | --- | --- | --- |
-| `TID` | 十进制 `0..65535`，最多 5 位 | 无效 | `RSIDsInitialSeedFinder.cpp` 的 `sanitizeInput<uint16_t>` |
-| `SID` | 十进制 `0..65535`，最多 5 位 | 无效 | `RSIDsInitialSeedFinder.cpp` 的 `sanitizeInput<uint16_t>` |
+| 控件          | 进制与范围                          | 空值                           | 核验来源                                                                          |
+| ------------- | ----------------------------------- | ------------------------------ | --------------------------------------------------------------------------------- |
+| `TID`         | 十进制 `0..65535`，最多 5 位        | 无效                           | `RSIDsInitialSeedFinder.cpp` 的 `sanitizeInput<uint16_t>`                         |
+| `SID`         | 十进制 `0..65535`，最多 5 位        | 无效                           | `RSIDsInitialSeedFinder.cpp` 的 `sanitizeInput<uint16_t>`                         |
 | `Target Seed` | 十六进制 `0..0xFFFFFFFF`，最多 8 位 | 按仓库通用 Seed 规则解释为 `0` | `backSeed.cpp` 的 `uint32_t targetSeed`；空值行为由本项目 `src/input.ts` 统一约定 |
-| `Max Results` | 十进制 `1..65536`，最多 5 位 | 无效 | Real96 源码接收正整数；`65536` 是本项目一周期内 16 位初始 Seed 的显式上限 |
-| Wasm 分片 | `1..500000` 个反推状态 | 不适用 | `gen3initialseed_find_target` C ABI；上限用于取消延迟和内存边界 |
+| `Max Results` | 十进制 `1..65536`，最多 5 位        | 无效                           | Real96 源码接收正整数；`65536` 是本项目一周期内 16 位初始 Seed 的显式上限         |
+| Wasm 分片     | `1..500000` 个反推状态              | 不适用                         | `gen3initialseed_find_target` C ABI；上限用于取消延迟和内存边界                   |
 
 `Initial Seed Finder`、`Target Seed` 和 `Max Results` 在 PokeFinder 简体中文翻译中没有可复用的控制翻译，因此保留英文。`TID`、`SID`、`Seed`、`初始种子`、`帧数` 与 `检索` 复用上游已有词条。
 

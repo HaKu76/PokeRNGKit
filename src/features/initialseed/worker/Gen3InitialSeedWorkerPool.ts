@@ -47,7 +47,9 @@ export class Gen3InitialSeedWorkerClient {
       data,
     }: MessageEvent<Gen3InitialSeedWorkerResponse>) => this.handleMessage(data);
     this.worker.onerror = (event) =>
-      this.fail(new Error(event.message || "Gen3 initial seed Worker crashed."));
+      this.fail(
+        new Error(event.message || "Gen3 initial seed Worker crashed."),
+      );
     this.post({ type: "init", moduleUrl });
   }
 
@@ -101,7 +103,9 @@ export class Gen3InitialSeedWorkerClient {
     }
     if (!this.pending || this.pending.taskId !== message.taskId) {
       this.fail(
-        new Error("Gen3 initial seed Worker returned a batch for an unknown task."),
+        new Error(
+          "Gen3 initial seed Worker returned a batch for an unknown task.",
+        ),
       );
       return;
     }
@@ -134,9 +138,7 @@ export class Gen3InitialSeedWorkerPool {
   private running = false;
   private cancelActive?: () => void;
 
-  constructor(
-    private readonly moduleUrl = defaultGen3InitialSeedModuleUrl(),
-  ) {}
+  constructor(private readonly moduleUrl = defaultGen3InitialSeedModuleUrl()) {}
 
   async findRsIds(
     request: Gen3RsInitialSeedRequest,
@@ -211,7 +213,8 @@ export class Gen3InitialSeedWorkerPool {
     }
     this.running = true;
     const startedAt = performance.now();
-    const workerCount = options.workerCount ?? recommendedGen3InitialSeedWorkerCount();
+    const workerCount =
+      options.workerCount ?? recommendedGen3InitialSeedWorkerCount();
     const chunkSize = options.chunkSize ?? GEN3_INITIAL_SEED_TARGET_CHUNK_SIZE;
     const taskId = crypto.randomUUID();
     const pendingBatches = new Map<number, ArrayBuffer>();

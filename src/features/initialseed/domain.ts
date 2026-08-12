@@ -87,7 +87,11 @@ export function decodeGen3InitialSeedStates(
     throw new RangeError("Invalid Gen3 initial seed result buffer length.");
   }
   const states = new Array<Gen3InitialSeedState>(words.length / 2);
-  for (let source = 0, target = 0; source < words.length; source += 2, target++) {
+  for (
+    let source = 0, target = 0;
+    source < words.length;
+    source += 2, target++
+  ) {
     states[target] = {
       initialSeed: words[source],
       advances: words[source + 1],

@@ -81,6 +81,8 @@ export function Gen3InitialSeedPanel({
       }),
     [results, sort],
   );
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: sortedResults.length,
     estimateSize: () => 42,
@@ -141,17 +143,14 @@ export function Gen3InitialSeedPanel({
     setProgress({
       processedStates: 0,
       totalStates:
-        operation === "rs-ids"
-          ? 0x1_0000
-          : GEN3_INITIAL_SEED_MAX_TOTAL_STATES,
+        operation === "rs-ids" ? 0x1_0000 : GEN3_INITIAL_SEED_MAX_TOTAL_STATES,
       resultCount: 0,
       percent: 0,
     });
     setStatus("calculating");
     try {
       const options: Gen3InitialSeedSearchOptions = {
-        onBatch: (batch) =>
-          setResults((current) => current.concat(batch)),
+        onBatch: (batch) => setResults((current) => current.concat(batch)),
         onProgress: setProgress,
       };
       const nextSummary =
@@ -330,7 +329,9 @@ export function Gen3InitialSeedPanel({
             </div>
             <div>
               <span>{t("rowAdvance")}</span>
-              <strong>{operation === "rs-ids" ? "TID frame" : "Reverse PokeRNG"}</strong>
+              <strong>
+                {operation === "rs-ids" ? "TID frame" : "Reverse PokeRNG"}
+              </strong>
             </div>
           </div>
         </section>
@@ -386,7 +387,10 @@ export function Gen3InitialSeedPanel({
             {t("workers")} <strong>{summary?.workerCount ?? "-"}</strong>
           </span>
           <span>
-            {t("elapsed")} <strong>{summary ? `${summary.elapsedMs.toFixed(0)} ms` : "-"}</strong>
+            {t("elapsed")}{" "}
+            <strong>
+              {summary ? `${summary.elapsedMs.toFixed(0)} ms` : "-"}
+            </strong>
           </span>
         </div>
         {error && (
@@ -412,7 +416,11 @@ export function Gen3InitialSeedPanel({
             >
               <div className="initial-seed-table-header">
                 {(["initialSeed", "advances"] as SortKey[]).map((key) => (
-                  <button key={key} onClick={() => toggleSort(key)} type="button">
+                  <button
+                    key={key}
+                    onClick={() => toggleSort(key)}
+                    type="button"
+                  >
                     {t(key === "initialSeed" ? "initialSeed" : "rowAdvance")}
                     {sortLabel(key)}
                   </button>
@@ -424,7 +432,9 @@ export function Gen3InitialSeedPanel({
                   <div
                     className="initial-seed-table-row"
                     key={`${state.initialSeed}-${state.advances}-${virtualRow.index}`}
-                    style={{ transform: `translateY(${virtualRow.start + 38}px)` }}
+                    style={{
+                      transform: `translateY(${virtualRow.start + 38}px)`,
+                    }}
                   >
                     <span>{formatHex(state.initialSeed, 4)}</span>
                     <span>{String(state.advances)}</span>

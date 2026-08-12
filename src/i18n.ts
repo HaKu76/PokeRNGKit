@@ -350,7 +350,8 @@ const resources = {
         "Wasm が生成されていません。Emscripten を有効にして npm run wasm:build を実行してください。",
       invalidInput: "乱数情報とフィルターの入力値を確認してください。",
       initialSeed: "初期シード",
-      invalidInitialSeedInput: "TID、SID、Target Seed、Max Results を確認してください。",
+      invalidInitialSeedInput:
+        "TID、SID、Target Seed、Max Results を確認してください。",
       targetSeed: "Target Seed",
       maxResults: "Max Results",
       rsIds: "RS IDs",

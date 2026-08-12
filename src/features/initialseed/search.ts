@@ -7,8 +7,7 @@ export interface Gen3InitialSeedSearchProgress {
   percent: number;
 }
 
-export interface Gen3InitialSeedSearchSummary
-  extends Gen3InitialSeedSearchProgress {
+export interface Gen3InitialSeedSearchSummary extends Gen3InitialSeedSearchProgress {
   elapsedMs: number;
   workerCount: number;
   cancelled: boolean;

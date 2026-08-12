@@ -432,8 +432,8 @@ function App() {
                     : activeModule === "initialseed"
                       ? "initialSeedEngine"
                       : activeModule === "static"
-                      ? "staticEngine"
-                      : "wildEngine",
+                        ? "staticEngine"
+                        : "wildEngine",
                 )}
               </h1>
             </div>
@@ -444,8 +444,8 @@ function App() {
                   : activeModule === "initialseed"
                     ? "initialSeedVersion"
                     : activeModule === "static"
-                    ? "staticVersion"
-                    : "wildVersion",
+                      ? "staticVersion"
+                      : "wildVersion",
               )}
             </div>
           </div>

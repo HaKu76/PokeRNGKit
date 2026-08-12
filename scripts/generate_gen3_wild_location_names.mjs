@@ -38,9 +38,13 @@ function findResourceName(name, entries) {
   const prefixes = entries
     .filter((entry) => {
       const candidate = normalize(entry.en);
-      return candidate.startsWith(normalized) || normalized.startsWith(candidate);
+      return (
+        candidate.startsWith(normalized) || normalized.startsWith(candidate)
+      );
     })
-    .sort((left, right) => normalize(right.en).length - normalize(left.en).length);
+    .sort(
+      (left, right) => normalize(right.en).length - normalize(left.en).length,
+    );
   return prefixes[0];
 }
 
@@ -48,7 +52,9 @@ const dataPath = path.resolve(option("--data"));
 const resourceRoot = path.resolve(option("--resources"));
 const outputPath = path.resolve(option("--output"));
 const data = await readFile(dataPath, "utf8");
-const names = [...new Set([...data.matchAll(/name:`([^`]+)`/g)].map((match) => match[1]))].sort();
+const names = [
+  ...new Set([...data.matchAll(/name:`([^`]+)`/g)].map((match) => match[1])),
+].sort();
 const resourceFiles = ["rs", "e", "frlg"];
 const resourceEntries = [];
 
@@ -78,6 +84,6 @@ const header = [
   " */",
   "",
 ].join("\n");
-const body = `export interface Gen3WildLocationNames {\n  readonly en: string;\n  readonly zh: string;\n}\n\nexport const GEN3_WILD_LOCATION_NAMES: Readonly<Record<string, Gen3WildLocationNames>> = ${JSON.stringify(labels, null, 2)} as const;\n\nexport function getGen3WildLocationName(language: string, name: string): string {\n  const labels = GEN3_WILD_LOCATION_NAMES[name];\n  if (!labels) return name;\n  return language === \"zh\" ? labels.zh : labels.en;\n}\n`;
+const body = `export interface Gen3WildLocationNames {\n  readonly en: string;\n  readonly zh: string;\n}\n\nexport const GEN3_WILD_LOCATION_NAMES: Readonly<Record<string, Gen3WildLocationNames>> = ${JSON.stringify(labels, null, 2)} as const;\n\nexport function getGen3WildLocationName(language: string, name: string): string {\n  const labels = GEN3_WILD_LOCATION_NAMES[name];\n  if (!labels) return name;\n  return language === "zh" ? labels.zh : labels.en;\n}\n`;
 
 await writeFile(outputPath, header + body, "utf8");

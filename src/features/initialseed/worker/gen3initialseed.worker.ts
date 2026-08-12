@@ -55,16 +55,17 @@ async function initialize(moduleUrl: string) {
   post({ type: "ready", apiVersion });
 }
 
-function run(
-  message: Exclude<Gen3InitialSeedWorkerRequest, { type: "init" }>,
-) {
+function run(message: Exclude<Gen3InitialSeedWorkerRequest, { type: "init" }>) {
   if (!wasm) {
     throw new Error("Gen3 initial seed Wasm module is not initialized.");
   }
   const startedAt = performance.now();
   const resultCount =
     message.type === "rs-ids"
-      ? wasm._gen3initialseed_find_rs_ids(message.request.tid, message.request.sid)
+      ? wasm._gen3initialseed_find_rs_ids(
+          message.request.tid,
+          message.request.sid,
+        )
       : wasm._gen3initialseed_find_target(
           message.request.targetSeed,
           message.chunk.startAdvance,
@@ -72,9 +73,7 @@ function run(
         );
   const errorCode = wasm._gen3initialseed_last_error();
   if (errorCode !== 0) {
-    throw new Error(
-      `Gen3 initial seed Wasm core returned error ${errorCode}.`,
-    );
+    throw new Error(`Gen3 initial seed Wasm core returned error ${errorCode}.`);
   }
   if (resultCount !== wasm._gen3initialseed_result_count()) {
     throw new Error(
@@ -88,7 +87,8 @@ function run(
       type: "batch",
       taskId: message.taskId,
       chunkIndex: message.type === "rs-ids" ? 0 : message.chunk.index,
-      stateCount: message.type === "rs-ids" ? 0x1_0000 : message.chunk.stateCount,
+      stateCount:
+        message.type === "rs-ids" ? 0x1_0000 : message.chunk.stateCount,
       resultCount,
       elapsedMs: performance.now() - startedAt,
       buffer: words.buffer,

@@ -730,7 +730,10 @@ export function Gen3WildPanel({
           </button>
         ))}
       </div>
-      <form className="static-control-grid gen3static-control-grid" onSubmit={run}>
+      <form
+        className="static-control-grid gen3static-control-grid"
+        onSubmit={run}
+      >
         <section className="panel static-panel static-rng-panel">
           <div className="panel-heading">
             <div>
