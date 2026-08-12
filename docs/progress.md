@@ -4,7 +4,7 @@
 > - 当前阶段：修复第三世代 Egg 与 Wild 的 TypeScript 合并残留
 > - 当前模块：`gen3egg`、`gen3wild`
 > - Git 基线：`5d4e124 style: 修复第三世代孵化模块格式`
-> - 工作区状态：存在四个未提交的 TypeScript 合并修复；Codex 不暂存、不提交、不 push
+> - 工作区状态：存在五个未提交的 Egg/Wild TypeScript 与 lint 修复；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
 > - 验收状态：本轮未运行工程检查、原生夹具、Wasm 构建、浏览器检查或算法验收
 
@@ -17,6 +17,7 @@
 - Actions run `31565396316` / job `94016055981`：`Verify TypeScript application` 失败，Wasm、原生夹具与部署均未执行。静态检查发现 `Gen3WildPanel.tsx` 含重复的 Ability/Gender 类型导入、`WildOperation` 类型别名和 `columns` 声明；已移除重复声明，未运行本地 `verify` 复核。
 - Actions run `31565728175` / job `94017012800`：`npm run verify` 在 `prettier --check .` 阶段失败，列出 `docs/modules/gen3egg.md`、`src/App.tsx`、8 个 Egg 文件及 `src/styles.css` 共 10 个文件。已用锁定的 Prettier `3.9.6` 格式化该清单；未运行完整 `verify`、Wasm、原生夹具、构建或算法验收。
 - Actions run `31566082714` / job `94018049518`：`prettier --check .` 已通过；ESLint 仅报告两个无效的 `react-hooks/incompatible-library` 禁用注释；`tsc -b` 报告 10 个 TypeScript 错误，均来自 Egg/Wild 合并残留。当前工作区已删除 Egg 的重复 `useVirtualizer` 导入和两处无效禁用注释，按游戏版本收窄 Egg Method 到 Wasm 的映射，移除 Wild 的重复本地 `MultiCheckSelect`、重复 `operation` 状态及旧 setter 调用，并移除 Worker 的旧 API 签名、前端二次筛选和重复 `search()` 实现。
+- Actions run `31566752956` / job `94020020424`：Prettier 已通过；`tsc -b` 尚未执行，因为 ESLint 在 `src/features/wild/worker/gen3wild.worker.ts` 报告 `Gen3WildRequest` 与 `Gen3WildSearcherRequest` 两个未使用类型导入。本地已移除它们。Egg/Wild 的 `useVirtualizer()` 仍各有一条 `react-hooks/incompatible-library` 警告，表示 React Compiler 跳过对此 hook 的自动 memoization；该警告没有使 job 失败，不作为本轮算法或 UI 验收结论。
 - 已静态核对 `gen3wild` API v3：`src/features/wild/worker/gen3wild.worker.ts` 的 `gen3wild_search` 调用参数顺序与 `wasm/modules/gen3wild/bridge/gen3wild_bridge.h/.cpp` 一致；全部筛选参数传入 Wasm，并直接 transfer 结果缓冲区。未执行本地 TypeScript、Wasm 或算法检查。
 - 当前模块集合：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`profiles`、`ivcalculator`。
 - Egg 阶段已完成静态源码与上游文件核对、`git diff --check`、仓库 Markdown 本地链接与新文件尾随空白检查。当前合并未运行 npm、CMake、测试、原生夹具、Wasm 构建、UI 预览、浏览器或性能检查。

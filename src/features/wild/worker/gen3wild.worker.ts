@@ -13,7 +13,6 @@ import {
   wildSearcherLeadToWasm,
   wildShinyFilterToWasm,
 } from "../domain";
-import type { Gen3WildRequest, Gen3WildSearcherRequest } from "../domain";
 import type { Gen3WildWorkerRequest, Gen3WildWorkerResponse } from "./messages";
 
 interface Gen3WildEmscriptenModule {
