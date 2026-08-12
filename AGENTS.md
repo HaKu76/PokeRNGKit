@@ -33,6 +33,7 @@
 - Update `docs/progress.md` after a material feature, decision, blocker, dependency, build, or deployment change.
 - Use `.agents/skills/hakuhiro-project-style/SKILL.md` for README, progress, build, release, and commit-message writing.
 - Do not run tests, builds, algorithm regressions, performance checks, browser checks, or acceptance work unless the owner explicitly authorizes the specific check or URL. This includes local UI preview and Wasm/Worker checks.
+- For every authorized browser, Worker, console, deployed-site, or UI debugging task, use an external Google Chrome or Microsoft Edge browser connection. Do not use the in-app browser as a debugging fallback. If neither external browser is connected, report that condition and wait for the owner to connect one.
 - Treat every automated result as engineering evidence only, never as project-owner acceptance. After an owner-authorized deployed UI check, report the result and complete UI acceptance together with the owner; do not declare it accepted independently.
 - Algorithm-result acceptance has one required path: GitHub Actions must first finish the deployment, then the owner provides the exact deployed site URL and authorizes regression. Run the regression only against that production page. Local fixtures, native/Wasm builds, preview mode, and Actions status alone cannot accept algorithm results.
 - Finish a module with one suggested GitHub Desktop commit title in the form `<type>: <Chinese action phrase>`.

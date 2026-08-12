@@ -77,6 +77,7 @@
 - 界面只支持简体中文、英文和日文；有上游简中翻译时逐字复用，没有时保留英文。
 - 正式 Wasm 与站点产物由 GitHub Actions 自动生成，不提交 `public/wasm/`、`wasm/build/` 或 `dist/`。
 - 未获项目所有者对具体命令或 URL 的明确授权时，Codex 不运行测试、构建、算法回归、性能检查或浏览器检查。
+- 已获授权的浏览器、Worker、控制台、部署页面和 UI 调试只使用外部 Google Chrome 或 Microsoft Edge；不使用应用内浏览器作为调试替代。外部浏览器未连接时应报告并等待连接。
 - Codex 不自动暂存、提交、push、部署或发布；完成模块后只提供一条 GitHub Desktop 提交标题。
 
 ## 后续验收
