@@ -30,6 +30,8 @@ import {
   type Gen3WildFilters,
   type Gen3WildGenderFilter,
   type Gen3WildItem,
+  type Gen3WildAbilityFilter,
+  type Gen3WildGenderFilter,
   type Gen3WildLead,
   type Gen3WildMethod,
   type Gen3WildRequest,
@@ -52,6 +54,7 @@ import { Gen3WildSearcherWorkerPool } from "./worker/Gen3WildSearcherWorkerPool"
 import { Gen3WildWorkerPool } from "./worker/Gen3WildWorkerPool";
 
 type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
+type WildOperation = "generator" | "searcher";
 type DataGame = "ruby" | "sapphire" | "emerald" | "fire-red" | "leaf-green";
 type WildOperation = "generator" | "searcher";
 type IvKey =
@@ -74,6 +77,7 @@ type IvRanges = { min: IvTextValues; max: IvTextValues };
 type WildResultState = Gen3WildState | Gen3WildSearcherState;
 type RawLocation = {
   readonly name: string;
+  readonly zhName: string;
   readonly encounters: readonly {
     readonly kind: Gen3WildEncounter;
     readonly rate: number;
@@ -186,6 +190,72 @@ const gameData = GEN3_ENCOUNTERS as unknown as Record<
   readonly RawLocation[]
 >;
 
+function MultiCheckSelect({
+  anyLabel,
+  label,
+  mask,
+  onChange,
+  options,
+}: MultiCheckSelectProps) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const fullMask = options.reduce(
+    (value, option) => value | (1 << option.value),
+    0,
+  );
+  const selected = options.filter(
+    (option) => (mask & (1 << option.value)) !== 0,
+  );
+  const summary =
+    mask === 0 || mask === fullMask
+      ? anyLabel
+      : selected.map((option) => option.label).join(", ");
+
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [open]);
+
+  return (
+    <div className="field multi-check-field" ref={rootRef}>
+      <span>{label}</span>
+      <button
+        aria-expanded={open}
+        className="multi-check-trigger"
+        onClick={() => setOpen((current) => !current)}
+        type="button"
+      >
+        <span>{summary}</span>
+        <span aria-hidden="true">▾</span>
+      </button>
+      {open && (
+        <div className="multi-check-menu">
+          {options.map((option) => (
+            <label key={option.value}>
+              <input
+                checked={(mask & (1 << option.value)) !== 0}
+                onChange={(event) =>
+                  onChange(
+                    event.target.checked
+                      ? mask | (1 << option.value)
+                      : mask & ~(1 << option.value),
+                  )
+                }
+                type="checkbox"
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function dataGame(version: Gen3Profile["version"]): DataGame {
   if (version === "firered") return "fire-red";
   if (version === "leafgreen") return "leaf-green";
@@ -196,6 +266,35 @@ function dataGame(version: Gen3Profile["version"]): DataGame {
 function personal(species: number) {
   const value = GEN3_PERSONAL[species] ?? [255, 0, 0];
   return { genderRatio: value[0], type1: value[1], type2: value[2] };
+}
+
+function displayLocation(
+  language: string,
+  location: Pick<RawLocation, "name" | "zhName">,
+) {
+  if (language !== "zh") return location.name;
+  if (location.zhName !== location.name) return location.zhName;
+  const { name } = location;
+  if (/^Mt\. Pyre [1-3]F$/.test(name)) return "送神山1F-3F";
+  if (/^Mt\. Pyre [4-6]F$/.test(name)) return "送神山4F-6F";
+  if (/^Seafloor Cavern/.test(name)) return "海底洞窟";
+  if (/^Cave Of Origin/.test(name)) return "觉醒神殿1F-B3F";
+  if (/^Shoal Cave/.test(name))
+    return name.includes("Ice") ? "浅滩洞穴（冰之房间）" : "浅滩洞穴";
+  if (/^Abandoned Ship/.test(name)) return "弃船";
+  if (/^Magma Hideout/.test(name)) return "熔岩队基地";
+  if (/^Mirage Tower/.test(name)) return "幻影之塔";
+  if (/^Artisan Cave/.test(name)) return "工匠之穴";
+  if (/^Victory Road [13]F$/.test(name)) return "冠军之路1F/3F";
+  if (/^Pok.mon Mansion/.test(name)) return "宝可梦屋1F-3F";
+  if (/^Pok.mon Tower [45]F$/.test(name)) return "宝可梦塔4F-5F";
+  if (/^Mt\. Ember Summit Path [13]F$/.test(name))
+    return "灯火山（山腰洞窟）1F/3F";
+  if (/^Four Island Icefall Cave/.test(name)) return "冻瀑洞窟1F/B1F";
+  if (/^Five Island Lost Cave/.test(name)) return "不归之穴";
+  if (name === "Route 21 North") return "21号道路（北）";
+  if (name === "Route 21 South") return "21号道路（南）";
+  return name;
 }
 
 function buildArea(
@@ -270,6 +369,7 @@ export function Gen3WildPanel({
   const tableRef = useRef<HTMLDivElement>(null);
   const [operation, setOperation] = useState<WildOperation>("generator");
   const [encounter, setEncounter] = useState<Gen3WildEncounter>("land");
+  const [operation, setOperation] = useState<WildOperation>("generator");
   const [locationIndex, setLocationIndex] = useState(0);
   const [selectedSpecies, setSelectedSpecies] = useState(0);
   const [method, setMethod] = useState<Gen3WildMethod>("method1");
@@ -318,6 +418,7 @@ export function Gen3WildPanel({
       direction: "asc",
     },
   );
+  const columns = useMemo(() => wildColumns(operation), [operation]);
 
   const locations = useMemo(
     () =>
@@ -424,6 +525,9 @@ export function Gen3WildPanel({
   );
   useEffect(() => {
     setLocationIndex(0);
+    setPokemonSlot("any");
+    setSpecies(0);
+    setSlotMask(0);
     setFeebasTile(false);
     setBike(false);
     setItem("none");

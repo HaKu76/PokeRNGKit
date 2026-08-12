@@ -11,6 +11,7 @@
 ## 0. 当前工作区优先状态
 
 - 最近更新：2026-08-12；Git 基线为 `4810cbb fix: 统一第三世代筛选器布局`。
+- PR #2 合并：已在 `main` 合并 `c006813 docs: 记录第三世代野生 PR`。野生模块、Wasm API、筛选界面、翻译与样例引擎的冲突均保留当前 `main` 侧实现；本轮未运行测试、构建、原生夹具或浏览器检查。
 - 当前未提交内容：CI 格式化、生成脚本 ESLint 修复、Initial Seed 面板的第三方 virtualizer 规则豁免、`gen3ivtopid` Wasm/Worker/UI 和对应文档。
 - 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`profiles`、`ivcalculator`。
 - 自动化状态：此前 CI 修复曾复核 `npm run format:check`、`npm run lint`、`npm run typecheck`；本轮新增与收尾 `gen3ivtopid` 后只完成静态审查与 `git diff --check`，未重新运行工程检查、测试、CMake、原生夹具、构建、浏览器检查或部署。算法和 UI 均未验收。
@@ -30,12 +31,15 @@
 
 1. 阅读 [`docs/modules/gen3ivtopid.md`](modules/gen3ivtopid.md)、[`docs/modules/gen3initialseed.md`](modules/gen3initialseed.md) 与 [`third_party/pokefinder/UPSTREAM.md`](../third_party/pokefinder/UPSTREAM.md)。
 2. 在具备项目所有者授权后，按 `.github/workflows/ci.yml` 和 `package-lock.json` 检查五个 Gen III Wasm target；当前 Codex 不执行这些命令。
-3. 项目所有者在 GitHub Desktop 审查当前 CI 修复后自行提交，建议标题：`fix: 修复 CI 格式与检查错误`。
+3. 项目所有者在 GitHub Desktop 审查并推送 PR #2 的合并提交，以及当前 CI 修复；合并本身未包含验证结果。
 4. 推送并等待 Actions 部署；项目所有者提供 URL 后，再共同验收 IVs to PID 固定输入、Initial Seed 结果、地点中文名和野生/定点筛选布局。
 
-## 1. 恢复入口
+## 当前可用模块
 
-本文是跨会话和跨机器恢复入口。新环境按以下顺序阅读：
+- `gen3id`：第三世代 ID Generator/Searcher。
+- `gen3static`：第三世代定点 Generator/Searcher。
+- `gen3wild`：第三世代野生 Generator/Searcher、地点选择、完整筛选、Worker Pool、CSV、UI 预览与真实 Wasm 运行。
+- `profiles`、`ivcalculator`：全局存档与个体值计算器。
 
 1. [`AGENTS.md`](../AGENTS.md)
 2. [AI 开发一致性指南](ai-development.md)
@@ -46,9 +50,15 @@
 7. [上游记录](../third_party/pokefinder/UPSTREAM.md)
 8. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)
 
-聊天记录不是项目状态的事实来源。功能、依赖、工具链、构建、部署或阻塞变化后更新本文。
+- 先 fetch 上游并 rebase；由于 PR #1 已被合入上游，跳过重复提交，避免再次制造同一改动的冲突。
+- 在遭遇生成数据中写入 PokeFinder 简体中文地点名，并为反编译地点标签补充同源名称映射。
+- 为 Wild 增加 Searcher 操作页：Method、队首、遭遇地点、性格和六维 IV 最小/最大范围；任务依旧在独立 Worker/Wasm 实例中分片。
+- 补齐觉醒力量、异色、性别、特性、宝可梦和遭遇槽位筛选，并移除 Wild 生成区旁的个体值计算器入口。
+- 将六项 IV 最大值默认设为 31；Wild 结果表按 Static 的通用列顺序显示并追加槽位、宝可梦和等级，CSV 复用同一列定义，槽位按 PokeFinder 的 0 基值显示和导出。
+- UI 模式提供明确标识的确定性样例引擎，方便先验收界面，且不把样例结果伪装成 Wasm 计算。
+- 安装并激活项目锁定的 Emscripten 6.0.6，修复 Windows 下 `emcc.exe`/`emcmake.exe` 探测，并排除本地 SDK 与生成 Wasm 的格式和 lint 扫描。
 
-## 2. 已确认决策
+## 验证记录
 
 - 正式英文工程名为 PokeRNGKit，不设置中文名。
 - 当前产品仍只做第三世代；第四世代仅保留 `gen4id`、`gen4static`、`gen4wild` 的共享接口和 AI 交接，不实现算法或 UI。
@@ -63,7 +73,7 @@
 - 算法结果的验收只能在 GitHub Actions 部署完成、项目所有者提供实际站点 URL 并明确授权后进行。原生夹具、本地 Wasm、UI 预览和 Actions 状态不构成算法验收。
 - Codex 不自动暂存、提交、push、部署或发布，只提供 GitHub Desktop 操作说明和一条提交标题。
 
-## 3. Git 与部署状态
+## 后续验收
 
 - 当前分支：`main`，HEAD `4810cbb`。
 - 当前没有待完成的 merge 状态；本轮工作区修改均保持未提交。
