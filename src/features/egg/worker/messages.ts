@@ -13,8 +13,7 @@ export interface Gen3EggWorkerRunMessage {
 }
 
 export type Gen3EggWorkerRequest =
-  | Gen3EggWorkerInitMessage
-  | Gen3EggWorkerRunMessage;
+  Gen3EggWorkerInitMessage | Gen3EggWorkerRunMessage;
 
 export interface Gen3EggWorkerReadyMessage {
   type: "ready";

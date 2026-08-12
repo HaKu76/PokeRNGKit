@@ -48,7 +48,8 @@ class Gen3EggWorkerClient {
 
   async run(taskId: string, request: Gen3EggRequest, chunk: Gen3EggChunk) {
     await this.ready;
-    if (this.pending) throw new Error("Gen3 egg Worker received overlapping chunks.");
+    if (this.pending)
+      throw new Error("Gen3 egg Worker received overlapping chunks.");
     return new Promise<Gen3EggWorkerBatchMessage>((resolve, reject) => {
       this.pending = { taskId, resolve, reject };
       this.post({ type: "run", taskId, request, chunk });
@@ -76,7 +77,9 @@ class Gen3EggWorkerClient {
       return;
     }
     if (!this.pending || this.pending.taskId !== message.taskId) {
-      this.fail(new Error("Gen3 egg Worker returned a batch for an unknown task."));
+      this.fail(
+        new Error("Gen3 egg Worker returned a batch for an unknown task."),
+      );
       return;
     }
     const pending = this.pending;
@@ -99,7 +102,10 @@ function recommendedGen3EggWorkerCount() {
 }
 
 function defaultGen3EggModuleUrl() {
-  return new URL(`${import.meta.env.BASE_URL}wasm/gen3egg.mjs`, globalThis.location.href).href;
+  return new URL(
+    `${import.meta.env.BASE_URL}wasm/gen3egg.mjs`,
+    globalThis.location.href,
+  ).href;
 }
 
 export class Gen3EggWorkerPool implements Gen3EggSearchEngine {
@@ -113,17 +119,24 @@ export class Gen3EggWorkerPool implements Gen3EggSearchEngine {
     request: Gen3EggRequest,
     options: Gen3EggSearchOptions = {},
   ): Promise<Gen3EggSearchSummary> {
-    if (this.running) throw new Error("A Gen3 egg calculation is already running.");
+    if (this.running)
+      throw new Error("A Gen3 egg calculation is already running.");
     this.running = true;
     const startedAt = performance.now();
-    const chunks = createGen3EggChunks(request, options.chunkSize ?? GEN3_EGG_HELD_CHUNK_SIZE);
+    const chunks = createGen3EggChunks(
+      request,
+      options.chunkSize ?? GEN3_EGG_HELD_CHUNK_SIZE,
+    );
     const totalStates =
       (request.maxAdvancesHeld + 1) *
       (request.maxAdvancesPickup + 1) *
       (request.game === "emerald"
         ? request.maxRedraws - request.minRedraws + 1
         : 1);
-    const workerCount = Math.min(options.workerCount ?? recommendedGen3EggWorkerCount(), chunks.length);
+    const workerCount = Math.min(
+      options.workerCount ?? recommendedGen3EggWorkerCount(),
+      chunks.length,
+    );
     const maxResults = options.maxResults ?? GEN3_EGG_MAX_RESULTS;
     const taskId = crypto.randomUUID();
     const pendingBatches = new Map<number, ArrayBuffer>();
@@ -148,7 +161,8 @@ export class Gen3EggWorkerPool implements Gen3EggSearchEngine {
         processedStates,
         totalStates,
         resultCount,
-        percent: totalStates === 0 ? 100 : (processedStates / totalStates) * 100,
+        percent:
+          totalStates === 0 ? 100 : (processedStates / totalStates) * 100,
       };
       options.onProgress?.(progress);
       return progress;
@@ -225,7 +239,10 @@ export class Gen3EggWorkerPool implements Gen3EggSearchEngine {
   private async ensureClients(count: number) {
     if (this.clients.length === count) return;
     this.resetClients();
-    this.clients = Array.from({ length: count }, (_, index) => new Gen3EggWorkerClient(index, this.moduleUrl));
+    this.clients = Array.from(
+      { length: count },
+      (_, index) => new Gen3EggWorkerClient(index, this.moduleUrl),
+    );
   }
 
   private resetClients() {

@@ -14,10 +14,7 @@ import { formatHex, parseDecimal, parseHex } from "../id/domain";
 import type { Gen3Profile } from "../profiles/domain";
 import { getGen3AbilityName } from "../shared/gen3Abilities";
 import { getGen3Personal } from "../shared/gen3Personal";
-import {
-  getGen3Species,
-  getGen3SpeciesName,
-} from "../shared/gen3Species";
+import { getGen3Species, getGen3SpeciesName } from "../shared/gen3Species";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import {
@@ -47,12 +44,7 @@ import { Gen3EggWorkerPool } from "./worker/Gen3EggWorkerPool";
 
 type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
 type IvKey =
-  | "hp"
-  | "attack"
-  | "defense"
-  | "specialAttack"
-  | "specialDefense"
-  | "speed";
+  "hp" | "attack" | "defense" | "specialAttack" | "specialDefense" | "speed";
 type IvTextValues = [string, string, string, string, string, string];
 type EggSortKey =
   | "advances"
@@ -142,7 +134,9 @@ function ivLabel(key: IvKey) {
   return `iv${key.charAt(0).toUpperCase()}${key.slice(1)}`;
 }
 
-function eggColumns(game: Gen3EggGame): Array<{ key: EggSortKey; label: string }> {
+function eggColumns(
+  game: Gen3EggGame,
+): Array<{ key: EggSortKey; label: string }> {
   return [
     { key: "advances", label: "eggHeldAdvances" },
     { key: "pickupAdvances", label: "eggPickupAdvances" },
@@ -315,7 +309,12 @@ export function Gen3EggPanel({
   const resetRunState = () => {
     engine.cancel();
     setResults([]);
-    setProgress({ processedStates: 0, totalStates: 0, resultCount: 0, percent: 0 });
+    setProgress({
+      processedStates: 0,
+      totalStates: 0,
+      resultCount: 0,
+      percent: 0,
+    });
     setSummary(undefined);
     setStatus("ready");
     setError("");
@@ -372,8 +371,12 @@ export function Gen3EggPanel({
           ability,
           natureMask: natureMask || NATURE_MASK_ALL,
           hiddenPowerMask: hiddenPowerMask || HIDDEN_POWER_MASK_ALL,
-          ivMin: ivMin.map((value) => parseDecimal(value) ?? Number.NaN) as Gen3EggFilters["ivMin"],
-          ivMax: ivMax.map((value) => parseDecimal(value) ?? Number.NaN) as Gen3EggFilters["ivMax"],
+          ivMin: ivMin.map(
+            (value) => parseDecimal(value) ?? Number.NaN,
+          ) as Gen3EggFilters["ivMin"],
+          ivMax: ivMax.map(
+            (value) => parseDecimal(value) ?? Number.NaN,
+          ) as Gen3EggFilters["ivMax"],
         };
   const request = (): Gen3EggRequest => ({
     game,
@@ -517,7 +520,9 @@ export function Gen3EggPanel({
             <option value="male">{t("male")}</option>
             <option value="female">{t("female")}</option>
             <option value="genderless">{t("genderless")}</option>
-            <option value="ditto">{getGen3SpeciesName(i18n.language, 132)}</option>
+            <option value="ditto">
+              {getGen3SpeciesName(i18n.language, 132)}
+            </option>
           </select>
         </label>
         {game === "emerald" && (
@@ -580,7 +585,11 @@ export function Gen3EggPanel({
 
   return (
     <>
-      <div aria-label={t("eggModule")} className="operation-tabs" role="tablist">
+      <div
+        aria-label={t("eggModule")}
+        className="operation-tabs"
+        role="tablist"
+      >
         {(["emerald", "rsfrlg"] as const).map((entry) => (
           <button
             aria-selected={game === entry}
@@ -641,7 +650,11 @@ export function Gen3EggPanel({
                   maxLength={10}
                   onChange={(event) =>
                     setInitialHeld(
-                      normalizeDecimalInput(event.target.value, 0xffff_ffff, 10),
+                      normalizeDecimalInput(
+                        event.target.value,
+                        0xffff_ffff,
+                        10,
+                      ),
                     )
                   }
                   value={initialHeld}
@@ -653,7 +666,9 @@ export function Gen3EggPanel({
                   inputMode="numeric"
                   maxLength={10}
                   onChange={(event) =>
-                    setMaxHeld(normalizeDecimalInput(event.target.value, 999_999, 10))
+                    setMaxHeld(
+                      normalizeDecimalInput(event.target.value, 999_999, 10),
+                    )
                   }
                   value={maxHeld}
                 />
@@ -667,7 +682,11 @@ export function Gen3EggPanel({
                   maxLength={10}
                   onChange={(event) =>
                     setInitialPickup(
-                      normalizeDecimalInput(event.target.value, 0xffff_ffff, 10),
+                      normalizeDecimalInput(
+                        event.target.value,
+                        0xffff_ffff,
+                        10,
+                      ),
                     )
                   }
                   value={initialPickup}
@@ -679,7 +698,9 @@ export function Gen3EggPanel({
                   inputMode="numeric"
                   maxLength={10}
                   onChange={(event) =>
-                    setMaxPickup(normalizeDecimalInput(event.target.value, 999_999, 10))
+                    setMaxPickup(
+                      normalizeDecimalInput(event.target.value, 999_999, 10),
+                    )
                   }
                   value={maxPickup}
                 />
@@ -718,7 +739,9 @@ export function Gen3EggPanel({
                     inputMode="numeric"
                     maxLength={3}
                     onChange={(event) =>
-                      setCalibration(normalizeDecimalInput(event.target.value, 255, 3))
+                      setCalibration(
+                        normalizeDecimalInput(event.target.value, 255, 3),
+                      )
                     }
                     value={calibration}
                   />
@@ -730,7 +753,9 @@ export function Gen3EggPanel({
                     inputMode="numeric"
                     maxLength={3}
                     onChange={(event) =>
-                      setMinRedraws(normalizeDecimalInput(event.target.value, 255, 3))
+                      setMinRedraws(
+                        normalizeDecimalInput(event.target.value, 255, 3),
+                      )
                     }
                     value={minRedraws}
                   />
@@ -739,7 +764,9 @@ export function Gen3EggPanel({
                     inputMode="numeric"
                     maxLength={3}
                     onChange={(event) =>
-                      setMaxRedraws(normalizeDecimalInput(event.target.value, 255, 3))
+                      setMaxRedraws(
+                        normalizeDecimalInput(event.target.value, 255, 3),
+                      )
                     }
                     value={maxRedraws}
                   />
@@ -749,7 +776,9 @@ export function Gen3EggPanel({
             <label className="field">
               <span>{t("method")}</span>
               <select
-                onChange={(event) => setMethod(event.target.value as Gen3EggMethod)}
+                onChange={(event) =>
+                  setMethod(event.target.value as Gen3EggMethod)
+                }
                 value={method}
               >
                 <option value="normal">{t("eggNormal")}</option>
@@ -1024,7 +1053,10 @@ export function Gen3EggPanel({
             {t("workers")} <strong>{summary?.workerCount ?? "-"}</strong>
           </span>
           <span>
-            {t("elapsed")} <strong>{summary ? `${summary.elapsedMs.toFixed(0)} ms` : "-"}</strong>
+            {t("elapsed")}{" "}
+            <strong>
+              {summary ? `${summary.elapsedMs.toFixed(0)} ms` : "-"}
+            </strong>
           </span>
         </div>
         {error && (
@@ -1085,7 +1117,9 @@ export function Gen3EggPanel({
                     }}
                   >
                     {columns.map((column) => (
-                      <span key={column.key}>{displayValue(state, column.key)}</span>
+                      <span key={column.key}>
+                        {displayValue(state, column.key)}
+                      </span>
                     ))}
                   </div>
                 );

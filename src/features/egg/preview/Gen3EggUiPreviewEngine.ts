@@ -53,7 +53,15 @@ function previewState(
   const hiddenPower = gen3HiddenPower(ivs);
   const ratio = request.genderRatio;
   const gender =
-    ratio === 255 ? 2 : ratio === 254 ? 1 : ratio === 0 ? 0 : (pid & 0xff) < ratio ? 1 : 0;
+    ratio === 255
+      ? 2
+      : ratio === 254
+        ? 1
+        : ratio === 0
+          ? 0
+          : (pid & 0xff) < ratio
+            ? 1
+            : 0;
   const trainerXor = request.tid ^ request.sid;
   const pidXor = (pid >>> 16) ^ (pid & 0xffff);
   const shinyXor = trainerXor ^ pidXor;
@@ -102,7 +110,9 @@ function matches(request: Gen3EggRequest, state: Gen3EggState) {
 }
 
 function pause(delayMs: number) {
-  return new Promise<void>((resolve) => globalThis.setTimeout(resolve, delayMs));
+  return new Promise<void>((resolve) =>
+    globalThis.setTimeout(resolve, delayMs),
+  );
 }
 
 export class Gen3EggUiPreviewEngine implements Gen3EggSearchEngine {
@@ -115,7 +125,8 @@ export class Gen3EggUiPreviewEngine implements Gen3EggSearchEngine {
     request: Gen3EggRequest,
     options: Gen3EggSearchOptions = {},
   ): Promise<Gen3EggSearchSummary> {
-    if (this.running) throw new Error("A Gen3 egg UI preview is already running.");
+    if (this.running)
+      throw new Error("A Gen3 egg UI preview is already running.");
     this.running = true;
     const startedAt = performance.now();
     const redrawRange =
@@ -143,7 +154,8 @@ export class Gen3EggUiPreviewEngine implements Gen3EggSearchEngine {
         processedStates,
         totalStates,
         resultCount,
-        percent: totalStates === 0 ? 100 : (processedStates / totalStates) * 100,
+        percent:
+          totalStates === 0 ? 100 : (processedStates / totalStates) * 100,
       };
       options.onProgress?.(progress);
       return progress;

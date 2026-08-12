@@ -53,13 +53,25 @@ const request: Gen3EggRequest = {
 describe("Gen3 Egg domain", () => {
   it("splits inclusive held advances while retaining the pickup range", () => {
     expect(createGen3EggChunks(request)).toEqual([
-      { index: 0, initialAdvancesHeld: 0, maxAdvancesHeld: 19_999, stateCount: 20_000 },
-      { index: 1, initialAdvancesHeld: 20_000, maxAdvancesHeld: 0, stateCount: 1 },
+      {
+        index: 0,
+        initialAdvancesHeld: 0,
+        maxAdvancesHeld: 19_999,
+        stateCount: 20_000,
+      },
+      {
+        index: 1,
+        initialAdvancesHeld: 20_000,
+        maxAdvancesHeld: 0,
+        stateCount: 1,
+      },
     ]);
   });
 
   it("enforces the upstream parent gender combinations", () => {
-    expect(isGen3EggParentCombinationValid(request.parentA, request.parentB)).toBe(true);
+    expect(
+      isGen3EggParentCombinationValid(request.parentA, request.parentB),
+    ).toBe(true);
     expect(
       isGen3EggParentCombinationValid(
         { ...request.parentA, gender: "male" },
@@ -73,7 +85,11 @@ describe("Gen3 Egg domain", () => {
       validateGen3EggRequest({ ...request, minRedraws: 8, maxRedraws: 7 }),
     ).toContain("redraws");
     expect(
-      validateGen3EggRequest({ ...request, game: "rsfrlg", seedHeld: 0x1_0000 }),
+      validateGen3EggRequest({
+        ...request,
+        game: "rsfrlg",
+        seedHeld: 0x1_0000,
+      }),
     ).toContain("seed");
     expect(validateGen3EggRequest({ ...request, method: "mixed" })).toContain(
       "method",
@@ -94,9 +110,8 @@ describe("Gen3 Egg domain", () => {
 
   it("decodes the 22-word C ABI state schema", () => {
     const words = new Uint32Array([
-      4, 8, 1, 0xf041_2a72, 0, 1, 22, 0,
-      31, 30, 29, 28, 27, 26,
-      2, 1, 0, 2, 0, 1, 15, 70,
+      4, 8, 1, 0xf041_2a72, 0, 1, 22, 0, 31, 30, 29, 28, 27, 26, 2, 1, 0, 2, 0,
+      1, 15, 70,
     ]);
     expect(decodeGen3EggStates(words.buffer)).toEqual([
       {

@@ -53,21 +53,21 @@ RS/FRLG Mixed:       iv1 skip 0, iv2 skip 0, inheritance skip 2
 
 以下限制已对照 `Form/Gen3/Eggs3.cpp/.ui`、`Form/Controls/TextBox.cpp`、`Form/Controls/EggSettings.cpp/.ui` 和 Core 参数类型。空 Seed 由 `parseHex()` 解释为 `0`，与上游 `getUInt()` / `getUShort()` 的空值行为一致。
 
-| 输入 | 上游类型或默认值 | Web 行为 |
-| --- | --- | --- |
-| Held / Pickup Seed | RS/FRLG `Seed16Bit`，`0..0xFFFF`，4 位十六进制，默认空 | 空值为 `0`；Emerald 不显示且 Core 固定 Seed `0` |
-| Initial Advances | `Advance32Bit`，默认 `1000` | 十进制 `0..4294967295` |
-| Max Advances | `Advance32Bit`，默认 `5000`，含起点 | 十进制 `0..4294967295`；还受浏览器组合上限约束 |
-| Offset | `Advance32Bit`，默认空 | 空值为 `0`；`Initial + Offset + Max` 不得超过 `0xFFFFFFFF` |
-| Calibration | `u8`，Emerald 默认 `18` | 十进制 `0..255` |
-| Redraws | `u8`，Emerald默认 `0..5` | 十进制 `0..255`，最小值不得大于最大值 |
-| Compatibility | 下拉 `20 / 50 / 70`，默认 `70` | 仅允许这三个值 |
-| 蛋种类 | `EggSettings` 第三世代允许列表 | 仅 `1..386` 内上游允许的可孵化种类 |
-| 亲代 IV | `QSpinBox` | 每项整数 `0..31` |
-| 亲代性别 | Male / Female / Genderless / Ditto | 仅允许上游的八种兼容组合 |
-| 亲代道具 / 性格 | Emerald 显示 | 道具仅 None / Everstone；性格 `0..24` |
-| TID / SID | 当前档案 `u16` | 整数 `0..65535` |
-| Nature / Hidden Power | `CheckList` | Nature 使用 25 位掩码 `0x1FF_FFFF`，Hidden Power 使用 16 位掩码 `0xFFFF`；未选择或全选均按 Any |
+| 输入                  | 上游类型或默认值                                       | Web 行为                                                                                       |
+| --------------------- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Held / Pickup Seed    | RS/FRLG `Seed16Bit`，`0..0xFFFF`，4 位十六进制，默认空 | 空值为 `0`；Emerald 不显示且 Core 固定 Seed `0`                                                |
+| Initial Advances      | `Advance32Bit`，默认 `1000`                            | 十进制 `0..4294967295`                                                                         |
+| Max Advances          | `Advance32Bit`，默认 `5000`，含起点                    | 十进制 `0..4294967295`；还受浏览器组合上限约束                                                 |
+| Offset                | `Advance32Bit`，默认空                                 | 空值为 `0`；`Initial + Offset + Max` 不得超过 `0xFFFFFFFF`                                     |
+| Calibration           | `u8`，Emerald 默认 `18`                                | 十进制 `0..255`                                                                                |
+| Redraws               | `u8`，Emerald默认 `0..5`                               | 十进制 `0..255`，最小值不得大于最大值                                                          |
+| Compatibility         | 下拉 `20 / 50 / 70`，默认 `70`                         | 仅允许这三个值                                                                                 |
+| 蛋种类                | `EggSettings` 第三世代允许列表                         | 仅 `1..386` 内上游允许的可孵化种类                                                             |
+| 亲代 IV               | `QSpinBox`                                             | 每项整数 `0..31`                                                                               |
+| 亲代性别              | Male / Female / Genderless / Ditto                     | 仅允许上游的八种兼容组合                                                                       |
+| 亲代道具 / 性格       | Emerald 显示                                           | 道具仅 None / Everstone；性格 `0..24`                                                          |
+| TID / SID             | 当前档案 `u16`                                         | 整数 `0..65535`                                                                                |
+| Nature / Hidden Power | `CheckList`                                            | Nature 使用 25 位掩码 `0x1FF_FFFF`，Hidden Power 使用 16 位掩码 `0xFFFF`；未选择或全选均按 Any |
 
 浏览器的额外保护不改变上游字段含义：总状态数为 `(Held Max + 1) * (Pickup Max + 1) * Redraw count`，上限为 `150,060,006`，恰好容纳 PokeFinder Emerald 默认 `5000 / 5000 / 0..5`。每次 C ABI 调用还限制为 `100,000` 个 Held/Pickup/Redraw 组合；Worker 以 Held 范围切分后运行。
 

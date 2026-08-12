@@ -7,10 +7,7 @@ import {
   GEN3_EGG_RESULT_WORDS,
   GEN3_EGG_MAX_PAIRS_PER_WASM_CALL,
 } from "../domain";
-import type {
-  Gen3EggWorkerRequest,
-  Gen3EggWorkerResponse,
-} from "./messages";
+import type { Gen3EggWorkerRequest, Gen3EggWorkerResponse } from "./messages";
 
 interface Gen3EggEmscriptenModule {
   HEAPU32: Uint32Array;
@@ -46,7 +43,9 @@ async function initialize(moduleUrl: string) {
     default?: Gen3EggModuleFactory;
   };
   if (typeof namespace.default !== "function") {
-    throw new TypeError("Gen3 egg Wasm module does not export a default factory.");
+    throw new TypeError(
+      "Gen3 egg Wasm module does not export a default factory.",
+    );
   }
   wasm = await namespace.default({
     locateFile: (file) => new URL(file, moduleUrl).href,
@@ -68,8 +67,11 @@ function run(message: Extract<Gen3EggWorkerRequest, { type: "run" }>) {
     initialAdvancesHeld: message.chunk.initialAdvancesHeld,
     maxAdvancesHeld: message.chunk.maxAdvancesHeld,
   });
-  const pointer = wasm._malloc(GEN3_EGG_REQUEST_WORDS * Uint32Array.BYTES_PER_ELEMENT);
-  if (pointer === 0) throw new Error("Gen3 egg Wasm could not allocate a request buffer.");
+  const pointer = wasm._malloc(
+    GEN3_EGG_REQUEST_WORDS * Uint32Array.BYTES_PER_ELEMENT,
+  );
+  if (pointer === 0)
+    throw new Error("Gen3 egg Wasm could not allocate a request buffer.");
   try {
     wasm.HEAPU32.set(request, pointer >>> 2);
     const resultCount = wasm._gen3egg_generate(
@@ -84,7 +86,9 @@ function run(message: Extract<Gen3EggWorkerRequest, { type: "run" }>) {
       throw new Error(`Gen3 egg Wasm core returned error ${errorCode}.`);
     }
     if (resultCount !== wasm._gen3egg_result_count()) {
-      throw new Error("Gen3 egg Wasm result count changed before the buffer was copied.");
+      throw new Error(
+        "Gen3 egg Wasm result count changed before the buffer was copied.",
+      );
     }
     if (resultCount > GEN3_EGG_MAX_PAIRS_PER_WASM_CALL) {
       throw new RangeError("Gen3 egg Wasm core exceeded its result limit.");
@@ -96,7 +100,9 @@ function run(message: Extract<Gen3EggWorkerRequest, { type: "run" }>) {
       resultBytePointer / Uint32Array.BYTES_PER_ELEMENT + resultWordCount >
         wasm.HEAPU32.length
     ) {
-      throw new RangeError("Gen3 egg Wasm core returned an invalid result range.");
+      throw new RangeError(
+        "Gen3 egg Wasm core returned an invalid result range.",
+      );
     }
     const resultPointer = resultBytePointer / Uint32Array.BYTES_PER_ELEMENT;
     const words = wasm.HEAPU32.slice(
@@ -132,7 +138,8 @@ workerScope.onmessage = async ({
       type: "error",
       taskId: data.type === "init" ? undefined : data.taskId,
       chunkIndex: data.type === "init" ? undefined : data.chunk.index,
-      code: data.type === "init" ? "initialization_failed" : "calculation_failed",
+      code:
+        data.type === "init" ? "initialization_failed" : "calculation_failed",
       message: error instanceof Error ? error.message : String(error),
     });
   }

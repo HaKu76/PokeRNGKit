@@ -1066,7 +1066,10 @@ h1 {
 .gen3egg-control-grid {
   display: grid;
   align-items: start;
-  grid-template-columns: minmax(250px, 290px) minmax(300px, 1fr) minmax(340px, 1.1fr);
+  grid-template-columns: minmax(250px, 290px) minmax(300px, 1fr) minmax(
+      340px,
+      1.1fr
+    );
   gap: 6px;
   margin-bottom: 6px;
 }
@@ -1158,11 +1161,15 @@ h1 {
 }
 .egg-table-layout-emerald .egg-table-header,
 .egg-table-layout-emerald .egg-table-row {
-  grid-template-columns: 100px 108px 66px 104px 82px 88px 150px repeat(6, 58px) 100px 74px 72px;
+  grid-template-columns:
+    100px 108px 66px 104px 82px 88px 150px repeat(6, 58px)
+    100px 74px 72px;
 }
 .egg-table-layout-rsfrlg .egg-table-header,
 .egg-table-layout-rsfrlg .egg-table-row {
-  grid-template-columns: 100px 108px 104px 82px 88px 150px repeat(6, 58px) 100px 74px 72px;
+  grid-template-columns:
+    100px 108px 104px 82px 88px 150px repeat(6, 58px)
+    100px 74px 72px;
 }
 .egg-table-header,
 .egg-table-row {
