@@ -2,14 +2,19 @@
 
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
-> - Git 基线：`185b6eb fix: 修复重复格式失败并优化构建流程`
-> - 当前阶段：合并 PR #3 的第四世代 Static Generator/Searcher
+> - Git 基线：`e2787be feat: 合并第四世代定点乱数模块`
+> - 当前阶段：修复合并后 GitHub Actions 的 ESLint 错误
 > - PR 来源：`github-desktop-axechaso/feat/gen4-static`，合并头 `fc31966`
-> - 工作区状态：合并冲突已解决并待提交；Codex 不提交、不 push、不部署
-> - 验收状态：本次合并已通过格式检查与空白检查；未运行测试、构建、Wasm、浏览器或生产回归，PR 分支验证仅保留为历史证据
+> - 工作区状态：lint 修复尚未提交；Codex 不提交、不 push、不部署
+> - 验收状态：Actions run `31621404322` 的 9 个 ESLint error 已修复；本轮 `npm run verify` 已通过
 
 ## 当前状态
 
+- Actions run `31621404322` 的 Prettier 已通过，ESLint 报告 9 个 error：`scripts/format-changed.mjs` 缺少 `URL`、`process`、`console` 的 Node 运行时声明，`Gen3SeedToTimeUiPreviewEngine.ts` 的 `_options` 未使用。Egg/Wild 的两条 TanStack Virtual 报告仍是既有非阻断 warning。
+- 修复 `format-changed.mjs`：从 Node 内置模块显式导入 `process` 与 `URL`，并使用 `process.stdout.write` 输出空文件集提示；不放宽全仓 `no-undef`。
+- 修复 Seed to Time UI 预览：读取 `options.signal?.aborted`，预先取消时返回空结果和 `cancelled: true`；生产 Wasm、Worker 和算法不变。
+- 已通过：非受限环境运行 `npm run verify`。Prettier、ESLint、TypeScript、23 个 Vitest 文件共 81 项测试、Vite 生产构建与 PWA 预缓存均成功；ESLint 只保留 Egg/Wild 的两条既有 TanStack Virtual warning，Vite 只保留主包超过 500 kB 的非阻断 warning。
+- 受限终端首次运行同一命令时，Vite 复制 `public/wasm/gen3egg.mjs` 到 `dist/wasm` 返回 Windows `EPERM`；非受限环境随后完整通过，确认该失败不是源码或 GitHub Actions 问题。
 - Actions run `31581467290`（#25）与 `31614337208`（#30）均在 `Verify TypeScript application -> prettier --check .` 失败，分别报告 4 个和 13 个未格式化文件；两次都不是算法、Wasm 或 TypeScript 编译错误。
 - 原 SOP 只在未获测试/构建授权时执行 `git diff --check`，无法发现 Prettier 排版差异；同时 Actions 在格式检查前先安装 Emscripten，#30 为必然失败的提交额外消耗约 34 秒。
 - 新增 `npm run format:files -- <file...>` 与 `npm run format:changed`。格式化改为每批编辑后的强制机械收尾，不需要测试/构建授权；工作区存在无关改动时必须限定到本任务文件。
@@ -96,8 +101,8 @@
 
 ## 已知限制
 
-- 当前分支：`main`，HEAD `185b6eb fix: 修复重复格式失败并优化构建流程`。
-- 当前 merge 的冲突已解决，尚未提交；正式 Pages 仍保持上一成功生产包。
+- 当前分支：`main`，HEAD `e2787be feat: 合并第四世代定点乱数模块`。
+- PR merge 已提交；当前只包含 Actions lint 修复与进度记录，尚未提交。正式 Pages 仍保持上一成功生产包。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线

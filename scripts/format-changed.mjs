@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import process from "node:process";
+import { fileURLToPath, URL } from "node:url";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const prettierCli = fileURLToPath(
@@ -26,7 +27,7 @@ const files = [
 ];
 
 if (files.length === 0) {
-  console.log("No changed files to format.");
+  process.stdout.write("No changed files to format.\n");
   process.exit(0);
 }
 

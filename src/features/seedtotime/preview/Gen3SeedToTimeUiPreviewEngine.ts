@@ -14,15 +14,16 @@ const previewStates = [
 export class Gen3SeedToTimeUiPreviewEngine implements Gen3SeedToTimeSearchEngine {
   async search(
     _request: Gen3SeedToTimeRequest,
-    _options: Gen3SeedToTimeSearchOptions = {},
+    options: Gen3SeedToTimeSearchOptions = {},
   ): Promise<Gen3SeedToTimeSearchSummary> {
+    const cancelled = options.signal?.aborted ?? false;
     return {
       originSeed: 0,
       advances: 0,
-      states: previewStates,
+      states: cancelled ? [] : previewStates,
       elapsedMs: 0,
       workerCount: 0,
-      cancelled: false,
+      cancelled,
     };
   }
 
