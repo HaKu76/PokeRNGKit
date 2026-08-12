@@ -14,6 +14,7 @@
 6. 当前模块的 `docs/modules/<module>.md`：算法、输入限制、上游文件和固定夹具。
 7. [`third_party/pokefinder/UPSTREAM.md`](../third_party/pokefinder/UPSTREAM.md)：vendored 源码来源、修改边界和 SHA-256。
 8. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)：README、进度、提交、构建与发布说明格式。
+9. [HakuStyle Web 前端 Skill](../.agents/skills/web-frontend-style/SKILL.md)：页面布局、视觉层级、响应式、交互样式、可访问性与动效规则。
 
 如项目所有者明确要求启动第四世代模块，还必须读取[第四世代扩展接口与 AI 交接](gen4-development.md)和 `src/features/shared/rngModuleContract.ts`。当前仅保留接口，不得自行添加第四世代算法、导航或默认构建项。
 

@@ -2,13 +2,20 @@
 
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
-> - Git 基线：`e2787be feat: 合并第四世代定点乱数模块`
-> - 当前阶段：修复合并后 GitHub Actions 的 ESLint 错误
-> - PR 来源：`github-desktop-axechaso/feat/gen4-static`，合并头 `fc31966`
-> - 工作区状态：lint 修复尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：Actions run `31621404322` 的 9 个 ESLint error 已修复；本轮 `npm run verify` 已通过
+> - Git 基线：`bc8f4bf fix: 修复合并后的 ESLint 错误`
+> - 当前阶段：接入 HakuStyle 并完成首轮界面样式优化
+> - 工作区状态：HakuStyle、全局样式与交接文档尚未提交；Codex 不提交、不 push、不部署
+> - 验收状态：源码级样式优化、Prettier、空白检查与 Skill 校验已通过；浏览器 UI、构建与测试未获授权
 
 ## 当前状态
+
+- 新增仓库级 `.agents/skills/web-frontend-style/`，包含 HakuStyle 的 `SKILL.md`、`agents/openai.yaml` 与 24 组前端蒸馏来源；`AGENTS.md` 和 `docs/ai-development.md` 已把它列为前端视觉与交互工作的规则入口。
+- 首轮样式方向确定为“宝可梦图鉴 / JRPG 数据终端”：保留现有高密度工具结构，使用红色品牌状态、青色信息状态、金色选择状态、深色顶部栏和模块抽屉，不复制第三方角色、卡牌纹理、字体或光标素材。
+- 重构 `src/styles.css` 的浅色/深色 token，并统一顶部栏、模块抽屉、页面标题、工作面板、表单控件、操作按钮、结果表、自动完成菜单、悬浮工具和页脚材质。
+- 响应式继续沿用现有组件和断点；窄屏补充品牌文本裁切、主内容安全边距和纵向操作按钮，reduced-motion 覆盖新增的侧栏与按钮位移动效。
+- 本轮不改变 React 结构、RNG 算法、Wasm/Worker、输入范围、持久化、翻译或模块状态，也没有新增运行时依赖。
+- 已通过：`npm run format:check`、`git diff --check`，以及 Skill Creator 对 `.agents/skills/web-frontend-style/` 的结构校验。
+- 未运行：浏览器 UI、ESLint、TypeScript、Vitest、Web/Wasm 构建和算法回归。仓库规则要求先取得项目所有者对具体检查或 URL 的明确授权；UI 验证还必须使用已连接的外部 Chrome 或 Edge。
 
 - Actions run `31621404322` 的 Prettier 已通过，ESLint 报告 9 个 error：`scripts/format-changed.mjs` 缺少 `URL`、`process`、`console` 的 Node 运行时声明，`Gen3SeedToTimeUiPreviewEngine.ts` 的 `_options` 未使用。Egg/Wild 的两条 TanStack Virtual 报告仍是既有非阻断 warning。
 - 修复 `format-changed.mjs`：从 Node 内置模块显式导入 `process` 与 `URL`，并使用 `process.stdout.write` 输出空文件集提示；不放宽全仓 `no-undef`。

@@ -1,0 +1,4 @@
+interface:
+  display_name: "HakuStyle"
+  short_description: "Hakuhiro's Web UI styling and interaction codex"
+  default_prompt: "Use $web-frontend-style to design or refine a polished, accessible Web interface."

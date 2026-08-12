@@ -32,6 +32,7 @@
 - Preserve user changes. Do not stage, commit, push, deploy, or publish unless the owner explicitly requests it.
 - Update `docs/progress.md` after a material feature, decision, blocker, dependency, build, or deployment change.
 - Use `.agents/skills/hakuhiro-project-style/SKILL.md` for README, progress, build, release, and commit-message writing.
+- Use `.agents/skills/web-frontend-style/SKILL.md` for frontend layout, visual hierarchy, responsive behavior, interaction styling, accessibility, and motion decisions.
 - Treat formatting as part of editing, not as a test or build. After every code or documentation edit batch, run `npm run format:files -- <files touched by the current task>`; when the worktree was clean at task start and all current changes belong to the task, `npm run format:changed` may be used instead. Then run `npm run format:check` and `git diff --check`. These cleanup steps do not require separate owner authorization.
 - Never use `git diff --check` as a substitute for Prettier. Do not hand off or suggest a commit while task-owned files still fail `npm run format:check`.
 - Do not run tests, builds, algorithm regressions, performance checks, browser checks, or acceptance work unless the owner explicitly authorizes the specific check or URL. This includes local UI preview and Wasm/Worker checks.
