@@ -106,4 +106,23 @@ FE6A55570119A253DBD69946D86648E25910687D3B851CD92D4213548C028BE2  RNGRecovertest
 
 ## PokeRNGKit 修改
 
-当前 vendored 文件未修改。PokeRNGKit 通过独立的 `wasm/modules/gen3id/bridge/gen3id_bridge.cpp` 提供 ID C ABI；`wasm/modules/gen3initialseed/bridge/gen3initialseed_bridge.cpp` 复用 vendored `LCRNG.hpp`，按已登记的 Real96 工作流提供初始 Seed C ABI；`wasm/modules/gen3static/bridge/gen3static_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `StaticGenerator3.cpp` 与 `Utilities.hpp` 的规则提供 Static C ABI、筛选和二进制结果布局；`wasm/modules/gen3wild/bridge/gen3wild_bridge.cpp` 复用同一 LCRNG，并按 Wild Generator、Encounter Area 与 Encounter Slot 规则提供独立 Wild C ABI。
+当前 vendored 文件未修改。PokeRNGKit 通过独立的 `wasm/modules/gen3id/bridge/gen3id_bridge.cpp` 提供 ID C ABI；`wasm/modules/gen3initialseed/bridge/gen3initialseed_bridge.cpp` 复用 vendored `LCRNG.hpp`，按已登记的 Real96 工作流提供初始 Seed C ABI；`wasm/modules/gen3static/bridge/gen3static_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `StaticGenerator3.cpp` 与 `Utilities.hpp` 的规则提供 Static C ABI、筛选和二进制结果布局；`wasm/modules/gen3wild/bridge/gen3wild_bridge.cpp` 复用同一 LCRNG，并按 Wild Generator、Encounter Area 与 Encounter Slot 规则提供独立 Wild C ABI；`wasm/modules/gen3ivtopid/bridge/gen3ivtopid_bridge.cpp` 复用 vendored LCRNG 参数，并按 `LCRNGReverse.cpp` 与 `IVToPIDCalculator.cpp` 的常量和调用顺序提供第三世代 IVs to PID C ABI。
+
+## IVs to PID 只读核验
+
+以下上游文件用于核验 `gen3ivtopid` 的算法、输入、翻译、结果列和固定夹具，未复制到 vendored snapshot：
+
+```text
+16C2E0D185E3DCBD97E00D8A989A8319981D5161F8D6D4ABD743B877440449F1  Core/Enum/Method.hpp
+1D05D72AA46A38C1957DB20F2A53930D0D9F3AC2ACF70044F9D8CCE56CA2D6FA  Core/RNG/LCRNGReverse.hpp
+2D3628267C1E5565789D0C42059A251523C39F9B56F31282B74F1AE1F3047521  Core/RNG/LCRNGReverse.cpp
+226268DA832ADD4371DA4EF893AD64C204AA7748A6414BF75C4920F933D0534C  Core/Util/IVToPIDCalculator.hpp
+879BE303D259722BB32A226C3F1AD1FF0A388098AB0FA6A19E8FF81B6301E227  Core/Util/IVToPIDCalculator.cpp
+0EA7CD53AFC68E880624B0773D1F6889617F1AB5B56885900AAA0F8187FC1A68  Core/Parents/States/IVToPIDState.hpp
+C9B5AEBF9EA87A381B4F04E3DBDC15AF751C05413789E99B09F70061F2205050  Form/Util/IVToPID.ui
+745D0F3ABC443F56DC0CFC863017284254A3BA3C863F97905B9646833A4298E9  Form/Util/IVToPID.cpp
+9DAE5EA6D88C5BBB2FDFDD6CC7677F7E336A7BAB6F90379A15EC3359157C7C62  Model/Util/IVToPIDModel.hpp
+D0B5DCBF392E5090CABED326D44A7E6C370E577EEC3AA6E447E3FFF767993D5A  Model/Util/IVToPIDModel.cpp
+5DE280596558910172C7DBFFD4162A23E342EE294E3F59D257456AF94C903BA5  Test/Util/IVToPIDCalculatorTest.cpp
+E617C4445F3B4C57C8E087B079661C2DE1DD95983C36D0028362D97DCAC76F33  Test/Util/ivtopidcalculator.json
+```

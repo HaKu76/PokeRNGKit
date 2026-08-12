@@ -1,8 +1,8 @@
 # PokeRNGKit 项目进度与交接
 
 > - 最近更新：2026-08-12
-> - 当前阶段：第三世代 Initial Seed Finder、Wild 地点本地化与筛选布局统一
-> - 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`profiles`、`ivcalculator`
+> - 当前阶段：第三世代 IVs to PID 模块落地
+> - 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`profiles`、`ivcalculator`
 > - Git 基线：`4810cbb fix: 统一第三世代筛选器布局`
 > - 工作区状态：存在 CI 格式与 ESLint 修复的未提交修改；Codex 不暂存、不提交、不 push
 > - 部署状态：本轮未推送，GitHub Pages 与 Cloudflare Pages 均未执行本轮部署
@@ -11,12 +11,14 @@
 ## 0. 当前工作区优先状态
 
 - 最近更新：2026-08-12；Git 基线为 `4810cbb fix: 统一第三世代筛选器布局`。
-- 当前未提交内容：CI 格式化、生成脚本 ESLint 修复、Initial Seed 面板的第三方 virtualizer 规则豁免及对应模块文件格式化。
-- 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`profiles`、`ivcalculator`。
-- 自动化状态：本轮已按 Actions 失败 job 复核 `npm run format:check`、`npm run lint`、`npm run typecheck` 并通过；未运行测试、CMake、原生夹具、构建、浏览器检查或部署；算法和 UI 均未验收。
+- 当前未提交内容：CI 格式化、生成脚本 ESLint 修复、Initial Seed 面板的第三方 virtualizer 规则豁免、`gen3ivtopid` Wasm/Worker/UI 和对应文档。
+- 当前模块：`gen3id`、`gen3initialseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`profiles`、`ivcalculator`。
+- 自动化状态：此前 CI 修复曾复核 `npm run format:check`、`npm run lint`、`npm run typecheck`；本轮新增与收尾 `gen3ivtopid` 后只完成静态审查与 `git diff --check`，未重新运行工程检查、测试、CMake、原生夹具、构建、浏览器检查或部署。算法和 UI 均未验收。
 - 项目所有者验收规则保持不变：必须先由 GitHub Actions 完成部署，再由所有者提供生产 URL 并明确授权，才能做算法回归；本地 Wasm 或 UI 预览不能替代验收。
 
 ### 本轮实现
+
+- `gen3ivtopid`：按 PokeFinder 4.3.2 `IVToPIDCalculator` 实现 Method 1/Reverse Method 1/2/4、XD/Colo、Channel 的六项 IV 反推；新增独立 Wasm API v1、Dedicated Worker、三语入口、九列结果、排序、CSV、输入校验和算法文档 [`docs/modules/gen3ivtopid.md`](modules/gen3ivtopid.md)。Worker 在复制结果前校验 128 条上限、`uint32_t` 对齐和 Wasm 堆边界；取消、组件卸载或异常后销毁旧实例。已写入上游固定夹具的原生测试文件，但本轮未运行。
 
 - `gen3initialseed`：RS TID/SID 全候选反推、FRLG/RSE 目标 Seed 分片反推、固定宽度 C ABI、独立 Worker/Wasm、稳定排序、进度、取消和 CSV；原生夹具覆盖 `48163/64377 -> 05A0/0、C19B/36724` 与 `00006073 -> 0000/1`，本轮未运行。
 - `gen3wild`：地点选择框使用 PokeFinder 4.3.2 `en/zh` 地点资源；不匹配的 EncounterTableGenerator 细分名称保留英文，日文沿用上游英文。
@@ -26,10 +28,10 @@
 
 ### 下一位开发者第一步
 
-1. 阅读 [`docs/modules/gen3initialseed.md`](modules/gen3initialseed.md) 与 [`third_party/pokefinder/UPSTREAM.md`](../third_party/pokefinder/UPSTREAM.md)。
-2. 在具备项目所有者授权后，按 `.github/workflows/ci.yml` 和 `package-lock.json` 检查四个 Gen III Wasm target；当前 Codex 不执行这些命令。
+1. 阅读 [`docs/modules/gen3ivtopid.md`](modules/gen3ivtopid.md)、[`docs/modules/gen3initialseed.md`](modules/gen3initialseed.md) 与 [`third_party/pokefinder/UPSTREAM.md`](../third_party/pokefinder/UPSTREAM.md)。
+2. 在具备项目所有者授权后，按 `.github/workflows/ci.yml` 和 `package-lock.json` 检查五个 Gen III Wasm target；当前 Codex 不执行这些命令。
 3. 项目所有者在 GitHub Desktop 审查当前 CI 修复后自行提交，建议标题：`fix: 修复 CI 格式与检查错误`。
-4. 推送并等待 Actions 部署；项目所有者提供 URL 后，再共同验收 Initial Seed 结果、地点中文名和野生/定点筛选布局。
+4. 推送并等待 Actions 部署；项目所有者提供 URL 后，再共同验收 IVs to PID 固定输入、Initial Seed 结果、地点中文名和野生/定点筛选布局。
 
 ## 1. 恢复入口
 
@@ -39,7 +41,7 @@
 2. [AI 开发一致性指南](ai-development.md)
 3. 本文
 4. [README](../README.md)、[产品需求](requirements.md)与[技术方案](tech-stack.md)
-5. 当前模块文档：[Gen 3 ID](modules/gen3id.md)
+5. 当前模块文档：[Gen 3 IVs to PID](modules/gen3ivtopid.md)
 6. 第四世代后续交接：[Gen 4 Development](gen4-development.md)
 7. [上游记录](../third_party/pokefinder/UPSTREAM.md)
 8. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)

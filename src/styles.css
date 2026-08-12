@@ -1069,6 +1069,47 @@ h1 {
   gap: 6px;
   margin-bottom: 6px;
 }
+.ivtopid-control-grid {
+  display: grid;
+  grid-template-columns: minmax(640px, 920px);
+  margin-bottom: 8px;
+}
+.compact-module-panel {
+  padding: 12px;
+}
+.ivtopid-iv-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(72px, 1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+.ivtopid-iv-grid .field {
+  gap: 4px;
+}
+.ivtopid-iv-grid input {
+  min-height: 34px;
+  padding: 6px 8px;
+  text-align: center;
+}
+.ivtopid-meta-grid {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(150px, 0.8fr) auto;
+  align-items: end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ivtopid-meta-grid .field {
+  gap: 4px;
+}
+.ivtopid-meta-grid input,
+.ivtopid-meta-grid select {
+  min-height: 34px;
+  padding: 6px 8px;
+}
+.ivtopid-actions {
+  align-items: center;
+  margin: 0 0 1px;
+}
 .initial-seed-control-grid .static-form-stack > .field {
   display: grid;
   grid-template-columns: minmax(96px, 1fr) minmax(140px, 220px);
@@ -1505,6 +1546,51 @@ h1 {
 .initial-seed-table-shell {
   height: 420px;
 }
+.ivtopid-table-shell {
+  height: 420px;
+}
+.ivtopid-table {
+  width: 100%;
+  min-width: 840px;
+  border-collapse: collapse;
+  color: var(--text);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+}
+.ivtopid-table th {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 38px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 500;
+  padding: 0 10px;
+  text-align: left;
+}
+.ivtopid-table th button {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+}
+.ivtopid-table th button:hover {
+  color: var(--teal);
+}
+.ivtopid-table td {
+  height: 42px;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 0 10px;
+  white-space: nowrap;
+}
 .initial-seed-virtual-table {
   position: relative;
   min-width: 360px;
@@ -1816,6 +1902,9 @@ h1 {
   .initial-seed-control-grid {
     grid-template-columns: 1fr;
   }
+  .ivtopid-control-grid {
+    grid-template-columns: 1fr;
+  }
   .floating-tools {
     gap: 7px;
   }
@@ -1882,6 +1971,12 @@ h1 {
   }
   .compact-field-row,
   .gen3-filter-selects {
+    grid-template-columns: 1fr;
+  }
+  .ivtopid-iv-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .ivtopid-meta-grid {
     grid-template-columns: 1fr;
   }
   .results-heading {

@@ -24,6 +24,7 @@ import { Gen3ProfileControls } from "./features/profiles/Gen3ProfileControls";
 import { gen3StaticProfileOrDefault } from "./features/profiles/domain";
 import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
 import { Gen3InitialSeedPanel } from "./features/initialseed/Gen3InitialSeedPanel";
+import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
 import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
@@ -31,7 +32,7 @@ import { useTheme } from "./theme";
 
 type SortKey = keyof Id3State;
 type SupportedLanguage = "zh" | "en" | "ja";
-type ActiveModule = "id" | "initialseed" | "static" | "wild";
+type ActiveModule = "id" | "initialseed" | "static" | "wild" | "ivtopid";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -415,6 +416,24 @@ function App() {
               <small>{t("wildVersion")}</small>
             </span>
           </button>
+          <button
+            className={
+              activeModule === "ivtopid"
+                ? "module-entry active"
+                : "module-entry"
+            }
+            onClick={() => {
+              setActiveModule("ivtopid");
+              setModuleRailOpen(false);
+            }}
+            type="button"
+          >
+            <span className="module-index">05</span>
+            <span>
+              <strong>{t("ivToPidModule")}</strong>
+              <small>{t("ivToPidVersion")}</small>
+            </span>
+          </button>
           <div className="rail-footer">
             <span className="rail-dot" />
             {t("localOnly")}
@@ -433,7 +452,9 @@ function App() {
                       ? "initialSeedEngine"
                       : activeModule === "static"
                         ? "staticEngine"
-                        : "wildEngine",
+                        : activeModule === "wild"
+                          ? "wildEngine"
+                          : "ivToPidEngine",
                 )}
               </h1>
             </div>
@@ -445,7 +466,9 @@ function App() {
                     ? "initialSeedVersion"
                     : activeModule === "static"
                       ? "staticVersion"
-                      : "wildVersion",
+                      : activeModule === "wild"
+                        ? "wildVersion"
+                        : "ivToPidVersion",
               )}
             </div>
           </div>
@@ -863,12 +886,14 @@ function App() {
               profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
               uiPreviewMode={uiPreviewMode}
             />
-          ) : (
+          ) : activeModule === "wild" ? (
             <Gen3WildPanel
               onOpenIvCalculator={() => setIvCalculatorExpanded(true)}
               profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
               uiPreviewMode={uiPreviewMode}
             />
+          ) : (
+            <Gen3IvToPidPanel uiPreviewMode={uiPreviewMode} />
           )}
         </main>
       </div>

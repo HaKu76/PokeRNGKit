@@ -5,13 +5,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代 Initial Seed Finder、Wild 地点本地化与筛选布局统一。** 当前工作区新增 `gen3initialseed`，并让 Wild 复用 Static 的紧凑筛选网格。真实 Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
+**当前里程碑：第三世代个体值查询 PID 模块落地。** 当前工作区新增 `gen3ivtopid`，并同步补充独立 Wasm/Worker、九列结果表、算法文档和三语入口。真实 Wasm、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
 - 目标范围：仅第三世代（Gen III）
-- 已有模块：ID Generator/Searcher、Initial Seed Finder、Static Generator/Searcher、Wild Generator/Searcher、三代存档信息、个体值计算器
-- 当前模块：Initial Seed Finder；实现尚未提交，真实 Wasm 待 Actions 验证
+- 已有模块：ID Generator/Searcher、Initial Seed Finder、Static Generator/Searcher、Wild Generator/Searcher、IVs to PID、三代存档信息、个体值计算器
+- 当前模块：IVs to PID；实现尚未提交，真实 Wasm 待 Actions 验证
 - 上游核验基线：PokeFinder 4.3.2
-- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
@@ -37,6 +37,14 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留 PokeFinder 三代
 - `gen3initialseed` Wasm C ABI、独立 Worker/Wasm 实例、分片进度、取消、稳定排序和 CSV
 - `Target Seed` 空值按项目统一 Seed 规则视为 `0`；`Max Results` 为 `1..65536`
 - 算法、输入边界和来源见 [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md)；本轮未构建或验收
+
+当前 IVs to PID 工作区包含：
+
+- 六项 IV、性格、TID 输入；空 TID 按上游行为作为 `0`
+- Method 1、Reverse Method 1、Method 2、Method 4、XD/Colo、Channel
+- Seed、PID、SID、Ability、四种性别比例和 Method 结果列
+- 独立 `gen3ivtopid` Wasm、Dedicated Worker、排序和 CSV
+- 算法、输入边界和上游文件见 [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md)；本轮未构建或验收
 
 当前 Static 工作区包含：
 
@@ -106,7 +114,8 @@ React UI
                     |-- Emscripten gen3id module
                     |-- Emscripten gen3initialseed module
                     |-- Emscripten gen3static module
-                    `-- Emscripten gen3wild module
+                    |-- Emscripten gen3wild module
+                    `-- Emscripten gen3ivtopid module
                           `-- PokeFinder Gen III C++ Core + thin adapter
 ```
 
@@ -176,7 +185,7 @@ npm run verify
 
 ## 构建与测试
 
-`npm run build` 先生成 release 模式的 `gen3id`、`gen3initialseed`、`gen3static` 与 `gen3wild` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
+`npm run build` 先生成 release 模式的 `gen3id`、`gen3initialseed`、`gen3static`、`gen3wild` 与 `gen3ivtopid` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
 
 测试规划分为五层：
 
@@ -186,7 +195,7 @@ npm run verify
 4. Worker + 真实 Wasm + IndexedDB 的浏览器集成测试（后续补充）。
 5. Playwright 覆盖核心流程、静态子路径部署和离线重载（Pages 预览稳定后引入）。
 
-当前验证门槛要求 `gen3id`、`gen3initialseed`、`gen3static` 与 `gen3wild` 的固定输入结果对齐已记录夹具、长范围计算可汇报进度并响应取消、GitHub Pages 能加载四个 Worker/Wasm 模块，且离线重载可用。项目所有者负责提交并提供部署 URL；算法回归仅能在 Actions 部署完成、所有者给出生产 URL 并授权后执行，项目所有者保留界面、设备和正式发布的最终验收。
+当前验证门槛要求 `gen3id`、`gen3initialseed`、`gen3static`、`gen3wild` 与 `gen3ivtopid` 的固定输入结果对齐已记录夹具、长范围计算可汇报进度并响应取消、GitHub Pages 能加载五个 Worker/Wasm 模块，且离线重载可用。项目所有者负责提交并提供部署 URL；算法回归仅能在 Actions 部署完成、所有者给出生产 URL 并授权后执行，项目所有者保留界面、设备和正式发布的最终验收。
 
 ## 部署
 
@@ -224,7 +233,8 @@ npm run build:web
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 兜底、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
 - **阶段 4A：Wild Generator** - 遭遇数据、独立 `gen3wild` Wasm/Worker、特殊地点规则、完整筛选和固定夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。
-- **阶段 5：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
+- **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、上游方法和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 6：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
 - **后续** - Egg、GameCube、PokeSpot、Jirachi 等三代能力；第四世代仅保留接口，是否实现由项目所有者另行决定。
 
 ## 许可证、署名与源码分发
