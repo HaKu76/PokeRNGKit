@@ -92,6 +92,17 @@ git diff --check
 
 `format:changed` 使用 Git 收集相对 `HEAD` 的已跟踪修改和未跟踪文件，通过 `--ignore-unknown` 跳过 PNG、Wasm 等非 Prettier 文件，并在写入后对同一文件批次执行只读检查。全仓 `format:check` 仍是提交前闭环，用于发现已经进入基线但尚未修正的格式问题。不得把 `git diff --check` 当成 Prettier 替代品；前者只能发现空白错误，不能发现换行、缩进和排版差异。
 
+格式收尾必须以“最后一次编辑之后”的文件状态为准。发生合并冲突解决、Cherry-pick、自动生成文件更新、格式化脚本修改或后续手工调整时，必须重新对本任务全部触及文件执行 `npm run format:files -- <file...>`；不能因为同一文件之前曾经格式化过就跳过。交接或请求提交前必须再运行与 CI 完全一致的 `npm run format:check`，不能只运行 `format:changed`、单文件 `prettier --check` 或 `git diff --check`。
+
+若 `npm run format:check` 报告文件，处理顺序固定为：
+
+1. 复制 CI 或本地输出的完整文件列表。
+2. 对列表执行 `npm run format:files -- <file...>`，只在确认这些文件属于当前任务时扩大格式化范围。
+3. 重新运行 `npm run format:check`，直到输出 `All matched files use Prettier code style!`。
+4. 最后运行 `git diff --check`，并在 `docs/progress.md` 记录失败次数、命令和未运行项。
+
+本项目已至少三次出现“功能代码可用但 Actions 的全仓 Prettier 先失败”：Actions `31581467290`、`31614337208` 和 `31691660050`。因此单文件或定向格式检查只能作为编辑后快速反馈，不能作为 CI 通过的替代证据。
+
 完成格式收尾后，再按授权范围执行工程检查。未经项目所有者明确授权，不得自行执行以下测试、构建、算法回归、性能检查或 UI 预览命令：
 
 ```bash

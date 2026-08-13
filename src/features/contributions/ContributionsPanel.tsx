@@ -39,9 +39,7 @@ export function ContributionsPanel({
       <div className="contributions-summary">
         <span>{t("contributionTotal")}</span>
         <strong>¥{total}</strong>
-        <small>
-          {t("contributionCount", { count: contributions.length })}
-        </small>
+        <small>{t("contributionCount", { count: contributions.length })}</small>
       </div>
       <div className="contributions-table-wrap">
         <table className="contributions-table">

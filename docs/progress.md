@@ -7,6 +7,12 @@
 > - 工作区状态：源码和文档尚未提交；Codex 不提交、不 push、不部署
 > - 验收状态：本轮完成静态审查、冲突清理和格式检查；ESLint、TypeScript、测试、构建和浏览器 UI 待授权验证
 
+## 2026-08-13 CI 格式失败复盘
+
+- 可追溯的 Actions 全仓 Prettier 失败至少 3 次：`31581467290`（4 个文件）、`31614337208`（13 个文件）和本次 `31691660050`（`src/features/contributions/ContributionsPanel.tsx`）。历史中另有 6 个格式相关修复提交，但不全部等同于 CI 失败。
+- 根因是定向格式化或旧的本地检查结果不能证明 CI 执行的 `prettier --check .`；后续合并、手工调整或新增文件可能再次引入排版差异。
+- 已将 SOP 固化为：最后一次编辑后重新格式化全部任务文件；提交前必须运行完整 `npm run format:check`；按 CI 输出文件列表定向修复并重复全仓检查；最后再运行 `git diff --check`。本次只修复格式，未运行 lint、typecheck、测试或构建。
+
 ## 2026-08-13 Contributions
 
 - 新增全局只读 Contributions 面板，从右下角工具栏打开，并复用现有悬浮面板的互斥、点外关闭、`Escape` 和焦点恢复逻辑；不占用按世代划分的 RNG 模块侧栏。
