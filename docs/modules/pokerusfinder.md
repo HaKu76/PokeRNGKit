@@ -1,4 +1,4 @@
-# Pokerus Finder
+# 宝可病毒查询
 
 `pokerusfinder` ports the frame search behavior of DevonStudios' Pokerus Finder (revision `262262fdb259c44a6a366b5c0dbf1bb319e39ff4`, downloaded 2026-08-13). The upstream project is GPL-3.0 and credits `zep715` for assembly research. This module keeps the upstream product name and English source labels because the upstream project does not provide a Simplified Chinese control translation.
 

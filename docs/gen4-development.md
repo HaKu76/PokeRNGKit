@@ -1,11 +1,11 @@
 # 第四世代扩展接口与 AI 交接
 
-> - 状态：第四世代 Static Generator/Searcher、独立存档和全局个体值计算器已实现；生产回归待部署
-> - 更新日期：2026-08-12
+> - 状态：第四世代 Static 与 Wild Generator/Searcher、独立存档和全局个体值计算器已实现；Wild 工程与生产回归待验证
+> - 更新日期：2026-08-13
 > - 上游基线：PokeFinder 4.3.2
-> - 当前产品范围：第三世代既有模块与第四世代 Static
+> - 当前产品范围：第三世代既有模块与第四世代 Static/Wild
 
-本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前只落地 `gen4static`；`gen4id` 与 `gen4wild` 仍仅保留共享接口，不得据此推断已支持其他第四世代功能。
+本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前已落地 `gen4static` 与 `gen4wild`；`gen4id` 仍仅保留共享接口，不得据此推断已支持其他第四世代功能。
 
 ## 1. 已保留接口
 
@@ -18,7 +18,7 @@
 - `RngWorkerReadyMessage`、`RngWorkerBatchMessage`、`RngWorkerErrorMessage`：握手、批次和失败信封。
 - `GEN4_MODULE_RESERVATIONS`：只保留 `gen4id`、`gen4static`、`gen4wild` 三个标识及 Generator/Searcher 能力。
 
-`gen4id` 与 `gen4wild` 仍没有运行时注册。`gen4static` 已使用 API 版本 `1`、独立 Wasm target、Worker Pool、导航入口和 UI 预览引擎。
+`gen4static` 与 `gen4wild` 已分别使用 API 版本 `1`、独立 Wasm target、Worker Pool、导航入口和 UI 预览引擎。`gen4id` 仍没有运行时注册。
 
 ## 2.1 当前已实现：`gen4static`
 
@@ -29,6 +29,18 @@
 - G4 存档使用独立 React 模块、schema、IndexedDB/localStorage 键，不读取或覆盖 G3 存档状态；个体值计算器为全局单一 React 工具，不按世代拆分入口。
 
 Generator 的 `Max Advances` 与 PokeFinder 一致，包含起点，因此输入 `N` 计算 `N + 1` 个状态；Searcher 的 IV 组合按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 的闭区间笛卡尔积枚举。
+
+## 2.2 当前已实现：`gen4wild`
+
+- 覆盖 DPPt Method J、HGSS Method K、甜甜蜜树和宝可追踪 Generator/Searcher。
+- 支持草丛、冲浪、碎岩、三种钓鱼、捕虫大赛、撞树、双插槽、大量出现、广播、大湿地/后院替换和 HGSS 狩猎地带模块。
+- Generator/Searcher 六项 IV 默认均为 `0..31`，筛选器、IV 快捷键、虚拟结果表、排序、CSV、进度和取消对齐 G3 Wild。
+- 甜甜蜜树和宝可追踪必须单槽；捕虫大赛和 HGSS 狩猎地带 Searcher 至少一项最小 IV 为 `31`。
+- Worker 请求、槽位与结果分别固定为 75、19、22 个 `uint32_t`；API v1、独立 Worker Pool、Wasm bridge 和原生夹具已写入工作区。
+- 数据由 `scripts/generate_gen4_wild_data.py` 从 PokeFinder revision `dd00fe7` 与 EncounterTableGenerator Gen4 revision `9a2ed62` 的固定来源生成。
+- PokemonRNGGuides 没有第四世代 Wild 实现，仅用于参考 React 工作台和任务流程组织。
+
+详细输入、数据、算法、结果和验证状态见 [`docs/modules/gen4wild.md`](modules/gen4wild.md)。本轮未运行 build、test、Wasm/native 或浏览器回归，不得把工作区夹具写成已通过。
 
 ## 2. 模块边界
 

@@ -22,8 +22,10 @@ type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
 
 export function PokerusFinderPanel({
   uiPreviewMode,
+  initialMode = "gen3",
 }: {
   uiPreviewMode: boolean;
+  initialMode?: PokerusFinderMode;
 }) {
   const { t } = useTranslation();
   const engine = useMemo<PokerusFinderSearchEngine>(
@@ -33,7 +35,7 @@ export function PokerusFinderPanel({
         : new PokerusFinderWorkerPool(),
     [uiPreviewMode],
   );
-  const [mode, setMode] = useState<PokerusFinderMode>("gen3");
+  const [mode, setMode] = useState<PokerusFinderMode>(initialMode);
   const [handheldInputs, setHandheldInputs] = useState({
     gen3: { seed: "", frame: "1", delay: "300" },
     dp: { seed: "", frame: "1", delay: "300" },
@@ -118,7 +120,7 @@ export function PokerusFinderPanel({
     <>
       <div
         aria-label={t("pokerusFinderEngine")}
-        className="operation-tabs"
+        className="operation-tabs pokerus-operation-tabs"
         role="tablist"
       >
         {(["gen3", "dp", "pthgss"] as const).map((entry) => (
@@ -151,7 +153,7 @@ export function PokerusFinderPanel({
               <span className="panel-index">01</span>
               <h2>{t("pokerusFinderConfig")}</h2>
             </div>
-            <span className="panel-note">Pokérus Finder</span>
+            <span className="panel-note">{t("pokerusFinderModule")}</span>
           </div>
           <div className="static-form-stack">
             {isDateMode ? (

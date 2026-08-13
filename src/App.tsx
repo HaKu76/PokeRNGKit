@@ -50,6 +50,7 @@ import {
 } from "./features/gen4profiles/profilePanelState";
 import { useGen4Profiles } from "./features/gen4profiles/useGen4Profiles";
 import { Gen4StaticPanel } from "./features/gen4static/Gen4StaticPanel";
+import { Gen4WildPanel } from "./features/gen4wild/Gen4WildPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
 
@@ -67,7 +68,8 @@ type ActiveModule =
   | "spindapainter"
   | "gen4static"
   | "gen7id"
-  | "pokerusfinder";
+  | "pokerusfinder"
+  | "gen4wild";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -95,10 +97,13 @@ function App() {
   const profiles = useGen3Profiles();
   const gen4Profiles = useGen4Profiles();
   const [activeModule, setActiveModule] = useState<ActiveModule>("id");
+  const [pokerusInitialMode, setPokerusInitialMode] = useState<
+    "gen3" | "pthgss"
+  >("gen3");
   const [moduleRailOpen, setModuleRailOpen] = useState(false);
+  const [moduleRailCollapsed, setModuleRailCollapsed] = useState(false);
   const [ivCalculatorExpanded, setIvCalculatorExpanded] = useState(false);
   const [encounterLookupExpanded, setEncounterLookupExpanded] = useState(false);
-  const [contributionsExpanded, setContributionsExpanded] = useState(false);
   const [profileExpanded, setProfileExpanded] = useState(
     initialGen3ProfilePanelExpanded,
   );
@@ -207,7 +212,6 @@ function App() {
   const openIvCalculator = () => {
     setIvCalculatorExpanded(true);
     setEncounterLookupExpanded(false);
-    setContributionsExpanded(false);
     setProfileExpanded(false);
     persistGen3ProfilePanelExpanded(false);
     setGen4ProfileExpanded(false);
@@ -220,7 +224,6 @@ function App() {
     if (expanded) {
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
-      setContributionsExpanded(false);
     }
   };
 
@@ -230,7 +233,6 @@ function App() {
     if (expanded) {
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
-      setContributionsExpanded(false);
     }
   };
 
@@ -340,39 +342,34 @@ function App() {
     cancelled: t("cancelled"),
     failed: t("failed"),
   }[status];
-  const gen4Tools = activeModule === "gen4static";
+  const gen4Tools =
+    activeModule === "gen4static" || activeModule === "gen4wild";
   const gen7Module = activeModule === "gen7id";
   const pokerusModule = activeModule === "pokerusfinder";
-  const profileTools = !gen7Module && !pokerusModule;
-  const activeFloatingTool = contributionsExpanded
-    ? "contributions"
-    : ivCalculatorExpanded
-      ? "iv"
-      : encounterLookupExpanded
-        ? "encounter"
-        : profileTools && gen4Tools
-          ? gen4ProfileExpanded
-            ? "profile"
-            : undefined
-          : profileTools && profileExpanded
-            ? "profile"
-            : undefined;
+  const profileTools = true;
+  const activeFloatingTool = ivCalculatorExpanded
+    ? "iv"
+    : encounterLookupExpanded
+      ? "encounter"
+      : profileTools && gen4Tools
+        ? gen4ProfileExpanded
+          ? "profile"
+          : undefined
+        : profileTools && profileExpanded
+          ? "profile"
+          : undefined;
 
-  const toggleFloatingTool = (
-    tool: "contributions" | "encounter" | "iv" | "profile",
-  ) => {
+  const toggleFloatingTool = (tool: "encounter" | "iv" | "profile") => {
     const expanded = activeFloatingTool !== tool;
     setEncounterLookupExpanded(false);
     setIvCalculatorExpanded(false);
-    setContributionsExpanded(false);
     if (gen4Tools) {
       changeGen4ProfileExpanded(false);
     } else {
       changeProfileExpanded(false);
     }
     if (!expanded) return;
-    if (tool === "contributions") setContributionsExpanded(true);
-    else if (tool === "encounter") setEncounterLookupExpanded(true);
+    if (tool === "encounter") setEncounterLookupExpanded(true);
     else if (tool === "iv") setIvCalculatorExpanded(true);
     else if (gen4Tools) changeGen4ProfileExpanded(true);
     else changeProfileExpanded(true);
@@ -384,11 +381,33 @@ function App() {
         <div className="topbar-leading">
           <button
             aria-controls="module-rail"
-            aria-expanded={moduleRailOpen}
-            aria-label={t(moduleRailOpen ? "closeModules" : "openModules")}
+            aria-expanded={wideViewport ? !moduleRailCollapsed : moduleRailOpen}
+            aria-label={t(
+              wideViewport
+                ? moduleRailCollapsed
+                  ? "openModules"
+                  : "closeModules"
+                : moduleRailOpen
+                  ? "closeModules"
+                  : "openModules",
+            )}
             className="module-menu-button"
-            onClick={() => setModuleRailOpen((current) => !current)}
-            title={t(moduleRailOpen ? "closeModules" : "openModules")}
+            onClick={() => {
+              if (wideViewport) {
+                setModuleRailCollapsed((current) => !current);
+              } else {
+                setModuleRailOpen((current) => !current);
+              }
+            }}
+            title={t(
+              wideViewport
+                ? moduleRailCollapsed
+                  ? "openModules"
+                  : "closeModules"
+                : moduleRailOpen
+                  ? "closeModules"
+                  : "openModules",
+            )}
             type="button"
           >
             <span aria-hidden="true">☰</span>
@@ -406,7 +425,7 @@ function App() {
               <div className="brand-name">{t("brand")}</div>
               <div className="brand-subtitle">
                 {t(
-                  activeModule === "gen4static"
+                  gen4Tools
                     ? "subtitleGen4"
                     : gen7Module
                       ? "subtitleGen7"
@@ -464,7 +483,7 @@ function App() {
       </header>
 
       <div className="workspace">
-        {moduleRailOpen && (
+        {moduleRailOpen && !wideViewport && (
           <button
             aria-label={t("closeModules")}
             className="module-rail-backdrop"
@@ -473,10 +492,20 @@ function App() {
           />
         )}
         <aside
-          aria-hidden={!wideViewport && !moduleRailOpen}
-          className={`module-rail${moduleRailOpen ? " open" : ""}`}
+          aria-hidden={
+            (!wideViewport && !moduleRailOpen) ||
+            (wideViewport && moduleRailCollapsed)
+          }
+          className={`module-rail${moduleRailOpen ? " open" : ""}${
+            moduleRailCollapsed ? " collapsed" : ""
+          }`}
           id="module-rail"
-          inert={!wideViewport && !moduleRailOpen ? true : undefined}
+          inert={
+            (!wideViewport && !moduleRailOpen) ||
+            (wideViewport && moduleRailCollapsed)
+              ? true
+              : undefined
+          }
         >
           <div className="rail-heading">
             <div className="rail-label">{t("modules")}</div>
@@ -648,6 +677,26 @@ function App() {
                 <small>{t("spindaPainterVersion")}</small>
               </span>
             </button>
+            <button
+              className={
+                activeModule === "pokerusfinder" &&
+                pokerusInitialMode === "gen3"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setPokerusInitialMode("gen3");
+                setActiveModule("pokerusfinder");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">10</span>
+              <span>
+                <strong>{t("pokerusFinderModule")}</strong>
+                <small>{t("pokerusGen3Version")}</small>
+              </span>
+            </button>
             <div className="rail-section-label">GEN IV</div>
             <button
               className={
@@ -661,10 +710,48 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">10</span>
+              <span className="module-index">11</span>
               <span>
                 <strong>{t("gen4StaticModule")}</strong>
                 <small>{t("gen4StaticVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "gen4wild"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("gen4wild");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">12</span>
+              <span>
+                <strong>{t("gen4WildModule")}</strong>
+                <small>{t("gen4WildVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "pokerusfinder" &&
+                pokerusInitialMode === "pthgss"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("pokerusfinder");
+                setPokerusInitialMode("pthgss");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">13</span>
+              <span>
+                <strong>{t("pokerusFinderModule")}</strong>
+                <small>{t("pokerusGen4Version")}</small>
               </span>
             </button>
             <div className="rail-section-label">GEN VII</div>
@@ -680,29 +767,10 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">11</span>
+              <span className="module-index">14</span>
               <span>
                 <strong>{t("gen7IdModule")}</strong>
                 <small>{t("gen7IdVersion")}</small>
-              </span>
-            </button>
-            <div className="rail-section-label">TOOLS</div>
-            <button
-              className={
-                activeModule === "pokerusfinder"
-                  ? "module-entry active"
-                  : "module-entry"
-              }
-              onClick={() => {
-                setActiveModule("pokerusfinder");
-                setModuleRailOpen(false);
-              }}
-              type="button"
-            >
-              <span className="module-index">12</span>
-              <span>
-                <strong>{t("pokerusFinderModule")}</strong>
-                <small>{t("pokerusFinderVersion")}</small>
               </span>
             </button>
           </nav>
@@ -712,11 +780,14 @@ function App() {
           </div>
         </aside>
 
-        <main className="main-content" key={activeModule}>
+        <main
+          className="main-content"
+          key={`${activeModule}-${pokerusInitialMode}`}
+        >
           <div className="page-heading">
             <div>
               <div className="eyebrow">
-                {activeModule === "gen4static"
+                {activeModule === "gen4static" || activeModule === "gen4wild"
                   ? "GEN IV / RNG LAB"
                   : gen7Module
                     ? "GEN VII / RNG LAB"
@@ -748,7 +819,9 @@ function App() {
                                       ? "gen7IdEngine"
                                       : activeModule === "pokerusfinder"
                                         ? "pokerusFinderEngine"
-                                        : "gen4StaticEngine",
+                                        : activeModule === "gen4static"
+                                          ? "gen4StaticEngine"
+                                          : "gen4WildEngine",
                 )}
               </h1>
             </div>
@@ -776,7 +849,9 @@ function App() {
                                     ? "gen7IdVersion"
                                     : activeModule === "pokerusfinder"
                                       ? "pokerusFinderVersion"
-                                      : "gen4StaticVersion",
+                                      : activeModule === "gen4static"
+                                        ? "gen4StaticVersion"
+                                        : "gen4WildVersion",
               )}
             </div>
           </div>
@@ -1221,11 +1296,23 @@ function App() {
           ) : activeModule === "gen7id" ? (
             <Gen7IdPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "pokerusfinder" ? (
-            <PokerusFinderPanel uiPreviewMode={uiPreviewMode} />
+            <PokerusFinderPanel
+              initialMode={pokerusInitialMode}
+              uiPreviewMode={uiPreviewMode}
+            />
+          ) : activeModule === "gen4wild" ? (
+            <Gen4WildPanel
+              onOpenIvCalculator={openGen4IvCalculator}
+              profile={gen4Profiles.selectedProfile ?? DEFAULT_GEN4_PROFILE}
+              uiPreviewMode={uiPreviewMode}
+            />
           ) : (
             <Gen3IvToPidPanel uiPreviewMode={uiPreviewMode} />
           )}
         </main>
+      </div>
+      <div className="contributions-site-section">
+        <ContributionsPanel embedded />
       </div>
       <div className="floating-tools">
         <IvCalculator
@@ -1234,7 +1321,6 @@ function App() {
             setIvCalculatorExpanded(expanded);
             if (expanded) {
               setEncounterLookupExpanded(false);
-              setContributionsExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
               else changeProfileExpanded(false);
             }
@@ -1246,7 +1332,6 @@ function App() {
             setEncounterLookupExpanded(expanded);
             if (expanded) {
               setIvCalculatorExpanded(false);
-              setContributionsExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
               else changeProfileExpanded(false);
             }
@@ -1272,18 +1357,6 @@ function App() {
             onExpandedChange={changeProfileExpanded}
           />
         ) : null}
-        <ContributionsPanel
-          expanded={activeFloatingTool === "contributions"}
-          onExpandedChange={(expanded) => {
-            setContributionsExpanded(expanded);
-            if (expanded) {
-              setIvCalculatorExpanded(false);
-              setEncounterLookupExpanded(false);
-              if (gen4Tools) changeGen4ProfileExpanded(false);
-              else changeProfileExpanded(false);
-            }
-          }}
-        />
         <nav aria-label={t("tools")} className="floating-tool-rail">
           <button
             aria-controls="iv-calculator-panel"
@@ -1344,25 +1417,6 @@ function App() {
               <span>{t("profile")}</span>
             </button>
           )}
-          <button
-            aria-controls="contributions-panel"
-            aria-expanded={activeFloatingTool === "contributions"}
-            aria-haspopup="dialog"
-            aria-label={t("contributions")}
-            className={
-              activeFloatingTool === "contributions" ? "active" : undefined
-            }
-            data-tone="brand"
-            id="contributions-trigger"
-            onClick={() => toggleFloatingTool("contributions")}
-            title={t("contributions")}
-            type="button"
-          >
-            <span aria-hidden="true" className="floating-tool-rail-icon">
-              ¥
-            </span>
-            <span>{t("contributions")}</span>
-          </button>
         </nav>
       </div>
       <footer className="legal-footer">
@@ -1377,7 +1431,9 @@ function App() {
         <a href="./legal/LICENSE.txt">{t("license")}</a>
         <a href="./legal/UPSTREAM.md">PokeFinder</a>
         <a href="./legal/3DSRNGTool-UPSTREAM.md">3DSRNGTool</a>
-        <a href="./legal/Pokerus-Finder-UPSTREAM.md">Pokerus Finder</a>
+        <a href="./legal/Pokerus-Finder-UPSTREAM.md">
+          {t("pokerusFinderModule")}
+        </a>
       </footer>
     </div>
   );

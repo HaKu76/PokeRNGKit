@@ -3,15 +3,22 @@
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
 > - Git 基线：`34eae65 feat: 新增宝可病毒查询`
-> - 当前阶段：同步 HakuStyle、优化全局 UI 并新增 Contributions 面板
-> - 工作区状态：HakuStyle、全局 UI 与 Contributions 源码和文档尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：本轮完成静态审查、格式检查与 Skill 结构校验；ESLint、TypeScript、测试、构建和浏览器 UI 待授权验证
+> - 当前阶段：合并第四世代 Wild、宝可病毒与全局 UI 优化
+> - 工作区状态：源码和文档尚未提交；Codex 不提交、不 push、不部署
+> - 验收状态：本轮完成静态审查、冲突清理和格式检查；ESLint、TypeScript、测试、构建和浏览器 UI 待授权验证
 
 ## 2026-08-13 Contributions
 
 - 新增全局只读 Contributions 面板，从右下角工具栏打开，并复用现有悬浮面板的互斥、点外关闭、`Escape` 和焦点恢复逻辑；不占用按世代划分的 RNG 模块侧栏。
 - 首条记录为 Jeff 贡献 `¥50 RMB`，用途为 `AI Token`；记录使用独立结构化数据，后续可以继续追加，不包含支付、账号、后端或在线编辑能力。
 - 桌面端面板从工具栏左侧打开，窄屏从工具栏上方打开；金额汇总由当前记录计算，不新增运行时依赖。
+
+## 2026-08-13 宝可病毒侧栏归位
+
+- 宝可病毒查询的第三世代和第四世代入口已分别归入 `GEN III` 与 `GEN IV` 主分组，移除临时的 `GEN III TOOLS` / `GEN IV TOOLS` 分组；模块编号统一为 Gen III `01-10`、Gen IV `11-13`、Gen VII `14`。
+- 两个入口使用独立的初始模式和 active 状态：第三世代默认打开 Gen III，第四世代默认打开 Pt/HGSS；面板和简体中文规则统一显示“宝可病毒”。上游代码目录、Wasm API 和法律记录仍保留 `pokerusfinder` 原名。
+- 本轮涉及文件的定向 Prettier 检查与 `git diff --check` 已通过；全仓 `npm run format:check` 仍被前端 Skill、Gen4 Wild 和其他既有文件共 95 个未格式化文件阻断，未擅自扩大格式化范围。
+- 冲突标记已从源码和文档工作树清除，但当前环境无法写入 `.git/index`，因此未能由 Codex 将 resolved 状态写入索引；未提交、未 push、未部署。
 
 ## 2026-08-13 UI 视觉与侧栏优化
 
@@ -49,6 +56,8 @@
 - 本轮使用 HakuStyle 保持现有紧凑工作台、三页签、稳定三列设置网格、移动端单列与结果表样式；三个页签分别保留轮次、结果和状态，切换时不互相清空；未新增运行时依赖。
 - 本轮已通过 `npm run format:changed`、`npm run format:check` 与 `git diff --check`。未运行 ESLint、TypeScript、Vitest、原生夹具、Wasm/Web 构建、UI 预览、浏览器或生产算法回归；仓库规则要求项目所有者对具体检查或 URL 明确授权。
 
+- 合并保留 `gen4wild` 的 DPPt/HGSS Wild Generator/Searcher、遭遇数据、独立 Wasm/Worker Pool、固定夹具和模块文档；其固定来源、输入边界和未验收状态继续以本节后续记录为准。
+
 - 本轮修复 Initial Seed Finder 虚拟结果表首行偏移：行定位补齐 `top: 0`，并将“结果表第一条不得出现虚假空行”写入 `docs/ai-development.md` 的 UI 回归规则；Static、Wild、Egg 和 Gen4 Static 仍使用已核对的 `translateY(start + 38px)` 表头偏移。
 - 本轮移除 Seed to Time 的两列进制辅助文本、IVs to PID 的 TID 辅助文本、Egg 设置标题右侧的存档版本标签和 Spinda Painter 的 `HEX / 32-bit` 文本。它们不是对应 PokeFinder UI 的独立控件或信息，今后不得擅自添加；规则已写入 UI 回归规则。
 - 本轮将个体值计算器合并为唯一全局浮层 `IvCalculator`，由工具自身选择 Gen III、Platinum、HGSS、BW2、SwSh、BDSP 六个上游数据集；移除未再使用的 `src/features/ivcalculator/Gen3IvCalculator.tsx`，保留 G4 Static 的兼容 Personal 导出。
@@ -85,14 +94,14 @@
 - 未运行：ESLint、TypeScript 类型检查、Vitest、Web/Wasm 构建、原生夹具、浏览器 UI 或生产回归；本轮授权范围仅为 Actions 日志诊断和格式/SOP 修复。
 
 - 主分支已包含自动完成控件、三代悬浮工具互斥、`gen3seedtotime`、`gen3spindapainter` 与格式化/Actions SOP；本次合并保留这些修改。
-- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3spindapainter`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`、G3/G4 独立 `profiles`、全局 `ivcalculator` 与 `encounterlookup`。
+- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3spindapainter`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、G3/G4 独立 `profiles`、全局 `ivcalculator` 与 `encounterlookup`。
 - 主分支此前新增 `encounterlookup`：右下角默认收起的全世代 Encounter Lookup，覆盖 PokeFinder 4.3.2 的 Gen III、Gen IV、Gen V 和 BDSP 共 16 个版本；静态数据由 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 生成。
 - 遇敌查询不进入左侧 RNG 导航，不使用 Wasm/Worker；宝可梦候选、游戏版本、地点、遇敌种类和等级范围均来自本地静态数据。
 - 已清理生成用 `.tmp-encounter-tables/` 与 `.tmp-encounter-tables.zip`；生成脚本和正式 `data.ts` 保留在工作区。
 - 主分支此前新增 `AutoCompleteComboBox`，覆盖 Encounter Lookup 宝可梦、IV Calculator 宝可梦、Egg 蛋种类和 Wild 地点。行为对应 PokeFinder `enableAutoComplete()`：点击展开、包含匹配、弹出候选、方向键/Enter/Escape 和 `NoInsert`。
 - 主分支此前将 G3 存档信息、个体值计算器和遇敌查询纳入同一展开状态；本次合并把相同互斥规则扩展到 G4 工具，并保留两代各自的 localStorage 展开偏好。
 - 本次合并新增 `gen4static` 和独立 G4 存档；个体值计算器已合并为全局单一入口。Encounter Lookup 在两代页面共用，当前页面的存档、个体值计算器和遇敌查询保持三方互斥。
-- RNG Wasm 默认构建列表为 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`，共 9 个。
+- RNG Wasm 默认构建列表为 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`，共 10 个。
 - 正式 Wasm、站点产物和 Pages 部署由 GitHub Actions 生成，不提交 `public/wasm/`、`wasm/build/` 或 `dist/`。
 - 本次合并已运行 `npm run format:changed`、定向 `npm run format:files -- ...`、`npm run format:check` 与 `git diff --check`；最终全仓格式和空白检查通过，未发现残留冲突标记。
 
@@ -127,18 +136,20 @@
 - `gen3ivtopid`：第三世代 IVs to PID 查询。
 - `gen3egg`：第三世代 Egg Generator。
 - `gen4static`：第四世代 Static Generator/Searcher。
+- `gen4wild`：第四世代 Wild Generator/Searcher、特殊遭遇数据、Worker Pool、CSV、UI 预览与 Wasm 运行时。
 - `profiles`、`ivcalculator`：G3/G4 独立存档与全局个体值计算器。
 - `encounterlookup`：右下角遇敌查询悬浮工具，覆盖 PokeFinder 4.3.2 实际支持的 16 个游戏版本。
 - 增加 `gen4static` Wasm API v1、C ABI、原生夹具、Dedicated Worker、Generator/Searcher Worker Pool 和消息协议。
+- 增加 `gen4wild` Wasm API v1、固定宽度 C ABI、原生夹具、Dedicated Worker、Generator/Searcher Worker Pool 和消息协议。
 - 修复 MSVC 参数求值顺序造成的 IV word 对调：先顺序读取 `iv1`、`iv2`，再解码六项 IV。
 - Worker 校验模块、契约和 API 版本，按 `chunkIndex` 恢复确定顺序；取消会终止并重建独立 Worker。
-- 默认 Wasm 构建列表同时包含 `gen3seedtotime` 与 `gen4static`。
+- 默认 Wasm 构建列表同时包含 `gen3seedtotime`、`gen4static` 与 `gen4wild`。
 
 ## 来源与参考
 
 - PokeFinder 4.3.2 revision：`dd00fe7`，作为控件、算法语义、模板规则和固定结果的权威基线。
-- EncounterTableGenerator Gen4 revision：`9a2ed62`，用于生成第四世代定点模板。
-- PokemonRNGGuides revision：`c0b2bb664f04a4ef052e6dd4d831351703fa4047`，用于交叉核对 Rust `stationary` Generator/Searcher 分层、IV 顺序、Method 1/J/K 逆推和 React 工作台流程。
+- EncounterTableGenerator Gen4 revision：`9a2ed62`，用于生成第四世代定点模板与 Wild 遭遇数据。
+- PokemonRNGGuides revision：`c0b2bb664f04a4ef052e6dd4d831351703fa4047`；用于交叉核对 Static 的 Rust 分层和 React 工作台流程。该 revision 没有第四世代 Wild 实现，不作为 G4 Wild 算法或数据来源。
 - PokeRNGKit 不复制或编译 PokemonRNGGuides 源码；两个参考发生差异时以 PokeFinder 4.3.2 为准。
 - 完整来源范围和许可证记录见 [`third_party/pokefinder/UPSTREAM.md`](../third_party/pokefinder/UPSTREAM.md)。
 
@@ -158,14 +169,14 @@
 
 ## 下一步
 
-1. 在 GitHub Desktop 审查 `NGC Seed查询` 的 Gales/Colo/Channel 页面、首次搜索 Precalc 询问、导航与文档。
-2. 项目所有者明确授权后，运行 `npm run verify`；如需覆盖新 C++/Wasm 再单独授权 `npm run wasm:test:native` 与 `npm run wasm:build`。
-3. 项目所有者提交并推送后，等待 GitHub Actions 完成部署，再提供实际生产 URL，使用外部 Chrome 与 PokeFinder 4.3.2 逐模式回归结果、Precalc、取消与移动布局。
+1. 在 GitHub Desktop 审查 `feat/gen4-wild` 的源码、7.5 MB 生成数据、vendored PokeFinder 文件、测试和文档。
+2. 项目所有者明确授权后运行 `npm run verify`、`npm run wasm:test:native` 与 `npm run wasm:build`；提交并推送后等待 Actions。
+3. 项目所有者提供实际生产 URL 并授权后，在外部 Chrome/Edge 回归 Route 222 Method J、HGSS Method K、甜甜蜜树、宝可追踪、捕虫大赛、狩猎地带、取消和结果列。
 
 ## 已知限制
 
-- 当前分支：`main`，HEAD `2819588 fix: 修正全局工具布局与世代入口`。
-- 本轮 `gen3ngcseed` 源码和文档尚未提交。正式 Pages 仍保持上一成功生产包，不能作为本轮源码的验收证据。
+- 当前分支：`feat/gen4-wild`，HEAD `3895d2d feat: 新增NGC Seed查询`。
+- 本轮 G4 Wild 源码、静态数据、vendored Core、测试和文档尚未提交。正式 Pages 仍保持上一成功生产包，不能作为本轮源码的验收证据。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
@@ -173,7 +184,7 @@
 - 工程基础：React 19、TypeScript 6、Vite 8、Vitest、ESLint、Prettier、PWA 和中英日三语；npm 是唯一包管理器。
 - 构建基线：Node.js `24.19.0`、npm `12.0.2`、Emscripten `6.0.6`、CMake runtime `4.3.1`、Ninja runtime `1.13.2`。
 - 法律边界：GPL-3.0-or-later、PokeFinder 署名、对应源码记录和站点免责声明。
-- 已有模块：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3spindapainter`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、`gen4static`、G3/G4 独立存档信息、全局个体值计算器，以及 `encounterlookup`。
+- 已有模块：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3spindapainter`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、`gen4static`、工作区 `gen4wild`、G3/G4 独立存档信息、全局个体值计算器，以及 `encounterlookup`。
 - UI 基础：默认收起的模块抽屉、全局存档悬浮窗、浅色/深色主题和系统默认字体。
 
 ## 5. 验证状态
@@ -208,7 +219,7 @@
 
 ## 6. 已知风险与边界
 
-- `gen4id` 与 `gen4wild` 仍只保留共享接口，不应写成已支持功能。
+- `gen4id` 仍只保留共享接口；`gen4wild` 已在工作区实现但尚未通过工程、Wasm 和部署验证。
 - `gen3egg` 当前只实现 Egg Generator；Egg Searcher、Masuda 和第四世代孵化规则不在范围内。
 - 多 Worker 会复制 Wasm 线性内存，低内存移动设备可能需要在 Pages 实测后降低 Worker 数。
 - PWA 旧缓存可能造成 UI/Wasm API 短暂错配；Worker API 握手会拒绝版本不一致，但更新体验仍需在部署后验证。

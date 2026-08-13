@@ -1,0 +1,7 @@
+{
+  "id": "gen4wild",
+  "apiVersion": 1,
+  "target": "gen4wild",
+  "artifacts": ["gen4wild.mjs", "gen4wild.wasm"],
+  "source": "PokeFinder 4.3.2 Gen IV WildGenerator4/WildSearcher4"
+}
