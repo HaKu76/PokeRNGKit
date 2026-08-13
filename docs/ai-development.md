@@ -113,6 +113,10 @@ npm run build:ui
 npm run verify
 ```
 
+提交或请求项目所有者审查前，必须在当前工作区本地运行一次与 CI 完全一致的 `npm run verify`，不能只依赖单项 lint、typecheck 或 GitHub Actions。推荐顺序为 `npm ci --engine-strict`、核对 `.node-version` 与 `package.json` 的 Node/npm 版本、再运行 `npm run verify`。该命令包含格式、Lint、TypeScript、Vitest 和 `build:web`；其中 `build:web` 必须实际完成 Vite/PWA 预缓存生成。若本地 Node/npm 版本不满足约束，先记录版本并切换到锁定工具链，再开始验证。
+
+若 `build:web` 在 `vite-plugin-pwa` 的 Workbox 预缓存阶段报告资源超过 `maximumFileSizeToCacheInBytes`，必须检查 `dist` 中的实际资源大小，更新 `vite.config.ts` 的显式上限或拆分资源，然后从头重新运行完整 `npm run verify`。不得只运行 `vite build` 的前半段、忽略 PWA 错误或把“生成了 dist 文件”当作构建成功。验证结果和未运行项目必须写入 `docs/progress.md`。
+
 具备本地 C++ 与已激活 emsdk 时，经授权再运行 `npm run verify:full`。缺少工具链时如实记录“未运行”，由锁定工具链的 GitHub Actions 补齐，不得把前端构建成功写成真实 Wasm 已验证。
 
 算法结果验收只有一个入口：GitHub Actions 完成部署后，项目所有者提供实际站点 URL 并明确授权回归。AI 只能在该生产页面使用已记录固定输入回归，并记录 URL、commit/Actions run、浏览器版本、预期与实际结果。原生夹具、本地 Wasm 构建、UI 预览与 Actions 状态都只是工程证据，不能单独验收算法结果。部署后的 UI 检查必须先向项目所有者报告，再共同完成验收，不得由 AI 单方面宣告通过。

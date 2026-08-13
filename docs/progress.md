@@ -25,6 +25,12 @@
 - 已在 Generator 分支对 `message.chunk` 显式收窄为 `Gen4WildChunk`，保留 Searcher 原请求路径和既有 75-word Wasm 请求 ABI，不改变算法或边界校验。
 - 本轮已运行：`npm run format:files -- src/features/gen4wild/worker/gen4wild.worker.ts docs/progress.md`、`npm run format:check`、`npm run typecheck` 和 `git diff --check`。`typecheck` 与 `git diff --check` 已通过；全仓 `format:check` 仍被基线中 89 个未格式化文件阻断，未扩大格式化范围。ESLint 仅保留 Egg/Wild 的两条既有 TanStack Virtual warning；未运行测试、构建、Wasm、浏览器验收或部署。
 
+## 2026-08-13 本地 Verify 与 PWA 预缓存
+
+- 附件对应的 Actions run 中格式、ESLint、TypeScript 和 28 个 Vitest 文件共 103 项测试均通过；其 `vite build` 已生成资源，但 PWA 在 Workbox 预缓存阶段因默认 2 MiB 上限拒绝 `index` 约 5.28 MiB 和 `gen4wild.worker` 约 3.65 MiB，命令最终失败。本机复跑时 Node `24.13.0` / npm `11.6.2` 未满足 Node `24.19.0` / npm `12.0.2` 锁定版本，且本地基线有 88 个全仓格式差异，因此完整 `npm run verify` 在格式阶段停止；后续 Lint、TypeScript、103 项测试和非受限 `npm run build:web` 已分项通过。
+- 已将 `vite.config.ts` 的 `workbox.maximumFileSizeToCacheInBytes` 显式设置为 8 MiB，覆盖当前构建资源并保留 PWA 预缓存错误的可见性；未忽略 Workbox 错误或只保留前半段构建结果。
+- 已将 SOP 更新为：提交或请求审查前必须在当前工作区运行完整 `npm run verify`；遇到 Workbox 资源上限时检查 `dist` 实际大小、调整上限或拆分资源后从头复跑，并记录命令结果。
+
 ## 2026-08-13 Contributions
 
 - 新增全局只读 Contributions 面板，从右下角工具栏打开，并复用现有悬浮面板的互斥、点外关闭、`Escape` 和焦点恢复逻辑；不占用按世代划分的 RNG 模块侧栏。
