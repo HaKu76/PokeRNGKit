@@ -1,10 +1,10 @@
 # 第三世代 Wild Generator / Searcher
 
 > - 模块标识：`gen3wild`
-> - 当前状态：Generator/Searcher 已接入 API v3、C++/Wasm 和独立 Worker Pool；尚未提交、推送或完成部署页面回归
+> - 当前状态：Generator/Searcher 已接入 API v4、C++/Wasm 和独立 Worker Pool；Tanoby Chamber 已实现并通过本机原生夹具，Actions 与部署页面回归待完成
 > - 上游基线：PokeFinder 4.3.2
-> - API 版本：`3`
-> - 当前范围：第三世代掌机 Wild；Tanoby Chamber 暂不开放
+> - API 版本：`4`
+> - 当前范围：第三世代掌机 Wild，包括 FireRed / LeafGreen 的 7 个 Tanoby Chamber
 
 ## 能力与边界
 
@@ -12,6 +12,7 @@
 - 支持 Grass、Rock Smash、Surfing、Old Rod、Good Rod、Super Rod 和上游 `Wild 1`、`Wild 2`、`Wild 4`。
 - 支持 Emerald Synchronize、Cute Charm、Pressure、Hustle、Vital Spirit、Magnet Pull 和 Static 队首规则。
 - 支持 RSE Rock Smash 的 Bike、Black Flute、Cleanse Tag、White Flute，Route 119 Feebas Tile 和 RSE Safari Zone 额外推进。
+- 支持 FireRed / LeafGreen 的 Monean、Liptoo、Weepth、Dilford、Scufib、Rixy、Viapois Chamber，并按槽位显示未知图腾 `A..Z`、`!`、`?` 形态。
 - Generator 按 Seed 与推进范围生成状态；Searcher 按六项 IV 范围逆推候选 Seed。
 - Location、Pokemon、Encounter Slot 和等级范围按当前存档版本联动。
 - 筛选支持 PokeFinder 的 Nature、Hidden Power、Encounter Slot 多选，Level、六项 IV 闭区间，Shiny、Gender 和 Ability。
@@ -34,6 +35,7 @@
 | 每项 IV                                | 十进制 `0..31`，最小值不得大于最大值                  | Generator 默认 `0..31`；Searcher 默认 `31..31`          | `Filter.ui`、`Filter::isValid`                      |
 | Nature / Hidden Power / Encounter Slot | 分别为 25 / 16 / 当前遭遇表槽位多选                   | 全不选和全选都按 `Any`                                  | `Form/Controls/Filter.cpp`、`CheckList::getChecked` |
 | Shiny / Gender / Ability               | `Any/Star/Square/Star-Square`、`Any/0/1/2`、`Any/0/1` | 默认 `Any`                                              | `Filter::setup`、`StateFilter`                      |
+| Tanoby Chamber form                    | 整数 `0..27`，12 个槽位分别固定                       | 不接受普通 `form 0` 补齐或任意形态                      | `Gen3/pack.py`、`Encounters3.cpp`                   |
 
 `Initial Advances + Offset + Max Advances` 不得超过 `0xFFFFFFFF`。Generator 的 `Max Advances` 包含起点，状态总数为 `Max Advances + 1`，TypeScript 分片上限为 100,000 个状态。
 
@@ -52,7 +54,7 @@ Searcher 不接收 Seed 或推进范围。它按 `HP -> Atk -> Def -> SpA -> SpD
 3. 按槽位范围计算等级；Pressure 类队首执行额外等级修正。
 4. Cute Charm 判定；RSE Safari Zone 额外推进一次。
 5. Synchronize 或普通性格判定，并应用性格筛选。
-6. 循环生成 PID，直到性格与 Cute Charm 条件满足。
+6. 普通地点循环生成 PID，直到性格与 Cute Charm 条件满足；Tanoby Chamber 改为循环生成 `(low << 16) | high`，直到 PID 对应的未知图腾形态与槽位 form 一致，再由 `pid % 25` 取得性格。
 7. Method 2 在 IV 前额外推进一次；Method 4 在两组 IV 之间额外推进一次。
 8. 拆分六项 IV，计算 Ability、Gender、Shiny、Hidden Power 与威力，并应用剩余筛选。
 
@@ -64,9 +66,9 @@ Searcher 对每个 IV 组合执行：
 
 1. Method 1/2 使用 `LCRNGReverse::recoverPokeRNGIV` 的连续 IV 调用恢复；Method 4 使用两次 IV 调用间有一次推进的恢复规则。每组 IV 最多得到 6 个候选状态。
 2. Method 2 先逆向额外推进，再读取 PID 高低位；Method 4 的恢复函数已包含间隔规则。
-3. 以恢复出的 PID 性格为目标，沿 `PokeRNGR` 反向追踪可能的队首、槽位、等级、Feebas、Safari 和 Rock Smash 分支。
+3. 普通地点以恢复出的 PID 性格为目标，沿 `PokeRNGR` 反向追踪可能的队首、槽位、等级、Feebas、Safari 和 Rock Smash 分支；Tanoby Chamber 按上游半字顺序恢复 PID，并以未知图腾形态作为回溯停止条件。
 4. Synchronize 同时检查成功分支和失败后自然命中性格的分支；Searcher 使用通用 `Synchronize`，不选择指定性格。
-5. 通过槽位、等级、Shiny、Gender、Ability、Nature 与 Hidden Power 筛选后，调用 `test[index].next()` 取得上游 `WildSearcherState` 的候选 Seed。
+5. 通过槽位、形态、等级、Shiny、Gender、Ability、Nature 与 Hidden Power 筛选后，调用 `test[index].next()` 取得上游 `WildSearcherState` 的候选 Seed。
 
 None、Cute Charm、Synchronize、Pressure、Magnet Pull 与 Static 的 RNG 调用顺序逐段对齐 `WildSearcher3::search`。Hustle 与 Vital Spirit 在上游枚举中与 Pressure 共享同一值，因此使用同一等级分支。
 
@@ -81,10 +83,10 @@ Gen3WildPanel
         `-- Dedicated Worker x N
               `-- gen3wild.mjs + gen3wild.wasm
                     |-- gen3wild_generate
-                    `-- gen3wild_search (API 3)
+                    `-- gen3wild_search (API 4)
 ```
 
-API v3 将 Generator/Searcher 的筛选都传入 C ABI，在 Wasm 内完成。旧 API 会在 Worker 初始化握手时被拒绝，避免 PWA 旧缓存把新 UI 请求发给旧模块。
+API v4 将 Generator/Searcher 的筛选和 `tanobyChamber` 标记都传入 C ABI，在 Wasm 内完成。旧 API 会在 Worker 初始化握手时被拒绝，避免 PWA 旧缓存把新 UI 请求发给旧模块。
 
 每个 Worker 持有独立 Wasm 实例。任务可乱序完成，Pool 按 `chunkIndex` 恢复提交顺序；取消通过终止 Worker 生效。结果使用 60 字节定长记录和 transferable `ArrayBuffer`，不依赖 `SharedArrayBuffer`、Wasm pthread 或跨源隔离。第一字段由 Generator 解码为 Advances，由 Searcher 解码为 Seed。
 
@@ -92,9 +94,19 @@ API v3 将 Generator/Searcher 的筛选都传入 C ABI，在 Wasm 内完成。�
 
 `src/features/wild/gen3Data.ts` 包含五个掌机版本的遭遇表和第三世代 Personal 的性别阈值与属性类型。`src/features/shared/gen3Personal.ts` 另保留 `personal_rsefrlg.bin` 的常规 Ability ID，`gen3Abilities.ts` 复用 PokeFinder 中英日三语能力名。
 
-当前数据没有保留 Tanoby Chamber 每个未知图腾槽位的 form。七个 Tanoby Chamber 从地点列表排除，不能按普通 form 0 计算；`Seven Island Tanoby Ruins` 的水面与钓鱼区域不是 Chamber，仍可选择。
+`gen3Data.ts` 的普通槽位元组没有保存 form，因此 `tanoby.ts` 按完整地点名恢复 `EncounterTableGenerator` 中的 7 组固定 form。来源为 revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 的 `Gen3/pack.py`；形态顺序如下：
 
-完整遭遇数据输入的精确 `EncounterTableGenerator` revision 尚待补记。完成来源记录和全表抽样前，只能声明固定地点与算法分支已核对，不能声明全部地点数据已通过上游一致性验收。
+- Monean：`A` × 11，最后 `?`。
+- Liptoo：`C/C/C/D/D/D/H/H/H/U/U/O`。
+- Weepth：`N/N/N/N/S/S/S/S/I/I/E/E`。
+- Dilford：`P/P/L/L/J/J/R/R/R/Q/Q/Q`。
+- Scufib：`Y/Y/T/T/G/G/G/F/F/F/K/K`。
+- Rixy：`V/V/V/W/W/W/X/X/M/M/B/B`。
+- Viapois：`Z` × 11，最后 `!`。
+
+这 7 个地点仅存在于 FireRed / LeafGreen，`EncounterArea3::tanobyChamber()` 对应 location `0..6`。每个地点只有 Grass，遭遇率为 `7`，包含 12 个 `#201` 槽位，等级均固定为 `25`，form 为 `0..27`。请求层与 C ABI 同时拒绝版本、遭遇类型、遭遇率、特殊地点标记、槽数、物种、等级或 form 不符合这些约束的数据。`Seven Island Tanoby Ruins` 的水面与钓鱼区域不是 Chamber，仍按普通地点计算。
+
+未知图腾形态使用上游公式：取 PID 的 `0x03000000`、`0x00030000`、`0x00000300`、`0x00000003` 四组低两位，拼接后 `% 28`。Generator 的 Tanoby PID 半字顺序为 `(low << 16) | high`；Searcher 恢复阶段与反向探测阶段分别保持 `WildSearcher3::search` 的对应顺序，并以目标形态而非性格判断回溯结束。
 
 ## 7. 上游核对文件
 
@@ -109,6 +121,7 @@ API v3 将 Generator/Searcher 的筛选都传入 C ABI，在 Wasm 内完成。�
 - `Form/i18n/PokeFinder_zh.ts`、`PokeFinder_ja.ts`
 - `Model/Gen3/WildModel3.cpp/.hpp`
 - `Core/Resources/Embed/embed_gen3.py`、`embed_personal.py`
+- `EncounterTableGenerator@7769c1df80be93761fe6479d51cbf2fe7a7dc4f9/Gen3/pack.py`、`Gen3/frlg/wild_encounters.json`
 - `Test/Gen3/WildGenerator3Test.cpp`、`WildSearcher3Test.cpp`、`wild3.json`
 
 ## 8. 固定夹具与验证
@@ -131,12 +144,23 @@ TID / SID: 12345 / 54321
 - Method 4 + Cute Charm F：4 条。
 - 第一条 Method 1 候选 Seed 重新调用 Generator 时生成 1 条匹配状态。
 
-本机当前没有可用 C++ 编译器和已激活的 Emscripten，因此上述新增 Searcher 原生断言和真实 Wasm 尚未运行；必须由 GitHub Actions 的 `npm run wasm:test:native` 与 `npm run wasm:build` 验证后再记录为通过。TypeScript、格式、Web 构建和 UI 预览检查结果记录在 [`docs/progress.md`](../progress.md)。
+Tanoby 固定夹具复用上游 `wild3.json` 的 `Fire Red Liptoo Chamber`：
+
+```text
+Seed: FFFFFFFC
+Method: Wild 1 / Method 1
+Advances: 0..9
+Location: Liptoo Chamber / Grass / Rate 7
+```
+
+第 0 帧预期为 PID `265752342`、Encounter Slot `0`、未知图腾 `C`（form `2`）、Level `25`、IV `5/14/26/6/30/26`、Nature `17`。Searcher 的 IV 范围为 `31/0/31/31/31/31..31/31/31/31/31/31`，预期得到 `97` 条结果。
+
+已通过：在 Visual Studio 2026 Build Tools x64 环境运行 `$env:POKERNGKIT_WASM_MODULES='gen3wild'; npm run wasm:test:native`，`gen3wild_native_parity` 通过 1/1；夹具同时覆盖普通地点 Generator/Searcher、Tanoby Generator/Searcher、非法输入和完整 Liptoo `97` 条结果。该原生证据不替代 Emscripten Wasm 构建或部署页面算法回归。TypeScript、格式、Web 构建和 UI 预览检查结果记录在 [`docs/progress.md`](../progress.md)。
 
 ## 9. 当前限制与下一步
 
-- Tanoby Chamber form、地点本地化和完整遭遇数据来源 revision 尚待补齐。
+- Tanoby Chamber 地点显示沿用模块已有的地点本地化表；未知图腾结果在物种名后显示 `A..Z`、`!`、`?` 形态。
 - GitHub Pages 的真实 Worker/Wasm 与算法结果待 Codex 使用部署 URL 回归；移动端性能、取消延迟和离线缓存仍需项目所有者最终验收。
-- Searcher 固定计数尚未在本机原生编译器中执行，不得写成已通过上游一致性测试。
+- 普通地点与 Tanoby Searcher 的本机原生固定计数已通过；真实 Emscripten Wasm、部署页面、移动端性能、取消延迟和离线缓存仍需项目所有者最终验收。
 
-下一步先由 Actions 验证 API v3 原生夹具和 Wasm 构建。项目所有者提供 Pages URL 后，由 Codex 使用 PokeFinder 固定输入逐字段回归 Generator/Searcher 并记录证据，再由项目所有者完成界面、设备和发布验收。通过后再决定 Tanoby Chamber 数据或发布加固，不提前开始其他世代算法。
+下一步先由 Actions 验证 API v4 原生夹具和 Wasm 构建。项目所有者提供 Pages URL 后，由 Codex 使用 PokeFinder 固定输入逐字段回归 Generator/Searcher 并记录证据，再由项目所有者完成界面、设备和发布验收。

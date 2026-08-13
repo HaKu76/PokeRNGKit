@@ -16,13 +16,11 @@ import { getGen3AbilityName } from "../shared/gen3Abilities";
 import { gen3HiddenPower } from "../shared/gen3HiddenPower";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import { getGen3Personal } from "../shared/gen3Personal";
-import { getGen3SpeciesName } from "../shared/gen3Species";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import {
   GEN3_WILD_MAX_RESULTS,
   GEN3_WILD_MAX_TOTAL_STATES,
   gen3WildSearcherCombinationCount,
-  isGen3WildTanobyChamber,
   validateGen3WildRequest,
   validateGen3WildSearcherRequest,
   type Gen3WildAbilityFilter,
@@ -49,6 +47,7 @@ import type {
   Gen3WildSearchSummary,
 } from "./search";
 import type { Gen3WildSearcherEngine } from "./searcher";
+import { getGen3WildSlotForm, getGen3WildSpeciesName } from "./tanoby";
 import { Gen3WildSearcherWorkerPool } from "./worker/Gen3WildSearcherWorkerPool";
 import { Gen3WildWorkerPool } from "./worker/Gen3WildWorkerPool";
 
@@ -214,9 +213,9 @@ function buildArea(
     (encounter === "old-rod" ||
       encounter === "good-rod" ||
       encounter === "super-rod");
-  const slots = source.slots.map(([species, minLevel, maxLevel]) => ({
+  const slots = source.slots.map(([species, minLevel, maxLevel], index) => ({
     species,
-    form: 0,
+    form: getGen3WildSlotForm(location.name, index),
     minLevel,
     maxLevel,
     ...personal(species),
@@ -329,10 +328,8 @@ export function Gen3WildPanel({
 
   const locations = useMemo(
     () =>
-      gameData[dataGame(profile.version)].filter(
-        (location) =>
-          !isGen3WildTanobyChamber(location.name) &&
-          location.encounters.some((entry) => entry.kind === encounter),
+      gameData[dataGame(profile.version)].filter((location) =>
+        location.encounters.some((entry) => entry.kind === encounter),
       ),
     [encounter, profile.version],
   );
@@ -661,7 +658,7 @@ export function Gen3WildPanel({
       return String("advances" in state ? state.advances : 0);
     if (key === "seed") return formatHex("seed" in state ? state.seed : 0, 8);
     if (key === "slot")
-      return `${state.encounterSlot}: ${getGen3SpeciesName(i18n.language, state.species, state.form)}`;
+      return `${state.encounterSlot}: ${getGen3WildSpeciesName(i18n.language, state.species, state.form)}`;
     if (key === "pid") return formatHex(state.pid, 8);
     if (key === "shiny")
       return state.shiny === 0
@@ -762,7 +759,7 @@ export function Gen3WildPanel({
               <span className="panel-index">01</span>
               <h2>{t("rngInfo")}</h2>
             </div>
-            <span className="panel-note">Gen III / Wild API 3</span>
+            <span className="panel-note">Gen III / Wild API 4</span>
           </div>
           <div className="static-form-stack">
             <label className="field">
@@ -971,7 +968,7 @@ export function Gen3WildPanel({
                 <option value={0}>-</option>
                 {speciesOptions.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {getGen3SpeciesName(
+                    {getGen3WildSpeciesName(
                       i18n.language,
                       option.species,
                       option.form,

@@ -83,4 +83,31 @@ describe("Gen3WildSearcherUiPreviewEngine", () => {
     expect(summary.cancelled).toBe(true);
     expect(summary.processedStates).toBeLessThan(summary.totalStates);
   });
+
+  it("preserves Tanoby Chamber forms in search previews", async () => {
+    const forms: number[] = [];
+    await new Gen3WildSearcherUiPreviewEngine(0).search(
+      {
+        ...request,
+        version: "leafgreen",
+        area: {
+          ...request.area,
+          name: "Seven Island Tanoby Ruins Viapois Chamber",
+          rate: 7,
+          slots: request.area.slots.map((slot) => ({
+            ...slot,
+            species: 201,
+            form: 26,
+            minLevel: 25,
+            maxLevel: 25,
+            genderRatio: 255,
+            type1: 13,
+            type2: 13,
+          })),
+        },
+      },
+      { onBatch: (batch) => forms.push(...batch.map((state) => state.form)) },
+    );
+    expect(forms).toEqual([26, 26, 26, 26]);
+  });
 });

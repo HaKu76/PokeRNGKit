@@ -24,7 +24,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 3;
+    constexpr std::uint32_t apiVersion = 4;
     constexpr std::uint32_t maxStatesPerCall = 100000;
     constexpr std::uint32_t maxResultsPerCall = 250000;
 
@@ -325,6 +325,13 @@ namespace
         }
         return lead == CuteCharmF ? (pid & 0xff) >= slot.genderRatio : (pid & 0xff) < slot.genderRatio;
     }
+
+    std::uint8_t unownLetter(std::uint32_t pid)
+    {
+        return static_cast<std::uint8_t>((((pid & 0x3000000) >> 18) | ((pid & 0x30000) >> 12)
+                                          | ((pid & 0x300) >> 6) | (pid & 0x3))
+                                         % 0x1c);
+    }
 }
 
 static_assert(sizeof(Gen3WildPackedSlot) == 24);
@@ -342,11 +349,11 @@ extern "C"
         std::uint32_t initialAdvances, std::uint32_t maxAdvances, std::uint32_t offset,
         std::uint32_t method, std::uint32_t lead, std::uint32_t encounter, std::uint32_t rate,
         std::uint32_t rse, std::uint32_t feebasTile, std::uint32_t feebasLocation,
-        std::uint32_t safariZone, std::uint32_t bike, std::uint32_t item, std::uint32_t tid,
-        std::uint32_t sid, std::uint32_t shinyFilter, std::uint32_t genderFilter,
-        std::uint32_t abilityFilter, std::uint32_t natureMask, std::uint32_t hiddenPowerMask,
-        std::uint32_t encounterSlotMask, std::uint32_t levelMin, std::uint32_t levelMax,
-        std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
+        std::uint32_t safariZone, std::uint32_t tanobyChamber, std::uint32_t bike,
+        std::uint32_t item, std::uint32_t tid, std::uint32_t sid, std::uint32_t shinyFilter,
+        std::uint32_t genderFilter, std::uint32_t abilityFilter, std::uint32_t natureMask,
+        std::uint32_t hiddenPowerMask, std::uint32_t encounterSlotMask, std::uint32_t levelMin,
+        std::uint32_t levelMax, std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
         std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
         std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax,
         std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax)
@@ -355,8 +362,12 @@ extern "C"
         lastError = ErrorCode::None;
         if (slots == nullptr || slotCount == 0 || slotCount > 12 || maxAdvances >= maxStatesPerCall
             || !validMethod(method) || !validLead(lead) || !validEncounter(encounter) || rate == 0 || rate > 255
-            || rse > 1 || feebasTile > 1 || feebasLocation > 1 || safariZone > 1 || bike > 1
-            || item > 3 || tid > 0xffff || sid > 0xffff || shinyFilter > ShinyStarSquare
+            || rse > 1 || feebasTile > 1 || feebasLocation > 1 || safariZone > 1 || tanobyChamber > 1
+            || (tanobyChamber != 0
+                && (rse != 0 || encounter != Grass || rate != 7 || feebasLocation != 0 || safariZone != 0
+                    || slotCount != 12))
+            || bike > 1 || item > 3 || tid > 0xffff
+            || sid > 0xffff || shinyFilter > ShinyStarSquare
             || genderFilter > GenderFemale || abilityFilter > AbilitySecond || natureMask == 0
             || natureMask > 0x1ffffff || hiddenPowerMask == 0 || hiddenPowerMask > 0xffff
             || encounterSlotMask == 0 || encounterSlotMask > 0xfff || levelMin == 0 || levelMax > 100
@@ -388,6 +399,12 @@ extern "C"
             if (slot.species == 0 || slot.species > 1025 || slot.form > 255 || slot.minLevel == 0
                 || slot.minLevel > slot.maxLevel || slot.maxLevel > 100 || slot.genderRatio > 255
                 || (slot.types & 0xff) > 16 || ((slot.types >> 8) & 0xff) > 16 || (slot.types >> 16) != 0)
+            {
+                lastError = ErrorCode::InvalidInput;
+                return 0;
+            }
+            if (tanobyChamber != 0
+                && (slot.species != 201 || slot.form > 27 || slot.minLevel != 25 || slot.maxLevel != 25))
             {
                 lastError = ErrorCode::InvalidInput;
                 return 0;
@@ -497,23 +514,36 @@ extern "C"
                 generated.next();
             }
 
-            const std::uint32_t nature = lead <= SynchronizeEnd
-                ? (generated.nextUShort(2) == 0 ? lead : generated.nextUShort(25))
-                : generated.nextUShort(25);
+            std::uint32_t nature;
+            std::uint32_t pid;
+            if (tanobyChamber != 0)
+            {
+                do
+                {
+                    const std::uint16_t low = generated.nextUShort();
+                    const std::uint16_t high = generated.nextUShort();
+                    pid = (static_cast<std::uint32_t>(low) << 16) | high;
+                } while (unownLetter(pid) != slot.form);
+                nature = pid % 25;
+            }
+            else
+            {
+                nature = lead <= SynchronizeEnd
+                    ? (generated.nextUShort(2) == 0 ? lead : generated.nextUShort(25))
+                    : generated.nextUShort(25);
+                do
+                {
+                    const std::uint16_t low = generated.nextUShort();
+                    const std::uint16_t high = generated.nextUShort();
+                    pid = (static_cast<std::uint32_t>(high) << 16) | low;
+                } while (pid % 25 != nature
+                         || (cuteCharm && ((lead == CuteCharmF && (pid & 0xff) < slot.genderRatio)
+                                           || (lead == CuteCharmM && (pid & 0xff) >= slot.genderRatio))));
+            }
             if ((natureMask & (1u << nature)) == 0)
             {
                 continue;
             }
-
-            std::uint32_t pid;
-            do
-            {
-                const std::uint16_t low = generated.nextUShort();
-                const std::uint16_t high = generated.nextUShort();
-                pid = (static_cast<std::uint32_t>(high) << 16) | low;
-            } while (pid % 25 != nature
-                     || (cuteCharm && ((lead == CuteCharmF && (pid & 0xff) < slot.genderRatio)
-                                       || (lead == CuteCharmM && (pid & 0xff) >= slot.genderRatio))));
 
             if (method == 2)
             {
@@ -553,11 +583,11 @@ extern "C"
         const Gen3WildPackedSlot *slots, std::uint32_t slotCount, std::uint32_t startIndex,
         std::uint32_t stateCount, std::uint32_t method, std::uint32_t lead, std::uint32_t encounter,
         std::uint32_t rate, std::uint32_t rse, std::uint32_t feebasTile, std::uint32_t feebasLocation,
-        std::uint32_t safariZone, std::uint32_t bike, std::uint32_t item, std::uint32_t tid,
-        std::uint32_t sid, std::uint32_t shinyFilter, std::uint32_t genderFilter,
-        std::uint32_t abilityFilter, std::uint32_t natureMask, std::uint32_t hiddenPowerMask,
-        std::uint32_t encounterSlotMask, std::uint32_t levelMin, std::uint32_t levelMax,
-        std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
+        std::uint32_t safariZone, std::uint32_t tanobyChamber, std::uint32_t bike,
+        std::uint32_t item, std::uint32_t tid, std::uint32_t sid, std::uint32_t shinyFilter,
+        std::uint32_t genderFilter, std::uint32_t abilityFilter, std::uint32_t natureMask,
+        std::uint32_t hiddenPowerMask, std::uint32_t encounterSlotMask, std::uint32_t levelMin,
+        std::uint32_t levelMax, std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
         std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
         std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax,
         std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax)
@@ -567,8 +597,12 @@ extern "C"
         if (slots == nullptr || slotCount == 0 || slotCount > 12 || stateCount == 0
             || stateCount > maxStatesPerCall || !validMethod(method) || !validLead(lead)
             || (lead > 0 && lead <= SynchronizeEnd) || !validEncounter(encounter) || rate == 0 || rate > 255
-            || rse > 1 || feebasTile > 1 || feebasLocation > 1 || safariZone > 1 || bike > 1
-            || item > 3 || tid > 0xffff || sid > 0xffff || shinyFilter > ShinyStarSquare
+            || rse > 1 || feebasTile > 1 || feebasLocation > 1 || safariZone > 1 || tanobyChamber > 1
+            || (tanobyChamber != 0
+                && (rse != 0 || encounter != Grass || rate != 7 || feebasLocation != 0 || safariZone != 0
+                    || slotCount != 12))
+            || bike > 1 || item > 3 || tid > 0xffff
+            || sid > 0xffff || shinyFilter > ShinyStarSquare
             || genderFilter > GenderFemale || abilityFilter > AbilitySecond || natureMask == 0
             || natureMask > 0x1ffffff || hiddenPowerMask == 0 || hiddenPowerMask > 0xffff
             || encounterSlotMask == 0 || encounterSlotMask > 0xfff || levelMin == 0 || levelMax > 100
@@ -602,6 +636,12 @@ extern "C"
             if (slot.species == 0 || slot.species > 1025 || slot.form > 255 || slot.minLevel == 0
                 || slot.minLevel > slot.maxLevel || slot.maxLevel > 100 || slot.genderRatio > 255
                 || (slot.types & 0xff) > 16 || ((slot.types >> 8) & 0xff) > 16 || (slot.types >> 16) != 0)
+            {
+                lastError = ErrorCode::InvalidInput;
+                return 0;
+            }
+            if (tanobyChamber != 0
+                && (slot.species != 201 || slot.form > 27 || slot.minLevel != 25 || slot.maxLevel != 25))
             {
                 lastError = ErrorCode::InvalidInput;
                 return 0;
@@ -670,8 +710,19 @@ extern "C"
                 {
                     rng.next();
                 }
-                std::uint32_t pid = static_cast<std::uint32_t>(rng.nextUShort()) << 16;
-                pid |= rng.nextUShort();
+                std::uint32_t pid;
+                std::uint8_t letter = 0;
+                if (tanobyChamber != 0)
+                {
+                    pid = rng.nextUShort();
+                    pid |= static_cast<std::uint32_t>(rng.nextUShort()) << 16;
+                    letter = unownLetter(pid);
+                }
+                else
+                {
+                    pid = static_cast<std::uint32_t>(rng.nextUShort()) << 16;
+                    pid |= rng.nextUShort();
+                }
                 const std::uint8_t nature = static_cast<std::uint8_t>(pid % 25);
                 if ((natureMask & (1u << nature)) == 0)
                 {
@@ -726,7 +777,14 @@ extern "C"
 
                     if (lead == LeadNone)
                     {
-                        if (nextRng % 25 == nature)
+                        if (tanobyChamber != 0)
+                        {
+                            levelRandom[0] = nextRng;
+                            selectedSlots[0] = encounterSlot(encounter, nextRng2 % 100);
+                            valid[0] = selectedSlots[0] < slotCount
+                                && (encounterSlotMask & (1u << selectedSlots[0])) != 0;
+                        }
+                        else if (nextRng % 25 == nature)
                         {
                             levelRandom[0] = safari ? tests[0].nextUShort() : nextRng2;
                             chooseFeebasOrNormal(0, 1);
@@ -827,7 +885,8 @@ extern "C"
                             continue;
                         }
                         const auto &slot = slots[selectedSlots[index]];
-                        if (cuteCharmFlag && !cuteCharmGender(slot, pid, lead))
+                        if ((cuteCharmFlag && !cuteCharmGender(slot, pid, lead))
+                            || (slot.species == 201 && unownLetter(pid) != slot.form))
                         {
                             continue;
                         }
@@ -854,8 +913,10 @@ extern "C"
                         }
                     }
 
-                    const std::uint32_t huntPid = (static_cast<std::uint32_t>(nextRng) << 16) | nextRng2;
-                    if (huntPid % 25 == nature)
+                    const bool huntComplete = tanobyChamber != 0
+                        ? unownLetter((static_cast<std::uint32_t>(nextRng2) << 16) | nextRng) == letter
+                        : ((static_cast<std::uint32_t>(nextRng) << 16) | nextRng2) % 25 == nature;
+                    if (huntComplete)
                     {
                         break;
                     }

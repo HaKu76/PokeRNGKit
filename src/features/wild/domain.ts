@@ -1,6 +1,9 @@
 import type { Gen3GameVersion } from "../profiles/domain";
+import { getGen3WildSlotForm, isGen3WildTanobyChamber } from "./tanoby";
 
-export const GEN3_WILD_API_VERSION = 3;
+export { isGen3WildTanobyChamber } from "./tanoby";
+
+export const GEN3_WILD_API_VERSION = 4;
 export const GEN3_WILD_CHUNK_SIZE = 100_000;
 export const GEN3_WILD_SEARCHER_CHUNK_SIZE = 10_000;
 export const GEN3_WILD_MAX_TOTAL_STATES = 50_000_000;
@@ -162,12 +165,6 @@ export function wildSearcherLeadToWasm(lead: Gen3WildLead) {
   return lead === "synchronize" ? 0 : wildLeadToWasm(lead, 0);
 }
 
-export function isGen3WildTanobyChamber(locationName: string) {
-  return (
-    locationName.includes("Tanoby Ruins") && locationName.endsWith("Chamber")
-  );
-}
-
 export function wildItemToWasm(item: Gen3WildItem) {
   return {
     none: 0,
@@ -325,6 +322,23 @@ export function validateGen3WildRequest(request: Gen3WildRequest) {
     )
       errors.push("slot");
   }
+  if (
+    isGen3WildTanobyChamber(request.area.name) &&
+    ((request.version !== "firered" && request.version !== "leafgreen") ||
+      request.area.encounter !== "land" ||
+      request.area.rate !== 7 ||
+      request.area.feebasLocation ||
+      request.area.safariZone ||
+      request.area.slots.length !== 12 ||
+      request.area.slots.some(
+        (slot, index) =>
+          slot.species !== 201 ||
+          slot.form !== getGen3WildSlotForm(request.area.name, index) ||
+          slot.minLevel !== 25 ||
+          slot.maxLevel !== 25,
+      ))
+  )
+    errors.push("tanobyChamber");
   return errors;
 }
 

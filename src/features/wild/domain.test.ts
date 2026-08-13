@@ -11,6 +11,11 @@ import {
   type Gen3WildRequest,
   type Gen3WildSearcherRequest,
 } from "./domain";
+import {
+  GEN3_WILD_TANOBY_FORMS,
+  getGen3WildSlotForm,
+  getGen3WildSpeciesName,
+} from "./tanoby";
 
 const request: Gen3WildRequest = {
   seed: 0,
@@ -160,11 +165,38 @@ describe("Gen3 wild domain", () => {
     ]);
   });
 
-  it("recognizes the full decomp labels for unsupported Tanoby Chambers", () => {
+  it("recognizes only the seven verified Tanoby Chamber labels", () => {
     expect(
       isGen3WildTanobyChamber("Seven Island Tanoby Ruins Monean Chamber"),
     ).toBe(true);
     expect(isGen3WildTanobyChamber("Seven Island Tanoby Ruins")).toBe(false);
+    expect(
+      isGen3WildTanobyChamber("Seven Island Tanoby Ruins Custom Chamber"),
+    ).toBe(false);
+  });
+
+  it("maps all seven Tanoby Chamber Unown forms from EncounterTableGenerator", () => {
+    expect(Object.keys(GEN3_WILD_TANOBY_FORMS)).toHaveLength(7);
+    expect(
+      GEN3_WILD_TANOBY_FORMS["Seven Island Tanoby Ruins Liptoo Chamber"],
+    ).toEqual([2, 2, 2, 3, 3, 3, 7, 7, 7, 20, 20, 14]);
+    expect(
+      getGen3WildSlotForm("Seven Island Tanoby Ruins Viapois Chamber", 11),
+    ).toBe(26);
+    expect(getGen3WildSpeciesName("zh", 201, 27)).toBe("未知图腾 (?)");
+  });
+
+  it("rejects malformed Tanoby Chamber requests", () => {
+    expect(
+      validateGen3WildRequest({
+        ...request,
+        version: "firered",
+        area: {
+          ...request.area,
+          name: "Seven Island Tanoby Ruins Liptoo Chamber",
+        },
+      }),
+    ).toContain("tanobyChamber");
   });
 
   it("chunks the searcher IV Cartesian product in deterministic order", () => {

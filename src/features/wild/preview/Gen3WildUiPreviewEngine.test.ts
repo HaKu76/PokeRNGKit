@@ -88,4 +88,32 @@ describe("Gen3WildUiPreviewEngine", () => {
     expect(cancelled.cancelled).toBe(true);
     expect(cancelled.processedStates).toBeLessThan(cancelled.totalStates);
   });
+
+  it("preserves Tanoby Chamber forms in preview rows", async () => {
+    const forms: number[] = [];
+    await new Gen3WildUiPreviewEngine(0).search(
+      {
+        ...request,
+        version: "firered",
+        maxAdvances: 0,
+        area: {
+          ...request.area,
+          name: "Seven Island Tanoby Ruins Liptoo Chamber",
+          rate: 7,
+          slots: request.area.slots.map((slot) => ({
+            ...slot,
+            species: 201,
+            form: 2,
+            minLevel: 25,
+            maxLevel: 25,
+            genderRatio: 255,
+            type1: 13,
+            type2: 13,
+          })),
+        },
+      },
+      { onBatch: (batch) => forms.push(...batch.map((state) => state.form)) },
+    );
+    expect(forms).toEqual([2]);
+  });
 });
