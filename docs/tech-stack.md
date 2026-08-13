@@ -5,7 +5,7 @@
 > - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 Static Generator/Searcher，第七世代 ID Generator，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 > - 包管理器：npm
 
-第七世代 `gen7id` 使用本地优化版 `C:\Users\Hakuhiro\source\repos\3DSRNGTool` 作为主要行为来源，公开仓库只作为祖先归属记录；实现路径与差异范围见 `third_party/3dsrngtool/UPSTREAM.md`。
+第七世代 `gen7id` 使用本地优化版 `C:\Users\Hakuhiro\source\repos\3DSRNGTool` 作为主要行为来源，公开仓库只作为祖先归属记录；实现路径与差异范围见 `third_party/3dsrngtool/UPSTREAM.md`。`pokerusfinder` 使用 DevonStudios Pokerus Finder 的 GPL-3.0 源码行为作为第三/四世代帧查询基线，来源记录见 `third_party/pokerusfinder/UPSTREAM.md`。
 
 ## 1. 技术结论
 
@@ -103,7 +103,7 @@ Vite 的 `ui` mode 在编译期选择本地 UI 预览引擎。该引擎只生成
 
 React 负责高交互表单、进度状态和虚拟化结果视图。TypeScript 为 RNG 请求、Worker 消息、Wasm 解码和状态机提供静态边界。
 
-当前有 ID、Initial Seed、Seed to Time、GameCube Seed Finder、G3 Static、Wild、IVs to PID、Egg 与 G4 Static 九个 RNG 工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。存档信息分别由 `useGen3Profiles`、`useGen4Profiles` 与各自 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；Spinda Painter 与 Encounter Lookup 使用本地确定性数据，不进入 RNG Worker 状态。
+当前有 ID、Initial Seed、Seed to Time、GameCube Seed Finder、G3 Static、Wild、IVs to PID、Egg、G4 Static、G7 ID 与 Pokerus Finder 十一个 RNG 工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。存档信息分别由 `useGen3Profiles`、`useGen4Profiles` 与各自 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；Spinda Painter 与 Encounter Lookup 使用本地确定性数据，不进入 RNG Worker 状态。
 
 ### 5.2 路由
 
@@ -231,6 +231,11 @@ wasm/
         |-- module.json
         |-- bridge/
         `-- tests/
+    |-- pokerusfinder/
+        |-- CMakeLists.txt
+        |-- module.json
+        |-- bridge/
+        `-- tests/
 
 public/wasm/                        # 生成物，忽略
 |-- gen3id.mjs
@@ -251,13 +256,15 @@ public/wasm/                        # 生成物，忽略
 |-- gen3egg.wasm
 |-- gen4static.mjs
 `-- gen4static.wasm
+|-- pokerusfinder.mjs
+`-- pokerusfinder.wasm
 ```
 
 `scripts/wasm.mjs` 读取 `module.json`，选择模块、调用 npm 提供的 CMake/Ninja、执行原生测试或通过 emsdk 构建 Wasm，并检查声明的产物是否存在。
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 2，`gen3initialseed` API 版本为 1，`gen3seedtotime` API 版本为 1，`gen3ngcseed` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 3，`gen3ivtopid` API 版本为 1，`gen3egg` API 版本为 1，`gen4static` API 版本为 1。ID C ABI 为：
+当前 `gen3id` API 版本为 2，`gen3initialseed` API 版本为 1，`gen3seedtotime` API 版本为 1，`gen3ngcseed` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 3，`gen3ivtopid` API 版本为 1，`gen3egg` API 版本为 1，`gen4static` API 版本为 1，`pokerusfinder` API 版本为 1。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -524,7 +531,7 @@ type ModuleWorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3egg_*`、`gen4static_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3egg_*`、`gen4static_*`、`pokerusfinder_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 

@@ -1,0 +1,7 @@
+{
+  "id": "pokerusfinder",
+  "apiVersion": 1,
+  "target": "pokerusfinder",
+  "artifacts": ["pokerusfinder.mjs", "pokerusfinder.wasm"],
+  "source": "DevonStudios Pokerus Finder revision 262262fdb259c44a6a366b5c0dbf1bb319e39ff4"
+}

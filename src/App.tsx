@@ -39,6 +39,7 @@ import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
 import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
 import { Gen7IdPanel } from "./features/gen7id/Gen7IdPanel";
+import { PokerusFinderPanel } from "./features/pokerusfinder/PokerusFinderPanel";
 import { IvCalculator } from "./features/gen4ivcalculator/Gen4IvCalculator";
 import { Gen4ProfileControls } from "./features/gen4profiles/Gen4ProfileControls";
 import { DEFAULT_GEN4_PROFILE } from "./features/gen4profiles/domain";
@@ -64,7 +65,8 @@ type ActiveModule =
   | "egg"
   | "spindapainter"
   | "gen4static"
-  | "gen7id";
+  | "gen7id"
+  | "pokerusfinder";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -323,7 +325,8 @@ function App() {
   }[status];
   const gen4Tools = activeModule === "gen4static";
   const gen7Module = activeModule === "gen7id";
-  const profileTools = !gen7Module;
+  const pokerusModule = activeModule === "pokerusfinder";
+  const profileTools = !gen7Module && !pokerusModule;
   const activeFloatingTool = ivCalculatorExpanded
     ? "iv"
     : encounterLookupExpanded
@@ -648,6 +651,25 @@ function App() {
               <small>{t("gen7IdVersion")}</small>
             </span>
           </button>
+          <div className="rail-section-label">TOOLS</div>
+          <button
+            className={
+              activeModule === "pokerusfinder"
+                ? "module-entry active"
+                : "module-entry"
+            }
+            onClick={() => {
+              setActiveModule("pokerusfinder");
+              setModuleRailOpen(false);
+            }}
+            type="button"
+          >
+            <span className="module-index">12</span>
+            <span>
+              <strong>{t("pokerusFinderModule")}</strong>
+              <small>{t("pokerusFinderVersion")}</small>
+            </span>
+          </button>
           <div className="rail-footer">
             <span className="rail-dot" />
             {t("localOnly")}
@@ -662,7 +684,9 @@ function App() {
                   ? "GEN IV / RNG LAB"
                   : gen7Module
                     ? "GEN VII / RNG LAB"
-                    : "GEN III / RNG LAB"}
+                    : pokerusModule
+                      ? "RNG TOOLS"
+                      : "GEN III / RNG LAB"}
               </div>
               <h1>
                 {t(
@@ -686,7 +710,9 @@ function App() {
                                     ? "spindaPainterEngine"
                                     : activeModule === "gen7id"
                                       ? "gen7IdEngine"
-                                      : "gen4StaticEngine",
+                                      : activeModule === "pokerusfinder"
+                                        ? "pokerusFinderEngine"
+                                        : "gen4StaticEngine",
                 )}
               </h1>
             </div>
@@ -712,7 +738,9 @@ function App() {
                                   ? "spindaPainterVersion"
                                   : activeModule === "gen7id"
                                     ? "gen7IdVersion"
-                                    : "gen4StaticVersion",
+                                    : activeModule === "pokerusfinder"
+                                      ? "pokerusFinderVersion"
+                                      : "gen4StaticVersion",
               )}
             </div>
           </div>
@@ -1156,6 +1184,8 @@ function App() {
             />
           ) : activeModule === "gen7id" ? (
             <Gen7IdPanel uiPreviewMode={uiPreviewMode} />
+          ) : activeModule === "pokerusfinder" ? (
+            <PokerusFinderPanel uiPreviewMode={uiPreviewMode} />
           ) : (
             <Gen3IvToPidPanel uiPreviewMode={uiPreviewMode} />
           )}
@@ -1278,6 +1308,7 @@ function App() {
         <a href="./legal/LICENSE.txt">{t("license")}</a>
         <a href="./legal/UPSTREAM.md">PokeFinder</a>
         <a href="./legal/3DSRNGTool-UPSTREAM.md">3DSRNGTool</a>
+        <a href="./legal/Pokerus-Finder-UPSTREAM.md">Pokerus Finder</a>
       </footer>
     </div>
   );

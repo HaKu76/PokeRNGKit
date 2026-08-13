@@ -28,6 +28,14 @@ export default defineConfig(({ mode }) => ({
             "third_party/3dsrngtool/UPSTREAM.md",
             `${outputDirectory}/legal/3DSRNGTool-UPSTREAM.md`,
           ),
+          copyFile(
+            "third_party/pokerusfinder/UPSTREAM.md",
+            `${outputDirectory}/legal/Pokerus-Finder-UPSTREAM.md`,
+          ),
+          copyFile(
+            "third_party/pokerusfinder/LICENSE",
+            `${outputDirectory}/legal/Pokerus-Finder-LICENSE.txt`,
+          ),
         ]);
       },
     },

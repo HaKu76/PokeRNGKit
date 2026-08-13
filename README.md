@@ -5,15 +5,16 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第七世代 ID 乱数模块。** 当前工作区在既有第三世代模块与第四世代 Static 基线上加入 `gen7id`、独立 Wasm/Worker Pool、SFMT ID 计算、本地交互和算法文档。工程检查、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
+**当前里程碑：宝可病毒查询模块。** 当前工作区在既有第三/四/七世代基线上加入 `pokerusfinder`、独立 Wasm/Worker、Pokérus Frame Finder 交互和算法文档。工程检查、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
 - 目标范围：第三世代现有模块、第四世代 Static、第七世代 ID，以及 PokeFinder Encounter Lookup 支持的跨世代静态查询
 - 已有模块：Gen III ID、Initial Seed、Seed to Time、GameCube Seed Finder、Static、Wild、IVs to PID、Egg、Spinda Painter，Gen IV Static，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 - 当前模块：第七世代 ID 乱数；覆盖 Sun/Moon 与 Ultra Sun/Ultra Moon 的 SFMT ID Generator
 - 上游核验基线：PokeFinder 4.3.2
-- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [GameCube Seed Finder](docs/modules/gen3ngcseed.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Encounter Lookup](docs/modules/encounterlookup.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [GameCube Seed Finder](docs/modules/gen3ngcseed.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Encounter Lookup](docs/modules/encounterlookup.md) / [Pokerus Finder](docs/modules/pokerusfinder.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 第七世代来源记录：[3DSRNGTool](third_party/3dsrngtool/UPSTREAM.md) / [Gen 7 ID](docs/modules/gen7id.md)
+- 宝可病毒来源记录：[Pokerus Finder](third_party/pokerusfinder/UPSTREAM.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
 - AI 开发入口：[docs/ai-development.md](docs/ai-development.md)
@@ -237,7 +238,7 @@ npm run verify
 
 ## 构建与测试
 
-`npm run build` 先生成 release 模式的 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg` 与 `gen4static` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
+`npm run build` 先生成 release 模式的 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen7id` 与 `pokerusfinder` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
 
 测试规划分为五层：
 
@@ -247,7 +248,7 @@ npm run verify
 4. Worker + 真实 Wasm + IndexedDB 的浏览器集成测试（后续补充）。
 5. Playwright 覆盖核心流程、静态子路径部署和离线重载（Pages 预览稳定后引入）。
 
-当前验证门槛要求九个 RNG Wasm 模块的固定输入结果对齐已记录夹具、长范围计算可汇报进度并响应取消、GitHub Pages 能加载对应 Worker/Wasm 模块，且离线重载可用。项目所有者负责提交并提供部署 URL；算法回归仅能在 Actions 部署完成、所有者给出生产 URL 并授权后执行，项目所有者保留界面、设备和正式发布的最终验收。
+当前验证门槛要求十一个 RNG Wasm 模块（含 `gen7id` 与 `pokerusfinder`）的固定输入结果对齐已记录夹具、长范围计算可汇报进度并响应取消、GitHub Pages 能加载对应 Worker/Wasm 模块，且离线重载可用。项目所有者负责提交并提供部署 URL；算法回归仅能在 Actions 部署完成、所有者给出生产 URL 并授权后执行，项目所有者保留界面、设备和正式发布的最终验收。
 
 ## 部署
 
@@ -291,6 +292,7 @@ npm run build:web
 - **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、上游方法和算法文档（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 7：`gen4static` Static Generator/Searcher** - 第四世代 Method 1/J/K、独立 G4 存档、全局个体值计算器、Wasm/Worker 和算法文档（当前合并工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 8：`pokerusfinder` Pokerus Finder** - DevonStudios 第三/四世代 Pokérus 帧查询、Wasm/Worker、日期反推与许可证记录（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 8：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
 - **后续** - Egg Searcher、Tanoby Chamber、GameCube 主 Generator、PokeSpot、Jirachi、`gen4id` 与 `gen4wild` 等未实现能力。
 

@@ -3,11 +3,16 @@
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
 > - Git 基线：`3895d2d feat: 新增NGC Seed查询`
-> - 当前阶段：新增第七世代 ID 乱数
-> - 工作区状态：`gen7id` 源码、接线与文档尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：本轮只完成源码与格式检查，Gen7 ID 算法、构建和 UI 均待授权验证
+> - 当前阶段：新增 Pokerus Finder 宝可病毒查询
+> - 工作区状态：`pokerusfinder` 源码、接线与文档尚未提交；Codex 不提交、不 push、不部署
+> - 验收状态：本轮只完成上游静态核对与格式检查，Pokerus Finder 算法、构建和 UI 均待授权验证
 
 ## 当前状态
+
+- 新增 `pokerusfinder`：基于 DevonStudios Pokerus Finder revision `262262fdb259c44a6a366b5c0dbf1bb319e39ff4`，提供 Gen III、Gen IV DP、Gen IV PtHGSS 三种模式；新增 Wasm bridge、Dedicated Worker、Worker Pool、预览引擎、面板、模块文档和许可证记录。
+- 上游核对确认：Gen III/DP 使用 16 位十六进制 Initial Seed、7 位 Frame、3 位 Delay；Gen III 最大扫描 9,999,999 帧，DP 最大 99,999 帧；Pt/HGSS 使用 2000-01-01..2099-12-31 日期、00..23 小时、00..59 分钟，并保留 -1400..-1000 的内部 Delay 搜索。
+- 本轮未运行 lint、typecheck、Vitest、原生夹具、Wasm/Web 构建、浏览器或生产算法回归；仅需执行定向格式化、`npm run format:check` 与 `git diff --check`。下一步先取得项目所有者对具体检查命令和部署 URL 的授权。
+- 上游交互复核补充：Gen III Initial Seed 为 4 位十六进制，DP 为 8 位十六进制；DP Frame 在上游界面固定为 1 且不可编辑；Pt/HGSS 默认日期来自当前日期。结果 Seed 保留上游不补前导零的显示语义（Pt/HGSS 的 8 位 Initial Seed 除外）。`uint i - short delay` 按 C# 二元数值提升为有符号 `long`，Wasm bridge 已使用 `int64_t` 对齐，Delay 前的帧不会误报。
 
 - 第七世代落地：优先实现 `gen7id`，对应 3DSRNGTool `Search7_ID()` 的 SFMT ID Generator；Stationary/Wild/Egg/Timeline 暂列后续开发。
 - 本轮新增 `gen7id` 源码、Worker、C ABI、CMake target、模块文档和 `GEN VII` 侧栏入口；当前尚未执行测试、构建或浏览器验收。

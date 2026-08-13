@@ -13,6 +13,8 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、存档信息和个体值计算器已进入主分支；当前工作区加入 GameCube Seed Finder，现有合并基线包含第四世代 Static Generator/Searcher 和独立 G4 存档。个体值计算器是跨工作区的全局工具，Encounter Lookup 是跨世代静态查询工具。
 
+当前工作区额外加入基于 DevonStudios Pokerus Finder 的 Pokérus Frame Finder，覆盖第三世代、第四世代 DP 与第四世代 Pt/HGSS 三种交互模式。
+
 ## 2. 已确认边界
 
 - 英文工程名为 PokeRNGKit，不设置中文名。
@@ -395,6 +397,16 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细算法、输入、数据来源和结果布局见 [Gen 4 Static](modules/gen4static.md)、[Gen 4 Profiles](modules/gen4profiles.md)和[Gen 4 IV Calculator](modules/gen4ivcalculator.md)。
 
+## 8.9 当前功能需求：`pokerusfinder`
+
+- **FR-POKERUS-01** 提供 DevonStudios Pokerus Finder 的 Gen III、Gen IV DP 和 Gen IV PtHGSS 三个模式，模块在工具分组中独立导航。
+- **FR-POKERUS-02** Gen III/DP 复用上游 `Initial Seed`、`Frame`、`Delay` 控件语义和十六进制/十进制边界；Gen III 最大 9,999,999 帧，DP 最大 99,999 帧。
+- **FR-POKERUS-03** PtHGSS 提供上游 Date、Hour、Minute 交互，并在结果中显示 Frame、Seed、Delay、Second 四列。
+- **FR-POKERUS-04** 32 位 LCG 搜索和日期反推只运行在独立 Wasm Worker，React 不重写生产算法。
+- **FR-POKERUS-05** 保留 GPL-3.0 许可证、上游署名、来源 revision 和对应源码记录。
+
+详细算法、输入限制、结果布局和许可证边界见 [Pokerus Finder](modules/pokerusfinder.md)。
+
 ## 9. 后续 MVP
 
 第四世代 Static 与 Encounter Lookup 通过工程检查、部署页面回归和项目所有者最终验收后，按以下顺序推进：
@@ -466,7 +478,7 @@ Egg Searcher、GameCube 主 Generator、PokeSpot、Jirachi 等第三世代功能
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
 3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、NGC Seed C ABI 输入边界、G3 Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、Egg Emerald/RSFRLG，以及 G4 Static Method 1/J/K、Synchronize、Cute Charm、Searcher、Gen7 ID 与错误边界夹具。
-4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static` 与 `gen7id` 的 MJS/Wasm 产物。
+4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen7id` 与 `pokerusfinder` 的 MJS/Wasm 产物。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
