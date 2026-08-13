@@ -4,7 +4,7 @@
 
 ## 1. 用途
 
-用户选择宝可梦和游戏版本，查询该宝可梦在对应版本的地点、遇敌种类和等级范围。结果按地点编号、遇敌种类和等级范围排序；点击悬浮标题可展开或收起，点击面板外部会收起。
+用户选择宝可梦和游戏版本，查询该宝可梦在对应版本的地点、遇敌种类和等级范围。结果按地点编号、遇敌种类和等级范围排序；右下角工具轨提供独立触发按钮，点击后在工具轨旁打开独立面板，点击面板外部、按 `Escape` 或点击面板关闭按钮均会收起；后两种关闭方式会把焦点归还触发按钮。
 
 “全世代”在本模块中仅指 PokeFinder 4.3.2 `Encounter Lookup` 实际支持的版本，不代表 PokeRNGKit 的 RNG Generator/Searcher 整体扩展到这些世代。当前支持：
 
@@ -57,7 +57,7 @@ python scripts\generate_encounter_lookup_data.py `
 
 ## 5. 实现边界
 
-`src/features/encounterlookup/domain.ts` 负责游戏版本、物种上限、语言资源和查询结果映射；`EncounterLookupPanel.tsx` 负责悬浮面板、候选输入、查询和结果表。`AutoCompleteComboBox.tsx` 复用 PokeFinder 的包含匹配、弹出补全和 `NoInsert` 行为；右下角的存档信息、个体值计算器和遇敌查询由 `App.tsx` 统一协调，任意展开一个会收起另外两个。
+`src/features/encounterlookup/domain.ts` 负责游戏版本、物种上限、语言资源和查询结果映射；`EncounterLookupPanel.tsx` 负责面板内容、候选输入、查询和结果表；共享 `FloatingToolPanel.tsx` 负责独立浮层、关闭和焦点恢复。`AutoCompleteComboBox.tsx` 复用 PokeFinder 的包含匹配、弹出补全和 `NoInsert` 行为；右下角的存档信息、个体值计算器和遇敌查询由 `App.tsx` 统一协调，任意展开一个会收起另外两个。
 
 本模块是用户明确批准的跨世代静态查询例外，不改变 `AGENTS.md` 中“RNG 算法模块先实现第三世代”的长期边界；后续世代 RNG 算法仍需单独决策和上游核对。
 
@@ -78,6 +78,6 @@ python scripts\generate_encounter_lookup_data.py `
 
 仓库内静态边界夹具位于 `src/features/encounterlookup/domain.test.ts`。本轮已核对上游 `Form/Util/EncounterLookup.cpp:57` 和 `Form/Controls/ComboBox.cpp:30`；`ComboBox::enableAutoComplete()` 使用可编辑、`NoInsert`、`MatchContains` 与 `PopupCompletion`。
 
-2026-08-12 经项目所有者授权，在外部 Chrome 对 `https://haku76.github.io/PokeRNGKit/` 的 `index-DC2qWhx2.js` 做了生产数据抽样：Emerald 的皮卡丘返回 Safari Zone Area 1/2 草丛 `25-27`，Diamond 与 Brilliant Diamond 均返回 Trophy Garden 草丛 `18-18`，Black 的皮卡丘返回空集。生产页仍是旧的 `datalist` 控件，只有通过原生候选的方向键/Enter 才会提交当前物种，鼠标候选弹窗不可验收；本地 UI 已验证新的受控组合框可点击展开、包含筛选、方向键/Enter 选择和无效自由文本保留当前有效物种。
+2026-08-13 经项目所有者授权，在外部 Chrome 对 `https://haku76.github.io/PokeRNGKit/` 的生产资源 `index-mLBsBTQF.js` 重新抽样：受控宝可梦组合框可由鼠标按钮展开、点击选择候选，也支持输入、方向键和 Enter；Emerald 的皮卡丘返回狩猎地带地区 1/2 草丛 `25-27`，Diamond 与 Brilliant Diamond 均返回自豪的后院草丛 `18-18`，Black 的皮卡丘返回空集。当前生产包仍使用触发器与面板相连的旧悬浮样式，不支持面板级 `Escape` 关闭；新的独立工具轨和浮层交互需部署后复验。
 
 已通过：定向 Prettier、`npm run typecheck`、`npm run lint`（仅既有两条 TanStack Virtual warning）和 `src/features/encounterlookup/domain.test.ts` 的 3 项测试。完整 `npm run verify` 与部署后生产交互复验记录见 `docs/progress.md`；项目所有者最终验收仍待完成。

@@ -343,6 +343,41 @@ function App() {
     cancelled: t("cancelled"),
     failed: t("failed"),
   }[status];
+  const gen4Tools = activeModule === "gen4static";
+  const activeFloatingTool = gen4Tools
+    ? gen4IvCalculatorExpanded
+      ? "iv"
+      : encounterLookupExpanded
+        ? "encounter"
+        : gen4ProfileExpanded
+          ? "profile"
+          : undefined
+    : ivCalculatorExpanded
+      ? "iv"
+      : encounterLookupExpanded
+        ? "encounter"
+        : profileExpanded
+          ? "profile"
+          : undefined;
+
+  const toggleFloatingTool = (tool: "encounter" | "iv" | "profile") => {
+    const expanded = activeFloatingTool !== tool;
+    setEncounterLookupExpanded(false);
+    if (gen4Tools) {
+      changeGen4IvCalculatorExpanded(false);
+      changeGen4ProfileExpanded(false);
+    } else {
+      setIvCalculatorExpanded(false);
+      changeProfileExpanded(false);
+    }
+    if (!expanded) return;
+    if (tool === "encounter") setEncounterLookupExpanded(true);
+    else if (tool === "iv") {
+      if (gen4Tools) changeGen4IvCalculatorExpanded(true);
+      else setIvCalculatorExpanded(true);
+    } else if (gen4Tools) changeGen4ProfileExpanded(true);
+    else changeProfileExpanded(true);
+  };
 
   return (
     <div className="app-shell">
@@ -1096,64 +1131,131 @@ function App() {
           )}
         </main>
       </div>
-      {activeModule === "gen4static" ? (
-        <div className="floating-tools">
-          <Gen4IvCalculator
-            expanded={gen4IvCalculatorExpanded}
-            onExpandedChange={changeGen4IvCalculatorExpanded}
-          />
-          <EncounterLookupPanel
-            expanded={encounterLookupExpanded}
-            onExpandedChange={(expanded) => {
-              setEncounterLookupExpanded(expanded);
-              if (expanded) {
-                changeGen4IvCalculatorExpanded(false);
-                changeGen4ProfileExpanded(false);
+      <div className="floating-tools">
+        {gen4Tools ? (
+          <>
+            <Gen4IvCalculator
+              expanded={activeFloatingTool === "iv"}
+              onExpandedChange={changeGen4IvCalculatorExpanded}
+            />
+            <EncounterLookupPanel
+              expanded={activeFloatingTool === "encounter"}
+              onExpandedChange={(expanded) => {
+                setEncounterLookupExpanded(expanded);
+                if (expanded) {
+                  changeGen4IvCalculatorExpanded(false);
+                  changeGen4ProfileExpanded(false);
+                }
+              }}
+            />
+            <Gen4ProfileControls
+              controller={gen4Profiles}
+              expanded={activeFloatingTool === "profile"}
+              onExpandedChange={changeGen4ProfileExpanded}
+            />
+          </>
+        ) : (
+          <>
+            <Gen3IvCalculator
+              expanded={activeFloatingTool === "iv"}
+              onExpandedChange={(expanded) => {
+                setIvCalculatorExpanded(expanded);
+                if (expanded) {
+                  setEncounterLookupExpanded(false);
+                  changeProfileExpanded(false);
+                }
+              }}
+            />
+            <EncounterLookupPanel
+              expanded={activeFloatingTool === "encounter"}
+              onExpandedChange={(expanded) => {
+                setEncounterLookupExpanded(expanded);
+                if (expanded) {
+                  setIvCalculatorExpanded(false);
+                  changeProfileExpanded(false);
+                }
+              }}
+            />
+            <Gen3ProfileControls
+              compatibleVersions={
+                activeModule === "static" ||
+                activeModule === "wild" ||
+                activeModule === "egg"
+                  ? "handheld"
+                  : "all"
               }
-            }}
-          />
-          <Gen4ProfileControls
-            controller={gen4Profiles}
-            expanded={gen4ProfileExpanded}
-            onExpandedChange={changeGen4ProfileExpanded}
-          />
-        </div>
-      ) : (
-        <div className="floating-tools">
-          <Gen3IvCalculator
-            expanded={ivCalculatorExpanded}
-            onExpandedChange={(expanded) => {
-              setIvCalculatorExpanded(expanded);
-              if (expanded) {
-                setEncounterLookupExpanded(false);
-                changeProfileExpanded(false);
-              }
-            }}
-          />
-          <EncounterLookupPanel
-            expanded={encounterLookupExpanded}
-            onExpandedChange={(expanded) => {
-              setEncounterLookupExpanded(expanded);
-              if (expanded) {
-                setIvCalculatorExpanded(false);
-                changeProfileExpanded(false);
-              }
-            }}
-          />
-          <Gen3ProfileControls
-            compatibleVersions={
-              activeModule === "static" ||
-              activeModule === "wild" ||
-              activeModule === "egg"
-                ? "handheld"
-                : "all"
+              controller={profiles}
+              expanded={activeFloatingTool === "profile"}
+              onExpandedChange={changeProfileExpanded}
+            />
+          </>
+        )}
+        <nav aria-label={t("tools")} className="floating-tool-rail">
+          <button
+            aria-controls={
+              gen4Tools
+                ? "gen4-iv-calculator-panel"
+                : "gen3-iv-calculator-panel"
             }
-            controller={profiles}
-            expanded={profileExpanded}
-            onExpandedChange={changeProfileExpanded}
-          />
-        </div>
-      )}
+            aria-expanded={activeFloatingTool === "iv"}
+            aria-haspopup="dialog"
+            aria-label={t("ivCalculator")}
+            className={activeFloatingTool === "iv" ? "active" : undefined}
+            data-tone="teal"
+            id={
+              gen4Tools
+                ? "gen4-iv-calculator-trigger"
+                : "gen3-iv-calculator-trigger"
+            }
+            onClick={() => toggleFloatingTool("iv")}
+            title={t("ivCalculator")}
+            type="button"
+          >
+            <span aria-hidden="true" className="floating-tool-rail-icon">
+              IV
+            </span>
+            <span>{t("ivCalculator")}</span>
+          </button>
+          <button
+            aria-controls="encounter-lookup-panel"
+            aria-expanded={activeFloatingTool === "encounter"}
+            aria-haspopup="dialog"
+            aria-label={t("encounterLookupModule")}
+            className={
+              activeFloatingTool === "encounter" ? "active" : undefined
+            }
+            data-tone="amber"
+            id="encounter-lookup-trigger"
+            onClick={() => toggleFloatingTool("encounter")}
+            title={t("encounterLookupModule")}
+            type="button"
+          >
+            <span aria-hidden="true" className="floating-tool-rail-icon">
+              ◉
+            </span>
+            <span>{t("encounterLookupModule")}</span>
+          </button>
+          <button
+            aria-controls={
+              gen4Tools ? "gen4-profile-panel" : "gen3-profile-panel"
+            }
+            aria-expanded={activeFloatingTool === "profile"}
+            aria-haspopup="dialog"
+            aria-label={t("profile")}
+            className={activeFloatingTool === "profile" ? "active" : undefined}
+            data-tone="brand"
+            id={gen4Tools ? "gen4-profile-trigger" : "gen3-profile-trigger"}
+            onClick={() => toggleFloatingTool("profile")}
+            title={t("profile")}
+            type="button"
+          >
+            <span aria-hidden="true" className="floating-tool-rail-icon">
+              ID
+            </span>
+            <span>{t("profile")}</span>
+          </button>
+        </nav>
+      </div>
       <footer className="legal-footer">
         <span>{t("upstream")}</span>
         <a

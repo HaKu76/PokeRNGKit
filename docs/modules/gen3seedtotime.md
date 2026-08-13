@@ -53,7 +53,7 @@ uint32_t gen3seedtotime_last_error();
 - Seed `80000000` 回推为 `19CB` / `10055`，Seed `C0000000` 回推为 `672C` / `44340`。
 - Year `1999` 与 `2038` 必须被 C ABI 拒绝。
 
-已添加 TypeScript domain 边界和结果布局测试、原生固定夹具，但本轮未运行测试、原生构建、Wasm 构建、浏览器检查或部署回归。算法结果只能在项目所有者提交、GitHub Actions 部署完成、提供生产 URL 并明确授权后，以真实生产 Wasm 共同验收。
+已添加 TypeScript domain 边界和结果布局测试、原生固定夹具。2026-08-13 经项目所有者授权，使用外部 Chrome 对 `https://haku76.github.io/PokeRNGKit/` 的生产资源 `index-mLBsBTQF.js` 回归真实 Wasm：Seed `0` / Year `2000` 返回 7 条，首条 `2000-03-30 18:22:00`、末条 `2000-12-29 02:10:00`；Seed `40000000` 回写为 `1AA5`，Advances 为 `66861`。其余 32 位回推夹具、非法年份、取消和项目所有者最终验收仍待完成。
 
 ## 来源与许可证
 

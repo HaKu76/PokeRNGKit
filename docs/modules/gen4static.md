@@ -67,4 +67,4 @@ Generator 的 DPPt 结果为 Advances、音高及通用状态列；HGSS 额外�
 
 ## 7. 验证状态
 
-TypeScript 领域测试、分片测试、数据数量测试和 UI 预览引擎测试已写入工作区；真实 Wasm/native、完整工程检查和浏览器预览需按项目所有者授权执行。GitHub Pages 部署后的 PokeFinder 逐字段回归仍是算法验收入口。
+TypeScript 领域测试、分片测试、数据数量测试和 UI 预览引擎测试已写入工作区。2026-08-13 经项目所有者授权，使用外部 Chrome 对 `https://haku76.github.io/PokeRNGKit/` 的生产资源 `index-mLBsBTQF.js` 回归 Method 1 / Manaphy：Seed `0`、Initial Advances `0`、Max Advances `9`、Offset `0` 返回 10 条，首条 Advances `0`、PID `E97E0000`、IV `17/19/20/13/12/16`、觉醒属性岩石、威力 `31`，与原生固定夹具十进制 PID `3917348864` 一致。Method J/K、Searcher、取消、移动端和项目所有者最终验收仍待完成。

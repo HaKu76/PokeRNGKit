@@ -18,7 +18,7 @@ IndexedDB 仍使用 `pokerngkit` 的 `app-data` store，但 G4 记录键为 `gen
 
 ## 3. 界面
 
-G4 Static 页面右下角使用独立的 `Gen4ProfileControls`，编辑器在 HGSS 版本显示全国图鉴、未知图腾拼图和未知图腾字母勾选项。G3 Static/Wild/ID 页面继续显示原有 G3 存档控件。
+G4 Static 页面右下角的统一工具轨使用独立 `Gen4ProfileControls` 面板，编辑器在 HGSS 版本显示全国图鉴、未知图腾拼图和未知图腾字母勾选项。桌面面板在工具轨左侧独立打开，窄屏在上方打开，并支持点外关闭、`Escape` 和关闭按钮；后两种方式会恢复触发按钮焦点。G3 Static/Wild/ID 页面继续显示独立的 G3 存档控件。
 
 ## 4. 来源与验证
 

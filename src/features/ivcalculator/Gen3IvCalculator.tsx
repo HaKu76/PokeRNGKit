@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
+import { FloatingToolPanel } from "../shared/FloatingToolPanel";
 import { getGen3Personal } from "../shared/gen3Personal";
 import { getGen3Species, getGen3SpeciesName } from "../shared/gen3Species";
 import type { Gen3StatValues } from "../shared/gen3Stats";
@@ -93,7 +94,6 @@ export function Gen3IvCalculator({
   onExpandedChange,
 }: Gen3IvCalculatorProps) {
   const { t, i18n } = useTranslation();
-  const panelRef = useRef<HTMLElement>(null);
   const nextRowId = useRef(2);
   const [species, setSpecies] = useState(1);
   const [speciesInput, setSpeciesInput] = useState({
@@ -118,18 +118,6 @@ export function Gen3IvCalculator({
     speciesInput.language === i18n.language && speciesInput.species === species
       ? speciesInput.text
       : (speciesOptions.find((entry) => entry.id === species)?.name ?? "");
-
-  useEffect(() => {
-    if (!expanded) return;
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!panelRef.current?.contains(event.target as Node)) {
-        onExpandedChange(false);
-      }
-    };
-    document.addEventListener("pointerdown", closeOnOutsidePointer);
-    return () =>
-      document.removeEventListener("pointerdown", closeOnOutsidePointer);
-  }, [expanded, onExpandedChange]);
 
   const updateRow = (rowId: number, field: "level" | number, value: string) => {
     setRows((current) =>
@@ -183,27 +171,18 @@ export function Gen3IvCalculator({
   };
 
   return (
-    <aside
-      aria-label={t("ivCalculator")}
-      className={`iv-calculator-display${expanded ? "" : " collapsed"}`}
-      ref={panelRef}
+    <FloatingToolPanel
+      className="iv-calculator-display"
+      closeLabel={t("collapse")}
+      expanded={expanded}
+      id="gen3-iv-calculator-panel"
+      label={t("ivCalculator")}
+      onExpandedChange={onExpandedChange}
+      tone="teal"
+      triggerId="gen3-iv-calculator-trigger"
     >
-      <button
-        aria-controls="gen3-iv-calculator-body"
-        aria-expanded={expanded}
-        aria-label={t(expanded ? "collapse" : "ivCalculator")}
-        className="floating-tool-heading"
-        onClick={() => onExpandedChange(!expanded)}
-        title={t(expanded ? "collapse" : "ivCalculator")}
-        type="button"
-      >
-        <strong>{expanded ? t("ivCalculator") : "IV"}</strong>
-        <span aria-hidden="true" className="floating-tool-trigger-icon">
-          {expanded ? "×" : "+"}
-        </span>
-      </button>
       {expanded && (
-        <div className="iv-calculator-body" id="gen3-iv-calculator-body">
+        <div className="iv-calculator-body">
           <div className="calculator-settings-grid">
             <label className="field">
               <span>{t("game")}</span>
@@ -393,6 +372,6 @@ export function Gen3IvCalculator({
           </div>
         </div>
       )}
-    </aside>
+    </FloatingToolPanel>
   );
 }

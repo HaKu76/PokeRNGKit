@@ -1,6 +1,7 @@
-import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
+import { FloatingToolPanel } from "../shared/FloatingToolPanel";
 import {
   ENCOUNTER_LOOKUP_GAMES,
   findEncounterLookup,
@@ -36,7 +37,6 @@ export function EncounterLookupPanel({
   onExpandedChange,
 }: EncounterLookupPanelProps) {
   const { t, i18n } = useTranslation();
-  const panelRef = useRef<HTMLElement>(null);
   const language: EncounterLookupLanguage =
     i18n.language === "ja" || i18n.language === "en" ? i18n.language : "zh";
   const [game, setGame] = useState<EncounterLookupGame>("ruby");
@@ -75,18 +75,6 @@ export function EncounterLookupPanel({
     });
   }, [language, query, t]);
 
-  useEffect(() => {
-    if (!expanded) return;
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!panelRef.current?.contains(event.target as Node)) {
-        onExpandedChange(false);
-      }
-    };
-    document.addEventListener("pointerdown", closeOnOutsidePointer);
-    return () =>
-      document.removeEventListener("pointerdown", closeOnOutsidePointer);
-  }, [expanded, onExpandedChange]);
-
   const changeGame = (nextGame: EncounterLookupGame) => {
     const nextOptions = getEncounterLookupSpecies(nextGame, language);
     const nextSpecies =
@@ -106,27 +94,18 @@ export function EncounterLookupPanel({
   };
 
   return (
-    <aside
-      aria-label={t("encounterLookupModule")}
-      className={`encounter-lookup-display${expanded ? "" : " collapsed"}`}
-      ref={panelRef}
+    <FloatingToolPanel
+      className="encounter-lookup-display"
+      closeLabel={t("collapse")}
+      expanded={expanded}
+      id="encounter-lookup-panel"
+      label={t("encounterLookupModule")}
+      onExpandedChange={onExpandedChange}
+      tone="amber"
+      triggerId="encounter-lookup-trigger"
     >
-      <button
-        aria-controls="encounter-lookup-body"
-        aria-expanded={expanded}
-        aria-label={t(expanded ? "collapse" : "encounterLookupModule")}
-        className="floating-tool-heading"
-        onClick={() => onExpandedChange(!expanded)}
-        title={t(expanded ? "collapse" : "encounterLookupModule")}
-        type="button"
-      >
-        <strong>{t("encounterLookupModule")}</strong>
-        <span aria-hidden="true" className="floating-tool-trigger-icon">
-          {expanded ? "×" : "+"}
-        </span>
-      </button>
       {expanded && (
-        <div className="encounter-lookup-body" id="encounter-lookup-body">
+        <div className="encounter-lookup-body">
           <form className="encounter-lookup-form" onSubmit={submit}>
             <label className="field encounter-lookup-pokemon-field">
               <span>{t("encounterLookupPokemon")}</span>
@@ -195,6 +174,6 @@ export function EncounterLookupPanel({
           </div>
         </div>
       )}
-    </aside>
+    </FloatingToolPanel>
   );
 }

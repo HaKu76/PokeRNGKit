@@ -1,6 +1,7 @@
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
+import { FloatingToolPanel } from "../shared/FloatingToolPanel";
 import type { Gen4GameVersion } from "../gen4static/domain";
 import {
   DEFAULT_GEN4_PROFILE,
@@ -411,31 +412,19 @@ export function Gen4ProfileControls({
 
   return (
     <>
-      <aside
-        aria-label={t("profile")}
-        className={`profile-display gen4-profile-display${
-          expanded ? "" : " collapsed"
-        }`}
+      <FloatingToolPanel
+        className="profile-display gen4-profile-display"
+        closeLabel={t("collapse")}
+        expanded={expanded}
+        id="gen4-profile-panel"
+        label={t("profile")}
+        onExpandedChange={onExpandedChange}
+        subtitle={selected.name}
+        tone="brand"
+        triggerId="gen4-profile-trigger"
       >
-        <button
-          aria-controls="gen4-profile-float-body"
-          aria-expanded={expanded}
-          aria-label={t(expanded ? "collapse" : "expand")}
-          className="profile-float-heading"
-          onClick={() => onExpandedChange(!expanded)}
-          title={t(expanded ? "collapse" : "expand")}
-          type="button"
-        >
-          <div className="profile-float-title">
-            <strong>{t("profile")}</strong>
-            <span title={selected.name}>{selected.name}</span>
-          </div>
-          <span aria-hidden="true" className="floating-tool-trigger-icon">
-            {expanded ? "×" : "+"}
-          </span>
-        </button>
         {expanded && (
-          <div className="profile-float-body" id="gen4-profile-float-body">
+          <div className="profile-float-body">
             <label>
               <span>{t("profile")}</span>
               <select
@@ -480,7 +469,7 @@ export function Gen4ProfileControls({
             </button>
           </div>
         )}
-      </aside>
+      </FloatingToolPanel>
       {managerOpen && (
         <ProfileManager
           controller={controller}
