@@ -2,16 +2,23 @@
 
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
-> - Git 基线：`2819588 fix: 修正全局工具布局与世代入口`
-> - 当前阶段：新增第三世代 GameCube Seed Finder
-> - 工作区状态：`gen3ngcseed` 源码、接线与文档尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：本轮只完成源码与格式检查，NGC Seed 算法、构建和 UI 均待授权验证
+> - Git 基线：`3895d2d feat: 新增NGC Seed查询`
+> - 当前阶段：新增第七世代 ID 乱数
+> - 工作区状态：`gen7id` 源码、接线与文档尚未提交；Codex 不提交、不 push、不部署
+> - 验收状态：本轮只完成源码与格式检查，Gen7 ID 算法、构建和 UI 均待授权验证
 
 ## 当前状态
 
+- 第七世代落地：优先实现 `gen7id`，对应 3DSRNGTool `Search7_ID()` 的 SFMT ID Generator；Stationary/Wild/Egg/Timeline 暂列后续开发。
+- 本轮新增 `gen7id` 源码、Worker、C ABI、CMake target、模块文档和 `GEN VII` 侧栏入口；当前尚未执行测试、构建或浏览器验收。
+- 第七世代来源决策：以本地优化项目 `C:\Users\Hakuhiro\source\repos\3DSRNGTool` 的 `359bdd7` 为主源，公开 `wwwwwwzx/3DSRNGTool` 的 `ae5d176` 仅作祖先归属；两者差异不止 README，已记录于 `third_party/3dsrngtool/UPSTREAM.md`。
+- `gen7id` 接线补全：加入 Sun/Moon/Ultra Sun/Ultra Moon 版本与起始帧校验、TID/SID/Gen7TID 前导零筛选、Gen7TID bridge 修正、虚拟化结果表、Worker 批次校验和第七世代页面隐藏存档工具；仍未执行测试、构建或浏览器验收。
+- 本地控件核验：Designer 的 `Frame_max` 初值上限是 `100000000`，但 `MainForm.cs` 初始化会用 `FuncUtil.MAXFRAME` 覆盖 `Frame_min`/`Frame_max`，实际有效上限为 `1000000000`；已同步 domain、HTML 输入和模块文档。
+- 本轮已执行并通过定向 `npm run format:files -- ...`、全仓 `npm run format:check` 与 `git diff --check`。未运行 lint、typecheck、Vitest、原生夹具、Wasm/Web 构建、UI 预览、浏览器或生产算法回归；这些检查需要项目所有者对具体命令或 URL 明确授权。
+
 - 新增 `gen3ngcseed`：PokeFinder `GameCube Seed Finder` 的 Gales/XD、Colo/竞技场与 Channel/频道三种查询，接入 GEN III 左侧导航。
 - Gales/Colo 支持多轮候选筛选；第一次搜索按上游通过 Yes/No 询问是否选择对应 `.precalc`，决定保留到模块关闭。文件按上游 25/24 个小端分区读取，并流式校验 Qt ISO 3309 CRC `0xD75B / 0x097B`；文件不上传、不持久化。
-- 新增独立 C++/Emscripten C ABI、Dedicated Worker、Worker Pool、API v1、消息协议、UI 预览引擎、TypeScript 边界测试与原生非法输入夹具。默认 Wasm 构建列表由 8 个增加为 9 个。
+- 新增独立 C++/Emscripten C ABI、Dedicated Worker、Worker Pool、API v1、消息协议、UI 预览引擎、TypeScript 边界测试与原生非法输入夹具。NGC 阶段默认 Wasm 构建列表由 8 个增加为 9 个；Gen7 ID 阶段再增加为 10 个。
 - Gales/Colo 首轮按低 16 位分片，Channel 精确覆盖 `0x40000001..0xFFFFFFFE`，候选数组按 50,000 个 Seed 分片；Worker 校验 domain、任务、分片和结果数量，Pool 按 `chunkIndex` 恢复确定顺序并支持取消。
 - 记录 PokeFinder 4.3.2 Gales 首轮的上游越界：`enemyHPStat[enemyIndex + 5]` 超出 5 行数组。本项目使用有效的 `enemyHPStat[enemyIndex]`，待生产页面与 PokeFinder 实际结果共同回归，当前不标记为算法已验收。
 - HP 控件保持上游空值语义：非空输入为 `1..714`，空白搜索时按 `0` 读取；Channel 少于 10 条时由 Search 动作显示上游 `You must have at least 10 entries`。

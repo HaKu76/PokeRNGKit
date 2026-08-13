@@ -1,0 +1,7 @@
+{
+  "id": "gen7id",
+  "apiVersion": 1,
+  "target": "gen7id",
+  "artifacts": ["gen7id.mjs", "gen7id.wasm"],
+  "source": "Local optimized 3DSRNGTool Gen7 ID7 and SFMT"
+}

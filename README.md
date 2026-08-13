@@ -5,14 +5,15 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第三世代 NGC Seed查询模块。** 当前工作区在既有第三世代模块与第四世代 Static 基线上加入 `gen3ngcseed`、独立 Wasm/Worker Pool、Precalc、本地交互和算法文档。工程检查、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
+**当前里程碑：第七世代 ID 乱数模块。** 当前工作区在既有第三世代模块与第四世代 Static 基线上加入 `gen7id`、独立 Wasm/Worker Pool、SFMT ID 计算、本地交互和算法文档。工程检查、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
-- 目标范围：第三世代现有模块、第四世代 Static，以及 PokeFinder Encounter Lookup 支持的跨世代静态查询
+- 目标范围：第三世代现有模块、第四世代 Static、第七世代 ID，以及 PokeFinder Encounter Lookup 支持的跨世代静态查询
 - 已有模块：Gen III ID、Initial Seed、Seed to Time、GameCube Seed Finder、Static、Wild、IVs to PID、Egg、Spinda Painter，Gen IV Static，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
-- 当前模块：GameCube Seed Finder；覆盖 Gales/XD、Colo/竞技场与 Channel/频道
+- 当前模块：第七世代 ID 乱数；覆盖 Sun/Moon 与 Ultra Sun/Ultra Moon 的 SFMT ID Generator
 - 上游核验基线：PokeFinder 4.3.2
 - 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [GameCube Seed Finder](docs/modules/gen3ngcseed.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Encounter Lookup](docs/modules/encounterlookup.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
+- 第七世代来源记录：[3DSRNGTool](third_party/3dsrngtool/UPSTREAM.md) / [Gen 7 ID](docs/modules/gen7id.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
 - AI 开发入口：[docs/ai-development.md](docs/ai-development.md)
@@ -84,6 +85,13 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - 固定列宽结果表、排序、CSV、觉醒属性、觉醒威力、个性、电话和音高
 - 独立 `gen4static` Wasm/Worker 与 G4 存档 schema；个体值计算器是跨工作区的单一全局工具，由工具自身选择六个 PokeFinder 数据集
 - 算法、输入边界和参考来源见 [Gen 4 Static](docs/modules/gen4static.md)
+
+当前 Gen VII ID 工作区包含：
+
+- Sun、Moon、Ultra Sun、Ultra Moon 的版本选择和对应 ID 起始帧
+- SFMT `Nextulong()`、TID/SID/TSV/TRV、Gen7TID、指针修正和首版单值筛选
+- 独立 `gen7id` Wasm、Dedicated Worker Pool、进度、取消、虚拟化结果表和 CSV
+- 主要行为来源为本地优化版 `3DSRNGTool`，公开祖先仅用于归属追溯；本模块尚未完成构建和部署验收
 
 当前 Static 工作区包含：
 

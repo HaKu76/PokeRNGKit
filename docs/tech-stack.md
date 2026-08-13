@@ -2,8 +2,10 @@
 
 > - 状态：第三世代既有模块与第四世代 Static 已接入独立 Wasm/Worker；PR #3 合并后的工程与部署回归待完成
 > - 更新日期：2026-08-13
-> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 Static Generator/Searcher，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
+> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 Static Generator/Searcher，第七世代 ID Generator，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 > - 包管理器：npm
+
+第七世代 `gen7id` 使用本地优化版 `C:\Users\Hakuhiro\source\repos\3DSRNGTool` 作为主要行为来源，公开仓库只作为祖先归属记录；实现路径与差异范围见 `third_party/3dsrngtool/UPSTREAM.md`。
 
 ## 1. 技术结论
 

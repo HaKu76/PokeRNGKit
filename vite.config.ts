@@ -20,6 +20,14 @@ export default defineConfig(({ mode }) => ({
             "third_party/pokefinder/UPSTREAM.md",
             `${outputDirectory}/legal/UPSTREAM.md`,
           ),
+          copyFile(
+            "third_party/3dsrngtool/LICENSE",
+            `${outputDirectory}/legal/3DSRNGTool-LICENSE.txt`,
+          ),
+          copyFile(
+            "third_party/3dsrngtool/UPSTREAM.md",
+            `${outputDirectory}/legal/3DSRNGTool-UPSTREAM.md`,
+          ),
         ]);
       },
     },

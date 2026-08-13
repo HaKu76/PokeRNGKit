@@ -70,6 +70,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 用户选择 Diamond、Pearl、Platinum、HeartGold 或 SoulSilver 存档与定点模板，使用 Method 1/J/K、Synchronize 或 Cute Charm 生成结果，也可以输入六项 IV 闭区间反向检索候选 Seed。G4 使用独立存档；全局个体值计算器由工具自身选择六个 PokeFinder 数据集，控件布局、IV 快捷操作、排序、CSV 和结果表行为与 G3 Static 保持一致。
 
+### 3.11 第七世代 ID 乱数用户
+
+用户选择 Sun、Moon、Ultra Sun 或 Ultra Moon，输入 SFMT Seed、起始帧、最大帧和指针修正，查看 TID、SID、TSV、TRV、Gen7TID、Random Number 与 Clock。ID 起始帧按本地优化版 3DSRNGTool 为 Sun/Moon `1012`、Ultra Sun/Ultra Moon `1132`；模块当前不包含第七世代定点、野生、SOS、孵化或 Timeline 流程。
+
 ## 4. 当前功能需求：`gen3id`
 
 需求编号用于测试、Issue 和版本清单追踪。
@@ -461,8 +465,8 @@ Egg Searcher、GameCube 主 Generator、PokeSpot、Jirachi 等第三世代功能
 
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
-3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、NGC Seed C ABI 输入边界、G3 Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、Egg Emerald/RSFRLG，以及 G4 Static Method 1/J/K、Synchronize、Cute Charm、Searcher 与错误边界夹具。
-4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg` 与 `gen4static` 的 MJS/Wasm 产物。
+3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、NGC Seed C ABI 输入边界、G3 Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、Egg Emerald/RSFRLG，以及 G4 Static Method 1/J/K、Synchronize、Cute Charm、Searcher、Gen7 ID 与错误边界夹具。
+4. `npm run wasm:build` 生成 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static` 与 `gen7id` 的 MJS/Wasm 产物。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
@@ -484,7 +488,7 @@ Egg Searcher、GameCube 主 Generator、PokeSpot、Jirachi 等第三世代功能
 11. NGC Seed 逐页签与 PokeFinder 4.3.2 比对多轮结果、Channel 方向输入、Precalc Yes/No 决策、单结果复制、取消和 Gales 首轮已记录差异；空 HP 与直接输入 `0` 的行为分别核对。
 12. IVs to PID 使用 `0/0/0/0/0/0`、Nature `0`、TID `12345` 核对 Channel 的 `56654838 / DC2DA271 / 48333`，并使用 `31/31/31/0/31/31`、Nature `0`、TID `12345` 核对 Method 2 的 `36E6808A / 02B0100B / 8832`；确认空 TID 等价于 `0` 且不显示第四世代 Cute Charm。
 13. G4 Static 使用已记录固定输入核对 Method 1/J/K、Synchronize、Cute Charm、`Max Advances + 1`、Searcher Seed、PID 和六项 IV；同时确认 G3/G4 存档独立，个体值计算器保持全局单一入口。
-14. GitHub Pages 在线加载 9 个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
+14. GitHub Pages 在线加载 10 个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
 15. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
 
 算法回归必须使用真实生产 Wasm，不能使用 `ui` 预览模式。无法从部署页面确认的原生夹具、移动设备性能或离线安装行为必须明确列为未覆盖。

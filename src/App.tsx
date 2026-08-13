@@ -38,6 +38,7 @@ import { Gen3SpindaPainterPanel } from "./features/spindapainter/Gen3SpindaPaint
 import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
 import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
+import { Gen7IdPanel } from "./features/gen7id/Gen7IdPanel";
 import { IvCalculator } from "./features/gen4ivcalculator/Gen4IvCalculator";
 import { Gen4ProfileControls } from "./features/gen4profiles/Gen4ProfileControls";
 import { DEFAULT_GEN4_PROFILE } from "./features/gen4profiles/domain";
@@ -62,7 +63,8 @@ type ActiveModule =
   | "ivtopid"
   | "egg"
   | "spindapainter"
-  | "gen4static";
+  | "gen4static"
+  | "gen7id";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -320,15 +322,17 @@ function App() {
     failed: t("failed"),
   }[status];
   const gen4Tools = activeModule === "gen4static";
+  const gen7Module = activeModule === "gen7id";
+  const profileTools = !gen7Module;
   const activeFloatingTool = ivCalculatorExpanded
     ? "iv"
     : encounterLookupExpanded
       ? "encounter"
-      : gen4Tools
+      : profileTools && gen4Tools
         ? gen4ProfileExpanded
           ? "profile"
           : undefined
-        : profileExpanded
+        : profileTools && profileExpanded
           ? "profile"
           : undefined;
 
@@ -375,7 +379,13 @@ function App() {
             <div>
               <div className="brand-name">{t("brand")}</div>
               <div className="brand-subtitle">
-                {t(activeModule === "gen4static" ? "subtitleGen4" : "subtitle")}
+                {t(
+                  activeModule === "gen4static"
+                    ? "subtitleGen4"
+                    : gen7Module
+                      ? "subtitleGen7"
+                      : "subtitle",
+                )}
               </div>
             </div>
           </div>
@@ -621,6 +631,23 @@ function App() {
               <small>{t("gen4StaticVersion")}</small>
             </span>
           </button>
+          <div className="rail-section-label">GEN VII</div>
+          <button
+            className={
+              activeModule === "gen7id" ? "module-entry active" : "module-entry"
+            }
+            onClick={() => {
+              setActiveModule("gen7id");
+              setModuleRailOpen(false);
+            }}
+            type="button"
+          >
+            <span className="module-index">11</span>
+            <span>
+              <strong>{t("gen7IdModule")}</strong>
+              <small>{t("gen7IdVersion")}</small>
+            </span>
+          </button>
           <div className="rail-footer">
             <span className="rail-dot" />
             {t("localOnly")}
@@ -633,7 +660,9 @@ function App() {
               <div className="eyebrow">
                 {activeModule === "gen4static"
                   ? "GEN IV / RNG LAB"
-                  : "GEN III / RNG LAB"}
+                  : gen7Module
+                    ? "GEN VII / RNG LAB"
+                    : "GEN III / RNG LAB"}
               </div>
               <h1>
                 {t(
@@ -655,7 +684,9 @@ function App() {
                                   ? "eggEngine"
                                   : activeModule === "spindapainter"
                                     ? "spindaPainterEngine"
-                                    : "gen4StaticEngine",
+                                    : activeModule === "gen7id"
+                                      ? "gen7IdEngine"
+                                      : "gen4StaticEngine",
                 )}
               </h1>
             </div>
@@ -679,7 +710,9 @@ function App() {
                                 ? "eggVersion"
                                 : activeModule === "spindapainter"
                                   ? "spindaPainterVersion"
-                                  : "gen4StaticVersion",
+                                  : activeModule === "gen7id"
+                                    ? "gen7IdVersion"
+                                    : "gen4StaticVersion",
               )}
             </div>
           </div>
@@ -1121,6 +1154,8 @@ function App() {
               profile={gen4Profiles.selectedProfile ?? DEFAULT_GEN4_PROFILE}
               uiPreviewMode={uiPreviewMode}
             />
+          ) : activeModule === "gen7id" ? (
+            <Gen7IdPanel uiPreviewMode={uiPreviewMode} />
           ) : (
             <Gen3IvToPidPanel uiPreviewMode={uiPreviewMode} />
           )}
@@ -1149,13 +1184,13 @@ function App() {
             }
           }}
         />
-        {gen4Tools ? (
+        {profileTools && gen4Tools ? (
           <Gen4ProfileControls
             controller={gen4Profiles}
             expanded={activeFloatingTool === "profile"}
             onExpandedChange={changeGen4ProfileExpanded}
           />
-        ) : (
+        ) : profileTools ? (
           <Gen3ProfileControls
             compatibleVersions={
               activeModule === "static" ||
@@ -1168,7 +1203,7 @@ function App() {
             expanded={activeFloatingTool === "profile"}
             onExpandedChange={changeProfileExpanded}
           />
-        )}
+        ) : null}
         <nav aria-label={t("tools")} className="floating-tool-rail">
           <button
             aria-controls="iv-calculator-panel"
@@ -1206,25 +1241,29 @@ function App() {
             </span>
             <span>{t("encounterLookupModule")}</span>
           </button>
-          <button
-            aria-controls={
-              gen4Tools ? "gen4-profile-panel" : "gen3-profile-panel"
-            }
-            aria-expanded={activeFloatingTool === "profile"}
-            aria-haspopup="dialog"
-            aria-label={t("profile")}
-            className={activeFloatingTool === "profile" ? "active" : undefined}
-            data-tone="brand"
-            id={gen4Tools ? "gen4-profile-trigger" : "gen3-profile-trigger"}
-            onClick={() => toggleFloatingTool("profile")}
-            title={t("profile")}
-            type="button"
-          >
-            <span aria-hidden="true" className="floating-tool-rail-icon">
-              ID
-            </span>
-            <span>{t("profile")}</span>
-          </button>
+          {profileTools && (
+            <button
+              aria-controls={
+                gen4Tools ? "gen4-profile-panel" : "gen3-profile-panel"
+              }
+              aria-expanded={activeFloatingTool === "profile"}
+              aria-haspopup="dialog"
+              aria-label={t("profile")}
+              className={
+                activeFloatingTool === "profile" ? "active" : undefined
+              }
+              data-tone="brand"
+              id={gen4Tools ? "gen4-profile-trigger" : "gen3-profile-trigger"}
+              onClick={() => toggleFloatingTool("profile")}
+              title={t("profile")}
+              type="button"
+            >
+              <span aria-hidden="true" className="floating-tool-rail-icon">
+                ID
+              </span>
+              <span>{t("profile")}</span>
+            </button>
+          )}
         </nav>
       </div>
       <footer className="legal-footer">
@@ -1238,6 +1277,7 @@ function App() {
         </a>
         <a href="./legal/LICENSE.txt">{t("license")}</a>
         <a href="./legal/UPSTREAM.md">PokeFinder</a>
+        <a href="./legal/3DSRNGTool-UPSTREAM.md">3DSRNGTool</a>
       </footer>
     </div>
   );
