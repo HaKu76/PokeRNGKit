@@ -1,0 +1,7 @@
+{
+  "id": "gen4seedtotime",
+  "apiVersion": 1,
+  "target": "gen4seedtotime",
+  "artifacts": ["gen4seedtotime.mjs", "gen4seedtotime.wasm"],
+  "source": "PokeFinder 4.3.2 SeedToTimeCalculator4"
+}

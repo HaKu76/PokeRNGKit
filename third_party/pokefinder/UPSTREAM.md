@@ -258,6 +258,10 @@ BB98B0FE73D2310712EE44CA04B255D6E31B8B70D1BD0FB2F759FD14F246140D  Form/i18n/Poke
 D67358790583FEBF22227ABF10B002EBAEC02E797EA08E125093CEA8C36F665F  Form/i18n/PokeFinder_ja.ts
 ```
 
+## Gen IV Seed to Time 只读核验
+
+`gen4seedtotime` 对照 PokeFinder 4.3.2 的 `SeedToTimeCalculator4`、`SeedTime4`、`HGSSRoamer` 与 `Utilities4` 实现独立 Wasm C ABI；没有修改 vendored Core。Roamer Map 与宝可梦图片从上游 `Form/Images` 原样复制为模块静态资源，保留 GPL-3.0-or-later 归属。完整输入边界、文件列表和 SHA-256 见 `docs/modules/gen4seedtotime.md`。
+
 ## Gen III Spinda Painter 只读核验
 
 以下上游文件用于核验 `gen3spindapainter` 的 PID 半字节映射、拖动边界、输入限制、翻译和图像资源。除 `Form/Images/spinda*.png` 复制到模块运行时 assets 外，未复制到 vendored snapshot：

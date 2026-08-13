@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi、存档信息和个体值计算器已进入工作区；第四世代 ID、Static/Wild、独立 G4 存档、宝可病毒与 Encounter Lookup 也已进入工作区。个体值计算器是跨工作区的全局工具，Encounter Lookup 是跨世代静态查询工具。
+当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi、存档信息和个体值计算器已进入工作区；第四世代 ID、Seed to Time、Static/Wild、独立 G4 存档、宝可病毒与 Encounter Lookup 也已进入工作区。个体值计算器是跨工作区的全局工具，Encounter Lookup 是跨世代静态查询工具。
 
 当前工作区额外加入基于 DevonStudios Pokerus Finder 的宝可病毒查询，覆盖第三世代、第四世代 DP 与第四世代 Pt/HGSS 三种交互模式。
 

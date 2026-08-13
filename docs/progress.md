@@ -2,10 +2,18 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`cd4ca09 style: 重做工作台界面与浮动面板`
+> - Git 基线：`e460cdb feat: 新增第四世代ID乱数`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：第四世代 ID 模块待提交
-> - 验收状态：第四世代 ID 原生夹具与完整 `npm run verify` 已通过；完整 Wasm 与部署回归待执行
+> - 工作区状态：第四世代 Seed to Time 待提交；连锁 SID 与第三世代 Tanoby Chamber 已完成独立开发
+> - 验收状态：第四世代 Seed to Time 原生夹具与完整工程检查已通过；完整 Wasm 与部署回归待执行
+
+## 2026-08-14 Gen4 Seed to Time
+
+- 新增：第四世代 DPPt/HGSS Seed to Time，覆盖年份与可选秒数检索、校准、硬币序列、Elm Calls、游走路线、序列反查和 Roamer Map。
+- 新增：`gen4seedtotime` Wasm API v1、独立 Worker、固定宽度结果、原生 parity 夹具、TypeScript 边界测试和 UI 预览引擎。
+- 边界：Seed `0..0xFFFFFFFF`、年份 `2000..2099`、秒数 `0..59`、Delay 校准 `uint32`、秒数校准 `0..500`、R/E 路线 `0..46`、L 路线 `0..28`；Web 校准结果限制为 2,000,000 条。
+- 验证：`$env:POKERNGKIT_WASM_MODULES='gen4seedtotime'; npm run wasm:test:native` 通过 1/1。完整 `npm run verify` 首次在受限环境复制既有 `public/wasm/gen3egg.mjs` 时因 Windows `EPERM` 停止；非受限重跑通过 Prettier、ESLint（0 error，保留 Egg/Wild 两条既有 TanStack Virtual warning）、TypeScript、33 个 Vitest 文件共 123 项测试、Vite 生产构建和 PWA 45 项预缓存，Vite 仅保留大包非阻断 warning。
+- 未验收：完整 Wasm 与生产页面算法回归需等待 GitHub Pages 部署，并使用外部 Chrome/Edge 与项目所有者共同完成。
 
 ## 2026-08-14 Gen4 ID 乱数
 

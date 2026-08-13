@@ -1,8 +1,8 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：第三世代既有模块与第四世代 ID/Static/Wild 已接入独立 Wasm/Worker；完整工程与部署回归待完成
+> - 状态：第三世代既有模块与第四世代 ID/Seed to Time/Static/Wild 已接入独立 Wasm/Worker；完整工程与部署回归待完成
 > - 更新日期：2026-08-14
-> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 ID/Static/Wild Generator/Searcher，第七世代 ID Generator，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
+> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 ID、Seed to Time、Static/Wild Generator/Searcher，第七世代 ID Generator，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 > - 包管理器：npm
 
 第七世代 `gen7id` 使用本地优化版 `C:\Users\Hakuhiro\source\repos\3DSRNGTool` 作为主要行为来源，公开仓库只作为祖先归属记录；实现路径与差异范围见 `third_party/3dsrngtool/UPSTREAM.md`。`pokerusfinder` 使用 DevonStudios Pokerus Finder 的 GPL-3.0 源码行为作为第三/四世代帧查询基线，来源记录见 `third_party/pokerusfinder/UPSTREAM.md`。
@@ -177,6 +177,7 @@ gen3gamecube
 gen3pokespot
 gen3jirachi
 gen4id
+gen4seedtotime
 gen4static
 gen4wild
 ```
