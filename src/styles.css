@@ -1760,6 +1760,50 @@ h1 {
   color: #ffffff;
   box-shadow: none;
 }
+.gen4id-operation-tabs {
+  display: grid;
+  width: min(100%, 420px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gen4id-control-grid {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) minmax(300px, 0.72fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.gen4id-rng-panel,
+.gen4id-filter-panel {
+  min-height: 320px;
+  padding: 16px;
+}
+.gen4id-filter-values textarea {
+  min-height: 164px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  line-height: 22px;
+}
+.gen4id-filter-values textarea:focus-visible {
+  outline: 2px solid var(--brand-strong);
+  outline-offset: 2px;
+}
+.gen4id-table.generator,
+.gen4id-table.generator .static-table-header,
+.gen4id-table.generator .static-table-row {
+  grid-template-columns: 130px repeat(3, 110px) 120px 100px;
+  min-width: 680px;
+}
+.gen4id-table.searcher,
+.gen4id-table.searcher .static-table-header,
+.gen4id-table.searcher .static-table-row {
+  grid-template-columns: 130px repeat(3, 110px) 120px;
+  min-width: 580px;
+}
 
 .pokespot-form-grid,
 .pid-to-iv-form-grid,
@@ -2992,6 +3036,9 @@ h1 {
     padding: 24px 18px 36px;
   }
   .control-grid {
+    grid-template-columns: 1fr;
+  }
+  .gen4id-control-grid {
     grid-template-columns: 1fr;
   }
   .static-control-grid {

@@ -1,0 +1,13 @@
+{
+  "id": "gen4id",
+  "generation": 4,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen4id",
+  "operations": ["generator", "searcher"],
+  "artifacts": {
+    "loader": "gen4id.mjs",
+    "wasm": "gen4id.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen IV IDGenerator4/IDSearcher4"
+}

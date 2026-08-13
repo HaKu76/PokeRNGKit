@@ -2,10 +2,19 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`08049de feat: 补全第三世代功能模块`
-> - 当前阶段：按 HakuStyle 重做工作台界面
-> - 工作区状态：本轮界面、交互和文档修改尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：本轮 Prettier 与空白检查已通过；浏览器 UI、ESLint、TypeScript、测试和构建未运行
+> - Git 基线：`cd4ca09 style: 重做工作台界面与浮动面板`
+> - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
+> - 工作区状态：第四世代 ID 模块待提交
+> - 验收状态：第四世代 ID 原生夹具与完整 `npm run verify` 已通过；完整 Wasm 与部署回归待执行
+
+## 2026-08-14 Gen4 ID 乱数
+
+- 新增：第四世代 ID Generator/Searcher，覆盖日期时间、Delay、TID/SID/TSV/PID 筛选、结果排序、CSV、进度和取消。
+- 新增：`gen4id` Wasm C ABI、独立 Worker Pool、固定宽度结果协议和原生 parity 夹具。
+- 验证：`$env:POKERNGKIT_WASM_MODULES='gen4id'; npm run wasm:test:native` 通过 1/1。
+- 验证：非受限环境完整 `npm run verify` 通过。Prettier、ESLint（0 error，保留 Egg/Wild 两条既有 TanStack Virtual warning）、TypeScript、30 个 Vitest 文件共 110 项测试、Vite 生产构建和 PWA 43 项预缓存均成功；Vite 仅保留主包超过 500 kB 的非阻断 warning。
+- 当前限制：完整 Wasm build 与 Pages 浏览器回归尚未执行。
+- 下一步：继续盘点并实现 PokeFinder 与 3DSRNGTool 的剩余独立模块，每个模块单独提交。
 
 ## 2026-08-14 HakuStyle 工作台重做
 
@@ -279,7 +288,7 @@
 
 ## 6. 已知风险与边界
 
-- `gen4id` 仍只保留共享接口；`gen4wild` 已在工作区实现但尚未通过工程、Wasm 和部署验证。
+- `gen4id` 已实现并通过原生夹具与工程检查；`gen4wild` 的完整 Wasm 和部署验证仍待完成。
 - `gen3egg` 当前只实现 Egg Generator；Egg Searcher、Masuda 和第四世代孵化规则不在范围内。
 - 多 Worker 会复制 Wasm 线性内存，低内存移动设备可能需要在 Pages 实测后降低 Worker 数。
 - PWA 旧缓存可能造成 UI/Wasm API 短暂错配；Worker API 握手会拒绝版本不一致，但更新体验仍需在部署后验证。

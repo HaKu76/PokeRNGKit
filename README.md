@@ -5,13 +5,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：补全第三世代 PokeFinder 功能模块。** 当前工作区在既有第三世代模块与第四世代基线上加入 `gen3gamecube`、`gen3pidtoiv`、`gen3pokespot`、`gen3jirachi`，并补齐独立 Wasm/Worker、模板数据和算法文档。工程检查、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
+**当前里程碑：补全 PokeFinder 与 3DSRNGTool 功能模块。** 当前工作区已完成第三世代既有模块，并新增第四世代 ID Generator/Searcher。完整 Wasm 构建、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
-- 目标范围：第三世代现有模块、第四世代 Static/Wild、第七世代 ID、宝可病毒查询，以及 PokeFinder Encounter Lookup 支持的跨世代静态查询
-- 已有模块：Gen III ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PokeSpot、PID to IVs、Jirachi Advancer、Static、Wild、IVs to PID、Egg、Spinda Painter，Gen IV Static/Wild，Gen VII ID，宝可病毒查询，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
+- 目标范围：PokeFinder 4.3.2 与本地优化版 3DSRNGTool 的全部功能模块
+- 已有模块：Gen III ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PokeSpot、PID to IVs、Jirachi Advancer、Static、Wild、IVs to PID、Egg、Spinda Painter，Gen IV ID/Static/Wild，Gen VII ID，宝可病毒查询，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 - 当前模块：第三世代四个新增模块、GameCube Seed Finder、Gen IV Wild、第七世代 ID 与宝可病毒查询；分别覆盖 GameCube/XD/Colosseum/Channel、XD PokeSpot、第三世代 PID 反推、Channel 基拉祈帧数、DPPt/HGSS 野生遭遇、Sun/Moon、Ultra Sun/Ultra Moon 以及第三/四世代感染帧
 - 上游核验基线：PokeFinder 4.3.2
-- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [GameCube Seed Finder](docs/modules/gen3ngcseed.md) / [Gen 3 GameCube RNG](docs/modules/gen3gamecube.md) / [Gen 3 PID to IVs](docs/modules/gen3pidtoiv.md) / [Gen 3 PokeSpot](docs/modules/gen3pokespot.md) / [Gen 3 Jirachi Advancer](docs/modules/gen3jirachiadvancer.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Wild](docs/modules/gen4wild.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Gen 7 ID](docs/modules/gen7id.md) / [宝可病毒查询](docs/modules/pokerusfinder.md) / [Encounter Lookup](docs/modules/encounterlookup.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [GameCube Seed Finder](docs/modules/gen3ngcseed.md) / [Gen 3 GameCube RNG](docs/modules/gen3gamecube.md) / [Gen 3 PID to IVs](docs/modules/gen3pidtoiv.md) / [Gen 3 PokeSpot](docs/modules/gen3pokespot.md) / [Gen 3 Jirachi Advancer](docs/modules/gen3jirachiadvancer.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 ID](docs/modules/gen4id.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Wild](docs/modules/gen4wild.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Gen 7 ID](docs/modules/gen7id.md) / [宝可病毒查询](docs/modules/pokerusfinder.md) / [Encounter Lookup](docs/modules/encounterlookup.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 第七世代来源记录：[3DSRNGTool](third_party/3dsrngtool/UPSTREAM.md) / [Gen 7 ID](docs/modules/gen7id.md)
 - 宝可病毒来源记录：[Pokerus Finder](third_party/pokerusfinder/UPSTREAM.md)
@@ -31,6 +31,13 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - Initial Advances / Max Advances 分片计算
 - Web Worker Pool 并行调度、进度、取消和错误状态
 - 虚拟化结果表、数值排序和 CSV 导出
+
+当前 Gen IV ID 工作区包含：
+
+- 日期、时间、Delay 的 Generator 与年份、Delay 区间的 Searcher
+- TID、SID、TID/SID、PID、TID/PID 与 TSV 精确筛选
+- 独立 `gen4id` Wasm、Worker Pool、进度、取消、排序和 CSV
+- 输入边界、固定夹具和协议见 [Gen 4 ID](docs/modules/gen4id.md)
 
 当前 Initial Seed Finder 工作区包含：
 
@@ -141,7 +148,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - PWA 安装与首次加载后的离线使用加固
 - 浏览器矩阵、性能基线和可访问性补充
 
-当前不包含 Tanoby Chamber 未知图腾 form 规则、Egg Searcher、Masuda、第四世代孵化规则及其他未列出的世代算法。第三世代 GameCube RNG、PokeSpot、PID to IVs 和 Jirachi 已加入，但仍待工程检查、Actions、部署回归与项目所有者最终验收。第四世代当前实现 `gen4static` 与 `gen4wild`；`gen4id` 和其他第四世代功能仍只保留扩展契约。每个功能继续使用独立 Wasm 模块和验收记录，不把后续算法并入现有模块。
+当前不包含 Tanoby Chamber 未知图腾 form 规则、Egg Searcher、Masuda、第四世代孵化规则及其他尚未实现的世代算法。第四世代当前实现 `gen4id`、`gen4static` 与 `gen4wild`。每个后续功能继续使用独立 Wasm 模块和验收记录，不把算法并入现有模块。
 
 ## 纯静态与隐私
 
@@ -253,7 +260,7 @@ npm run verify
 
 ## 构建与测试
 
-`npm run build` 先生成 release 模式的 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3pidtoiv`、`gen3egg`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen4static`、`gen4wild`、`gen7id` 与 `pokerusfinder` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
+`npm run build` 先生成 release 模式的 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3pidtoiv`、`gen3egg`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen4id`、`gen4static`、`gen4wild`、`gen7id` 与 `pokerusfinder` MJS/Wasm 产物，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。这些目录都是生成物，不提交到 Git。
 
 测试规划分为五层：
 
@@ -310,9 +317,10 @@ npm run build:web
 - **阶段 6B：`gen3pidtoiv`、`gen3pokespot`、`gen3jirachi`** - 第三世代 PID to IVs、XD PokeSpot、Channel Jirachi Advancer、独立 Wasm/Worker 和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 7：`gen4static` Static Generator/Searcher** - 第四世代 Method 1/J/K、独立 G4 存档、全局个体值计算器、Wasm/Worker 和算法文档（当前合并工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 7B：`gen4wild` Wild Generator/Searcher** - 第四世代野生遭遇、特殊地点数据、独立 Wasm/Worker 和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 7C：`gen4id` ID Generator/Searcher** - 第四世代日期时间与 Delay 枚举、ID 精确筛选、独立 Wasm/Worker 和算法文档（已实现并通过原生夹具与工程检查，待完整 Wasm、Actions、部署回归与最终验收）。
 - **阶段 8：`gen7id` 与 `pokerusfinder`** - 第七世代 ID Generator，以及 DevonStudios 第三/四世代宝可病毒帧查询、Wasm/Worker、日期反推与许可证记录（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 8：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
-- **后续** - Egg Searcher、Tanoby Chamber、Masuda、第四世代孵化、`gen4id` 等未实现能力。
+- **后续** - Egg Searcher、Tanoby Chamber、Masuda、第四世代孵化及其他未实现能力。
 
 ## 许可证、署名与源码分发
 

@@ -57,6 +57,7 @@ import {
 import { useGen4Profiles } from "./features/gen4profiles/useGen4Profiles";
 import { Gen4StaticPanel } from "./features/gen4static/Gen4StaticPanel";
 import { Gen4WildPanel } from "./features/gen4wild/Gen4WildPanel";
+import { Gen4IdPanel } from "./features/gen4id/Gen4IdPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
 
@@ -76,6 +77,7 @@ type ActiveModule =
   | "gamecube"
   | "jirachiadvancer"
   | "spindapainter"
+  | "gen4id"
   | "gen4static"
   | "gen7id"
   | "pokerusfinder"
@@ -357,7 +359,9 @@ function App() {
     failed: t("failed"),
   }[status];
   const gen4Tools =
-    activeModule === "gen4static" || activeModule === "gen4wild";
+    activeModule === "gen4id" ||
+    activeModule === "gen4static" ||
+    activeModule === "gen4wild";
   const gen7Module = activeModule === "gen7id";
   const pokerusModule = activeModule === "pokerusfinder";
   const profileTools = true;
@@ -780,6 +784,24 @@ function App() {
             <div className="rail-section-label">GEN IV</div>
             <button
               className={
+                activeModule === "gen4id"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("gen4id");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">15</span>
+              <span>
+                <strong>{t("gen4IdModule")}</strong>
+                <small>{t("gen4IdVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
                 activeModule === "gen4static"
                   ? "module-entry active"
                   : "module-entry"
@@ -790,7 +812,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">15</span>
+              <span className="module-index">16</span>
               <span>
                 <strong>{t("gen4StaticModule")}</strong>
                 <small>{t("gen4StaticVersion")}</small>
@@ -808,7 +830,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">16</span>
+              <span className="module-index">17</span>
               <span>
                 <strong>{t("gen4WildModule")}</strong>
                 <small>{t("gen4WildVersion")}</small>
@@ -828,7 +850,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">17</span>
+              <span className="module-index">18</span>
               <span>
                 <strong>{t("pokerusFinderModule")}</strong>
                 <small>{t("pokerusGen4Version")}</small>
@@ -847,7 +869,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">18</span>
+              <span className="module-index">19</span>
               <span>
                 <strong>{t("gen7IdModule")}</strong>
                 <small>{t("gen7IdVersion")}</small>
@@ -867,7 +889,9 @@ function App() {
           <div className="page-heading">
             <div>
               <div className="eyebrow">
-                {activeModule === "gen4static" || activeModule === "gen4wild"
+                {activeModule === "gen4id" ||
+                activeModule === "gen4static" ||
+                activeModule === "gen4wild"
                   ? "GEN IV / RNG LAB"
                   : gen7Module
                     ? "GEN VII / RNG LAB"
@@ -903,13 +927,17 @@ function App() {
                                           ? "jirachiAdvancerEngine"
                                           : activeModule === "spindapainter"
                                             ? "spindaPainterEngine"
-                                            : activeModule === "gen7id"
-                                              ? "gen7IdEngine"
-                                              : activeModule === "pokerusfinder"
-                                                ? "pokerusFinderEngine"
-                                                : activeModule === "gen4static"
-                                                  ? "gen4StaticEngine"
-                                                  : "gen4WildEngine",
+                                            : activeModule === "gen4id"
+                                              ? "gen4IdEngine"
+                                              : activeModule === "gen7id"
+                                                ? "gen7IdEngine"
+                                                : activeModule ===
+                                                    "pokerusfinder"
+                                                  ? "pokerusFinderEngine"
+                                                  : activeModule ===
+                                                      "gen4static"
+                                                    ? "gen4StaticEngine"
+                                                    : "gen4WildEngine",
                 )}
               </h1>
             </div>
@@ -941,13 +969,15 @@ function App() {
                                         ? "jirachiAdvancerVersion"
                                         : activeModule === "spindapainter"
                                           ? "spindaPainterVersion"
-                                          : activeModule === "gen7id"
-                                            ? "gen7IdVersion"
-                                            : activeModule === "pokerusfinder"
-                                              ? "pokerusFinderVersion"
-                                              : activeModule === "gen4static"
-                                                ? "gen4StaticVersion"
-                                                : "gen4WildVersion",
+                                          : activeModule === "gen4id"
+                                            ? "gen4IdVersion"
+                                            : activeModule === "gen7id"
+                                              ? "gen7IdVersion"
+                                              : activeModule === "pokerusfinder"
+                                                ? "pokerusFinderVersion"
+                                                : activeModule === "gen4static"
+                                                  ? "gen4StaticVersion"
+                                                  : "gen4WildVersion",
               )}
             </div>
           </div>
@@ -1399,6 +1429,8 @@ function App() {
             <Gen3JirachiAdvancerPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "spindapainter" ? (
             <Gen3SpindaPainterPanel />
+          ) : activeModule === "gen4id" ? (
+            <Gen4IdPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "gen4static" ? (
             <Gen4StaticPanel
               onOpenIvCalculator={openGen4IvCalculator}

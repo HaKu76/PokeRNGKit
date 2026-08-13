@@ -1,11 +1,11 @@
 # 第四世代扩展接口与 AI 交接
 
-> - 状态：第四世代 Static 与 Wild Generator/Searcher、独立存档和全局个体值计算器已实现；Wild 工程与生产回归待验证
-> - 更新日期：2026-08-13
+> - 状态：第四世代 ID、Static 与 Wild Generator/Searcher、独立存档和全局个体值计算器已实现；完整工程与生产回归待验证
+> - 更新日期：2026-08-14
 > - 上游基线：PokeFinder 4.3.2
-> - 当前产品范围：第三世代既有模块与第四世代 Static/Wild
+> - 当前产品范围：第三世代既有模块与第四世代 ID/Static/Wild
 
-本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前已落地 `gen4static` 与 `gen4wild`；`gen4id` 仍仅保留共享接口，不得据此推断已支持其他第四世代功能。
+本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前已落地 `gen4id`、`gen4static` 与 `gen4wild`；不得据此推断已支持其他第四世代功能。
 
 ## 1. 已保留接口
 
@@ -18,7 +18,7 @@
 - `RngWorkerReadyMessage`、`RngWorkerBatchMessage`、`RngWorkerErrorMessage`：握手、批次和失败信封。
 - `GEN4_MODULE_RESERVATIONS`：只保留 `gen4id`、`gen4static`、`gen4wild` 三个标识及 Generator/Searcher 能力。
 
-`gen4static` 与 `gen4wild` 已分别使用 API 版本 `1`、独立 Wasm target、Worker Pool、导航入口和 UI 预览引擎。`gen4id` 仍没有运行时注册。
+`gen4id`、`gen4static` 与 `gen4wild` 已分别使用 API 版本 `1`、独立 Wasm target、Worker Pool、导航入口和 UI 预览引擎。
 
 ## 2.1 当前已实现：`gen4static`
 

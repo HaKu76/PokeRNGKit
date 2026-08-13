@@ -1,7 +1,7 @@
 # PokeRNGKit 产品需求
 
 > - 状态：PR #3 合并冲突已处理；合并结果待工程检查与部署验收
-> - 更新日期：2026-08-13
+> - 更新日期：2026-08-14
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
 
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi、存档信息和个体值计算器已进入工作区；现有合并基线包含第四世代 Static/Wild、独立 G4 存档、宝可病毒与 Encounter Lookup。个体值计算器是跨工作区的全局工具，Encounter Lookup 是跨世代静态查询工具。
+当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi、存档信息和个体值计算器已进入工作区；第四世代 ID、Static/Wild、独立 G4 存档、宝可病毒与 Encounter Lookup 也已进入工作区。个体值计算器是跨工作区的全局工具，Encounter Lookup 是跨世代静态查询工具。
 
 当前工作区额外加入基于 DevonStudios Pokerus Finder 的宝可病毒查询，覆盖第三世代、第四世代 DP 与第四世代 Pt/HGSS 三种交互模式。
 
@@ -434,13 +434,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 9. 后续 MVP
 
-第四世代 Static/Wild 与 Encounter Lookup 通过工程检查、部署页面回归和项目所有者最终验收后，按以下顺序推进：
+第四世代 ID/Static/Wild 与 Encounter Lookup 通过工程检查、部署页面回归和项目所有者最终验收后，按以下顺序推进：
 
 1. 第四世代 Wild 的 Actions、Pages 部署回归和项目所有者最终验收。
 2. Tanoby Chamber form 数据、来源记录与固定夹具。
 3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
-Egg Searcher、Masuda、第四世代孵化等第三世代/第四世代功能在上述 MVP 后评估。GameCube RNG、PokeSpot、PID to IVs、Jirachi 已实现但仍待工程检查、Actions、部署回归与最终验收。第四世代当前承诺 `gen4static` 与 `gen4wild`；`gen4id` 和其他第四世代功能仍只保留扩展接口或候选边界。
+Egg Searcher、Masuda、第四世代孵化等第三世代/第四世代功能在上述 MVP 后评估。第四世代当前实现 `gen4id`、`gen4static` 与 `gen4wild`；其他第四世代功能仍为候选边界。
 
 ## 10. 非目标
 

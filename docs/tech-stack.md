@@ -1,8 +1,8 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：第三世代既有模块与第四世代 Static 已接入独立 Wasm/Worker；PR #3 合并后的工程与部署回归待完成
-> - 更新日期：2026-08-13
-> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 Static Generator/Searcher，第七世代 ID Generator，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
+> - 状态：第三世代既有模块与第四世代 ID/Static/Wild 已接入独立 Wasm/Worker；完整工程与部署回归待完成
+> - 更新日期：2026-08-14
+> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 ID/Static/Wild Generator/Searcher，第七世代 ID Generator，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 > - 包管理器：npm
 
 第七世代 `gen7id` 使用本地优化版 `C:\Users\Hakuhiro\source\repos\3DSRNGTool` 作为主要行为来源，公开仓库只作为祖先归属记录；实现路径与差异范围见 `third_party/3dsrngtool/UPSTREAM.md`。`pokerusfinder` 使用 DevonStudios Pokerus Finder 的 GPL-3.0 源码行为作为第三/四世代帧查询基线，来源记录见 `third_party/pokerusfinder/UPSTREAM.md`。
@@ -183,7 +183,7 @@ gen4wild
 
 每个模块必须拥有独立目录、manifest、构建 target、C ABI 前缀、Worker client 和测试，避免一个 Wasm 文件吸收所有世代和功能。当前 `gen3ivtopid` 每次输入只恢复有限候选，不创建多 Worker 分片；`gen3egg` 只提供 Generator，Searcher 保留为后续独立工作流。
 
-`src/features/shared/rngModuleContract.ts` 保留跨世代的 manifest、Worker 信封和第四世代模块标识。`gen4static` 与 `gen4wild` 已分别注册 API v1、独立产物、导航、Worker Pool 和运行时；`gen4id` 仍只有 reservation。实施边界见[第四世代扩展接口与 AI 交接](gen4-development.md)。
+`src/features/shared/rngModuleContract.ts` 保留跨世代的 manifest、Worker 信封和第四世代模块标识。`gen4id`、`gen4static` 与 `gen4wild` 已分别注册 API v1、独立产物、导航、Worker Pool 和运行时。实施边界见[第四世代扩展接口与 AI 交接](gen4-development.md)。
 
 ### 7.2 当前目录
 
@@ -577,7 +577,7 @@ type ModuleWorkerResponse =
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
 - ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi Advancer、Static、Wild、IVs to PID 与 Egg 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time、PID to IVs、Jirachi 与 IVs to PID 每次输入都是有限任务；GameCube Seed Finder、GameCube RNG 和 PokeSpot 使用模块自己的分片协议；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入。
 
-`gen4static` 与 `gen4wild` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`，任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`。这一契约不改写三代消息类型；`gen4id` 未来可沿用同一跨世代信封。
+`gen4id`、`gen4static` 与 `gen4wild` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`，任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`。这一契约不改写三代消息类型。
 
 ## 9. 源码与许可证边界
 
@@ -585,7 +585,7 @@ type ModuleWorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4static_*`、`gen4wild_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4id_*`、`gen4static_*`、`gen4wild_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 
