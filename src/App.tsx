@@ -28,6 +28,8 @@ import {
 } from "./features/profiles/profilePanelState";
 import {
   gen3EggProfileOrDefault,
+  gen3GameCubeProfileOrDefault,
+  gen3PokeSpotProfileOrDefault,
   gen3StaticProfileOrDefault,
 } from "./features/profiles/domain";
 import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
@@ -36,6 +38,10 @@ import { Gen3NgcSeedPanel } from "./features/ngcseed/Gen3NgcSeedPanel";
 import { Gen3SeedToTimePanel } from "./features/seedtotime/Gen3SeedToTimePanel";
 import { Gen3SpindaPainterPanel } from "./features/spindapainter/Gen3SpindaPainterPanel";
 import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
+import { Gen3PidToIvPanel } from "./features/pidtoiv/Gen3PidToIvPanel";
+import { Gen3JirachiAdvancerPanel } from "./features/jirachiadvancer/Gen3JirachiAdvancerPanel";
+import { Gen3PokeSpotPanel } from "./features/pokespot/Gen3PokeSpotPanel";
+import { Gen3GameCubePanel } from "./features/gamecube/Gen3GameCubePanel";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
 import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
 import { Gen7IdPanel } from "./features/gen7id/Gen7IdPanel";
@@ -64,7 +70,11 @@ type ActiveModule =
   | "static"
   | "wild"
   | "ivtopid"
+  | "pidtoiv"
   | "egg"
+  | "pokespot"
+  | "gamecube"
+  | "jirachiadvancer"
   | "spindapainter"
   | "gen4static"
   | "gen7id"
@@ -697,6 +707,78 @@ function App() {
                 <small>{t("pokerusGen3Version")}</small>
               </span>
             </button>
+            <button
+              className={
+                activeModule === "gamecube"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("gamecube");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">11</span>
+              <span>
+                <strong>{t("gameCubeModule")}</strong>
+                <small>{t("gameCubeVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "pidtoiv"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("pidtoiv");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">12</span>
+              <span>
+                <strong>{t("pidToIvModule")}</strong>
+                <small>{t("pidToIvVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "pokespot"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("pokespot");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">13</span>
+              <span>
+                <strong>{t("pokeSpotModule")}</strong>
+                <small>{t("pokeSpotVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "jirachiadvancer"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("jirachiadvancer");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">14</span>
+              <span>
+                <strong>{t("jirachiAdvancerModule")}</strong>
+                <small>{t("jirachiAdvancerVersion")}</small>
+              </span>
+            </button>
             <div className="rail-section-label">GEN IV</div>
             <button
               className={
@@ -710,7 +792,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">11</span>
+              <span className="module-index">15</span>
               <span>
                 <strong>{t("gen4StaticModule")}</strong>
                 <small>{t("gen4StaticVersion")}</small>
@@ -728,7 +810,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">12</span>
+              <span className="module-index">16</span>
               <span>
                 <strong>{t("gen4WildModule")}</strong>
                 <small>{t("gen4WildVersion")}</small>
@@ -748,7 +830,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">13</span>
+              <span className="module-index">17</span>
               <span>
                 <strong>{t("pokerusFinderModule")}</strong>
                 <small>{t("pokerusGen4Version")}</small>
@@ -767,7 +849,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">14</span>
+              <span className="module-index">18</span>
               <span>
                 <strong>{t("gen7IdModule")}</strong>
                 <small>{t("gen7IdVersion")}</small>
@@ -813,15 +895,23 @@ function App() {
                                 ? "ivToPidEngine"
                                 : activeModule === "egg"
                                   ? "eggEngine"
-                                  : activeModule === "spindapainter"
-                                    ? "spindaPainterEngine"
-                                    : activeModule === "gen7id"
-                                      ? "gen7IdEngine"
-                                      : activeModule === "pokerusfinder"
-                                        ? "pokerusFinderEngine"
-                                        : activeModule === "gen4static"
-                                          ? "gen4StaticEngine"
-                                          : "gen4WildEngine",
+                                  : activeModule === "gamecube"
+                                    ? "gameCubeEngine"
+                                    : activeModule === "pidtoiv"
+                                      ? "pidToIvEngine"
+                                      : activeModule === "pokespot"
+                                        ? "pokeSpotEngine"
+                                        : activeModule === "jirachiadvancer"
+                                          ? "jirachiAdvancerEngine"
+                                          : activeModule === "spindapainter"
+                                            ? "spindaPainterEngine"
+                                            : activeModule === "gen7id"
+                                              ? "gen7IdEngine"
+                                              : activeModule === "pokerusfinder"
+                                                ? "pokerusFinderEngine"
+                                                : activeModule === "gen4static"
+                                                  ? "gen4StaticEngine"
+                                                  : "gen4WildEngine",
                 )}
               </h1>
             </div>
@@ -843,15 +933,23 @@ function App() {
                               ? "ivToPidVersion"
                               : activeModule === "egg"
                                 ? "eggVersion"
-                                : activeModule === "spindapainter"
-                                  ? "spindaPainterVersion"
-                                  : activeModule === "gen7id"
-                                    ? "gen7IdVersion"
-                                    : activeModule === "pokerusfinder"
-                                      ? "pokerusFinderVersion"
-                                      : activeModule === "gen4static"
-                                        ? "gen4StaticVersion"
-                                        : "gen4WildVersion",
+                                : activeModule === "gamecube"
+                                  ? "gameCubeVersion"
+                                  : activeModule === "pidtoiv"
+                                    ? "pidToIvVersion"
+                                    : activeModule === "pokespot"
+                                      ? "pokeSpotVersion"
+                                      : activeModule === "jirachiadvancer"
+                                        ? "jirachiAdvancerVersion"
+                                        : activeModule === "spindapainter"
+                                          ? "spindaPainterVersion"
+                                          : activeModule === "gen7id"
+                                            ? "gen7IdVersion"
+                                            : activeModule === "pokerusfinder"
+                                              ? "pokerusFinderVersion"
+                                              : activeModule === "gen4static"
+                                                ? "gen4StaticVersion"
+                                                : "gen4WildVersion",
               )}
             </div>
           </div>
@@ -1285,6 +1383,22 @@ function App() {
               profile={gen3EggProfileOrDefault(profiles.selectedProfile)}
               uiPreviewMode={uiPreviewMode}
             />
+          ) : activeModule === "gamecube" ? (
+            <Gen3GameCubePanel
+              onOpenIvCalculator={openIvCalculator}
+              profile={gen3GameCubeProfileOrDefault(profiles.selectedProfile)}
+              uiPreviewMode={uiPreviewMode}
+            />
+          ) : activeModule === "pidtoiv" ? (
+            <Gen3PidToIvPanel uiPreviewMode={uiPreviewMode} />
+          ) : activeModule === "pokespot" ? (
+            <Gen3PokeSpotPanel
+              onOpenIvCalculator={openIvCalculator}
+              profile={gen3PokeSpotProfileOrDefault(profiles.selectedProfile)}
+              uiPreviewMode={uiPreviewMode}
+            />
+          ) : activeModule === "jirachiadvancer" ? (
+            <Gen3JirachiAdvancerPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "spindapainter" ? (
             <Gen3SpindaPainterPanel />
           ) : activeModule === "gen4static" ? (
@@ -1350,7 +1464,11 @@ function App() {
               activeModule === "wild" ||
               activeModule === "egg"
                 ? "handheld"
-                : "all"
+                : activeModule === "pokespot"
+                  ? "xd"
+                  : activeModule === "gamecube"
+                    ? "gamecube"
+                    : "all"
             }
             controller={profiles}
             expanded={activeFloatingTool === "profile"}

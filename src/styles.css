@@ -1754,6 +1754,59 @@ h1 {
   color: #ffffff;
   box-shadow: none;
 }
+
+.pokespot-form-grid,
+.pid-to-iv-form-grid,
+.jirachi-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pokespot-slot-note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.pokespot-table-shell,
+.pid-to-iv-table-shell {
+  min-height: 260px;
+}
+.pokespot-table-shell {
+  height: 560px;
+}
+.pokespot-result-table {
+  min-width: 1570px;
+}
+.pokespot-result-table th,
+.pokespot-result-table td {
+  white-space: nowrap;
+}
+.gamecube-result-table {
+  min-width: 1260px;
+}
+.gamecube-result-table th,
+.gamecube-result-table td {
+  white-space: nowrap;
+}
+
+.jirachi-action-list {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 16px 16px 20px;
+}
+
+.jirachi-action-list li {
+  border-bottom: 1px solid var(--line-soft);
+  padding: 8px 0;
+}
+
+.jirachi-empty-state {
+  min-height: 220px;
+}
 .pokerus-operation-tabs {
   display: grid;
   width: 100%;
@@ -1882,6 +1935,21 @@ h1 {
 }
 .gen3static-control-grid .static-rng-panel .compact-field-row {
   display: contents;
+}
+.pokespot-paired-field {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) repeat(2, minmax(72px, 110px));
+  align-items: center;
+  gap: 7px;
+}
+.pokespot-paired-field > span {
+  font-size: 11px;
+}
+.pokespot-paired-field > input {
+  min-width: 0;
+  min-height: 32px;
+  padding: 6px 8px;
+  font-size: 12px;
 }
 .static-encounter-meta {
   display: grid;
@@ -2872,6 +2940,11 @@ h1 {
 }
 
 @media (max-width: 560px) {
+  .pokespot-form-grid,
+  .pid-to-iv-form-grid,
+  .jirachi-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .topbar {
     height: auto;
     min-height: 72px;

@@ -105,7 +105,7 @@ Vite 的 `ui` mode 在编译期选择本地 UI 预览引擎。该引擎只生成
 
 React 负责高交互表单、进度状态和虚拟化结果视图。TypeScript 为 RNG 请求、Worker 消息、Wasm 解码和状态机提供静态边界。
 
-当前有 ID、Initial Seed、Seed to Time、GameCube Seed Finder、G3 Static、Wild、IVs to PID、Egg、G4 Static、G4 Wild、G7 ID 与宝可病毒查询十二个 RNG 工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。存档信息分别由 `useGen3Profiles`、`useGen4Profiles` 与各自 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；Spinda Painter 与 Encounter Lookup 使用本地确定性数据，不进入 RNG Worker 状态。
+当前有 ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi Advancer、G3 Static、Wild、IVs to PID、Egg、G4 Static、G4 Wild、G7 ID 与宝可病毒查询十六个 RNG 工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。存档信息分别由 `useGen3Profiles`、`useGen4Profiles` 与各自 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；Spinda Painter 与 Encounter Lookup 使用本地确定性数据，不进入 RNG Worker 状态。
 
 ### 5.2 路由
 
@@ -172,6 +172,10 @@ gen3static
 gen3wild
 gen3ivtopid
 gen3egg
+gen3pidtoiv
+gen3gamecube
+gen3pokespot
+gen3jirachi
 gen4id
 gen4static
 gen4wild
@@ -228,6 +232,26 @@ wasm/
         |-- module.json
         |-- bridge/
         `-- tests/
+    |-- gen3pidtoiv/
+        |-- CMakeLists.txt
+        |-- module.json
+        |-- bridge/
+        `-- tests/
+    |-- gen3gamecube/
+        |-- CMakeLists.txt
+        |-- module.json
+        |-- bridge/
+        `-- tests/
+    |-- gen3pokespot/
+        |-- CMakeLists.txt
+        |-- module.json
+        |-- bridge/
+        `-- tests/
+    |-- gen3jirachi/
+        |-- CMakeLists.txt
+        |-- module.json
+        |-- bridge/
+        `-- tests/
     |-- gen4static/
     |   |-- CMakeLists.txt
     |   |-- module.json
@@ -261,6 +285,14 @@ public/wasm/                        # 生成物，忽略
 |-- gen3ivtopid.wasm
 |-- gen3egg.mjs
 |-- gen3egg.wasm
+|-- gen3pidtoiv.mjs
+|-- gen3pidtoiv.wasm
+|-- gen3gamecube.mjs
+|-- gen3gamecube.wasm
+|-- gen3pokespot.mjs
+|-- gen3pokespot.wasm
+|-- gen3jirachi.mjs
+|-- gen3jirachi.wasm
 |-- gen4static.mjs
 |-- gen4static.wasm
 |-- gen4wild.mjs
@@ -275,7 +307,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 2，`gen3initialseed` API 版本为 1，`gen3seedtotime` API 版本为 1，`gen3ngcseed` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 3，`gen3ivtopid` API 版本为 1，`gen3egg` API 版本为 1，`gen4static` API 版本为 1，`gen4wild` API 版本为 1，`gen7id` API 版本为 1，`pokerusfinder` API 版本为 1。ID C ABI 为：
+当前 `gen3id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen7id` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -543,7 +575,7 @@ type ModuleWorkerResponse =
 - 批次缓冲区使用 transfer list 移交所有权。
 - 取消通过终止 Pool 中的 Worker 实现，下一任务重新初始化。
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
-- ID、Initial Seed、Seed to Time、GameCube Seed Finder、Static、Wild、IVs to PID 与 Egg 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time 和 IVs to PID 每次输入都是有限任务，不拆分 chunk；GameCube Seed Finder 以低 16 位、32 位 Seed 区间或候选数组分片；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入。
+- ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi Advancer、Static、Wild、IVs to PID 与 Egg 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time、PID to IVs、Jirachi 与 IVs to PID 每次输入都是有限任务；GameCube Seed Finder、GameCube RNG 和 PokeSpot 使用模块自己的分片协议；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入。
 
 `gen4static` 与 `gen4wild` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`，任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`。这一契约不改写三代消息类型；`gen4id` 未来可沿用同一跨世代信封。
 
@@ -553,7 +585,7 @@ type ModuleWorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3egg_*`、`gen4static_*`、`gen4wild_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4static_*`、`gen4wild_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 

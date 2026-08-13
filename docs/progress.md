@@ -2,10 +2,20 @@
 
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
-> - Git 基线：`34eae65 feat: 新增宝可病毒查询`
-> - 当前阶段：合并第四世代 Wild、宝可病毒与全局 UI 优化
+> - Git 基线：`cdf8b67 fix: 修复 PWA 预缓存构建上限`
+> - 当前阶段：补全第三世代 PokeFinder 功能模块
 > - 工作区状态：源码和文档尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：本轮完成静态审查、冲突清理和格式检查；ESLint、TypeScript、测试、构建和浏览器 UI 待授权验证
+> - 验收状态：本轮完成静态审查和冲突清理；最终格式检查待本轮编辑收尾，ESLint、TypeScript、测试、构建和浏览器 UI 待授权验证
+
+## 2026-08-13 第三世代模块补全
+
+- 新增：`gen3gamecube` GameCube Generator/Searcher，覆盖 XD、Colosseum、Channel 的 Non Shadow、Shadow Locks 和 Channel 模板；正式数据静态核对为 `69/1/77` 条。
+- 新增：`gen3pidtoiv` PID to IVs、`gen3pokespot` XD PokeSpot、`gen3jirachi` Channel Jirachi Advancer；四个模块均接入 React 导航、独立 C ABI、Dedicated Worker、API v1、原生夹具和模块文档。
+- 优化：PokeSpot Food/Encounter 二维组合按约一百万组合拆分，最多使用 8 个独立 Worker，并按 `chunkIndex` 恢复确定结果顺序；进度按实际组合数汇报，默认范围为 `100020001` 组。
+- 修复：Jirachi 上游 `255` 直接接受哨兵现在解码为 `Accept Jirachi`；GameCube、PokeSpot 结果解码新增 IV、能力、性别、等级、性格、闪光和物种边界校验。
+- 更新：`scripts/generate-gen3-gamecube-data.mjs` 从 EncounterTableGenerator `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 生成正式 GameCube 模板数据；临时生成目录仅用于本地审计，完成后清理。
+- 已执行：对本轮任务文件运行定向 `npm run format:files -- ...`；`git diff --check` 未报告空白错误。
+- 当前限制：`npm run format:check` 已执行，但全仓仍有 85 个历史未格式化文件；未扩大格式化范围。未获授权执行 `npm run verify`、`npm run wasm:test:native`、`npm run wasm:build`、TypeScript、浏览器或生产回归。
 
 ## 2026-08-13 CI 格式失败复盘
 

@@ -55,6 +55,11 @@ export const DEFAULT_GEN3_PROFILE: Gen3Profile = {
   updatedAt: 0,
 };
 
+export const DEFAULT_GEN3_GAMECUBE_PROFILE: Gen3Profile = {
+  ...DEFAULT_GEN3_PROFILE,
+  version: "xd",
+};
+
 export const EMPTY_GEN3_PROFILE_STATE: Gen3ProfileState = {
   schemaVersion: 1,
   profiles: [],
@@ -89,6 +94,20 @@ export function gen3EggProfileOrDefault(profile?: Gen3Profile) {
   return profile && isGen3EggVersion(profile.version)
     ? profile
     : DEFAULT_GEN3_PROFILE;
+}
+
+export function isGen3GameCubeVersion(version: Gen3GameVersion) {
+  return version === "xd" || version === "colosseum";
+}
+
+export function gen3GameCubeProfileOrDefault(profile?: Gen3Profile) {
+  return profile && isGen3GameCubeVersion(profile.version)
+    ? profile
+    : DEFAULT_GEN3_GAMECUBE_PROFILE;
+}
+
+export function gen3PokeSpotProfileOrDefault(profile?: Gen3Profile) {
+  return profile?.version === "xd" ? profile : DEFAULT_GEN3_GAMECUBE_PROFILE;
 }
 
 function createId() {

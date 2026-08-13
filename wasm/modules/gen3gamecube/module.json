@@ -1,0 +1,7 @@
+{
+  "id": "gen3gamecube",
+  "apiVersion": 1,
+  "target": "gen3gamecube",
+  "artifacts": ["gen3gamecube.mjs", "gen3gamecube.wasm"],
+  "source": "PokeFinder 4.3.2 Gen III GameCubeGenerator and GameCubeSearcher"
+}

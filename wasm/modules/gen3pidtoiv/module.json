@@ -1,0 +1,7 @@
+{
+  "id": "gen3pidtoiv",
+  "apiVersion": 1,
+  "target": "gen3pidtoiv",
+  "artifacts": ["gen3pidtoiv.mjs", "gen3pidtoiv.wasm"],
+  "source": "PokeFinder 4.3.2 PIDToIVCalculator"
+}

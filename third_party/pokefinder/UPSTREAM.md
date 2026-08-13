@@ -5,7 +5,7 @@
 - 本地核验来源：`C:\Users\Hakuhiro\Desktop\PokeFinder-master`
 - 导入日期：2026-08-11
 - 许可证：GNU GPL v3 or later
-- 导入范围：第三世代 ID Generator 所需的最小 Core、共享 LCRNG、ID 状态与筛选父类；G3 Static、Wild、IVs to PID、Egg、G4 Static 与 G4 Wild 以独立 bridge 对照上游源码实现；Encounter Lookup 以静态生成数据对照上游行为
+- 导入范围：第三世代 ID Generator 与 GameCube Generator/Searcher 所需的 Core、共享 LCRNG、状态与筛选父类；G3 Static、Wild、IVs to PID、PID to IVs、PokeSpot、Jirachi、Egg、G4 Static 与 G4 Wild 以独立 bridge 对照上游源码实现；Encounter Lookup 以静态生成数据对照上游行为
 
 本地核验目录不是构建依赖。PokeRNGKit 构建只使用本目录内的 vendored snapshot；所有文件保留原始版权与 GPL 头部。
 
@@ -148,6 +148,73 @@ FE6A55570119A253DBD69946D86648E25910687D3B851CD92D4213548C028BE2  RNGRecovertest
 `wasm/modules/gen3seedtotime/bridge/gen3seedtotime_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `SeedToTimeCalculator3` 的 PokeRNGR 回推、分钟枚举和 post-2000 日历缺陷提供第三世代 Seed to Time C ABI；不修改 vendored 上游文件。
 
 `wasm/modules/gen3ngcseed/bridge/gen3ngcseed_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `GalesSeedSearcher`、`ColoSeedSearcher` 与 `ChannelSeedSearcher` 的调用顺序提供 GameCube Seed Finder C ABI。React 不直接执行 XDRNG；`.precalc` 仅在 TypeScript 中解析上游固定的小端文件结构和 Qt ISO 3309 CRC。
+
+`wasm/modules/gen3pidtoiv/bridge/gen3pidtoiv_bridge.cpp` 对照 `PIDToIVCalculator` 的 Method 1/2/4、XD/Colo 和 Channel 路径，复用 vendored `LCRNG.hpp` 与 `LCRNGReverse.cpp` 提供 PID to IVs C ABI。`wasm/modules/gen3jirachi/bridge/gen3jirachi_bridge.cpp` 对照 `JirachiPattern` 提供菜单动作与目标 Seed C ABI；两者都只在 Dedicated Worker 内运行。
+
+`wasm/modules/gen3pokespot/bridge/gen3pokespot_bridge.cpp` 对照 `PokeSpotGenerator` 的 Food/Encounter 双 XDRNG 调用顺序，并使用 EncounterTableGenerator 固定 PokeSpot 数据。`wasm/modules/gen3gamecube/bridge/gen3gamecube_bridge.cpp` 编译下列 vendored PokeFinder GameCube Core，通过 PokeRNGKit 兼容层和固定 55-word 请求提供 Generator/Searcher C ABI。
+
+## 第三世代补全模块来源
+
+本轮新增的 vendored PokeFinder 文件未修改，保留原始 GPL-3.0-or-later 头：
+
+```text
+839E30FD29ACD03D0737C12B9DDA22743969A3DE5B2783A9D2E2680200C6C47F  Core/Enum/Shiny.hpp
+DED5EFD80029D6C34940472816A67E7A0E31B427CC77957F0CCE465C2A61015C  Core/Enum/ShadowType.hpp
+39FD7D7A5854698D77B51D6E3C375CA0421A25599B2CF98CB2ECEA65A297558C  Core/Gen3/Generators/GameCubeGenerator.cpp
+91C21E7B6B773FADDCA49525CAC72E6D7B8B19A8497BBC291E39A459BF001900  Core/Gen3/Generators/GameCubeGenerator.hpp
+F9DFEA0ABD638602E1FBC4D80341A49778CCD107D6B9ECE6A9954B0922511574  Core/Gen3/LockInfo.hpp
+9B47579A41CAECD01DA6B8E20E9277B854FD968738C13549A48E939A0862DD14  Core/Gen3/Profile3.cpp
+C8C58AC4DA4A06F55D7A830150FEA97F74B4E7DAD79EB474D9302295C5CCD2FB  Core/Gen3/Profile3.hpp
+35B44477707654A0C8DDE7A3656561A8000CF233D8D1197C41F2CE81B19013F0  Core/Gen3/Searchers/GameCubeSearcher.cpp
+A044673AE0DD8A92DD74388D02F958F2A1A61FEBE1B7E2A6AD59CA93E11A2FAF  Core/Gen3/Searchers/GameCubeSearcher.hpp
+FE227215ABF9D26926B5D19F9BB7DBBE7E589FC2801A709A52B40941FA1289C0  Core/Gen3/ShadowLock.cpp
+F39BCF463F5A9DBEC2741C61A3D44F64190E044FAEB2CB5A290C29D0D381E85B  Core/Gen3/ShadowLock.hpp
+861A0F5A37B73EC425398FB61D4EE9D0AE8D22A61CFB7C8EA0F7E770806EA49C  Core/Parents/Searchers/StaticSearcher.hpp
+```
+
+以下 PokeFinder 4.3.2 文件只用于核验 Form 输入、Core 参数和固定夹具，未复制到 vendored snapshot：
+
+```text
+47EB030E6C010174EE9CCE140860447D87243213BD16A169F74BB8C896834C9D  Form/Gen3/GameCube.cpp
+DDB872A7C06C5038603DC5DBA76BD73266649346FAAE3FFDCE6F0F340AF57A59  Form/Gen3/GameCube.ui
+BB7B9102B4C0B4797A33B51F97C4460A4EC0B86D599BD6922CC62D0593E7345D  Form/Gen3/Tools/PIDToIV.cpp
+AF78F49EDE5BDCE858FD8AF3A398B34B1FD7C0F2693921C8BAC3D37137E116DC  Form/Gen3/Tools/PIDToIV.ui
+13FC8FDB3581C7FE1FCAAB312357CC508AAF856EDF6FC8B75D8BC94D00043BE5  Form/Gen3/Tools/PokeSpot.cpp
+C19ABBFABA5BF4DDE29226609FC4DA6BF0954A6A19527CF2F00D451AABB20628  Form/Gen3/Tools/PokeSpot.ui
+76C32A675C6BAE6DAB9FD52D43F31432233F24B5F2E6E77803F82444120F285D  Form/Gen3/Tools/JirachiAdvancer.cpp
+77803E3897AFC0E5716930071C593C0FBEB1FCEF6D1D37C3C01CC9A2B41744B4  Form/Gen3/Tools/JirachiAdvancer.ui
+C92BE23FFE02299DFC6B2B14B55705A589E01A422D4EC571F4974E3B4A1CE4AE  Core/Gen3/Generators/PokeSpotGenerator.cpp
+0E6239995D7C585A94914DA28D7211FEEE43B7D851C03F912EFC52FE17DAE453  Core/Gen3/Generators/PokeSpotGenerator.hpp
+013B90F00192BAD1A2FB3EDC349C8324D25491E09711746487FA6232D7B90675  Core/Gen3/Tools/PIDToIVCalculator.cpp
+772F4369459E01DC2EA6ED470C063C289DCC6845B0AF355FD9F0CFF3EF5FB952  Core/Gen3/Tools/PIDToIVCalculator.hpp
+9416B499B06D2C760E1654D9836BF500C3A33138B9E872E51331C0461E0300AE  Core/Gen3/Tools/JirachiPattern.cpp
+2CD4D661769BAFED9DB7DF3D80B4EF7365E9C61D5013BD6E13C6DB5D78A144DA  Core/Gen3/Tools/JirachiPattern.hpp
+1A649D229B6DA06A75674B227BA351B2F6155D164E99181E39B77E11F92CCC85  Test/Gen3/GameCubeGeneratorTest.cpp
+CF27B0D9B585A900653D67CD7C21B305AEC1D16ED71F249DB845D27F1931AFC2  Test/Gen3/GameCubeSearcherTest.cpp
+E9386E8ABAB335A6B7ECA8E4B254E82A7D8369E7C52CA72C838763025B0A2E07  Test/Gen3/PokeSpotGeneratorTest.cpp
+2CF4BCEFA38013FC931FC94929D26BB86D0715ED5E801776E5FD2598695B94E7  Test/Gen3/PIDToIVCalculatorTest.cpp
+05D9936917F5617502FBA0291E93DD97203718479B361C4F682B8BE4BF45CE15  Test/Gen3/JirachiPatternTest.cpp
+51B4F88667748825CE5091600BD2C5EE7F0152912BFC25856004319E41863FCA  Form/Controls/TextBox.cpp
+BB98B0FE73D2310712EE44CA04B255D6E31B8B70D1BD0FB2F759FD14F246140D  Form/i18n/PokeFinder_zh.ts
+```
+
+GameCube 模板和 PokeSpot 槽位锁定到 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9`：
+
+```text
+13DEFA92FCEFA95966847AB97EE40E79E43194AD452DA77EF4E1C1EE0B42C6DE  Gen3/encounters.json
+AAEFF8172BCC0FCCF55F8CBDA8A8551A15FA5F6C34CB3233545D5E8D6E395142  Gen3/xd/pokespot.bin
+90159F174CBD4F62AAE47487D55F4203773069B92E1735DF19026562BABA3800  src/features/gamecube/encounters.json
+E4089631ED50E6CB6E25689821E0F797A2F34A72766FEF86897234E643648A13  scripts/generate-gen3-gamecube-data.mjs
+```
+
+生成命令：
+
+```powershell
+node scripts\generate-gen3-gamecube-data.mjs `
+  <EncounterTableGenerator-7769c1df\Gen3\encounters.json>
+```
+
+生成结果包含 Non Shadow `69`、Channel `1`、Shadow `77` 条模板。EncounterTableGenerator 解压目录与压缩包只用于来源审计，不是构建或运行时依赖，不应提交。
 
 ## GameCube Seed Finder 只读核验
 

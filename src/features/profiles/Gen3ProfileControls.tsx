@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
 import { FloatingToolPanel } from "../shared/FloatingToolPanel";
 import {
+  DEFAULT_GEN3_GAMECUBE_PROFILE,
   DEFAULT_GEN3_PROFILE,
   GEN3_GAME_VERSIONS,
   isGen3StaticVersion,
@@ -337,7 +338,7 @@ function ProfileManager({ controller, onClose }: ProfileManagerProps) {
 
 interface Gen3ProfileControlsProps {
   controller: Gen3ProfilesController;
-  compatibleVersions: "all" | "handheld";
+  compatibleVersions: "all" | "handheld" | "gamecube" | "xd";
   expanded: boolean;
   onExpandedChange(expanded: boolean): void;
 }
@@ -355,13 +356,21 @@ export function Gen3ProfileControls({
       controller.profiles.filter((profile) =>
         compatibleVersions === "all"
           ? true
-          : isGen3StaticVersion(profile.version),
+          : compatibleVersions === "handheld"
+            ? isGen3StaticVersion(profile.version)
+            : compatibleVersions === "xd"
+              ? profile.version === "xd"
+              : profile.version === "xd" || profile.version === "colosseum",
       ),
     [compatibleVersions, controller.profiles],
   );
+  const defaultProfile =
+    compatibleVersions === "gamecube" || compatibleVersions === "xd"
+      ? DEFAULT_GEN3_GAMECUBE_PROFILE
+      : DEFAULT_GEN3_PROFILE;
   const selected =
     profiles.find((profile) => profile.id === controller.selectedProfileId) ??
-    DEFAULT_GEN3_PROFILE;
+    defaultProfile;
 
   return (
     <>
@@ -384,14 +393,14 @@ export function Gen3ProfileControls({
                 disabled={controller.loading}
                 onChange={(event) =>
                   void controller.selectProfile(
-                    event.target.value === DEFAULT_GEN3_PROFILE.id
+                    event.target.value === defaultProfile.id
                       ? null
                       : event.target.value,
                   )
                 }
                 value={selected.id}
               >
-                <option value={DEFAULT_GEN3_PROFILE.id}>-</option>
+                <option value={defaultProfile.id}>-</option>
                 {profiles.map((profile) => (
                   <option key={profile.id} value={profile.id}>
                     {profile.name}

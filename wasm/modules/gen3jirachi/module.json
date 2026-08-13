@@ -1,0 +1,7 @@
+{
+  "id": "gen3jirachi",
+  "apiVersion": 1,
+  "target": "gen3jirachi",
+  "artifacts": ["gen3jirachi.mjs", "gen3jirachi.wasm"],
+  "source": "PokeFinder 4.3.2 JirachiPattern"
+}
