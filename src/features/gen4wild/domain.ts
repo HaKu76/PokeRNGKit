@@ -354,14 +354,6 @@ function isHgss(version: Gen4WildGame) {
   return version === "heartgold" || version === "soulsilver";
 }
 
-function isFishing(encounter: Gen4WildEncounter) {
-  return (
-    encounter === "old-rod" ||
-    encounter === "good-rod" ||
-    encounter === "super-rod"
-  );
-}
-
 function unlockedUnown(profile: Gen4GameProfile) {
   const groups = [
     [0, 9],

@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useEffect, useRef } from "react";
+import { type PropsWithChildren, useCallback, useEffect, useRef } from "react";
 
 interface FloatingToolPanelProps extends PropsWithChildren {
   readonly className?: string;
@@ -28,9 +28,9 @@ export function FloatingToolPanel({
   const wasExpanded = useRef(expanded);
   const headingId = `${id}-heading`;
 
-  const restoreTriggerFocus = () => {
+  const restoreTriggerFocus = useCallback(() => {
     requestAnimationFrame(() => document.getElementById(triggerId)?.focus());
-  };
+  }, [triggerId]);
 
   useEffect(() => {
     if (expanded && !wasExpanded.current) panelRef.current?.focus();
@@ -64,7 +64,7 @@ export function FloatingToolPanel({
       document.removeEventListener("keydown", closeOnEscape);
       document.removeEventListener("pointerdown", closeOnOutsidePointer);
     };
-  }, [expanded, onExpandedChange, triggerId]);
+  }, [expanded, onExpandedChange, restoreTriggerFocus, triggerId]);
 
   if (!expanded) return null;
 

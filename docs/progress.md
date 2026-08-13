@@ -13,6 +13,12 @@
 - 根因是定向格式化或旧的本地检查结果不能证明 CI 执行的 `prettier --check .`；后续合并、手工调整或新增文件可能再次引入排版差异。
 - 已将 SOP 固化为：最后一次编辑后重新格式化全部任务文件；提交前必须运行完整 `npm run format:check`；按 CI 输出文件列表定向修复并重复全仓检查；最后再运行 `git diff --check`。本次只修复格式，未运行 lint、typecheck、测试或构建。
 
+## 2026-08-13 Actions lint 修复
+
+- Actions `31692370495` 的 Prettier 已通过；唯一阻断错误是 `src/features/gen4wild/domain.ts` 中未使用的 `isFishing`，已删除死代码。
+- `src/features/shared/FloatingToolPanel.tsx` 的 `restoreTriggerFocus` 已改为 `useCallback` 并加入 effect 依赖，消除本次新增的 Hook warning。
+- 已通过：定向 Prettier、`npm run lint`（仅保留 Gen3 Egg/Wild 的两条既有 TanStack Virtual warning）和 `git diff --check`。未运行 typecheck、测试、构建或浏览器验收。
+
 ## 2026-08-13 Contributions
 
 - 新增全局只读 Contributions 面板，从右下角工具栏打开，并复用现有悬浮面板的互斥、点外关闭、`Escape` 和焦点恢复逻辑；不占用按世代划分的 RNG 模块侧栏。
