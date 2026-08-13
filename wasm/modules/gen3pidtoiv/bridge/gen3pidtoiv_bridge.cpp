@@ -59,7 +59,7 @@ namespace
 
     void calculateMethods124(std::uint32_t pid)
     {
-        const auto seeds = LCRNGReverse::recoverPokeRNGPID(pid);
+        auto seeds = LCRNGReverse::recoverPokeRNGPID(pid);
         for (int i = 0; i < seeds.count; i++)
         {
             const std::uint32_t seed = PokeRNGR(seeds[i]).next();
@@ -75,7 +75,7 @@ namespace
 
     void calculateXdColo(std::uint32_t pid)
     {
-        const auto seeds = LCRNGReverse::recoverXDRNGPID(pid);
+        auto seeds = LCRNGReverse::recoverXDRNGPID(pid);
         for (int i = 0; i < seeds.count; i++)
         {
             XDRNGR backward(seeds[i], 1);
@@ -87,7 +87,7 @@ namespace
 
     void calculateChannelCandidate(std::uint32_t pid, std::uint32_t recoveredPid)
     {
-        const auto seeds = LCRNGReverse::recoverXDRNGPID(recoveredPid);
+        auto seeds = LCRNGReverse::recoverXDRNGPID(recoveredPid);
         for (int i = 0; i < seeds.count; i++)
         {
             XDRNGR backward(seeds[i]);

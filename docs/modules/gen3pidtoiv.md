@@ -34,6 +34,8 @@ uint32_t gen3pidtoiv_last_error();
 
 ## 验证状态
 
-已加入 `wasm/modules/gen3pidtoiv/tests/pid_to_iv_native_test.cpp`，夹具包含 PID `0` 的 Method 1 与 Channel 结果。2026-08-13 经项目所有者授权，非受限环境的 `npm run verify` 已通过 Prettier、ESLint、TypeScript、28 个 Vitest 文件共 103 项测试、Vite 构建和 PWA 预缓存。`npm run wasm:test:native`、`npm run wasm:build`、浏览器和生产算法回归未运行；算法验收仍需部署完成后由项目所有者提供 URL 并明确授权。
+已加入 `wasm/modules/gen3pidtoiv/tests/pid_to_iv_native_test.cpp`，夹具包含 PID `0` 的 Method 1 与 Channel 结果。针对 Actions 的 GNU 13.3 编译错误，三个 `RecoverySeeds` 局部值已改为非 const；上游 `operator[]` 只有非 const 重载，未修改 vendored PokeFinder 文件。
+
+2026-08-13 经项目所有者授权，非受限环境的 `npm run verify` 已通过 Prettier、ESLint、TypeScript、28 个 Vitest 文件共 103 项测试、Vite 构建和 PWA 预缓存；Visual Studio 2026 Build Tools x64 环境的 `npm run wasm:test:native` 已通过全部 16 个原生测试，包含 `gen3pidtoiv_native_parity`。未重新运行 GNU 13.3 环境的 Actions，`npm run wasm:build`、浏览器和生产算法回归未运行；算法验收仍需部署完成后由项目所有者提供 URL 并明确授权。
 
 上游算法与 vendored 文件 SHA-256 见 [`third_party/pokefinder/UPSTREAM.md`](../../third_party/pokefinder/UPSTREAM.md)。

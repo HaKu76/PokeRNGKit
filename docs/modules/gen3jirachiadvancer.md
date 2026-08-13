@@ -39,6 +39,8 @@ uint32_t gen3jirachi_last_error();
 
 ## 验证状态
 
-已加入 `wasm/modules/gen3jirachi/tests/jirachi_native_test.cpp`，覆盖 API 版本、`compute_seed` 固定值和不可获得目标。2026-08-13 经项目所有者授权，非受限环境的 `npm run verify` 已通过 Prettier、ESLint、TypeScript、28 个 Vitest 文件共 103 项测试、Vite 构建和 PWA 预缓存。原生夹具、Wasm 构建、浏览器和生产算法回归未运行。
+已加入 `wasm/modules/gen3jirachi/tests/jirachi_native_test.cpp`，覆盖 API 版本、`compute_seed` 固定值、超出最大帧数和不可获得目标。`startingSeed=0 / targetSeed=0` 的转换目标位于第 16 帧，因此 `maxAdvances=0` 按上游 UI 判断顺序返回 `outsideRange`；以转换后的目标作为起始 Seed 时，0 帧操作序列返回 `unobtainable`。
+
+2026-08-13 经项目所有者授权，非受限环境的 `npm run verify` 已通过 Prettier、ESLint、TypeScript、28 个 Vitest 文件共 103 项测试、Vite 构建和 PWA 预缓存；Visual Studio 2026 Build Tools x64 环境的 `npm run wasm:test:native` 已通过全部 16 个原生测试，包含 `gen3jirachi_native_parity`。`npm run wasm:build`、浏览器和生产算法回归未运行；原生夹具仅作为工程证据，不代替部署页面的算法验收。
 
 上游算法与 SHA-256 记录见 [`third_party/pokefinder/UPSTREAM.md`](../../third_party/pokefinder/UPSTREAM.md)。

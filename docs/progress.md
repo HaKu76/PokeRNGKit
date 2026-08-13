@@ -2,10 +2,10 @@
 
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
-> - Git 基线：`0522fc4 feat: 补全第三世代功能模块`
-> - 当前阶段：修复第三世代模块 CI 并更新 HakuStyle
-> - 工作区状态：本轮源码、样式、Skill 和文档修改尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：`npm run verify` 已通过；原生夹具、Wasm 构建、浏览器 UI 和生产算法回归未运行
+> - Git 基线：`08049de feat: 补全第三世代功能模块`
+> - 当前阶段：修复第三世代原生测试 CI
+> - 工作区状态：本轮原生兼容修复、夹具和文档修改尚未提交；Codex 不提交、不 push、不部署
+> - 验收状态：`npm run verify` 与 16/16 原生夹具已通过；Wasm 构建、浏览器 UI 和生产算法回归未运行
 
 ## 2026-08-13 第三世代模块 CI 与 HakuStyle 更新
 
@@ -15,9 +15,12 @@
 - 更新：从本地 HakuStyle `C:\Users\Hakuhiro\Documents\Codex\2026-08-12\b\outputs\hakustyle` 的 `b69b444` 同步最新版 `SKILL.md`、8 份渐进参考、交互预览资产、界面元数据和校验脚本；补充成对输入、精确可见标签和 React 依赖状态重置规则。`PyYAML 6.0.3` 与 Skill Creator 校验均通过。
 - 修复：HakuStyle 浏览器 Demo 显式声明 `document`、`navigator` 和 `window`，保持资源继续纳入 ESLint；同一修正已回写本地 HakuStyle 源目录。
 - 修复：新增根目录 `.gitattributes`，统一文本为 LF，消除 Windows 全局 `core.autocrlf=true` 导致本地 Prettier 对 81 个已提交文件的误报；归一化没有为这些文件产生实际内容 diff。
+- 修复：Actions 的 GNU 13.3 原生构建在 PID to IVs 的 `RecoverySeeds::operator[]` 处拒绝 const 对象；三个局部恢复结果改为非 const，匹配上游仅提供非 const 下标重载的类型接口，不修改 vendored PokeFinder 文件。
+- 修复：Jirachi 原生夹具原先把 `startingSeed=0 / targetSeed=0 / maxAdvances=0` 错判为 `unobtainable`；实际转换目标为第 16 帧，按上游 UI 判断顺序应先返回 `outsideRange`。夹具现分别覆盖 16 帧超范围和 0 帧不可获得两个分支。
 - 验证：首次有效 `npm run verify` 在 81 个 CRLF 工作树文件的 Prettier 检查停止；第二次在新 Demo 的 25 个浏览器全局 lint error 停止；第三次在 GameCube UI 预览的 TypeScript 字面量比较停止；第四次通过格式、lint、类型和 103 项测试后，在受限终端复制 `public/wasm/gen3egg.mjs` 到 `dist` 时因 Windows `EPERM` 停止。
 - 已通过：非受限环境完整运行 `npm run verify`。Prettier、ESLint（0 error，保留 Egg/Wild 两条既有 TanStack Virtual warning）、TypeScript、28 个 Vitest 文件共 103 项测试、Vite 生产构建和 PWA 42 项预缓存均成功；Vite 仅保留主包超过 500 kB 的非阻断 warning。
-- 未运行：`npm run wasm:test:native`、`npm run wasm:build`、性能、外部浏览器、部署页面和生产算法回归；本轮没有获授权执行这些检查或提供 URL。
+- 已通过：经项目所有者授权，在 Visual Studio 2026 Build Tools x64 开发环境完整运行 `npm run wasm:test:native`，16/16 原生测试通过，包含 `gen3pidtoiv_native_parity` 与 `gen3jirachi_native_parity`。第一次 1 秒调用仅启动开发环境并被调用端超时，不是测试失败；随后完整命令成功。
+- 未运行：未在 GNU 13.3 环境重新执行 Actions；`npm run wasm:build`、性能、外部浏览器、部署页面和生产算法回归未运行。原生夹具是工程证据，不作为算法验收。
 
 ## 2026-08-13 第三世代模块补全
 
