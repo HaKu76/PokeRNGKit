@@ -40,6 +40,7 @@ import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
 import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
 import { Gen7IdPanel } from "./features/gen7id/Gen7IdPanel";
 import { PokerusFinderPanel } from "./features/pokerusfinder/PokerusFinderPanel";
+import { ContributionsPanel } from "./features/contributions/ContributionsPanel";
 import { IvCalculator } from "./features/gen4ivcalculator/Gen4IvCalculator";
 import { Gen4ProfileControls } from "./features/gen4profiles/Gen4ProfileControls";
 import { DEFAULT_GEN4_PROFILE } from "./features/gen4profiles/domain";
@@ -97,6 +98,7 @@ function App() {
   const [moduleRailOpen, setModuleRailOpen] = useState(false);
   const [ivCalculatorExpanded, setIvCalculatorExpanded] = useState(false);
   const [encounterLookupExpanded, setEncounterLookupExpanded] = useState(false);
+  const [contributionsExpanded, setContributionsExpanded] = useState(false);
   const [profileExpanded, setProfileExpanded] = useState(
     initialGen3ProfilePanelExpanded,
   );
@@ -142,6 +144,11 @@ function App() {
   const [language, setLanguage] = useState<SupportedLanguage>(
     i18n.language === "en" || i18n.language === "ja" ? i18n.language : "zh",
   );
+  const [wideViewport, setWideViewport] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(min-width: 901px)").matches,
+  );
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => () => searchEngine.dispose(), [searchEngine]);
@@ -149,6 +156,13 @@ function App() {
     document.documentElement.lang =
       language === "zh" ? "zh-CN" : language === "ja" ? "ja" : "en";
   }, [language]);
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 901px)");
+    const updateViewport = () => setWideViewport(media.matches);
+    updateViewport();
+    media.addEventListener("change", updateViewport);
+    return () => media.removeEventListener("change", updateViewport);
+  }, []);
   useEffect(() => {
     if (!moduleRailOpen) return;
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -193,6 +207,7 @@ function App() {
   const openIvCalculator = () => {
     setIvCalculatorExpanded(true);
     setEncounterLookupExpanded(false);
+    setContributionsExpanded(false);
     setProfileExpanded(false);
     persistGen3ProfilePanelExpanded(false);
     setGen4ProfileExpanded(false);
@@ -205,6 +220,7 @@ function App() {
     if (expanded) {
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
+      setContributionsExpanded(false);
     }
   };
 
@@ -214,6 +230,7 @@ function App() {
     if (expanded) {
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
+      setContributionsExpanded(false);
     }
   };
 
@@ -327,29 +344,35 @@ function App() {
   const gen7Module = activeModule === "gen7id";
   const pokerusModule = activeModule === "pokerusfinder";
   const profileTools = !gen7Module && !pokerusModule;
-  const activeFloatingTool = ivCalculatorExpanded
-    ? "iv"
-    : encounterLookupExpanded
-      ? "encounter"
-      : profileTools && gen4Tools
-        ? gen4ProfileExpanded
-          ? "profile"
-          : undefined
-        : profileTools && profileExpanded
-          ? "profile"
-          : undefined;
+  const activeFloatingTool = contributionsExpanded
+    ? "contributions"
+    : ivCalculatorExpanded
+      ? "iv"
+      : encounterLookupExpanded
+        ? "encounter"
+        : profileTools && gen4Tools
+          ? gen4ProfileExpanded
+            ? "profile"
+            : undefined
+          : profileTools && profileExpanded
+            ? "profile"
+            : undefined;
 
-  const toggleFloatingTool = (tool: "encounter" | "iv" | "profile") => {
+  const toggleFloatingTool = (
+    tool: "contributions" | "encounter" | "iv" | "profile",
+  ) => {
     const expanded = activeFloatingTool !== tool;
     setEncounterLookupExpanded(false);
     setIvCalculatorExpanded(false);
+    setContributionsExpanded(false);
     if (gen4Tools) {
       changeGen4ProfileExpanded(false);
     } else {
       changeProfileExpanded(false);
     }
     if (!expanded) return;
-    if (tool === "encounter") setEncounterLookupExpanded(true);
+    if (tool === "contributions") setContributionsExpanded(true);
+    else if (tool === "encounter") setEncounterLookupExpanded(true);
     else if (tool === "iv") setIvCalculatorExpanded(true);
     else if (gen4Tools) changeGen4ProfileExpanded(true);
     else changeProfileExpanded(true);
@@ -401,11 +424,18 @@ function App() {
           <button
             aria-label={t(theme === "dark" ? "themeLight" : "themeDark")}
             className="theme-toggle"
-            onClick={() => changeTheme(theme === "dark" ? "light" : "dark")}
+            onClick={(event) =>
+              changeTheme(theme === "dark" ? "light" : "dark", {
+                x: event.clientX,
+                y: event.clientY,
+              })
+            }
             title={t(theme === "dark" ? "themeLight" : "themeDark")}
             type="button"
           >
-            <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
+            <span aria-hidden="true" className="theme-toggle-icon">
+              {theme === "dark" ? "☀" : "☾"}
+            </span>
           </button>
           <div className="language-switch" aria-label={t("language")}>
             <button
@@ -443,10 +473,10 @@ function App() {
           />
         )}
         <aside
-          aria-hidden={!moduleRailOpen}
+          aria-hidden={!wideViewport && !moduleRailOpen}
           className={`module-rail${moduleRailOpen ? " open" : ""}`}
           id="module-rail"
-          inert={moduleRailOpen ? undefined : true}
+          inert={!wideViewport && !moduleRailOpen ? true : undefined}
         >
           <div className="rail-heading">
             <div className="rail-label">{t("modules")}</div>
@@ -460,223 +490,229 @@ function App() {
               <span aria-hidden="true">×</span>
             </button>
           </div>
-          <div className="rail-section-label">GEN III</div>
-          <button
-            className={
-              activeModule === "id" ? "module-entry active" : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("id");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">01</span>
-            <span>
-              <strong>{t("idModule")}</strong>
-              <small>{t("version")}</small>
-            </span>
-          </button>
-          <button
-            className={
-              activeModule === "initialseed"
-                ? "module-entry active"
-                : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("initialseed");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">02</span>
-            <span>
-              <strong>{t("initialSeedModule")}</strong>
-              <small>{t("initialSeedVersion")}</small>
-            </span>
-          </button>
-          <button
-            className={
-              activeModule === "ngcseed"
-                ? "module-entry active"
-                : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("ngcseed");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">03</span>
-            <span>
-              <strong>{t("ngcSeedModule")}</strong>
-              <small>{t("ngcSeedVersion")}</small>
-            </span>
-          </button>
-          <button
-            className={
-              activeModule === "seedtotime"
-                ? "module-entry active"
-                : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("seedtotime");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">04</span>
-            <span>
-              <strong>{t("seedToTimeModule")}</strong>
-              <small>{t("seedToTimeVersion")}</small>
-            </span>
-          </button>
-          <button
-            className={
-              activeModule === "static" ? "module-entry active" : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("static");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">05</span>
-            <span>
-              <strong>{t("staticModule")}</strong>
-              <small>{t("staticVersion")}</small>
-            </span>
-          </button>
-          <button
-            className={
-              activeModule === "wild" ? "module-entry active" : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("wild");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">06</span>
-            <span>
-              <strong>{t("wildModule")}</strong>
-              <small>{t("wildVersion")}</small>
-            </span>
-          </button>
-          <button
-            className={
-              activeModule === "ivtopid"
-                ? "module-entry active"
-                : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("ivtopid");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">07</span>
-            <span>
-              <strong>{t("ivToPidModule")}</strong>
-              <small>{t("ivToPidVersion")}</small>
-            </span>
-          </button>
-          <button
-            className={
-              activeModule === "egg" ? "module-entry active" : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("egg");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">08</span>
-            <span>
-              <strong>{t("eggModule")}</strong>
-              <small>{t("eggVersion")}</small>
-            </span>
-          </button>
-          <button
-            className={
-              activeModule === "spindapainter"
-                ? "module-entry active"
-                : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("spindapainter");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">09</span>
-            <span>
-              <strong>{t("spindaPainterModule")}</strong>
-              <small>{t("spindaPainterVersion")}</small>
-            </span>
-          </button>
-          <div className="rail-section-label">GEN IV</div>
-          <button
-            className={
-              activeModule === "gen4static"
-                ? "module-entry active"
-                : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("gen4static");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">10</span>
-            <span>
-              <strong>{t("gen4StaticModule")}</strong>
-              <small>{t("gen4StaticVersion")}</small>
-            </span>
-          </button>
-          <div className="rail-section-label">GEN VII</div>
-          <button
-            className={
-              activeModule === "gen7id" ? "module-entry active" : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("gen7id");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">11</span>
-            <span>
-              <strong>{t("gen7IdModule")}</strong>
-              <small>{t("gen7IdVersion")}</small>
-            </span>
-          </button>
-          <div className="rail-section-label">TOOLS</div>
-          <button
-            className={
-              activeModule === "pokerusfinder"
-                ? "module-entry active"
-                : "module-entry"
-            }
-            onClick={() => {
-              setActiveModule("pokerusfinder");
-              setModuleRailOpen(false);
-            }}
-            type="button"
-          >
-            <span className="module-index">12</span>
-            <span>
-              <strong>{t("pokerusFinderModule")}</strong>
-              <small>{t("pokerusFinderVersion")}</small>
-            </span>
-          </button>
+          <nav aria-label={t("modules")} className="module-navigation">
+            <div className="rail-section-label">GEN III</div>
+            <button
+              className={
+                activeModule === "id" ? "module-entry active" : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("id");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">01</span>
+              <span>
+                <strong>{t("idModule")}</strong>
+                <small>{t("version")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "initialseed"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("initialseed");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">02</span>
+              <span>
+                <strong>{t("initialSeedModule")}</strong>
+                <small>{t("initialSeedVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "ngcseed"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("ngcseed");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">03</span>
+              <span>
+                <strong>{t("ngcSeedModule")}</strong>
+                <small>{t("ngcSeedVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "seedtotime"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("seedtotime");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">04</span>
+              <span>
+                <strong>{t("seedToTimeModule")}</strong>
+                <small>{t("seedToTimeVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "static"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("static");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">05</span>
+              <span>
+                <strong>{t("staticModule")}</strong>
+                <small>{t("staticVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "wild" ? "module-entry active" : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("wild");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">06</span>
+              <span>
+                <strong>{t("wildModule")}</strong>
+                <small>{t("wildVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "ivtopid"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("ivtopid");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">07</span>
+              <span>
+                <strong>{t("ivToPidModule")}</strong>
+                <small>{t("ivToPidVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "egg" ? "module-entry active" : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("egg");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">08</span>
+              <span>
+                <strong>{t("eggModule")}</strong>
+                <small>{t("eggVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "spindapainter"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("spindapainter");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">09</span>
+              <span>
+                <strong>{t("spindaPainterModule")}</strong>
+                <small>{t("spindaPainterVersion")}</small>
+              </span>
+            </button>
+            <div className="rail-section-label">GEN IV</div>
+            <button
+              className={
+                activeModule === "gen4static"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("gen4static");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">10</span>
+              <span>
+                <strong>{t("gen4StaticModule")}</strong>
+                <small>{t("gen4StaticVersion")}</small>
+              </span>
+            </button>
+            <div className="rail-section-label">GEN VII</div>
+            <button
+              className={
+                activeModule === "gen7id"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("gen7id");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">11</span>
+              <span>
+                <strong>{t("gen7IdModule")}</strong>
+                <small>{t("gen7IdVersion")}</small>
+              </span>
+            </button>
+            <div className="rail-section-label">TOOLS</div>
+            <button
+              className={
+                activeModule === "pokerusfinder"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("pokerusfinder");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">12</span>
+              <span>
+                <strong>{t("pokerusFinderModule")}</strong>
+                <small>{t("pokerusFinderVersion")}</small>
+              </span>
+            </button>
+          </nav>
           <div className="rail-footer">
             <span className="rail-dot" />
             {t("localOnly")}
           </div>
         </aside>
 
-        <main className="main-content">
+        <main className="main-content" key={activeModule}>
           <div className="page-heading">
             <div>
               <div className="eyebrow">
@@ -1198,6 +1234,7 @@ function App() {
             setIvCalculatorExpanded(expanded);
             if (expanded) {
               setEncounterLookupExpanded(false);
+              setContributionsExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
               else changeProfileExpanded(false);
             }
@@ -1209,6 +1246,7 @@ function App() {
             setEncounterLookupExpanded(expanded);
             if (expanded) {
               setIvCalculatorExpanded(false);
+              setContributionsExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
               else changeProfileExpanded(false);
             }
@@ -1234,6 +1272,18 @@ function App() {
             onExpandedChange={changeProfileExpanded}
           />
         ) : null}
+        <ContributionsPanel
+          expanded={activeFloatingTool === "contributions"}
+          onExpandedChange={(expanded) => {
+            setContributionsExpanded(expanded);
+            if (expanded) {
+              setIvCalculatorExpanded(false);
+              setEncounterLookupExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
         <nav aria-label={t("tools")} className="floating-tool-rail">
           <button
             aria-controls="iv-calculator-panel"
@@ -1294,6 +1344,25 @@ function App() {
               <span>{t("profile")}</span>
             </button>
           )}
+          <button
+            aria-controls="contributions-panel"
+            aria-expanded={activeFloatingTool === "contributions"}
+            aria-haspopup="dialog"
+            aria-label={t("contributions")}
+            className={
+              activeFloatingTool === "contributions" ? "active" : undefined
+            }
+            data-tone="brand"
+            id="contributions-trigger"
+            onClick={() => toggleFloatingTool("contributions")}
+            title={t("contributions")}
+            type="button"
+          >
+            <span aria-hidden="true" className="floating-tool-rail-icon">
+              ¥
+            </span>
+            <span>{t("contributions")}</span>
+          </button>
         </nav>
       </div>
       <footer className="legal-footer">

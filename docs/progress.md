@@ -2,10 +2,28 @@
 
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
-> - Git 基线：`3895d2d feat: 新增NGC Seed查询`
-> - 当前阶段：新增 Pokerus Finder 宝可病毒查询
-> - 工作区状态：`pokerusfinder` 源码、接线与文档尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：本轮只完成上游静态核对与格式检查，Pokerus Finder 算法、构建和 UI 均待授权验证
+> - Git 基线：`34eae65 feat: 新增宝可病毒查询`
+> - 当前阶段：同步 HakuStyle、优化全局 UI 并新增 Contributions 面板
+> - 工作区状态：HakuStyle、全局 UI 与 Contributions 源码和文档尚未提交；Codex 不提交、不 push、不部署
+> - 验收状态：本轮完成静态审查、格式检查与 Skill 结构校验；ESLint、TypeScript、测试、构建和浏览器 UI 待授权验证
+
+## 2026-08-13 Contributions
+
+- 新增全局只读 Contributions 面板，从右下角工具栏打开，并复用现有悬浮面板的互斥、点外关闭、`Escape` 和焦点恢复逻辑；不占用按世代划分的 RNG 模块侧栏。
+- 首条记录为 Jeff 贡献 `¥50 RMB`，用途为 `AI Token`；记录使用独立结构化数据，后续可以继续追加，不包含支付、账号、后端或在线编辑能力。
+- 桌面端面板从工具栏左侧打开，窄屏从工具栏上方打开；金额汇总由当前记录计算，不新增运行时依赖。
+
+## 2026-08-13 UI 视觉与侧栏优化
+
+- 已将最新 HakuStyle 同步到 `.agents/skills/web-frontend-style/`，包含最新执行规则、Ant Neutral / Royal Blueprint 配色参考、31 组来源蒸馏记录和 Skill 校验脚本。
+- UI 方向确定为冷色中性工作台：以 Ant Neutral 为基础，使用 Royal Blueprint 冷蓝作为品牌强调；红色、金色和青色仅保留给错误、警告、选择和状态语义。
+- 重做 `src/styles.css` 的全局 Token、顶部栏、工作面板、侧栏、按钮和浮动工具材质；卡片保持高可读实色表面，玻璃效果只用于顶部栏和侧栏的辅助层。
+- 左侧模块导航改为“固定标题区 + 独立滚动模块区 + 固定底部状态区”。桌面端侧栏固定在顶部栏下方并为主内容预留宽度，移动端改为带遮罩的抽屉，避免模块数量增加后点击目标被裁切或底部状态消失。
+- 主题切换支持 View Transition 点击位置扩散动画；模块切换增加渐进式内容进入，按钮、侧栏和面板使用短时状态动效，并保留 `prefers-reduced-motion` 回退。
+- `src/App.tsx` 与 `src/theme.ts` 只调整 UI 状态和主题表现；RNG 算法、Wasm、Worker、输入边界、存档和翻译未改变。
+- 已通过：定向 Prettier 格式化、`npm run format:check`、`git diff --check`、项目内 HakuStyle Skill 校验。
+- 未运行：ESLint、TypeScript、Vitest、Web/Wasm 构建、浏览器 UI 或生产回归；按仓库规则，这些检查需要项目所有者对具体命令或 URL 明确授权。
+- 提交前静态复核移除了页面背景的径向装饰渐变，并将工作面板圆角收敛到 `8px`，保持工具界面的信息密度与仓库前端约束。
 
 ## 当前状态
 

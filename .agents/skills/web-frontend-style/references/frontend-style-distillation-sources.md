@@ -2,7 +2,7 @@
 
 这份文档记录前端风格 Skill 的蒸馏来源、观察范围和可迁移结论。它与最终 Skill 分开维护：Skill 保存可执行规则，本文件保存规则的出处和证据，便于回溯与继续迭代。
 
-当前状态：已完成当前 24 组样本的蒸馏，正式 Skill 已初始化；后续样本可继续追加。
+当前状态：已完成当前 31 组样本的蒸馏，正式 Skill 已初始化；后续样本可继续追加。
 
 ## 1. Leonus 右下角悬浮菜单
 
@@ -280,6 +280,8 @@
 - 搜索头部/关闭按钮 56px，输入 48px；MiniSearch 搜索标题和正文，500ms debounce、fuzzy 0.3、最多五条，并区分搜索中、结果、空状态。
 - 页脚与顶栏构成镜像框架：72px 高、上部 32px 圆角、同一纹理/边框/辉光体系，移动端缩小文字和 logo。
 - 浅色与深色不是简单反色，而是分别定义蓝白与紫黑材质、搜索表面、图片亮度和阴影 token。
+- 仓库 `vars.less` 的浅色核心为 `#EAEFF5` 页面、白色表面、`#128AFA` 主蓝与 `#466398` 图标蓝；暗色核心为 `#0F0F16` 页面、`#1F1F2C` 表面、`#9D7CD8` 图标紫与 `#705781` 主紫。迁移时应保留“日间清亮蓝、夜间柔和紫”的模式差异，而不是把暗色机械地压暗成深蓝。
+- 上游浅色的亮黄只适合作为极少量游戏化点睛；在通用 Web 中需限制为徽标、奖励或精选标记，不用于白底小字或默认按钮。
 
 许可/归属：本轮未在仓库根目录观察到独立 LICENSE 文件。最终 Skill 仅蒸馏通用布局与设计规则；Blue Archive 名称、Logo、字体、角色、Spine 与其他素材不复制，并保留原项目及其感谢列表归属。
 
@@ -490,19 +492,258 @@ License boundary: the Dogument repository is marked CC0-1.0, but that does not a
 
 许可/归属：本轮只以公开页面、DOM 与 computed style 作为观察来源；不复制 Logo、光标位图、图片、音乐、文案、画布实现或源代码，实际复用前需核对站点条款和所有第三方依赖。
 
-## 25. 交叉规则
+## 25. ant-design/ant-design
+
+来源：
+
+- 仓库：https://github.com/ant-design/ant-design
+- 设计价值观：https://ant.design/docs/spec/values
+- 主题与 Design Token：https://ant.design/docs/react/customize-theme
+- ConfigProvider：https://ant.design/components/config-provider
+- Form：https://ant.design/components/form
+- Table：https://ant.design/components/table
+
+平台标签：
+
+- 主适配：桌面优先的企业级响应式 Web、现代浏览器、SSR、Electron。
+- 可迁移：移动 Web 的表单/反馈/数据模式，需缩小密度并改造导航。
+- 不适用：直接当作原生 Android/iOS 组件或把 React API 搬进非 React 项目。
+
+观察范围：GitHub README/LICENSE、官方设计价值观、主题文档、ConfigProvider、Form 和 Table 文档。
+
+蒸馏结论：
+
+- 设计价值以 Natural、Certain、Meaningful、Growing 为判断框架：降低认知成本，建立一致和可预测的规则，围绕任务提供即时反馈，并让系统随用户能力成长。
+- Design Token 使用 Seed -> Map -> Alias 三层派生关系；基础色、基础圆角等少量 Seed 经算法生成色阶、密度与圆角，再由语义 Alias 和组件 Token 控制局部用途。
+- 默认、dark、compact 算法可组合；主题支持动态切换、嵌套作用域、组件级覆盖、CSS 变量/静态样式提取和关闭动效。主题变更应保持组件结构与内容稳定。
+- 组件按 General、Layout、Navigation、Data Entry、Data Display、Feedback、Other 分类组织，形成从按钮/输入到表格/分页/弹窗/通知的完整企业工作流。
+- Form 需要稳定的标签、布局、必填标记、帮助文本、校验触发、错误列表、动态字段和提交反馈；Table 需要排序、筛选、搜索、选择、分页、展开、固定列、虚拟滚动、响应式和空/加载状态。
+- ConfigProvider 统一方向、语言、尺寸、禁用状态、主题、popup 容器、空状态与 CSP；Modal/Message/Notification 等 imperative overlay 若脱离 Provider 会丢失上下文，应使用有上下文的实例/holder。
+- Feedback 应按风险和持续时间分层：字段反馈/Alert、Message、Notification、Popconfirm、Modal/Drawer、Result；Skeleton、Spin、Progress 和 Empty 分别表达结构占位、短时未知进度、可测进度和无数据。
+- 组件实现应保留 default、hover、active、focus-visible、selected、disabled、loading、warning、error、success、empty 等状态矩阵，并共享 z-index、Portal、焦点和滚动锁定规则。
+
+适用边界：适合管理台、数据录入、配置页、工作台和复杂反馈流程；个人博客或沉浸式首页只借用 Token/表单/反馈规律，不整套搬用企业密度。
+
+许可/归属：Ant Design 仓库与组件实现为 MIT；图标、Logo、品牌和第三方内容仍需单独核对。HakuStyle 只记录设计规律，不复制 React 源码或素材。
+
+## 26. saadeghi/daisyui
+
+来源：
+
+- 仓库：https://github.com/saadeghi/daisyui
+- 主题文档：https://daisyui.com/docs/themes/
+- 配置文档：https://daisyui.com/docs/config/
+- Button：https://daisyui.com/components/button/
+
+平台标签：
+
+- 主适配：Tailwind CSS 驱动的响应式 Web、静态 HTML、React/Vue/Svelte 等 Web 框架。
+- 可迁移：非 Tailwind 项目可借用语义类、CSS 变量和主题作用域，但需自行建立构建与命名约束。
+- 不适用：原生移动组件或仅依赖设计稿、不允许 CSS 构建的运行时环境。
+
+观察范围：GitHub README/LICENSE、主题列表、主题配置、颜色变量、组件类名和 Button 文档。
+
+蒸馏结论：
+
+- 以语义组件类表达意图，使用 `btn`、`input` 等基类配合 `primary`、`outline`、`ghost`、`loading`、`disabled`、尺寸和形状修饰；组件结构与视觉变体分离。
+- 主题是 CSS 变量集合，可通过 `data-theme` 在根节点或任意子树作用域切换；默认主题与 prefers-dark 主题可独立声明，主题可以嵌套。
+- 主题变量同时定义 surface/content 配对、primary/secondary/accent、info/success/warning/error，以及 selector/field/box 半径、尺寸、边框、depth/noise 等材质参数。
+- 配置支持只包含所需组件、排除组件、前缀命名、根作用域和关闭日志；蒸馏到 Web 项目时应保持样式按需、避免全局类名冲突。
+- 组件变体优先用类组合而不是复制组件；按钮状态、尺寸、块级/方形/圆形比例都应保持命中区域和语义可访问。
+- 35 个内置主题说明“主题是可替换数据”，不是让一页同时堆多套视觉；产品应选择少量兼容主题并核对对比度、焦点和状态色。
+
+适用边界：适合快速搭建、原型和多主题 Web 产品；复杂企业流程仍需补齐 Form/Table 的校验、数据状态和反馈语义，不能只靠视觉类名。
+
+许可/归属：daisyUI 仓库为 MIT。HakuStyle 只蒸馏语义类、变量主题和组合方式，不复制源码、Logo 或站点素材。
+
+## 27. vueComponent/ant-design-vue
+
+来源：
+
+- 仓库：https://github.com/vueComponent/ant-design-vue
+- 官方文档：https://antdv.com/docs/vue/introduce
+- ConfigProvider：https://antdv.com/components/config-provider
+
+平台标签：
+
+- 主适配：Vue 2/Vue 3 的桌面优先企业级响应式 Web、SSR、Electron。
+- 可迁移：Vue WebView/PWA 的组件状态和主题边界；跨框架只迁移设计契约。
+- 不适用：把 Vue 的 `provide/inject`、插槽或 `v-model` API 直接用于 React/原生项目。
+
+观察范围：GitHub README/LICENSE、介绍文档、组件分类、按需导入/Tree shaking、ConfigProvider 的 locale、size、direction、theme、popup 和 CSP 配置。
+
+蒸馏结论：
+
+- 与 Ant Design 共享设计资源、HTML/CSS 结构和尽可能一致的组件 API，但将配置传递落到 Vue 的 `provide/inject`，适合在 Vue 应用树内统一主题和上下文。
+- 使用模板、组件注册、插槽和 `v-model` 时仍要保持受控状态、事件回传、键盘语义和焦点管理；不要把组件内部响应式状态当作业务数据源。
+- 支持按需导入/Tree shaking，避免把整个组件包和所有样式载入；全局 `prefixCls`、locale、componentSize、direction、theme、popup container、empty rendering 与 CSP 应处于同一配置边界。
+- ConfigProvider 的 imperative Modal/Message/Notification 可能创建独立 Vue 实例而脱离原上下文；为主题、语言和前缀一致性优先使用能继承上下文的调用方式，并为 popup 容器处理 null/SSR 情况。
+- 平台默认偏桌面工作台，但 Vue 组件可响应式降级；在手机上应优先重排表单与表格、增大触控命中区、减少悬浮操作，不能只缩放桌面密度。
+
+适用边界：适合 Vue 管理台、后台、配置页和数据密集工作流；博客与游戏化页面只借用组件状态、表单反馈、主题上下文和按需加载原则。
+
+许可/归属：ant-design-vue 仓库声明 MIT。Ant Design 共享设计资源、图标和第三方内容仍需按各自许可证核对；不复制 Vue 源码或品牌素材。
+
+## 28. nordtheme/termite
+
+来源：
+
+- 仓库：https://github.com/nordtheme/termite
+- Nord 调色板：https://www.nordtheme.com/docs/colors-and-palettes/
+
+平台标签：
+
+- 主适配：Termite/Linux 终端与代码阅读场景。
+- 可迁移：暗色 Web、开发者工具、代码块、仪表盘状态 Token。
+- 不适用：把终端 16 色当作完整品牌系统，或在移动 Web 上直接使用小字号/低触控密度。
+
+观察范围：仓库 README、`src/config`、MIT 许可证和 Nord 官方 Colors and Palettes 文档。
+
+蒸馏结论：
+
+- Nord 由 16 个低饱和、偏冷的 dimmed pastel 颜色组成，分为 Polar Night、Snow Storm、Frost、Aurora 四组，强调清晰、简洁、扁平和不打断阅读。
+- Polar Night (`#2E3440` 到 `#4C566A`) 适合暗色背景、面板、边框和次级文本；Snow Storm (`#D8DEE9` 到 `#ECEFF4`) 适合正文、浅色表面和高可读文字。
+- Frost (`#8FBCBB`、`#88C0D0`、`#81A1C1`、`#5E81AC`) 依次承担主、次、三级强调；Aurora 中红/橙/黄/绿/紫分别承载错误、危险/特殊、警告、成功和不常规状态。
+- Termite 映射给出背景/前景、选中高亮、光标和 ANSI 0–15 色的明确角色；迁移到 Web 时应把这些角色转为 semantic surface/content/accent/status，而不是只抄十六进制。
+- 暗色界面要保证正文与代码的层级，避免纯黑底和纯白字；状态色需要同时有图标/文本/边框等非颜色信号。
+
+适用边界：适合代码、终端、开发者工具和克制的暗色 Web；摄影博客、儿童/游戏首页或高情绪品牌需要另外的主视觉方案。
+
+许可/归属：`nordtheme/termite` 与 Nord 资料声明 MIT/对应项目许可；Nord 名称、Logo 和具体端口仍需保留归属并核对当前条款。HakuStyle 只记录调色规律，不分发 Termite 配置文件。
+
+## 29. khang-nd/7.css
+
+来源：
+
+- 仓库：https://github.com/khang-nd/7.css
+- 文档与演示：https://khang-nd.github.io/7.css/
+
+平台标签：
+
+- 主适配：PC 浏览器的桌面优先 Web，尤其是键鼠操作和固定窗口画布。
+- 可迁移：响应式 Web 的语义控件、焦点环、对话框、表格、下拉和 CSS-only 组件；移动端需改为自然流布局。
+- 不适用：安卓/iOS 原生界面、触控优先页面，或把 Windows 7 品牌材质当作通用默认主题。
+
+观察范围：README、MIT 许可、官方组件文档、semantic HTML 要求、scoped stylesheet 与 tree-shaking 说明。
+
+蒸馏结论：
+
+- 7.css 是不含 JavaScript、依赖语义 HTML 的 CSS 框架，可在任意 Web 框架中使用；`button`、`label`、`fieldset`、`details/summary`、表格和 ARIA role 共同构成可访问的控件骨架。
+- Windows 7 视觉由细腻渐变、内外高光、凹陷/凸起边框、玻璃标题栏和稳定的窗口几何表达；这类材质应只服务于桌面隐喻，不能替代内容层级。
+- 文档覆盖 balloon/tooltip、button、checkbox、collapse、combobox、dropdown、groupbox、listbox、table、menu、progress、searchbox、tabs、textbox、treeview、window 等完整控件族。
+- `7.scoped.css` 允许在 `.win7` 范围内共存；独立组件 CSS 支持按需导入/tree-shaking。迁移时应保留命名作用域并锁定版本，避免全局 reset 与其他设计系统冲突。
+- Button 明确区分 default、hover、active、disabled、focus 和默认提交按钮；焦点使用内置点状边框，触控/键盘实现必须保留清晰命中区和语义属性。
+- CSS-only 不等于行为完整：窗口拖拽、菜单开关、焦点陷阱、Escape、滚动锁定、响应式重排和状态持久化仍需由应用逻辑负责。
+
+适用边界：适合复古桌面、个人档案、模拟系统界面和 PC 端工具；博客正文、移动优先控制台和低功耗触屏设备应只借用语义控件规则。
+
+许可/归属：7.css 仓库为 MIT，并基于 XP.css/98.css 的设计脉络。HakuStyle 不复制 CSS 源码、Windows 商标、图标或演示素材；实际依赖时需保留许可证与上游归属。
+
+## 30. Clooos/Home-Assistant-Mobile-First
+
+来源：
+
+- 仓库：https://github.com/Clooos/Home-Assistant-Mobile-First
+
+平台标签：
+
+- 主适配：移动优先 Web/PWA/WebView 的家庭控制、状态监控和快速操作。
+- 可迁移：响应式 Web 仪表盘、触控设备控制面板、平板增强布局。
+- 不适用：以鼠标悬停为主的桌面工具、长文阅读、需要通用品牌组件库的页面。
+
+观察范围：README、截图/功能说明、Noctis 主题、Lovelace card-mod、button-card、sticky footer、房间/实体卡和依赖列表。该仓库 README 已标注项目不再维护，新增实现需核对依赖现状。
+
+蒸馏结论：
+
+- 移动优先不是把桌面缩小，而是先确定单手操作的主路径：顶部天气/日期/环境摘要，中部按房间或任务分组的实体卡，底部 sticky 快捷栏承载静音、遮阳、视图切换等低摩擦动作。
+- 卡片优先表达“当前状态 + 一个常用动作”，复杂调节才进入独立控件；灯光、温度、媒体、摄像头、日历、能耗图等模块共享同一表面和间距，但保留各自状态语义。
+- 触控命中区、底部安全区和 sticky footer 必须稳定，使用 `env(safe-area-inset-bottom)`，避免底栏覆盖最后一张卡；键盘/鼠标 Web 仍需有 focus-visible 和 hover 的非触控增强。
+- 使用深色、低干扰背景和高对比状态色；在线/活动/警告/关闭状态不能只依赖颜色，应配合图标、文字、数值或边框。
+- 通过模板和可复用卡片配置减少重复；业务实体、卡片样式和主题变量分离，允许用户按房间/视图重排，而不把数据绑定硬编码进视觉组件。
+- 桌面/平板渐进增强：在更宽视口增加列数、摘要图表和侧边导航，但不破坏手机上顺序清晰、按钮靠近拇指和快速完成任务的路径。
+
+适用边界：适合移动控制台、家庭自动化、设备状态与快捷操作；不要直接复制 Home Assistant YAML、实体 ID、第三方卡片代码、图标、背景或主题文件。
+
+许可/归属：本轮以公开 GitHub README 和项目说明作为观察来源；仓库未在目标路径确认独立 LICENSE 页面，且项目声明不再维护。HakuStyle 只记录移动优先信息架构和交互规律，复用任何仓库代码或依赖前必须重新核对许可证、维护状态和第三方声明。
+
+## 31. Hurt-in-dream 个人信息 Bento 页面
+
+来源：
+
+- 网站：https://hurtindream.de/
+
+平台标签：
+
+- 主适配：桌面优先、响应式 Web 的个人主页、状态面板和档案页。
+- 可迁移：平板/手机单列个人主页、轻量 PWA/WebView 档案页。
+- 不适用：需要高可读长文的文章正文、低端设备上的全屏模糊墙纸、依赖鼠标才能操作的装饰角色。
+
+观察范围：首页公开 DOM、桌面视口截图、390px 窄屏布局、卡片 computed style、`#live2d` canvas 与滚轮反馈。页面使用四列 Bento Grid；身份卡中的 Live2D canvas 在卡片内部独立渲染，画布默认 `cursor: grab`，滚轮可按指针位置缩放，身份卡在移动端进入单列并缩小画布。
+
+蒸馏结论：
+
+- **Bento 信息架构**：以 `max-width: 1100px` 左右的容器承载四列网格，主身份卡跨两列/两行，状态、时间和设备卡承担高密度摘要，媒体/一言与导航卡放在下方；这是编辑型信息编排，应使用显式 Grid span，不要把它误写成任意 masonry。
+- **玻璃材质**：卡片使用约 `rgba(255,255,255,.035)` 的低透明表面、`backdrop-filter: blur(28px)`、约 `rgba(255,255,255,.07)` 细边框、24px 圆角、深色柔和阴影和 1px 内侧高光；悬停只做轻微上移/放大，并提高表面和边框不透明度。正文文字和交互控件必须使用不透明或高对比前景，玻璃层不能承担唯一的分组线索。
+- **壁纸与内容层分离**：背景图/渐变/遮罩固定在内容下方，内容卡片仍保持稳定宽度与阅读层级；应允许关闭壁纸、降低透明度或切换到实色面板，不能把动态背景当作信息本身。
+- **可抓取装饰角色**：把角色/模型封装成独立的 `canvas` 或替代 DOM 层，默认 `grab`、按住时 `grabbing`；拖拽只更新角色层的平移，不得劫持卡片文字选择、滚动或链接点击。缩放以指针/触点为锚点，设置最小/最大比例、卡片边界和失焦收尾，避免模型跑出视口。
+- **输入与降级**：鼠标拖拽和滚轮缩放必须补充触控 `pointer` 手势；为键盘和无指针用户提供“放大/缩小/重置位置”按钮或等价命令，并用 `aria-label`/状态文本说明当前比例。`prefers-reduced-motion` 下停用漂浮、跟随和自动呼吸，仅保留静态角色或静态占位图。
+- **响应式**：桌面使用跨列编排，约 768px 以下切成单列自然流，保留主身份卡优先级；不要只按比例缩小桌面四列。窄屏画布需要固定 `aspect-ratio`/最大高度、触控安全边距和足够文字空间，页脚与浮动控件要避开 safe area。
+- **性能与可访问性**：`backdrop-filter`、大图和 canvas 都要有实色/无滤镜回退；限制 DPR、暂停隐藏页面或离屏 canvas、清理事件与动画帧。玻璃卡片的焦点环、状态文字和边界必须在高对比模式、键盘导航和无背景图片时仍可见。
+
+适用边界：适合个人档案、作品集、状态摘要和游戏化主页的玻璃 Bento 壳；不要把 28px 模糊、全屏壁纸、Live2D 或自定义光标作为所有页面的默认层，也不要复制原站的角色、图片、字体、光标、Logo 或脚本。
+
+许可/归属：本轮仅以公开页面的可见布局、样式和交互行为作为设计观察；HakuStyle 只记录可迁移规律，不打包原站素材或代码。实际复用任何依赖、模型或媒体前，需重新核对其许可证、来源和维护状态。
+
+## 32. 平台适配矩阵
+
+| 编号与来源                      | 主适配平台                | 可迁移方向                      | 明确边界                                                     |
+| ------------------------------- | ------------------------- | ------------------------------- | ------------------------------------------------------------ |
+| 1 Leonus 浮动菜单               | 响应式 Web、桌面博客      | PWA、WebView                    | 触控需放大命中区，不能遮挡正文                               |
+| 2 FF7 UI                        | PC 浏览器、桌面游戏化 Web | 平板 Web                        | 不是原生游戏 UI；手机只保留平面化窗口                        |
+| 3 Clarity 博客主题              | 桌面优先响应式博客        | 平板/手机阅读                   | 不套高密度后台或沉浸式游戏壳                                 |
+| 4 纸鹿前端文章                  | 长文 Web、技术文档        | PWA、平板阅读                   | 这是排版/主题工程规则，不是独立视觉皮肤                      |
+| 5 Anheyu                        | 桌面优先产品介绍 Web      | 响应式营销页                    | 不用于长文、后台或移动原生工具                               |
+| 6 Haku76 主题                   | 桌面优先 VitePress/博客   | 平板/手机 Web                   | 像素字体和特效必须降级，不当原生 JRPG UI                     |
+| 7 Imsyy 设置/右键菜单           | 桌面博客、响应式 Web      | PWA/WebView                     | 手机不依赖右键；设置需传统入口                               |
+| 8 Bikari 浮动栏                 | 响应式 Web                | PWA/WebView                     | 触控需安全区与大命中区                                       |
+| 9 Uiverse 翻转卡                | 桌面交互 Web              | 平板/手机点击切换               | 不把 hover 作为唯一入口                                      |
+| 10 Uiverse 搜索框               | 桌面交互 Web              | PWA/手机 Web                    | 动态渐变需静态、低功耗回退                                   |
+| 11 Uiverse 右键菜单             | PC 浏览器                 | 长按/更多菜单的移动改造         | 不替代输入、选区与系统菜单                                   |
+| 12 Uiverse 播放器               | 响应式媒体 Web            | PWA/WebView                     | 音量/队列不能 hover-only                                     |
+| 13 React Bits Balatro           | GPU 可用的桌面 Web        | 平板/高端手机降级               | shader 不是核心内容，需静态回退                              |
+| 14 React Bits Carousel          | 响应式交互 Web            | 触控 PWA/平板                   | 3D 和 autoplay 必须可关闭                                    |
+| 15 Pokemon Cards CSS            | 桌面收藏/展示 Web         | 平板触控、手机平面卡            | 品牌素材不复用；高成本材质只给活动卡                         |
+| 16 Blue Archive VitePress       | 桌面优先博客/文档         | 平板/手机 Web                   | 不当原生手游 UI；角色素材不复用                              |
+| 17 Mizuki                       | 桌面优先响应式博客        | 超宽屏与手机 Web                | 配置很多但每页仍只选一个主方向                               |
+| 18 Sakurairo                    | 桌面优先 WordPress 博客   | 响应式移动博客                  | 大图/音乐/视频是可选增强                                     |
+| 19 Lunora 侧栏                  | PC 浏览器 SaaS/后台       | 手机抽屉                        | 移动端不能只显示无标签图标轨                                 |
+| 20 Dogument 字体                | 桌面复古 Web、短文案      | 移动短标签                      | 不默认用于长文；字体权利需单查                               |
+| 21 Gaoice                       | PC 浏览器桌面隐喻         | 大屏 Web、手机自然流回退        | 不用于移动优先或原生 Android/iOS                             |
+| 22 xlrt 卡片                    | PC/手机个人主页 Web       | PWA/WebView                     | 固定卡片不用于长表单和数据后台                               |
+| 23 Soki 图片墙                  | 桌面作品集 Web            | 手机横向 snap 画廊              | 动态任意数据不套固定拼贴                                     |
+| 24 CRWeb 档案页                 | 桌面沉浸式个人 Web        | 手机单列降级                    | 画布、光标与持续动效不能成为必需                             |
+| 25 Ant Design                   | 企业级桌面优先响应式 Web  | 移动 Web、Electron              | React 组件 API 不跨框架搬运                                  |
+| 26 daisyUI                      | Tailwind 响应式 Web       | React/Vue/Svelte/Web Components | 需要 CSS 构建与命名作用域                                    |
+| 27 Ant Design Vue               | Vue 桌面优先响应式 Web    | Vue PWA/WebView                 | `provide/inject`、slot、`v-model` 只在 Vue 语境适用          |
+| 28 Nord Termite                 | Linux 终端                | 暗色开发者 Web、代码块          | 不是完整品牌组件库                                           |
+| 29 7.css                        | PC 浏览器桌面隐喻         | 大屏 Web、语义控件              | 不用于移动优先或原生 Android/iOS                             |
+| 30 Home Assistant Mobile First  | 移动 Web/PWA/WebView      | 平板、响应式 Web                | 不以 hover 为必需交互，不照搬旧依赖                          |
+| 31 Hurt-in-dream Bento 玻璃档案 | 桌面优先响应式 Web        | 平板/手机单列、PWA/WebView      | 玻璃需实色回退；角色拖拽缩放不可成为唯一操作；不复制原站素材 |
+
+## 33. 交叉规则
 
 - 本 Skill 面向 Web，优先使用语义化 HTML、CSS、JavaScript、响应式设计、浏览器能力检测、可访问性和性能约束，不绑定 Vue、React、Astro、VitePress 或 WordPress。
+- 先确认平台和产品密度，再从来源档案按主适配标签筛选 1 个主配方与至多 1 个辅助配方；只有在说明迁移理由后才跨平台借用。
 - 先建立设计 token，再把 token 应用到导航、内容面板、代码块、分页、弹窗和焦点态。
 - 以稳定的阅读/工作表面为基础，在层级和状态边界使用强烈视觉签名。
 - 主流程保持可见，低频操作渐进披露；自定义菜单、浮动工具和个性化面板必须有传统入口和键盘路径。
 - 动效必须解释状态变化，并支持 `prefers-reduced-motion`；WebGL、混合模式和多层模糊必须有低成本回退。
-- 每个页面选择一个主视觉语言和至多一个辅助特效，避免把 FF 边框、BA 顶栏、霓虹搜索框、玻璃壁纸、宝可梦闪膜和樱花封面同时堆叠。
+- 每个页面选择一个主视觉语言和至多一个辅助特效，避免把 FF 边框、BA 顶栏、霓虹搜索框、玻璃壁纸、宝可梦闪膜、樱花封面、Win7 窗口和移动控制底栏同时堆叠。
 - 只蒸馏可迁移规律，不把原项目源码、字体、角色、Logo、图片、纹理或音频素材直接打包进 Skill。
 
 ## 当前项目状态
 
-- 已记录用户目前提供的全部 24 组来源。
+- 已记录用户目前提供的全部 31 组来源，并为新增来源补充平台适配标签。
 - 项目暂定名为 `HakuStyle`，仓库 slug 为 `hakustyle`。
 - 正式 Skill 已初始化，目录为 `outputs/hakustyle/`；后续样本可继续追加。
 - Skill 已包含 `SKILL.md`、`agents/openai.yaml`、`references/` 和 README，并通过 Skill Creator 校验。

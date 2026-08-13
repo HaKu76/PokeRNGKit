@@ -9,7 +9,22 @@ Use this skill to turn a visual direction into a coherent, usable Web interface.
 
 Read `references/frontend-style-distillation-sources.md` when a task cites one of the collected references, asks for a named visual recipe, or needs source attribution and license boundaries. Use it as evidence and pattern guidance, never as permission to copy source code, fonts, characters, logos, images, textures, or audio.
 
+Read `references/core-palette-system.md` whenever choosing, creating, or changing
+colors. Hakuhiro prefers cool, clean, comparatively neutral palettes. Use Ant
+Neutral as the default. The final preferred alternatives are Indigo Night,
+Frosted Lilac, and Royal Blueprint. Use Blue Archive Dual for a more thematic
+cool blog, HakuDex Azure for JRPG/archive identity, and Sakura Mist only when a
+softer reading direction is explicitly preferred. Preserve an existing product
+palette when replacement would conflict with established brand or user intent.
+
 ## Workflow
+
+### 0. Classify the target platform and product
+
+- Identify the delivery surface before choosing a reference: responsive Web, desktop-first Web, mobile-first Web, installable PWA, embedded WebView, or a native platform. HakuStyle is Web-first; do not transfer desktop-window, touch-dashboard, or terminal rules across platforms without an adaptation note.
+- Record three labels in the implementation plan: **primary platform**, **supported platform**, and **out of scope**. Treat viewport size, pointer type, keyboard availability, safe-area insets, network quality, and GPU availability as separate constraints.
+- Use a source only when its platform label and product density match the current task. A PC dashboard can borrow 7.css or Gaoice window geometry; a phone dashboard can borrow Home Assistant Mobile First; a long-form blog should reject both as a shell.
+- Ask the user to choose a visual direction when the request is open-ended. If no choice is given, propose two or three compatible recipes with their platform and interaction tradeoffs, then select the least conflicting set. Never blend every collected source by default.
 
 ### 1. Inspect before styling
 
@@ -25,11 +40,29 @@ Select one dominant language for the page and at most one supporting expressive 
 - **Reading-first**: bounded text measure, quiet navigation, stable article metadata, restrained decoration, explicit light/system/dark state.
 - **Retro/game window**: compact radii, hard directional bevels, high-contrast text shadows, fixed selection gutters, explicit menu/dialog state machines.
 - **Themed chrome**: matched top/bottom frames, repeated border geometry, patterned material, themed accent states, conventional navigation semantics.
-- **Glass/wallpaper**: opaque text and controls over a controlled image, low-alpha borders, blur only where contrast is verified, independent wallpaper/card-transparency modes.
+- **Glass/wallpaper**: opaque text and controls over a controlled image, low-alpha borders, blur only where contrast is verified, independent wallpaper/card-transparency modes. Treat glass as a bounded content surface, not a global default; provide solid/no-filter fallbacks and allow a decorative canvas or character layer only when it remains optional.
 - **Immersive cover**: image/video or shader establishes identity, then a readable gradient/overlay introduces the first content hint.
 - **Material card**: base art plus mask, texture, shine, glare, and a bounded pointer-driven tilt; provide a flat fallback.
 
 Do not combine several dominant recipes merely because each looks attractive. Use the reference document to select compatible patterns and record the choice in the implementation plan.
+
+Use this selection SOP when the user has not named an exact recipe:
+
+1. **Apply hard filters**: platform, product type, framework, primary task, content density, input method, accessibility, performance budget, and existing brand. Reject incompatible sources before judging aesthetics.
+2. **Build by layer**: choose one foundation/system, one shell/information architecture, any task-required component patterns, and at most one expressive effect. A layer may be inherited from the existing repository instead of HakuStyle.
+3. **Rank candidates**: score product fit, platform fit, compatibility with the current stack, stated user preference, accessibility, and performance risk. Prefer the strongest task/platform fit, not the source with the most decoration.
+4. **Resolve user intent**: if the user names a style or source, treat it as the leading candidate but still enforce platform and usability constraints. If the request is open-ended and multiple directions remain valid, present two or three distinct options with plain-language tradeoffs and ask the user to choose.
+5. **Write a style contract**: record the selected sources by layer, platform labels, token direction, layout model, component density, motion budget, and excluded patterns before editing.
+6. **Implement and verify**: adapt the contract to the repository's own components and test all required platforms and states. Revisit the selection only when evidence shows the contract conflicts with content or workflow.
+
+Use the source layers as follows:
+
+- **Foundation/system**: Ant Design, Ant Design Vue, daisyUI, Nord, or the repository's existing design system. This layer supplies tokens, states, forms, feedback, and theme mechanics; it does not dictate the page's personality by itself.
+- **Shell/information architecture**: Clarity, Lunora, Home Assistant Mobile First, Haku76, Mizuki, Sakurairo, Blue Archive, Gaoice, or another page-level recipe matched to the product.
+- **Task component**: floating rails, search, context menus, players, galleries, cards, carousels, forms, tables, or feedback patterns required by the workflow.
+- **Expressive effect**: Balatro shader, Pokemon material, immersive reveal, custom cursor, foil, glow, or another optional signature. Keep zero or one and provide a low-cost fallback.
+
+Do not ask the user to choose between dozens of source names. Translate candidates into outcomes such as "quiet reading", "JRPG archive", "compact enterprise", "mobile control panel", or "Windows desktop", then cite the source recipe behind each option.
 
 ### 3. Establish tokens
 
@@ -42,7 +75,20 @@ Define tokens before component CSS. At minimum provide:
 - motion: duration, easing, spring values where needed, and a reduced-motion mode;
 - effects: shadow, blur, texture opacity, image brightness, and overlay opacity.
 
+Organize reusable systems as a derivation chain rather than one flat variable list:
+
+- **seed tokens** express sparse brand intent such as primary hue, base radius, body font, and density;
+- **derived/map tokens** expand seeds into color ramps, spacing, control heights, and elevation steps;
+- **semantic/alias tokens** name usage such as link, danger, selected row, panel border, and focus ring;
+- **component tokens** adjust a local component without silently changing unrelated components.
+
+Change seeds for broad themes, semantic aliases for product meaning, and component tokens for isolated exceptions. Keep default, dark, compact, and brand algorithms composable; verify combinations instead of maintaining unrelated hard-coded palettes. Allow a nested theme scope for previews or embedded areas, but inherit unspecified values from the parent.
+
+Keep component structure independent from color, appearance, size, shape, and state modifiers. Prefer semantic theme variables with paired foreground roles, for example surface/content and primary/primary-content, so a theme can change without rewriting component markup. Scope variables and class prefixes when embedding into an existing product; include only the component styles the page actually uses when the toolchain supports it.
+
 Use one hue or palette family only when contrast remains valid for every semantic role. Keep warning, danger, and content-image colors independent. Prefer `color-scheme` and a resolved `light`/`dark` DOM state; avoid duplicated `auto` branches.
+
+When using a Nord-inspired palette, map Polar Night to dark surfaces, Snow Storm to text/light surfaces, Frost to primary through tertiary emphasis, and Aurora to status semantics. Do not turn every surface, text role, and status into blue; preserve the red, yellow, green, and violet distinctions and re-check contrast outside terminal-sized text.
 
 ### 4. Build stable structure
 
@@ -54,8 +100,37 @@ Use one hue or palette family only when contrast remains valid for every semanti
 - Collapse or reorder secondary widgets on narrow screens instead of shrinking every element until it becomes unusable.
 - For profile/archive pages, follow an identity stage with a bounded main-plus-profile shell. Define mobile source/order intentionally; do not let CSS reversal create a confusing reading or focus sequence.
 - Protect `env(safe-area-inset-*)` and avoid collisions between floating rails, chat buttons, consent actions, and browser UI.
+- For glass Bento/profile layouts, use explicit Grid spans for the editorial desktop composition and a deliberate single-column source order below the narrow breakpoint. Keep the content layer independent from wallpaper, blur, and decorative canvas bounds.
 
 ## Component Patterns
+
+### Component systems and states
+
+- Define each component by semantic anatomy and orthogonal axes: purpose, appearance, size, shape, state, and responsive behavior. Do not make one modifier class carry several unrelated decisions.
+- Build one explicit state matrix for default, hover, active/pressed, focus-visible, selected/checked, disabled, loading, read-only, invalid, warning, success, and empty states where applicable.
+- Keep hit-area geometry stable across states. Loading may replace or precede an icon, but it must reserve label width, expose busy state, and prevent duplicate submission without masquerading as disabled content.
+- Use native elements and attributes first. Treat visual disabled classes only as presentation helpers; preserve `disabled`, `aria-disabled`, keyboard behavior, and form semantics.
+- Expose a small size scale and one compact density mode. Compact mode must reduce padding and gaps coherently, not shrink only fonts or touch targets.
+- In a component-library project, use its public provider, theme, token, slot, variant, and component APIs before overriding generated internal selectors. Preserve the repository's React or Vue conventions and translate design rules instead of transplanting framework-specific APIs.
+- Keep global locale, direction, component size, disabled state, popup container, and empty rendering in one configuration boundary. Prefer context-bound modal/message/notification instances so imperative overlays do not escape theme or locale context.
+
+### Forms and data workspaces
+
+- Give every field a persistent label, optional help/constraint text, and reserved feedback area. Connect descriptions and errors programmatically; do not use placeholder text as the only label.
+- Keep label alignment, required/optional markers, control height, and feedback icons consistent across horizontal, vertical, inline, and mixed layouts. Switch to a single-column reading order before labels or controls become cramped.
+- Model validation as explicit untouched, validating, valid, warning, and invalid states. Validate at an intentional trigger, focus the first failed field after submission, preserve entered values, and distinguish client validation from server failure.
+- Pair submit actions with loading, success, and retry feedback. Keep destructive or irreversible actions visually and spatially separate from routine submission.
+- For tables, preserve header/column alignment while supporting sorting, filtering, search, selection, pagination, expansion, empty/loading/error states, and responsive overflow. Make active filters and sort direction visible and resettable.
+- Keep row identity stable across pagination and remote refresh. Announce selected counts, put batch actions near the selection summary, confirm destructive batches, and virtualize only after measuring a real performance need.
+- On narrow screens, prioritize columns, allow deliberate horizontal scroll with a visible cue, or transform rows into labeled records. Never hide essential values solely to avoid overflow.
+
+### Feedback, overlays, and layering
+
+- Choose the lightest feedback surface that fits the consequence: field message or inline alert, transient message, persistent notification, popconfirm, modal/drawer, then full result state.
+- Use skeletons when the final structure is predictable, a spinner for short indeterminate work, progress for measurable work, and an explicit empty or error result when loading ends without content.
+- Define one z-index ladder for base content, sticky chrome, dropdown/tooltip, scrim, drawer/modal, notification, and critical system feedback. Test nested overlays rather than increasing z-index locally.
+- Render popups in a container whose clipping, scrolling, positioning, theme scope, and direction are known. Match popup width to its trigger only when it improves scanning; do not let portal placement detach feedback from context.
+- Give dialogs and drawers accessible names, initial focus, containment, Escape and close behavior, scroll locking, and focus restoration. Keep notifications operable without stealing focus.
 
 ### Navigation and chrome
 
@@ -109,6 +184,13 @@ Use one hue or palette family only when contrast remains valid for every semanti
 - For foil/shine cards, normalize one pointer vector and derive tilt, glare, shine, and texture offsets from it.
 - Cap rotation, scale, blur, texture resolution, and compositing. Promote only the active card to expensive layers.
 - Use `mix-blend-mode`, masks, and multiple gradients only when a flat fallback and contrast check exist.
+
+### Glass surfaces and draggable decorative layers
+
+- Define glass with semantic tokens for surface alpha, border alpha, blur radius, shadow, radius, text contrast, and a solid fallback. Verify text and focus contrast against the actual wallpaper; increase opacity or remove blur when the check fails.
+- Keep wallpaper, glass cards, and content controls in separate layers. Provide a user-controlled wallpaper/transparency off state, and never let a moving background carry essential information.
+- If a page includes a draggable or zoomable character/canvas, isolate it in a bounded decorative layer. Support mouse drag, touch/pointer gestures, and an accessible keyboard/button path for zoom in, zoom out, and reset. Clamp translation and scale, preserve text selection/scroll/link behavior, and use `grab`/`grabbing` only for the draggable surface.
+- Pause or simplify canvas/model motion when hidden, off-screen, low-power, or under `prefers-reduced-motion`; cap DPR and clean up listeners/animation frames. Supply a static DOM/image placeholder when canvas or model loading fails.
 
 ### Galleries and image previews
 
@@ -168,14 +250,15 @@ Use one hue or palette family only when contrast remains valid for every semanti
 1. Render the changed page at narrow mobile, regular desktop, and wide desktop widths.
 2. Test empty, loading, error, disabled, active, focused, hover, selected, expanded, collapsed, and reduced-motion states.
 3. Verify no text overflow, layout shift, clipped controls, accidental horizontal scroll, or overlay collision.
-4. Verify light/dark/system theme resolution before first paint and after system preference changes.
-5. Verify keyboard and touch interaction for menus, search, cards, rails, carousels, media, and settings.
-6. Verify expensive effects have cleanup and a static fallback; inspect the console for runtime errors.
-7. Re-check licenses and attribution before reusing any third-party implementation, font, or asset.
+4. Verify light/dark/system and compact theme resolution before first paint and after system preference changes.
+5. Verify keyboard and touch interaction for menus, search, cards, rails, carousels, media, forms, tables, overlays, and settings.
+6. Verify locale changes, long translated labels, RTL layout, popup placement, and the complete z-index ladder.
+7. Verify expensive effects have cleanup and a static fallback; inspect the console for runtime errors.
+8. Re-check licenses and attribution before reusing any third-party implementation, font, or asset.
 
 ## Reference map
 
-Load `references/frontend-style-distillation-sources.md` for the complete evidence log covering all collected sources: floating rails, FF7 UI, Clarity, Anheyu, Haku76's theme, Imsyy, Bikari Archive, Dogument's pixel typography, Gaoice's Windows-style desktop UI, Lunora's dashboard sidebar, xlrt.top's compact multi-view card, Soki's directed photo wall, CRWeb's immersive profile archive, Uiverse cards/search/context/player, React Bits Balatro/carousel, Pokemon card materials, Blue Archive, Mizuki, and Sakurairo. Use the relevant section only; do not load the entire reference for an unrelated task.
+Load `references/frontend-style-distillation-sources.md` for the complete evidence log covering all collected sources: floating rails, FF7 UI, Clarity, Anheyu, Haku76's theme, Imsyy, Bikari Archive, Dogument's pixel typography, Gaoice's Windows-style desktop UI, Lunora's dashboard sidebar, xlrt.top's compact multi-view card, Soki's directed photo wall, CRWeb's immersive profile archive, Uiverse cards/search/context/player, React Bits Balatro/carousel, Pokemon card materials, Blue Archive, Mizuki, Sakurairo, Ant Design, daisyUI, Ant Design Vue, Nord Termite, 7.css, and Home Assistant Mobile First. Use the platform label and the relevant section only; do not load the entire reference for an unrelated task.
 
 ## Skill maintenance SOP
 
