@@ -47,6 +47,7 @@ import {
 } from "./features/gen4profiles/profilePanelState";
 import { useGen4Profiles } from "./features/gen4profiles/useGen4Profiles";
 import { Gen4StaticPanel } from "./features/gen4static/Gen4StaticPanel";
+import { Gen4WildPanel } from "./features/gen4wild/Gen4WildPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
 
@@ -62,7 +63,8 @@ type ActiveModule =
   | "ivtopid"
   | "egg"
   | "spindapainter"
-  | "gen4static";
+  | "gen4static"
+  | "gen4wild";
 
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
@@ -319,7 +321,8 @@ function App() {
     cancelled: t("cancelled"),
     failed: t("failed"),
   }[status];
-  const gen4Tools = activeModule === "gen4static";
+  const gen4Tools =
+    activeModule === "gen4static" || activeModule === "gen4wild";
   const activeFloatingTool = ivCalculatorExpanded
     ? "iv"
     : encounterLookupExpanded
@@ -375,7 +378,7 @@ function App() {
             <div>
               <div className="brand-name">{t("brand")}</div>
               <div className="brand-subtitle">
-                {t(activeModule === "gen4static" ? "subtitleGen4" : "subtitle")}
+                {t(gen4Tools ? "subtitleGen4" : "subtitle")}
               </div>
             </div>
           </div>
@@ -621,6 +624,24 @@ function App() {
               <small>{t("gen4StaticVersion")}</small>
             </span>
           </button>
+          <button
+            className={
+              activeModule === "gen4wild"
+                ? "module-entry active"
+                : "module-entry"
+            }
+            onClick={() => {
+              setActiveModule("gen4wild");
+              setModuleRailOpen(false);
+            }}
+            type="button"
+          >
+            <span className="module-index">11</span>
+            <span>
+              <strong>{t("gen4WildModule")}</strong>
+              <small>{t("gen4WildVersion")}</small>
+            </span>
+          </button>
           <div className="rail-footer">
             <span className="rail-dot" />
             {t("localOnly")}
@@ -631,7 +652,7 @@ function App() {
           <div className="page-heading">
             <div>
               <div className="eyebrow">
-                {activeModule === "gen4static"
+                {activeModule === "gen4static" || activeModule === "gen4wild"
                   ? "GEN IV / RNG LAB"
                   : "GEN III / RNG LAB"}
               </div>
@@ -655,7 +676,9 @@ function App() {
                                   ? "eggEngine"
                                   : activeModule === "spindapainter"
                                     ? "spindaPainterEngine"
-                                    : "gen4StaticEngine",
+                                    : activeModule === "gen4static"
+                                      ? "gen4StaticEngine"
+                                      : "gen4WildEngine",
                 )}
               </h1>
             </div>
@@ -679,7 +702,9 @@ function App() {
                                 ? "eggVersion"
                                 : activeModule === "spindapainter"
                                   ? "spindaPainterVersion"
-                                  : "gen4StaticVersion",
+                                  : activeModule === "gen4static"
+                                    ? "gen4StaticVersion"
+                                    : "gen4WildVersion",
               )}
             </div>
           </div>
@@ -1117,6 +1142,12 @@ function App() {
             <Gen3SpindaPainterPanel />
           ) : activeModule === "gen4static" ? (
             <Gen4StaticPanel
+              onOpenIvCalculator={openGen4IvCalculator}
+              profile={gen4Profiles.selectedProfile ?? DEFAULT_GEN4_PROFILE}
+              uiPreviewMode={uiPreviewMode}
+            />
+          ) : activeModule === "gen4wild" ? (
+            <Gen4WildPanel
               onOpenIvCalculator={openGen4IvCalculator}
               profile={gen4Profiles.selectedProfile ?? DEFAULT_GEN4_PROFILE}
               uiPreviewMode={uiPreviewMode}
