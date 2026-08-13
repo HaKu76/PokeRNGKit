@@ -2,12 +2,22 @@
 
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
-> - Git 基线：`b2c6ade feat: 统一悬浮工具面板交互`
-> - 当前阶段：回归修正模块布局、全局工具入口与侧栏世代分组
-> - 工作区状态：本轮 UI、全局个体值计算器和文档修改尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：当前生产页 UI 与遇敌查询抽样已记录；新悬浮交互待部署后共同验收
+> - Git 基线：`2819588 fix: 修正全局工具布局与世代入口`
+> - 当前阶段：新增第三世代 GameCube Seed Finder
+> - 工作区状态：`gen3ngcseed` 源码、接线与文档尚未提交；Codex 不提交、不 push、不部署
+> - 验收状态：本轮只完成源码与格式检查，NGC Seed 算法、构建和 UI 均待授权验证
 
 ## 当前状态
+
+- 新增 `gen3ngcseed`：PokeFinder `GameCube Seed Finder` 的 Gales/XD、Colo/竞技场与 Channel/频道三种查询，接入 GEN III 左侧导航。
+- Gales/Colo 支持多轮候选筛选；第一次搜索按上游通过 Yes/No 询问是否选择对应 `.precalc`，决定保留到模块关闭。文件按上游 25/24 个小端分区读取，并流式校验 Qt ISO 3309 CRC `0xD75B / 0x097B`；文件不上传、不持久化。
+- 新增独立 C++/Emscripten C ABI、Dedicated Worker、Worker Pool、API v1、消息协议、UI 预览引擎、TypeScript 边界测试与原生非法输入夹具。默认 Wasm 构建列表由 8 个增加为 9 个。
+- Gales/Colo 首轮按低 16 位分片，Channel 精确覆盖 `0x40000001..0xFFFFFFFE`，候选数组按 50,000 个 Seed 分片；Worker 校验 domain、任务、分片和结果数量，Pool 按 `chunkIndex` 恢复确定顺序并支持取消。
+- 记录 PokeFinder 4.3.2 Gales 首轮的上游越界：`enemyHPStat[enemyIndex + 5]` 超出 5 行数组。本项目使用有效的 `enemyHPStat[enemyIndex]`，待生产页面与 PokeFinder 实际结果共同回归，当前不标记为算法已验收。
+- HP 控件保持上游空值语义：非空输入为 `1..714`，空白搜索时按 `0` 读取；Channel 少于 10 条时由 Search 动作显示上游 `You must have at least 10 entries`。
+- 简中逐字使用 `NGC Seed查询`、`XD`、`竞技场`、`频道` 等已完成上游词条；`Round #%1`、四个 HP、Precalc、Channel 数量提示与复制词条 unfinished，因此保留英文。结果 Seed 与上游一致使用大写十六进制且不补前导零。
+- 本轮使用 HakuStyle 保持现有紧凑工作台、三页签、稳定三列设置网格、移动端单列与结果表样式；三个页签分别保留轮次、结果和状态，切换时不互相清空；未新增运行时依赖。
+- 本轮已通过 `npm run format:changed`、`npm run format:check` 与 `git diff --check`。未运行 ESLint、TypeScript、Vitest、原生夹具、Wasm/Web 构建、UI 预览、浏览器或生产算法回归；仓库规则要求项目所有者对具体检查或 URL 明确授权。
 
 - 本轮修复 Initial Seed Finder 虚拟结果表首行偏移：行定位补齐 `top: 0`，并将“结果表第一条不得出现虚假空行”写入 `docs/ai-development.md` 的 UI 回归规则；Static、Wild、Egg 和 Gen4 Static 仍使用已核对的 `translateY(start + 38px)` 表头偏移。
 - 本轮移除 Seed to Time 的两列进制辅助文本、IVs to PID 的 TID 辅助文本、Egg 设置标题右侧的存档版本标签和 Spinda Painter 的 `HEX / 32-bit` 文本。它们不是对应 PokeFinder UI 的独立控件或信息，今后不得擅自添加；规则已写入 UI 回归规则。
@@ -45,14 +55,14 @@
 - 未运行：ESLint、TypeScript 类型检查、Vitest、Web/Wasm 构建、原生夹具、浏览器 UI 或生产回归；本轮授权范围仅为 Actions 日志诊断和格式/SOP 修复。
 
 - 主分支已包含自动完成控件、三代悬浮工具互斥、`gen3seedtotime`、`gen3spindapainter` 与格式化/Actions SOP；本次合并保留这些修改。
-- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3spindapainter`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`、G3/G4 独立 `profiles`、全局 `ivcalculator` 与 `encounterlookup`。
+- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3spindapainter`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`、G3/G4 独立 `profiles`、全局 `ivcalculator` 与 `encounterlookup`。
 - 主分支此前新增 `encounterlookup`：右下角默认收起的全世代 Encounter Lookup，覆盖 PokeFinder 4.3.2 的 Gen III、Gen IV、Gen V 和 BDSP 共 16 个版本；静态数据由 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 生成。
 - 遇敌查询不进入左侧 RNG 导航，不使用 Wasm/Worker；宝可梦候选、游戏版本、地点、遇敌种类和等级范围均来自本地静态数据。
 - 已清理生成用 `.tmp-encounter-tables/` 与 `.tmp-encounter-tables.zip`；生成脚本和正式 `data.ts` 保留在工作区。
 - 主分支此前新增 `AutoCompleteComboBox`，覆盖 Encounter Lookup 宝可梦、IV Calculator 宝可梦、Egg 蛋种类和 Wild 地点。行为对应 PokeFinder `enableAutoComplete()`：点击展开、包含匹配、弹出候选、方向键/Enter/Escape 和 `NoInsert`。
 - 主分支此前将 G3 存档信息、个体值计算器和遇敌查询纳入同一展开状态；本次合并把相同互斥规则扩展到 G4 工具，并保留两代各自的 localStorage 展开偏好。
 - 本次合并新增 `gen4static` 和独立 G4 存档；个体值计算器已合并为全局单一入口。Encounter Lookup 在两代页面共用，当前页面的存档、个体值计算器和遇敌查询保持三方互斥。
-- RNG Wasm 默认构建列表为 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`，共 8 个。
+- RNG Wasm 默认构建列表为 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`，共 9 个。
 - 正式 Wasm、站点产物和 Pages 部署由 GitHub Actions 生成，不提交 `public/wasm/`、`wasm/build/` 或 `dist/`。
 - 本次合并已运行 `npm run format:changed`、定向 `npm run format:files -- ...`、`npm run format:check` 与 `git diff --check`；最终全仓格式和空白检查通过，未发现残留冲突标记。
 
@@ -80,6 +90,7 @@
 - `gen3id`：第三世代 ID Generator/Searcher。
 - `gen3initialseed`：第三世代 Initial Seed 反推。
 - `gen3seedtotime`：第三世代 Seed 到日期时间查询。
+- `gen3ngcseed`：第三世代 GameCube Seed Finder，覆盖 Gales、Colo 与 Channel。
 - `gen3spindapainter`：第三世代晃晃斑的斑点 PID/坐标双向工具。
 - `gen3static`：第三世代定点 Generator/Searcher。
 - `gen3wild`：第三世代野生 Generator/Searcher、地点选择、完整筛选、Worker Pool、CSV、UI 预览与真实 Wasm 运行。
@@ -117,14 +128,14 @@
 
 ## 下一步
 
-1. 在 GitHub Desktop 审查本轮 Initial Seed 首行、控件对齐、Egg/Spinda 标签、全局工具与侧栏世代分组修改。
-2. 项目所有者明确授权后，运行 `npm run verify`；如需覆盖 Wasm 再单独授权 `npm run wasm:test:native` 与 `npm run wasm:build`。
-3. 项目所有者提交并推送后，等待 GitHub Actions 完成部署，再以实际生产 URL 在外部 Chrome 回归 Initial Seed 首行、Seed to Time 与 IVs to PID 对齐、Egg/Spinda 标签、全局工具六数据集和侧栏分组。
+1. 在 GitHub Desktop 审查 `NGC Seed查询` 的 Gales/Colo/Channel 页面、首次搜索 Precalc 询问、导航与文档。
+2. 项目所有者明确授权后，运行 `npm run verify`；如需覆盖新 C++/Wasm 再单独授权 `npm run wasm:test:native` 与 `npm run wasm:build`。
+3. 项目所有者提交并推送后，等待 GitHub Actions 完成部署，再提供实际生产 URL，使用外部 Chrome 与 PokeFinder 4.3.2 逐模式回归结果、Precalc、取消与移动布局。
 
 ## 已知限制
 
-- 当前分支：`main`，HEAD `b2c6ade feat: 统一悬浮工具面板交互`。
-- 本轮 UI、全局个体值计算器数据和文档修改尚未提交。正式 Pages 仍保持上一成功生产包，不能作为本轮源码的验收证据。
+- 当前分支：`main`，HEAD `2819588 fix: 修正全局工具布局与世代入口`。
+- 本轮 `gen3ngcseed` 源码和文档尚未提交。正式 Pages 仍保持上一成功生产包，不能作为本轮源码的验收证据。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
@@ -132,7 +143,7 @@
 - 工程基础：React 19、TypeScript 6、Vite 8、Vitest、ESLint、Prettier、PWA 和中英日三语；npm 是唯一包管理器。
 - 构建基线：Node.js `24.19.0`、npm `12.0.2`、Emscripten `6.0.6`、CMake runtime `4.3.1`、Ninja runtime `1.13.2`。
 - 法律边界：GPL-3.0-or-later、PokeFinder 署名、对应源码记录和站点免责声明。
-- 已有模块：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3spindapainter`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、`gen4static`、G3/G4 独立存档信息、全局个体值计算器，以及 `encounterlookup`。
+- 已有模块：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3spindapainter`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、`gen4static`、G3/G4 独立存档信息、全局个体值计算器，以及 `encounterlookup`。
 - UI 基础：默认收起的模块抽屉、全局存档悬浮窗、浅色/深色主题和系统默认字体。
 
 ## 5. 验证状态

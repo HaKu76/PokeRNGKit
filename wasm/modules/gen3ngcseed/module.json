@@ -1,0 +1,7 @@
+{
+  "id": "gen3ngcseed",
+  "apiVersion": 1,
+  "target": "gen3ngcseed",
+  "artifacts": ["gen3ngcseed.mjs", "gen3ngcseed.wasm"],
+  "source": "PokeFinder 4.3.2 GameCubeSeedFinder and Gen3 Channel/Colo/Gales searchers"
+}

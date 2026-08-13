@@ -2,7 +2,7 @@
 
 > - 状态：第三世代既有模块与第四世代 Static 已接入独立 Wasm/Worker；PR #3 合并后的工程与部署回归待完成
 > - 更新日期：2026-08-13
-> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 Static Generator/Searcher，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
+> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 Static Generator/Searcher，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 > - 包管理器：npm
 
 ## 1. 技术结论
@@ -42,6 +42,7 @@ React UI
         |-- Gen3IdWorkerPool / Gen3IdSearcherWorkerPool -> gen3id.mjs + gen3id.wasm
         |-- Gen3InitialSeedWorkerPool -> gen3initialseed.mjs + gen3initialseed.wasm
         |-- Gen3SeedToTimeWorkerPool -> gen3seedtotime.mjs + gen3seedtotime.wasm
+        |-- Gen3NgcSeedWorkerPool -> gen3ngcseed.mjs + gen3ngcseed.wasm
         |-- Gen3StaticWorkerPool ---------+
         |-- Gen3StaticSearcherWorkerPool -+-> gen3static.mjs + gen3static.wasm
         |-- Gen3WildWorkerPool ---------+
@@ -100,7 +101,7 @@ Vite 的 `ui` mode 在编译期选择本地 UI 预览引擎。该引擎只生成
 
 React 负责高交互表单、进度状态和虚拟化结果视图。TypeScript 为 RNG 请求、Worker 消息、Wasm 解码和状态机提供静态边界。
 
-当前有 ID、Initial Seed、Seed to Time、G3 Static、Wild、IVs to PID、Egg 与 G4 Static 八个 RNG 工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。存档信息分别由 `useGen3Profiles`、`useGen4Profiles` 与各自 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；Spinda Painter 与 Encounter Lookup 使用本地确定性数据，不进入 RNG Worker 状态。
+当前有 ID、Initial Seed、Seed to Time、GameCube Seed Finder、G3 Static、Wild、IVs to PID、Egg 与 G4 Static 九个 RNG 工作区，状态仍由各自 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理。存档信息分别由 `useGen3Profiles`、`useGen4Profiles` 与各自 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；Spinda Painter 与 Encounter Lookup 使用本地确定性数据，不进入 RNG Worker 状态。
 
 ### 5.2 路由
 
@@ -144,7 +145,7 @@ PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等�
 - `localStorage`：两代独立存档镜像、语言、主题和各悬浮窗折叠状态。
 - Worker/Wasm：任务期间的临时计算状态。
 - 页面刷新：终止任务并重建 Worker，不持久化结果。
-- UI 预览：ID、Initial Seed、G3/G4 Static、Wild、IVs to PID 与 Egg 各自使用同一请求边界的确定性样例引擎，不读取或生成 Wasm；预览结果只用于界面交互验收。`gen3spindapainter` 是不涉及 RNG 的确定性 PID/坐标映射，直接由 React domain 计算，不创建 Wasm 或 Worker。
+- UI 预览：ID、Initial Seed、GameCube Seed Finder、G3/G4 Static、Wild、IVs to PID 与 Egg 各自使用同一请求边界的确定性样例引擎，不读取或生成 Wasm；预览结果只用于界面交互验收。`gen3spindapainter` 是不涉及 RNG 的确定性 PID/坐标映射，直接由 React domain 计算，不创建 Wasm 或 Worker。
 
 ### 6.2 存档 repository
 
@@ -162,6 +163,7 @@ PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等�
 gen3id
 gen3initialseed
 gen3seedtotime
+gen3ngcseed
 gen3static
 gen3wild
 gen3ivtopid
@@ -193,6 +195,11 @@ wasm/
     |   |-- bridge/
     |   `-- tests/
     |-- gen3seedtotime/
+    |   |-- CMakeLists.txt
+    |   |-- module.json
+    |   |-- bridge/
+    |   `-- tests/
+    |-- gen3ngcseed/
     |   |-- CMakeLists.txt
     |   |-- module.json
     |   |-- bridge/
@@ -230,6 +237,8 @@ public/wasm/                        # 生成物，忽略
 |-- gen3initialseed.wasm
 |-- gen3seedtotime.mjs
 |-- gen3seedtotime.wasm
+|-- gen3ngcseed.mjs
+|-- gen3ngcseed.wasm
 |-- gen3static.mjs
 |-- gen3static.wasm
 |-- gen3wild.mjs
@@ -246,7 +255,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 2，`gen3initialseed` API 版本为 1，`gen3seedtotime` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 3，`gen3ivtopid` API 版本为 1，`gen3egg` API 版本为 1，`gen4static` API 版本为 1。ID C ABI 为：
+当前 `gen3id` API 版本为 2，`gen3initialseed` API 版本为 1，`gen3seedtotime` API 版本为 1，`gen3ngcseed` API 版本为 1，`gen3static` API 版本为 3，`gen3wild` API 版本为 3，`gen3ivtopid` API 版本为 1，`gen3egg` API 版本为 1，`gen4static` API 版本为 1。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -324,6 +333,33 @@ uint32_t gen3seedtotime_last_error();
 ```
 
 每条记录为五个连续 `uint32_t`：`year / month / day / hour / minute`。C++ 先用 PokeRNGR 回推到不超过 `0xFFFF` 的原始 Seed，再按 PokeFinder 的年份/分钟顺序枚举；全年最多扫描 527,040 个分钟，使用单个 Dedicated Worker，不分片。
+
+GameCube Seed Finder C ABI v1 提供 Gales、Colo 与 Channel 三种入口，并返回单个 `uint32_t` Seed 记录：
+
+```c
+uint32_t gen3ngcseed_api_version();
+uint32_t gen3ngcseed_search_gales(
+  uint32_t playerIndex, uint32_t enemyIndex,
+  uint32_t enemyHpLeft, uint32_t enemyHpRight,
+  uint32_t playerHpLeft, uint32_t playerHpRight,
+  const uint32_t* seeds, uint32_t seedCount,
+  uint32_t lowStart, uint32_t lowCount
+);
+uint32_t gen3ngcseed_search_colo(
+  uint32_t partyLead, uint32_t trainer,
+  const uint32_t* seeds, uint32_t seedCount,
+  uint32_t lowStart, uint32_t lowCount
+);
+uint32_t gen3ngcseed_search_channel(
+  const uint32_t* patterns, uint32_t count,
+  uint32_t startSeed, uint32_t stateCount
+);
+uintptr_t gen3ngcseed_result_ptr();
+uint32_t gen3ngcseed_result_count();
+uint32_t gen3ngcseed_last_error();
+```
+
+Gales/Colo 首轮按低 16 位分片，Channel 覆盖 `0x40000001..0xFFFFFFFE`。可选 `.precalc` 由 TypeScript 流式校验 Qt ISO 3309 CRC 与 25/24 个小端分区，候选按 200,000 个 Seed 读取并在 Pool 内进一步按 50,000 个 Seed 分片；XDRNG 搜索仍只在 C++/Wasm 中执行。
 
 IVs to PID C ABI v1 接受六项 IV、Nature 与 TID：
 
@@ -406,6 +442,7 @@ Generator 的 `Max Advances` 包含起点；Searcher 的 IV 组合按 `HP -> Atk
 - `gen3wild` API v3 的 Generator/Searcher 筛选都在 C++/Wasm 内完成，Worker 不复制第二套 RNG 筛选逻辑。
 - `gen3initialseed` 的正向/反向 LCRNG 计算只在 C++/Wasm 中执行，TypeScript 不复写生产 RNG。
 - `gen3seedtotime` 的 PokeRNGR 回推和全年日期/分钟枚举只在 C++/Wasm 中执行，TypeScript 不复写生产算法。
+- `gen3ngcseed` 的 Gales/Colo/Channel XDRNG 搜索只在 C++/Wasm 中执行；TypeScript 只读取 Precalc 二进制结构，不推导 RNG 结果。
 - 返回缓冲区在下一次同 Worker 调用前有效，Worker 必须立即复制并转移。
 - 错误使用稳定数值码，TypeScript 负责转换为用户可见错误。
 - API 版本不匹配时停止初始化，不尝试兼容猜测。
@@ -475,7 +512,7 @@ type ModuleWorkerResponse =
 - 批次缓冲区使用 transfer list 移交所有权。
 - 取消通过终止 Pool 中的 Worker 实现，下一任务重新初始化。
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
-- ID、Initial Seed、Seed to Time、Static、Wild、IVs to PID 与 Egg 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time 和 IVs to PID 每次输入都是有限任务，不拆分 chunk；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入。
+- ID、Initial Seed、Seed to Time、GameCube Seed Finder、Static、Wild、IVs to PID 与 Egg 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time 和 IVs to PID 每次输入都是有限任务，不拆分 chunk；GameCube Seed Finder 以低 16 位、32 位 Seed 区间或候选数组分片；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入。
 
 `gen4static` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`，任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`。这一契约不改写三代消息类型，未来 `gen4id` 与 `gen4wild` 可沿用同一跨世代信封。
 
@@ -485,7 +522,7 @@ type ModuleWorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3egg_*`、`gen4static_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3egg_*`、`gen4static_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 
@@ -500,6 +537,7 @@ docs/
 |   |-- gen3id.md
 |   |-- gen3initialseed.md
 |   |-- gen3seedtotime.md
+|   |-- gen3ngcseed.md
 |   |-- gen3profiles.md
 |   |-- gen3static.md
 |   |-- gen3wild.md
@@ -537,6 +575,12 @@ src/
     |-- seedtotime/
     |   |-- domain.ts
     |   |-- Gen3SeedToTimePanel.tsx
+    |   |-- preview/
+    |   `-- worker/
+    |-- ngcseed/
+    |   |-- domain.ts
+    |   |-- precalc.ts
+    |   |-- Gen3NgcSeedPanel.tsx
     |   |-- preview/
     |   `-- worker/
     |-- profiles/
@@ -584,6 +628,7 @@ wasm/modules/
 |-- gen3id/
 |-- gen3initialseed/
 |-- gen3seedtotime/
+|-- gen3ngcseed/
 |-- gen3static/
 |-- gen3wild/
 |-- gen3ivtopid/
@@ -632,10 +677,10 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 ### 12.1 当前已实现
 
-- **C++ 原生夹具**：ID 三种模式，Initial Seed 的 RS TID/SID 固定候选，Seed to Time 的时间表与 32 位回推，G3 Static Method 1/4、Searcher 反向恢复与游走缺陷，Wild Route 111 Generator/Searcher，IVs to PID Channel/Method 2，Egg Emerald/RSFRLG，以及 G4 Static Method 1/J/K、Synchronize、Cute Charm 与 Searcher 固定结果。
+- **C++ 原生夹具**：ID 三种模式，Initial Seed 的 RS TID/SID 固定候选，Seed to Time 的时间表与 32 位回推，NGC Seed C ABI 输入边界，G3 Static Method 1/4、Searcher 反向恢复与游走缺陷，Wild Route 111 Generator/Searcher，IVs to PID Channel/Method 2，Egg Emerald/RSFRLG，以及 G4 Static Method 1/J/K、Synchronize、Cute Charm 与 Searcher 固定结果。
 - **TypeScript 单元测试**：ID、G3/G4 Static、Wild、IVs to PID、Egg、Spinda Painter 输入边界，Generator/Searcher 分片、固定宽度结果解码、PID/斑点双向映射、觉醒力量、输入规范化、主题和红蓝宝石 Seed 推导。
 - **持久化单元测试**：G3/G4 存档 JSON schema、合并边界、IndexedDB 主存储抽象与 localStorage 兜底。
-- **UI 预览引擎测试**：ID、Initial Seed、G3/G4 Static、Wild Generator/Searcher、IVs to PID 与 Egg Generator 的确定性样例、进度和取消。
+- **UI 预览引擎测试**：ID、Initial Seed、GameCube Seed Finder、G3/G4 Static、Wild Generator/Searcher、IVs to PID 与 Egg Generator 的确定性样例、进度和取消。
 - **静态检查**：Prettier、ESLint、TypeScript project build。
 - **生产 Web 构建**：Vite Worker、PWA、相对 base 和法律文件。
 

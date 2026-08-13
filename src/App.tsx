@@ -32,6 +32,7 @@ import {
 } from "./features/profiles/domain";
 import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
 import { Gen3InitialSeedPanel } from "./features/initialseed/Gen3InitialSeedPanel";
+import { Gen3NgcSeedPanel } from "./features/ngcseed/Gen3NgcSeedPanel";
 import { Gen3SeedToTimePanel } from "./features/seedtotime/Gen3SeedToTimePanel";
 import { Gen3SpindaPainterPanel } from "./features/spindapainter/Gen3SpindaPainterPanel";
 import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
@@ -54,6 +55,7 @@ type SupportedLanguage = "zh" | "en" | "ja";
 type ActiveModule =
   | "id"
   | "initialseed"
+  | "ngcseed"
   | "seedtotime"
   | "static"
   | "wild"
@@ -482,6 +484,24 @@ function App() {
           </button>
           <button
             className={
+              activeModule === "ngcseed"
+                ? "module-entry active"
+                : "module-entry"
+            }
+            onClick={() => {
+              setActiveModule("ngcseed");
+              setModuleRailOpen(false);
+            }}
+            type="button"
+          >
+            <span className="module-index">03</span>
+            <span>
+              <strong>{t("ngcSeedModule")}</strong>
+              <small>{t("ngcSeedVersion")}</small>
+            </span>
+          </button>
+          <button
+            className={
               activeModule === "seedtotime"
                 ? "module-entry active"
                 : "module-entry"
@@ -492,7 +512,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">03</span>
+            <span className="module-index">04</span>
             <span>
               <strong>{t("seedToTimeModule")}</strong>
               <small>{t("seedToTimeVersion")}</small>
@@ -508,7 +528,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">04</span>
+            <span className="module-index">05</span>
             <span>
               <strong>{t("staticModule")}</strong>
               <small>{t("staticVersion")}</small>
@@ -524,7 +544,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">05</span>
+            <span className="module-index">06</span>
             <span>
               <strong>{t("wildModule")}</strong>
               <small>{t("wildVersion")}</small>
@@ -542,7 +562,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">06</span>
+            <span className="module-index">07</span>
             <span>
               <strong>{t("ivToPidModule")}</strong>
               <small>{t("ivToPidVersion")}</small>
@@ -558,7 +578,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">07</span>
+            <span className="module-index">08</span>
             <span>
               <strong>{t("eggModule")}</strong>
               <small>{t("eggVersion")}</small>
@@ -576,7 +596,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">08</span>
+            <span className="module-index">09</span>
             <span>
               <strong>{t("spindaPainterModule")}</strong>
               <small>{t("spindaPainterVersion")}</small>
@@ -595,7 +615,7 @@ function App() {
             }}
             type="button"
           >
-            <span className="module-index">09</span>
+            <span className="module-index">10</span>
             <span>
               <strong>{t("gen4StaticModule")}</strong>
               <small>{t("gen4StaticVersion")}</small>
@@ -621,19 +641,21 @@ function App() {
                     ? "engine"
                     : activeModule === "initialseed"
                       ? "initialSeedEngine"
-                      : activeModule === "seedtotime"
-                        ? "seedToTimeEngine"
-                        : activeModule === "static"
-                          ? "staticEngine"
-                          : activeModule === "wild"
-                            ? "wildEngine"
-                            : activeModule === "ivtopid"
-                              ? "ivToPidEngine"
-                              : activeModule === "egg"
-                                ? "eggEngine"
-                                : activeModule === "spindapainter"
-                                  ? "spindaPainterEngine"
-                                  : "gen4StaticEngine",
+                      : activeModule === "ngcseed"
+                        ? "ngcSeedEngine"
+                        : activeModule === "seedtotime"
+                          ? "seedToTimeEngine"
+                          : activeModule === "static"
+                            ? "staticEngine"
+                            : activeModule === "wild"
+                              ? "wildEngine"
+                              : activeModule === "ivtopid"
+                                ? "ivToPidEngine"
+                                : activeModule === "egg"
+                                  ? "eggEngine"
+                                  : activeModule === "spindapainter"
+                                    ? "spindaPainterEngine"
+                                    : "gen4StaticEngine",
                 )}
               </h1>
             </div>
@@ -643,19 +665,21 @@ function App() {
                   ? "version"
                   : activeModule === "initialseed"
                     ? "initialSeedVersion"
-                    : activeModule === "seedtotime"
-                      ? "seedToTimeVersion"
-                      : activeModule === "static"
-                        ? "staticVersion"
-                        : activeModule === "wild"
-                          ? "wildVersion"
-                          : activeModule === "ivtopid"
-                            ? "ivToPidVersion"
-                            : activeModule === "egg"
-                              ? "eggVersion"
-                              : activeModule === "spindapainter"
-                                ? "spindaPainterVersion"
-                                : "gen4StaticVersion",
+                    : activeModule === "ngcseed"
+                      ? "ngcSeedVersion"
+                      : activeModule === "seedtotime"
+                        ? "seedToTimeVersion"
+                        : activeModule === "static"
+                          ? "staticVersion"
+                          : activeModule === "wild"
+                            ? "wildVersion"
+                            : activeModule === "ivtopid"
+                              ? "ivToPidVersion"
+                              : activeModule === "egg"
+                                ? "eggVersion"
+                                : activeModule === "spindapainter"
+                                  ? "spindaPainterVersion"
+                                  : "gen4StaticVersion",
               )}
             </div>
           </div>
@@ -1067,6 +1091,8 @@ function App() {
             </>
           ) : activeModule === "initialseed" ? (
             <Gen3InitialSeedPanel uiPreviewMode={uiPreviewMode} />
+          ) : activeModule === "ngcseed" ? (
+            <Gen3NgcSeedPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "seedtotime" ? (
             <Gen3SeedToTimePanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "static" ? (

@@ -147,6 +147,29 @@ FE6A55570119A253DBD69946D86648E25910687D3B851CD92D4213548C028BE2  RNGRecovertest
 
 `wasm/modules/gen3seedtotime/bridge/gen3seedtotime_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `SeedToTimeCalculator3` 的 PokeRNGR 回推、分钟枚举和 post-2000 日历缺陷提供第三世代 Seed to Time C ABI；不修改 vendored 上游文件。
 
+`wasm/modules/gen3ngcseed/bridge/gen3ngcseed_bridge.cpp` 复用 vendored `LCRNG.hpp`，并按 `GalesSeedSearcher`、`ColoSeedSearcher` 与 `ChannelSeedSearcher` 的调用顺序提供 GameCube Seed Finder C ABI。React 不直接执行 XDRNG；`.precalc` 仅在 TypeScript 中解析上游固定的小端文件结构和 Qt ISO 3309 CRC。
+
+## GameCube Seed Finder 只读核验
+
+以下上游文件用于核验 `gen3ngcseed` 的算法、输入、翻译、Precalc 分区和交互，未复制到 vendored snapshot：
+
+```text
+5C50E93457AD6A451A167F4106163F7624E2C337D1857A26BBF1B3CC1CE9449A  Form/Gen3/Tools/GameCubeSeedFinder.cpp
+5285B43631EAE7DA347C87058FD324439686ADDCA8B2D887AC32FE616A9D77DC  Form/Gen3/Tools/GameCubeSeedFinder.hpp
+35DCAE60B417E93746A8C878FA8A740F9C86EA7463FAFC3CFB651E8001972364  Form/Gen3/Tools/GameCubeSeedFinder.ui
+41159DF4A91A183D9382BBE5B0B14DD82DAEBD6CD6A872DB0F7969B58BA4E1AD  Core/Gen3/Searchers/GalesSeedSearcher.cpp
+87F7994298C8E292184A7096B25312F0EEABBBFAE26DFD20CF003E711E8F6DA8  Core/Gen3/Searchers/GalesSeedSearcher.hpp
+35A8BBA1169154F773B7893F9FD88674080FB550CE623CFD852EB217CB5688A6  Core/Gen3/Searchers/ColoSeedSearcher.cpp
+7F6D268091BA054761386D5B1CBC67E1BDAE15AF88875CE9ECF0C7B52127EE42  Core/Gen3/Searchers/ColoSeedSearcher.hpp
+998CC1D3D0E591A7F1D279270F31BDD56D866FFC37F3669F3F34EEB36A1CD2AD  Core/Gen3/Searchers/ChannelSeedSearcher.cpp
+6B1CF0BC492429ECE3B8137213C5A421C52537D3F57CE15DFB8E3174FC46D889  Core/Gen3/Searchers/ChannelSeedSearcher.hpp
+BB98B0FE73D2310712EE44CA04B255D6E31B8B70D1BD0FB2F759FD14F246140D  Form/i18n/PokeFinder_zh.ts
+```
+
+PokeFinder 4.3.2 的 `GalesSeedSearcher::searchSeedSkip()` 读取 `enemyHPStat[enemyIndex + 5]`，而 `enemyHPStat` 只有 5 行。这是确定的越界访问。PokeRNGKit bridge 不复制未定义行为，第一轮使用与普通搜索一致的 `enemyHPStat[enemyIndex]`。该修改边界必须在生产页面与 PokeFinder 实际查询结果交叉回归；当前不能标记为算法已验收。
+
+上游 Gales/Colo Precalc 文件分别使用 25/24 个小端 `uint32_t` 分区计数，并以 Qt 默认 `qChecksum` 校验为 `0xD75B / 0x097B`。本项目不分发 Precalc 文件，只允许用户从本地选择并在内存中校验、读取。
+
 ## Gen III Seed to Time 只读核验
 
 以下上游文件用于核验 `gen3seedtotime` 的算法、输入、翻译、结果列和固定夹具，未复制到 vendored snapshot：
