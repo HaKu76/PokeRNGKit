@@ -114,6 +114,7 @@ function App() {
   const [moduleRailCollapsed, setModuleRailCollapsed] = useState(false);
   const [ivCalculatorExpanded, setIvCalculatorExpanded] = useState(false);
   const [encounterLookupExpanded, setEncounterLookupExpanded] = useState(false);
+  const [contributionsExpanded, setContributionsExpanded] = useState(false);
   const [profileExpanded, setProfileExpanded] = useState(
     initialGen3ProfilePanelExpanded,
   );
@@ -222,6 +223,7 @@ function App() {
   const openIvCalculator = () => {
     setIvCalculatorExpanded(true);
     setEncounterLookupExpanded(false);
+    setContributionsExpanded(false);
     setProfileExpanded(false);
     persistGen3ProfilePanelExpanded(false);
     setGen4ProfileExpanded(false);
@@ -234,6 +236,7 @@ function App() {
     if (expanded) {
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
+      setContributionsExpanded(false);
     }
   };
 
@@ -243,6 +246,7 @@ function App() {
     if (expanded) {
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
+      setContributionsExpanded(false);
     }
   };
 
@@ -357,29 +361,35 @@ function App() {
   const gen7Module = activeModule === "gen7id";
   const pokerusModule = activeModule === "pokerusfinder";
   const profileTools = true;
-  const activeFloatingTool = ivCalculatorExpanded
-    ? "iv"
-    : encounterLookupExpanded
-      ? "encounter"
-      : profileTools && gen4Tools
-        ? gen4ProfileExpanded
-          ? "profile"
-          : undefined
-        : profileTools && profileExpanded
-          ? "profile"
-          : undefined;
+  const activeFloatingTool = contributionsExpanded
+    ? "contributions"
+    : ivCalculatorExpanded
+      ? "iv"
+      : encounterLookupExpanded
+        ? "encounter"
+        : profileTools && gen4Tools
+          ? gen4ProfileExpanded
+            ? "profile"
+            : undefined
+          : profileTools && profileExpanded
+            ? "profile"
+            : undefined;
 
-  const toggleFloatingTool = (tool: "encounter" | "iv" | "profile") => {
+  const toggleFloatingTool = (
+    tool: "contributions" | "encounter" | "iv" | "profile",
+  ) => {
     const expanded = activeFloatingTool !== tool;
     setEncounterLookupExpanded(false);
     setIvCalculatorExpanded(false);
+    setContributionsExpanded(false);
     if (gen4Tools) {
       changeGen4ProfileExpanded(false);
     } else {
       changeProfileExpanded(false);
     }
     if (!expanded) return;
-    if (tool === "encounter") setEncounterLookupExpanded(true);
+    if (tool === "contributions") setContributionsExpanded(true);
+    else if (tool === "encounter") setEncounterLookupExpanded(true);
     else if (tool === "iv") setIvCalculatorExpanded(true);
     else if (gen4Tools) changeGen4ProfileExpanded(true);
     else changeProfileExpanded(true);
@@ -517,18 +527,6 @@ function App() {
               : undefined
           }
         >
-          <div className="rail-heading">
-            <div className="rail-label">{t("modules")}</div>
-            <button
-              aria-label={t("closeModules")}
-              className="rail-close-button"
-              onClick={() => setModuleRailOpen(false)}
-              title={t("closeModules")}
-              type="button"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
           <nav aria-label={t("modules")} className="module-navigation">
             <div className="rail-section-label">GEN III</div>
             <button
@@ -1425,16 +1423,26 @@ function App() {
           )}
         </main>
       </div>
-      <div className="contributions-site-section">
-        <ContributionsPanel embedded />
-      </div>
       <div className="floating-tools">
+        <ContributionsPanel
+          expanded={activeFloatingTool === "contributions"}
+          onExpandedChange={(expanded) => {
+            setContributionsExpanded(expanded);
+            if (expanded) {
+              setIvCalculatorExpanded(false);
+              setEncounterLookupExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
         <IvCalculator
           expanded={activeFloatingTool === "iv"}
           onExpandedChange={(expanded) => {
             setIvCalculatorExpanded(expanded);
             if (expanded) {
               setEncounterLookupExpanded(false);
+              setContributionsExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
               else changeProfileExpanded(false);
             }
@@ -1446,6 +1454,7 @@ function App() {
             setEncounterLookupExpanded(expanded);
             if (expanded) {
               setIvCalculatorExpanded(false);
+              setContributionsExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
               else changeProfileExpanded(false);
             }
@@ -1538,6 +1547,16 @@ function App() {
         </nav>
       </div>
       <footer className="legal-footer">
+        <button
+          aria-controls="contributions-panel"
+          aria-expanded={activeFloatingTool === "contributions"}
+          className="legal-footer-action"
+          id="contributions-trigger"
+          onClick={() => toggleFloatingTool("contributions")}
+          type="button"
+        >
+          {t("contributions")}
+        </button>
         <span>{t("upstream")}</span>
         <a
           href="https://github.com/HaKu76/PokeRNGKit"

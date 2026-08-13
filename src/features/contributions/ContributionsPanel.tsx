@@ -18,13 +18,11 @@ const contributions: readonly ContributionRecord[] = [
 ];
 
 interface ContributionsPanelProps {
-  readonly embedded?: boolean;
   readonly expanded?: boolean;
   readonly onExpandedChange?: (expanded: boolean) => void;
 }
 
 export function ContributionsPanel({
-  embedded = false,
   expanded = false,
   onExpandedChange = () => undefined,
 }: ContributionsPanelProps) {
@@ -75,24 +73,6 @@ export function ContributionsPanel({
       </div>
     </div>
   );
-
-  if (embedded) {
-    return (
-      <section
-        aria-labelledby="contributions-section-heading"
-        className="panel contributions-section"
-      >
-        <div className="panel-heading">
-          <div>
-            <span className="panel-index">TOOLS</span>
-            <h2 id="contributions-section-heading">{t("contributions")}</h2>
-          </div>
-          <span className="panel-note">{t("contributionsSubtitle")}</span>
-        </div>
-        {content}
-      </section>
-    );
-  }
 
   return (
     <FloatingToolPanel

@@ -19,6 +19,8 @@
 
 结果的 Method、Seed、PID 和 IV 顺序与 `PIDToIVCalculator` 一致。Channel 计算同时尝试 PID 原值与最高位翻转值，因为 SID 未知。
 
+结果区使用与其他 RNG 模块一致的数据表结构：Seed 与生成方式左对齐，六项 IV 居中，数值使用等宽字体和固定列宽；表头在滚动时保持可见，窄屏通过表格内部横向滚动保留完整列，不压缩字段名。
+
 ## Wasm/Worker ABI
 
 API v1：

@@ -166,7 +166,7 @@ export function Gen3PidToIvPanel({
               <span>{t("emptyPidToIv")}</span>
             </div>
           ) : (
-            <table>
+            <table className="pid-to-iv-table">
               <thead>
                 <tr>
                   <th>{t("seed")}</th>
