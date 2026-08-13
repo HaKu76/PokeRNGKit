@@ -1,8 +1,8 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：第三世代既有模块与第四世代 ID/Seed to Time/Static/Wild 已接入独立 Wasm/Worker；完整工程与部署回归待完成
+> - 状态：第三世代既有模块与第四世代 ID/Seed to Time/Static/Wild/Chained Shiny to SID 已接入独立 Wasm/Worker；完整工程与部署回归待完成
 > - 更新日期：2026-08-14
-> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 ID、Seed to Time、Static/Wild Generator/Searcher，第七世代 ID Generator，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
+> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、GameCube Seed Finder、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 ID、Seed to Time、Static/Wild Generator/Searcher 与 Chained Shiny to SID，第七世代 ID Generator，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 > - 包管理器：npm
 
 第七世代 `gen7id` 使用本地优化版 `C:\Users\Hakuhiro\source\repos\3DSRNGTool` 作为主要行为来源，公开仓库只作为祖先归属记录；实现路径与差异范围见 `third_party/3dsrngtool/UPSTREAM.md`。`pokerusfinder` 使用 DevonStudios Pokerus Finder 的 GPL-3.0 源码行为作为第三/四世代帧查询基线，来源记录见 `third_party/pokerusfinder/UPSTREAM.md`。
@@ -54,7 +54,8 @@ React UI
         |-- Gen4StaticWorkerPool ---------+
         |-- Gen4StaticSearcherWorkerPool -+-> gen4static.mjs + gen4static.wasm
         |-- Gen4WildWorkerPool -----------+
-        `-- Gen4WildSearcherWorkerPool ---+-> gen4wild.mjs + gen4wild.wasm
+        |-- Gen4WildSearcherWorkerPool ---+-> gen4wild.mjs + gen4wild.wasm
+        `-- Gen4ChainedSidWorker ------------> gen4chainedsid.mjs + gen4chainedsid.wasm
                                             |
                                             `-- narrow C ABI bridges
                                              `-- PokeFinder 4.3.2 Gen III / Gen IV rules
@@ -180,11 +181,12 @@ gen4id
 gen4seedtotime
 gen4static
 gen4wild
+gen4chainedsid
 ```
 
 每个模块必须拥有独立目录、manifest、构建 target、C ABI 前缀、Worker client 和测试，避免一个 Wasm 文件吸收所有世代和功能。当前 `gen3ivtopid` 每次输入只恢复有限候选，不创建多 Worker 分片；`gen3egg` 只提供 Generator，Searcher 保留为后续独立工作流。
 
-`src/features/shared/rngModuleContract.ts` 保留跨世代的 manifest、Worker 信封和第四世代模块标识。`gen4id`、`gen4static` 与 `gen4wild` 已分别注册 API v1、独立产物、导航、Worker Pool 和运行时。实施边界见[第四世代扩展接口与 AI 交接](gen4-development.md)。
+`src/features/shared/rngModuleContract.ts` 保留跨世代的 manifest、Worker 信封和第四世代模块标识。`gen4id`、`gen4static`、`gen4wild` 与 `gen4chainedsid` 已分别注册 API v1、独立产物、导航和运行时；Chained SID 使用单 Dedicated Worker，其余大范围模块按任务使用 Worker Pool。实施边界见[第四世代扩展接口与 AI 交接](gen4-development.md)。
 
 ### 7.2 当前目录
 
@@ -254,16 +256,21 @@ wasm/
         |-- bridge/
         `-- tests/
     |-- gen4static/
-    |   |-- CMakeLists.txt
-    |   |-- module.json
-    |   |-- bridge/
-    |   `-- tests/
-    `-- gen4wild/
         |-- CMakeLists.txt
         |-- module.json
         |-- bridge/
         `-- tests/
-    |-- pokerusfinder/
+    |-- gen4wild/
+        |-- CMakeLists.txt
+        |-- module.json
+        |-- bridge/
+        `-- tests/
+    |-- gen4chainedsid/
+        |-- CMakeLists.txt
+        |-- module.json
+        |-- bridge/
+        `-- tests/
+    `-- pokerusfinder/
         |-- CMakeLists.txt
         |-- module.json
         |-- bridge/
@@ -298,6 +305,8 @@ public/wasm/                        # 生成物，忽略
 |-- gen4static.wasm
 |-- gen4wild.mjs
 |-- gen4wild.wasm
+|-- gen4chainedsid.mjs
+|-- gen4chainedsid.wasm
 |-- gen7id.mjs
 |-- gen7id.wasm
 |-- pokerusfinder.mjs
@@ -308,7 +317,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen7id` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。ID C ABI 为：
+当前 `gen3id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7id` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。ID C ABI 为：
 
 ```c
 uint32_t gen3id_api_version();
@@ -507,6 +516,7 @@ Generator 与 Searcher 结果均为 22 个 `uint32_t`。Generator 布局为 `adv
 - `gen3initialseed` 的正向/反向 LCRNG 计算只在 C++/Wasm 中执行，TypeScript 不复写生产 RNG。
 - `gen3seedtotime` 的 PokeRNGR 回推和全年日期/分钟枚举只在 C++/Wasm 中执行，TypeScript 不复写生产算法。
 - `gen3ngcseed` 的 Gales/Colo/Channel XDRNG 搜索只在 C++/Wasm 中执行；TypeScript 只读取 Precalc 二进制结构，不推导 RNG 结果。
+- `gen4chainedsid` 的 Method 1 Seed 恢复、PID 位回推和 SID 候选收窄只在 C++/Wasm 中执行；TypeScript 只提交完整观测列表并解码 SID 缓冲区。
 - 返回缓冲区在下一次同 Worker 调用前有效，Worker 必须立即复制并转移。
 - 错误使用稳定数值码，TypeScript 负责转换为用户可见错误。
 - API 版本不匹配时停止初始化，不尝试兼容猜测。
@@ -578,7 +588,7 @@ type ModuleWorkerResponse =
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
 - ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi Advancer、Static、Wild、IVs to PID 与 Egg 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time、PID to IVs、Jirachi 与 IVs to PID 每次输入都是有限任务；GameCube Seed Finder、GameCube RNG 和 PokeSpot 使用模块自己的分片协议；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入。
 
-`gen4id`、`gen4static` 与 `gen4wild` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`，任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`。这一契约不改写三代消息类型。
+`gen4id`、`gen4static`、`gen4wild` 与 `gen4chainedsid` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`，任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`。这一契约不改写三代消息类型。
 
 ## 9. 源码与许可证边界
 
@@ -586,7 +596,7 @@ type ModuleWorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4id_*`、`gen4static_*`、`gen4wild_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4id_*`、`gen4static_*`、`gen4wild_*`、`gen4chainedsid_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 
@@ -609,6 +619,7 @@ docs/
 |   |-- gen3egg.md
 |   |-- gen4static.md
 |   |-- gen4wild.md
+|   |-- gen4chainedsid.md
 |   |-- gen4profiles.md
 |   |-- gen4ivcalculator.md
 |   `-- encounterlookup.md
@@ -684,6 +695,7 @@ src/
     |   |-- preview/
     |   `-- worker/
     |-- gen4wild/
+    |-- gen4chainedsid/
     |   |-- data.ts
     |   |-- domain.ts
     |   |-- Gen4WildPanel.tsx
@@ -705,10 +717,11 @@ wasm/modules/
 |-- gen3ivtopid/
 |-- gen3egg/
 |-- gen4static/
-`-- gen4wild/
+|-- gen4wild/
+`-- gen4chainedsid/
 ```
 
-后续模块沿用同一结构。G3 Static、G4 Static、G3 Wild 与 G4 Wild 的 Generator/Searcher 各自共享所属版本化模块，但使用独立请求、Pool 和任务生命周期；不要把 `gen4id` 或其他世代逻辑塞进现有模块。
+后续模块沿用同一结构。G3 Static、G4 Static、G3 Wild 与 G4 Wild 的 Generator/Searcher 各自共享所属版本化模块，但使用独立请求、Pool 和任务生命周期；Chained SID 使用自己的单 Worker 和 Wasm；不要把 `gen4id` 或其他模块逻辑塞进现有模块。
 
 ## 11. npm 构建入口
 
@@ -789,6 +802,8 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 `gen4static` 额外门槛：原生夹具必须覆盖 Method 1/J/K、Synchronize、Cute Charm、Searcher 和输入错误；浏览器必须核对 `Max Advances=N` 处理 `N+1` 个状态、固定结果列宽、Searcher 首列 Seed、六项 IV 默认 `0..31`，并确认 G3/G4 存档 schema、存储键与全局个体值计算器状态边界清晰。
 
 `gen4wild` 额外门槛：原生夹具必须覆盖 Route 222 Method J Generator/Searcher 与非法 fixed slot；浏览器必须抽样 Method J/K、甜甜蜜树、宝可追踪、捕虫大赛和 HGSS 狩猎地带，确认单槽与 31 IV 约束、默认 IV `0..31`、固定结果列宽、Searcher 不显示 Delay/Hour，以及 G3/G4 存档与全局个体值计算器边界清晰。
+
+`gen4chainedsid` 额外门槛：原生夹具必须使用 Lake of Rage Gyrados 的三条观测得到唯一 SID `54320`，并覆盖 API 版本和非法 TID；Worker 必须拒绝超过 1024 条观测、非 `uint32_t` 对齐或长度异常的结果；浏览器必须确认逐条收窄、TID 锁定、清空和取消。
 
 ## 14. GitHub Actions 与 Pages
 

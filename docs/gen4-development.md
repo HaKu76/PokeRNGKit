@@ -1,11 +1,11 @@
 # 第四世代扩展接口与 AI 交接
 
-> - 状态：第四世代 ID、Static 与 Wild Generator/Searcher、独立存档和全局个体值计算器已实现；完整工程与生产回归待验证
+> - 状态：第四世代 ID、Seed to Time、Static、Wild 与 Chained Shiny to SID 已实现；完整工程与生产回归待验证
 > - 更新日期：2026-08-14
 > - 上游基线：PokeFinder 4.3.2
-> - 当前产品范围：第三世代既有模块与第四世代 ID/Static/Wild
+> - 当前产品范围：第三世代既有模块与第四世代 ID/Seed to Time/Static/Wild/Chained Shiny to SID
 
-本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前已落地 `gen4id`、`gen4static` 与 `gen4wild`；不得据此推断已支持其他第四世代功能。
+本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前已落地 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild` 与 `gen4chainedsid`；不得据此推断已支持其他第四世代功能。
 
 ## 1. 已保留接口
 
@@ -16,9 +16,9 @@
 - `RngWorkerInitMessage`：加载 MJS/Wasm 前声明模块、协议和 API 版本。
 - `RngWorkerTaskMessage`：携带 `taskId`、操作、`chunkIndex`、模块请求和分片。
 - `RngWorkerReadyMessage`、`RngWorkerBatchMessage`、`RngWorkerErrorMessage`：握手、批次和失败信封。
-- `GEN4_MODULE_RESERVATIONS`：只保留 `gen4id`、`gen4static`、`gen4wild` 三个标识及 Generator/Searcher 能力。
+- `GEN4_MODULE_RESERVATIONS`：登记 `gen4id`、`gen4static`、`gen4wild` 与 `gen4chainedsid` 的模块标识和 Generator/Searcher 能力。
 
-`gen4id`、`gen4static` 与 `gen4wild` 已分别使用 API 版本 `1`、独立 Wasm target、Worker Pool、导航入口和 UI 预览引擎。
+`gen4id`、`gen4static`、`gen4wild` 与 `gen4chainedsid` 已分别使用 API 版本 `1`、独立 Wasm target、导航入口和 UI 预览引擎；`gen4chainedsid` 为单 Dedicated Worker，其余大范围模块按任务使用 Worker Pool。
 
 ## 2.1 当前已实现：`gen4static`
 
@@ -42,17 +42,27 @@ Generator 的 `Max Advances` 与 PokeFinder 一致，包含起点，因此输入
 
 详细输入、数据、算法、结果和验证状态见 [`docs/modules/gen4wild.md`](modules/gen4wild.md)。本轮未运行 build、test、Wasm/native 或浏览器回归，不得把工作区夹具写成已通过。
 
+## 2.3 当前已实现：`gen4chainedsid`
+
+- 覆盖 PokeFinder 第四世代 Chained Shiny to SID，按观测顺序从 8192 个 SID 候选连续收窄。
+- 输入当前物种、特性、性别、性格、TID 与六项能力值；首条成功观测后锁定 TID，`Clear` 清空观测、恢复候选并终止当前 Worker。
+- Qt Form 能力值上限与 Core `u8` 参数不一致；Web 保留 Form 输入范围，Wasm 在进入恢复算法前复现上游转换。
+- API v1、单 Dedicated Worker、原生固定夹具、TypeScript 域测试和 UI Preview 已实现，并接入共享契约、导航和默认 Wasm 构建列表。
+
+详细输入、算法和固定夹具见 [`docs/modules/gen4chainedsid.md`](modules/gen4chainedsid.md)。工程检查与生产页面回归必须单独记录，不能由工作区实现状态推断通过。
+
 ## 2. 模块边界
 
 第四世代按 PokeFinder 模块分别落地：
 
-| 模块         | 上游 Form           | 上游 Core Generator/Searcher          | 上游固定夹具                                                          |
-| ------------ | ------------------- | ------------------------------------- | --------------------------------------------------------------------- |
-| `gen4id`     | `Form/Gen4/IDs4`    | `IDGenerator4`、`IDSearcher4`         | `IDGenerator4Test.cpp`、`IDSearcher4Test.cpp`、`id4.json`             |
-| `gen4static` | `Form/Gen4/Static4` | `StaticGenerator4`、`StaticSearcher4` | `StaticGenerator4Test.cpp`、`StaticSearcher4Test.cpp`、`static4.json` |
-| `gen4wild`   | `Form/Gen4/Wild4`   | `WildGenerator4`、`WildSearcher4`     | `WildGenerator4Test.cpp`、`WildSearcher4Test.cpp`、`wild4.json`       |
+| 模块             | 上游 Form                    | 上游 Core Generator/Searcher          | 上游固定夹具                                                          |
+| ---------------- | ---------------------------- | ------------------------------------- | --------------------------------------------------------------------- |
+| `gen4id`         | `Form/Gen4/IDs4`             | `IDGenerator4`、`IDSearcher4`         | `IDGenerator4Test.cpp`、`IDSearcher4Test.cpp`、`id4.json`             |
+| `gen4static`     | `Form/Gen4/Static4`          | `StaticGenerator4`、`StaticSearcher4` | `StaticGenerator4Test.cpp`、`StaticSearcher4Test.cpp`、`static4.json` |
+| `gen4wild`       | `Form/Gen4/Wild4`            | `WildGenerator4`、`WildSearcher4`     | `WildGenerator4Test.cpp`、`WildSearcher4Test.cpp`、`wild4.json`       |
+| `gen4chainedsid` | `Form/Gen4/Tools/ChainedSID` | `ChainedSIDCalc`                      | `ChainedSIDCalcTest.cpp`、`chainedsid.json`                           |
 
-每次只实现一个模块。Egg、Event、Seed to Time、Chained SID、Roamer 等保持独立候选，不并入上述三个模块。
+每次只实现一个模块。Egg、Event、Roamer 等保持独立候选，不并入现有模块。
 
 ## 3. AI 必读顺序
 

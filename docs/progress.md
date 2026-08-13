@@ -2,10 +2,26 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`e460cdb feat: 新增第四世代ID乱数`
+> - Git 基线：`d21ec9b feat: 新增第四世代Seed查询时间`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：第四世代 Seed to Time 待提交；连锁 SID 与第三世代 Tanoby Chamber 已完成独立开发
-> - 验收状态：第四世代 Seed to Time 原生夹具与完整工程检查已通过；完整 Wasm 与部署回归待执行
+> - 工作区状态：Gen4 Chained SID 与第三世代 Tanoby Chamber 均在当前工作区，分模块提交中
+> - 验收状态：Gen4 Chained SID 与 Tanoby Chamber 原生夹具已通过；完整 Wasm 与部署回归待执行
+
+## 2026-08-14 Gen3 Tanoby Chamber
+
+- 新增：第三世代 Wild 的 FireRed / LeafGreen 七个 Tanoby Chamber，补齐未知图腾 `A..Z`、`!`、`?` form 映射、Generator/Searcher PID 顺序和形态回溯。
+- 修复：原生 Searcher 夹具按六项 IV 闭区间计算完整笛卡尔积；Liptoo 攻击 IV `0..31` 不再错误地只提交一个组合。
+- 验证：`$env:POKERNGKIT_WASM_MODULES='gen3wild'; npm run wasm:test:native` 通过 `gen3wild_native_parity` 1/1，包含普通地点、Tanoby、非法输入和 Liptoo `97` 条结果。
+- 未验收：Emscripten Wasm 构建、GitHub Pages Worker/Wasm 回归、移动端性能和项目所有者最终验收待完成。
+
+## 2026-08-14 Gen4 Chained Shiny to SID 接入
+
+- 新增：将现有 `gen4chainedsid` 接入 GEN IV 导航、页面标题、版本信息和共享模块契约；模块使用单 Dedicated Worker，逐条收窄 DPPt 连锁异色 SID 候选。
+- 更新：`wasm/CMakeLists.txt` 与 `scripts/wasm.mjs` 默认模块列表加入 `gen4chainedsid`，默认产物为 `gen4chainedsid.mjs` 与 `gen4chainedsid.wasm`。
+- 更新：README、需求、技术栈、第四世代交接和模块文档记录输入边界、API v1、`54320` 固定夹具、清空/取消行为及验收限制；三语导航词条复用上游 `PokeFinder_zh.ts`。
+- 已运行：任务文件定向 `npm run format:files -- ...`、完整 `npm run format:check`、`git diff --check`、`npm test -- src/features/gen4chainedsid`（2 个文件、5 项测试）、`npm run typecheck`；授权的 `$env:POKERNGKIT_WASM_MODULES='gen4chainedsid'; npm run wasm:test:native` 通过 1/1。
+- 已运行：完整 `npm run verify` 的 Prettier、ESLint（0 errors，仅 Egg/Wild 两条既有 warning）、TypeScript 和 33 个测试文件/123 项测试均通过；Web 构建受限于复制既有 `public/wasm/gen3egg.mjs` 的 Windows `EPERM`。
+- 未验收：默认全模块 Wasm 构建、外部 Chrome/Edge 页面调试和生产部署回归待完成。
 
 ## 2026-08-14 Gen4 Seed to Time
 
