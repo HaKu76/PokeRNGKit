@@ -99,7 +99,6 @@ export function Gen3SeedToTimePanel({
                 }
                 value={seed}
               />
-              <small>HEX / 00000000 - FFFFFFFF</small>
             </label>
             <label className="field">
               <span>{t("seedToTimeYear")}</span>
@@ -118,7 +117,6 @@ export function Gen3SeedToTimePanel({
                 }}
                 value={year}
               />
-              <small>DEC / 2000 - 2037</small>
             </label>
             <label className="field seed-to-time-readonly">
               <span>{t("seedToTimeAdvances")}</span>

@@ -148,13 +148,11 @@ export function Gen3SpindaPainterPanel() {
         <label className="field">
           <span>{t("pid")}</span>
           <input
-            aria-describedby="spinda-pid-format"
             inputMode="text"
             maxLength={8}
             onChange={(event) => updatePidInput(event.target.value)}
             value={pidInput}
           />
-          <small id="spinda-pid-format">HEX / 32-bit</small>
         </label>
         <dl className="spinda-painter-info">
           <div>

@@ -1,6 +1,6 @@
 # 第四世代扩展接口与 AI 交接
 
-> - 状态：第四世代 Static Generator/Searcher、独立存档和独立个体值计算器已实现；生产回归待部署
+> - 状态：第四世代 Static Generator/Searcher、独立存档和全局个体值计算器已实现；生产回归待部署
 > - 更新日期：2026-08-12
 > - 上游基线：PokeFinder 4.3.2
 > - 当前产品范围：第三世代既有模块与第四世代 Static
@@ -26,7 +26,7 @@
 - 内置 99 条 DPPt/HGSS 定点模板，按 Starters、Fossils、Gifts、Game Corner、Stationary、Legends、Events、Roamers 分类；数据由 `scripts/generate_gen4_static_data.mjs` 生成。
 - Generator 与 Searcher 六项 IV 最小/最大值均默认 `0..31`，IV 名称按钮沿用 G3 的单击、Ctrl、Alt、Ctrl+Alt 快捷键。
 - 结果表使用固定列宽并显示觉醒属性、觉醒威力、个性、电话和音高；Searcher 的首列为 Seed，Generator 的首列为 Advances。
-- G4 存档和个体值计算器使用独立 React 模块、schema、IndexedDB/localStorage 键，不读取或覆盖 G3 控件状态。
+- G4 存档使用独立 React 模块、schema、IndexedDB/localStorage 键，不读取或覆盖 G3 存档状态；个体值计算器为全局单一 React 工具，不按世代拆分入口。
 
 Generator 的 `Max Advances` 与 PokeFinder 一致，包含起点，因此输入 `N` 计算 `N + 1` 个状态；Searcher 的 IV 组合按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 的闭区间笛卡尔积枚举。
 

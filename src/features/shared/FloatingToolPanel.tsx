@@ -55,6 +55,7 @@ export function FloatingToolPanel({
         return;
       }
       onExpandedChange(false);
+      restoreTriggerFocus();
     };
 
     document.addEventListener("keydown", closeOnEscape);

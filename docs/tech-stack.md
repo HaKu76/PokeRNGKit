@@ -2,7 +2,7 @@
 
 > - 状态：第三世代既有模块与第四世代 Static 已接入独立 Wasm/Worker；PR #3 合并后的工程与部署回归待完成
 > - 更新日期：2026-08-13
-> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 Static Generator/Searcher，两代独立存档与个体值计算器，以及 Encounter Lookup
+> - 当前范围：第三世代 ID、Initial Seed Finder、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg Generator 与 Spinda Painter，第四世代 Static Generator/Searcher，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 > - 包管理器：npm
 
 ## 1. 技术结论
@@ -669,7 +669,7 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 
 `gen3egg` 额外门槛：原生夹具必须覆盖 `EBred` Bulbasaur 的 50 条结果与 `RSFRLGBredSplit` Bulbasaur 的 60 条结果，并核对首条 Advances、PID 和六项 IV；Worker 必须拒绝超过 100,000 条、未按 `uint32_t` 对齐或超出 Wasm 堆边界的结果缓冲区；浏览器页面必须按游戏显示 Emerald 的 16 列或 RS/FRLG 的 15 列，空 16 位 Seed 必须等价于 `0000`。
 
-`gen4static` 额外门槛：原生夹具必须覆盖 Method 1/J/K、Synchronize、Cute Charm、Searcher 和输入错误；浏览器必须核对 `Max Advances=N` 处理 `N+1` 个状态、固定结果列宽、Searcher 首列 Seed、六项 IV 默认 `0..31`，并确认 G3/G4 存档和个体值计算器的 schema、存储键与展开状态相互独立。
+`gen4static` 额外门槛：原生夹具必须覆盖 Method 1/J/K、Synchronize、Cute Charm、Searcher 和输入错误；浏览器必须核对 `Max Advances=N` 处理 `N+1` 个状态、固定结果列宽、Searcher 首列 Seed、六项 IV 默认 `0..31`，并确认 G3/G4 存档 schema、存储键与全局个体值计算器状态边界清晰。
 
 ## 14. GitHub Actions 与 Pages
 

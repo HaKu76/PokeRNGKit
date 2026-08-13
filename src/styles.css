@@ -387,6 +387,16 @@ select:focus-visible {
   margin-top: 5px;
   font-size: 9px;
 }
+.rail-section-label {
+  margin: 12px 9px 5px;
+  color: var(--rail-muted);
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+.rail-heading + .rail-section-label {
+  margin-top: 0;
+}
 .module-index {
   color: var(--amber);
   font-family: ui-monospace, monospace;
@@ -1975,6 +1985,7 @@ h1 {
 }
 .initial-seed-table-row {
   position: absolute;
+  top: 0;
   right: 0;
   left: 0;
   height: 42px;

@@ -1,16 +1,16 @@
-# 第三世代个体值计算器
+# 全局个体值计算器
 
-本文说明全局个体值计算器的输入、反推算法和界面边界。该工具对齐 PokeFinder 4.3.2 `IVCalculator`、`IVChecker` 与 `Nature`，不执行 RNG 搜索，也不占用 Wasm Worker。
+本文说明全局个体值计算器的输入、反推算法和界面边界。该工具对齐 PokeFinder 4.3.2 `IVCalculator`、`IVChecker` 与 `Nature`，不执行 RNG 搜索，也不占用 Wasm Worker。它覆盖上游全局工具提供的六个数据集：Gen III、Platinum、HGSS、BW2、SwSh 和 BDSP。
 
 ## 1. 用途
 
-用户选择第三世代宝可梦、性格和可选觉醒力量，输入一次或多次等级与六项实际能力值，工具返回每项可能的个体值集合以及下一次能够进一步区分候选值的等级。
+用户先选择游戏数据集，再选择宝可梦、性格和可选觉醒力量或个性，输入一次或多次等级与六项实际能力值，工具返回每项可能的个体值集合以及下一次能够进一步区分候选值的等级。
 
-计算器是应用全局悬浮工具，在 ID 与 Static 工作区均可使用，默认收起。统一工具轨的 `IV` 按钮打开独立计算器面板；Static 筛选区的“个体值计算器”按钮会直接展开同一工具。面板支持点外关闭、`Escape` 和显式关闭按钮；后两种方式会恢复触发按钮焦点。
+计算器是应用全局悬浮工具，在所有左侧 RNG 工作区均可使用，默认收起。统一工具轨的 `IV` 按钮打开唯一的计算器面板；各模块内的“个体值计算器”按钮也会直接展开同一工具。面板支持点外关闭、`Escape` 和显式关闭按钮；后两种方式会恢复触发按钮焦点。世代或游戏选择属于计算器自身状态，不随当前左侧模块切换。
 
 ## 2. 能力值公式
 
-实现逐项移植 `Nature::computeStat`。第三世代不考虑努力值时：
+实现逐项移植 `Nature::computeStat`。不考虑努力值时，Gen III 至 Gen VIII 的基础能力值公式保持一致；Gen III 不显示 Characteristic，其他数据集使用对应世代的 Characteristic 过滤：
 
 ```text
 base = floor((2 * BaseStat + IV) * Level / 100)
@@ -29,7 +29,7 @@ Stat = floor((base + 5) * NatureModifier)
 3. 多行输入对同一能力项取集合交集。
 4. 指定觉醒力量时，再按六项 IV 奇偶组合过滤候选。
 
-候选连续时显示为 `0-2`，不连续时使用 `0-2, 5, 7-8`。没有候选时显示上游“无效值”。第三世代没有 Characteristic，界面不显示该控件。
+候选连续时显示为 `0-2`，不连续时使用 `0-2, 5, 7-8`。没有候选时显示上游“无效值”。Gen III 没有 Characteristic，界面不显示该控件；Gen IV、V、VIII 按数据集显示上游对应文本。
 
 ## 4. 下一级
 
@@ -41,20 +41,20 @@ Stat = floor((base + 5) * NatureModifier)
 
 输入限制已对照 `IVCalculator.cpp::addEntry`：
 
-| 输入         | 范围         | Web 行为                  |
-| ------------ | ------------ | ------------------------- |
-| Game         | Gen III      | 固定 `Emerald/RS/FRLG`    |
-| Pokémon      | `1..386`     | 使用上游第三世代物种名称  |
-| Altform      | Deoxys 4 种  | 仅 Deoxys 显示            |
-| Nature       | 无或 `0..24` | 下拉框                    |
-| Hidden Power | 无或 `0..15` | 下拉框                    |
-| Level        | `1..100`     | 每行独立输入              |
-| HP           | `1..651`     | 与上游 SpinBox 最大值一致 |
-| Atk          | `1..437`     | 与上游 SpinBox 最大值一致 |
-| Def          | `1..545`     | 与上游 SpinBox 最大值一致 |
-| SpA          | `1..435`     | 与上游 SpinBox 最大值一致 |
-| SpD          | `1..545`     | 与上游 SpinBox 最大值一致 |
-| Spe          | `1..479`     | 与上游 SpinBox 最大值一致 |
+| 输入         | 范围                                                      | Web 行为                        |
+| ------------ | --------------------------------------------------------- | ------------------------------- |
+| Game         | `Gen III / Platinum / HGSS / BW2 / SwSh / BDSP`           | 由计算器自身选择                |
+| Pokémon      | 按所选数据集图鉴上限：`386 / 493 / 493 / 649 / 898 / 493` | 使用上游物种名称和 present 标记 |
+| Altform      | 按所选 Personal 数据的 formCount                          | 仅存在多个形态时显示            |
+| Nature       | 无或 `0..24`                                              | 下拉框                          |
+| Hidden Power | 无或 `0..15`                                              | 下拉框                          |
+| Level        | `1..100`                                                  | 每行独立输入                    |
+| HP           | `1..651`                                                  | 与上游 SpinBox 最大值一致       |
+| Atk          | `1..437`                                                  | 与上游 SpinBox 最大值一致       |
+| Def          | `1..545`                                                  | 与上游 SpinBox 最大值一致       |
+| SpA          | `1..435`                                                  | 与上游 SpinBox 最大值一致       |
+| SpD          | `1..545`                                                  | 与上游 SpinBox 最大值一致       |
+| Spe          | `1..479`                                                  | 与上游 SpinBox 最大值一致       |
 
 ## 6. 实现边界
 
@@ -77,8 +77,8 @@ Stat = floor((base + 5) * NatureModifier)
 
 仓库验证入口：
 
-- 算法边界：`src/features/ivcalculator/domain.test.ts`
-- 界面：`src/features/ivcalculator/Gen3IvCalculator.tsx`
+- 算法边界：`src/features/gen4ivcalculator/domain.test.ts`
+- 界面：`src/features/gen4ivcalculator/Gen4IvCalculator.tsx`（导出 `IvCalculator`）
 - 基础能力值：`src/features/shared/gen3Personal.ts`
 - 物种名称：`src/features/shared/gen3Species.ts`
 

@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、存档信息和个体值计算器已进入主分支；当前合并工作区加入第四世代 Static Generator/Searcher、独立 G4 存档和独立 G4 个体值计算器。Encounter Lookup 是跨世代静态查询工具。
+当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、存档信息和个体值计算器已进入主分支；当前合并工作区加入第四世代 Static Generator/Searcher 和独立 G4 存档。个体值计算器是跨工作区的全局工具，Encounter Lookup 是跨世代静态查询工具。
 
 ## 2. 已确认边界
 
@@ -68,7 +68,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ### 3.10 第四世代定点乱数用户
 
-用户选择 Diamond、Pearl、Platinum、HeartGold 或 SoulSilver 存档与定点模板，使用 Method 1/J/K、Synchronize 或 Cute Charm 生成结果，也可以输入六项 IV 闭区间反向检索候选 Seed。G4 使用独立存档和独立个体值计算器，但控件布局、IV 快捷操作、排序、CSV 和结果表行为与 G3 Static 保持一致。
+用户选择 Diamond、Pearl、Platinum、HeartGold 或 SoulSilver 存档与定点模板，使用 Method 1/J/K、Synchronize 或 Cute Charm 生成结果，也可以输入六项 IV 闭区间反向检索候选 Seed。G4 使用独立存档；全局个体值计算器由工具自身选择六个 PokeFinder 数据集，控件布局、IV 快捷操作、排序、CSV 和结果表行为与 G3 Static 保持一致。
 
 ## 4. 当前功能需求：`gen3id`
 
@@ -238,14 +238,14 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-PROFILE-10** 应用不上传、记录或写入 URL 中的存档内容。
 - **FR-PROFILE-11** 存档悬浮窗展开后点击外部页面区域自动收起；打开管理器时不得关闭或中断管理弹窗。
 
-## 7. 当前应用基础：第三世代个体值计算器
+## 7. 当前应用基础：全局个体值计算器
 
-- **FR-IVCALC-01** 固定使用第三世代 `Emerald/RS/FRLG` 能力值规则，并提供 `1..386` 物种和 Deoxys 形态。
-- **FR-IVCALC-02** 支持性格、可选觉醒力量及一行或多行等级与六项能力值观测。
+- **FR-IVCALC-01** 提供 PokeFinder `IVCalculator` 的六个数据集：Gen III、Platinum、HGSS、BW2、SwSh 和 BDSP；按所选数据集提供 `1..386`、`1..493`、`1..493`、`1..649`、`1..898` 或 `1..493` 物种及对应形态。
+- **FR-IVCALC-02** 支持性格、个性、可选觉醒力量及一行或多行等级与六项能力值观测；Gen III 不显示上游不存在的 Characteristic 控件。
 - **FR-IVCALC-03** 每项枚举 `0..31` 并对多行结果取交集；无候选时显示上游“无效值”。
 - **FR-IVCALC-04** 输入范围与 PokeFinder `IVCalculator.cpp::addEntry` 的 SpinBox 保持一致。
 - **FR-IVCALC-05** 返回每项候选 IV 和上游 `IVChecker::nextLevel` 对应的下一级提示。
-- **FR-IVCALC-06** 计算器作为全局默认收起的悬浮工具，在 ID 与 Static 工作区均可打开。
+- **FR-IVCALC-06** 计算器作为全局默认收起的悬浮工具，在所有左侧 RNG 工作区均可打开；模块内入口与右下角工具轨指向同一面板。
 - **FR-IVCALC-07** 该工具不得发起远端请求；其轻量确定性计算可以在 TypeScript 主线程同步完成。
 
 ## 8. 当前功能需求：`gen3wild` Generator/Searcher
@@ -373,7 +373,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-G4STATIC-04** Generator 的 `Max Advances=N` 包含起点并处理 `N+1` 个状态；Searcher 按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 枚举 IV 闭区间笛卡尔积。
 - **FR-G4STATIC-05** 结果显示 Advances 或 Seed、PID、异色、性格、特性、性别、六项 IV、觉醒属性、觉醒威力、个性、电话和音高；中文术语固定为“觉醒力量”“觉醒属性”“觉醒威力”。
 - **FR-G4STATIC-06** 使用独立 `gen4static` Wasm API v1、C ABI、Worker 和 Worker Pool，不在 React 主线程或 TypeScript 中重写生产 RNG。
-- **FR-G4STATIC-07** G4 存档与个体值计算器使用独立 schema、IndexedDB/localStorage 键和 React 状态，不读取、覆盖或删除 G3 控件。
+- **FR-G4STATIC-07** G4 存档使用独立 schema、IndexedDB/localStorage 键和 React 状态，不读取、覆盖或删除 G3 存档；全局个体值计算器不按当前世代拆分入口或状态。
 - **FR-G4STATIC-08** G3/G4 页面均保留 Encounter Lookup；当前页面的存档、个体值计算器与 Encounter Lookup 三个悬浮工具必须互斥展开。
 
 详细算法、输入、数据来源和结果布局见 [Gen 4 Static](modules/gen4static.md)、[Gen 4 Profiles](modules/gen4profiles.md)和[Gen 4 IV Calculator](modules/gen4ivcalculator.md)。
@@ -469,7 +469,7 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 9. Wild Generator/Searcher 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
 10. Seed to Time 使用 `00000000 / 2000` 核对 7 条时间、首条 `2000-03-30 18:22:00` 和末条 `2000-12-29 02:10:00`；再以 `40000000 / 2000` 核对回写原始 Seed `1AA5` 与 Advances `66861`。
 11. IVs to PID 使用 `0/0/0/0/0/0`、Nature `0`、TID `12345` 核对 Channel 的 `56654838 / DC2DA271 / 48333`，并使用 `31/31/31/0/31/31`、Nature `0`、TID `12345` 核对 Method 2 的 `36E6808A / 02B0100B / 8832`；确认空 TID 等价于 `0` 且不显示第四世代 Cute Charm。
-12. G4 Static 使用已记录固定输入核对 Method 1/J/K、Synchronize、Cute Charm、`Max Advances + 1`、Searcher Seed、PID 和六项 IV；同时确认 G3/G4 存档与个体值计算器相互独立。
+12. G4 Static 使用已记录固定输入核对 Method 1/J/K、Synchronize、Cute Charm、`Max Advances + 1`、Searcher Seed、PID 和六项 IV；同时确认 G3/G4 存档独立，个体值计算器保持全局单一入口。
 13. GitHub Pages 在线加载 8 个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
 14. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
 
@@ -498,7 +498,7 @@ Egg Searcher、GameCube、PokeSpot、Jirachi 等第三世代功能在上述 MVP 
 - **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（已进入 Git 基线，待部署回归与最终验收）。
 - **静态工具：`encounterlookup`** - PokeFinder 4.3.2 支持的 Gen III、Gen IV、Gen V 与 BDSP 遇敌查询（已进入上游基线，待部署回归与最终验收）。
 - **阶段 6B：`gen3spindapainter`** - PID 与晃晃斑斑点双向映射、原始 PNG、拖动和键盘交互、输入边界及模块文档（已进入主分支，待工程检查、Actions、部署回归与最终验收）。
-- **阶段 7：`gen4static` Static Generator/Searcher** - 第四世代 Method 1/J/K、独立 G4 存档与个体值计算器、Wasm/Worker 和算法文档（当前合并工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 7：`gen4static` Static Generator/Searcher** - 第四世代 Method 1/J/K、独立 G4 存档、全局个体值计算器、Wasm/Worker 和算法文档（当前合并工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 8：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

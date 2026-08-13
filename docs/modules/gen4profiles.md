@@ -12,7 +12,7 @@
 
 IndexedDB 仍使用 `pokerngkit` 的 `app-data` store，但 G4 记录键为 `gen4-profiles`；localStorage 镜像键为 `pokerngkit-gen4-profiles-v1`。展开状态为 `pokerngkit-gen4-profile-panel-expanded`。这些键与 G3 的 `gen3-profiles`、`pokerngkit-gen3-profiles-v1` 和展开键完全分离。
 
-展开状态由 `App.tsx` 统一协调并通过 `profilePanelState.ts` 持久化。G4 Static 页面任意展开存档、个体值计算器或 Encounter Lookup 时，另外两个工具会收起；切回 G3 页面不会读取或改写 G4 的展开偏好。
+展开状态由 `App.tsx` 统一协调并通过 `profilePanelState.ts` 持久化。G4 Static 页面任意展开 G4 存档、全局个体值计算器或 Encounter Lookup 时，另外两个工具会收起；切回 G3 页面不会读取或改写 G4 存档的展开偏好。
 
 导入导出格式为 `pokerngkit.gen4-profiles`，schema 版本为 `1`。IndexedDB 失败时回退 localStorage；清除操作只清除 G4 记录和镜像。
 

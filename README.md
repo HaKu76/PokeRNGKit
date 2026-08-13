@@ -5,13 +5,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：第四世代定点乱数模块合并。** 当前工作区在第三世代完整模块基线上加入 `gen4static`、独立 G4 存档、G4 个体值计算器、Wasm/Worker、算法文档和三语入口。合并后的工程检查、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
+**当前里程碑：第四世代定点乱数模块合并。** 当前工作区在第三世代完整模块基线上加入 `gen4static`、独立 G4 存档、全局六数据集个体值计算器、Wasm/Worker、算法文档和三语入口。合并后的工程检查、GitHub Pages 部署回归与项目所有者最终验收仍待完成。
 
 - 目标范围：第三世代现有模块、第四世代 Static，以及 PokeFinder Encounter Lookup 支持的跨世代静态查询
-- 已有模块：Gen III ID、Initial Seed、Seed to Time、Static、Wild、IVs to PID、Egg、Spinda Painter，Gen IV Static，两代独立存档与个体值计算器，以及 Encounter Lookup
+- 已有模块：Gen III ID、Initial Seed、Seed to Time、Static、Wild、IVs to PID、Egg、Spinda Painter，Gen IV Static，G3/G4 独立存档、全局个体值计算器，以及 Encounter Lookup
 - 当前模块：Gen IV Static Generator/Searcher；PR 分支保留历史工程证据，合并结果尚未重新验证
 - 上游核验基线：PokeFinder 4.3.2
-- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [Gen 3 IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Gen 4 IV Calculator](docs/modules/gen4ivcalculator.md) / [Encounter Lookup](docs/modules/encounterlookup.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Encounter Lookup](docs/modules/encounterlookup.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
 - 技术方案：[docs/tech-stack.md](docs/tech-stack.md)
@@ -74,7 +74,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - Method 1、Method J、Method K、Synchronize 和 Cute Charm Generator/Searcher
 - 六项 IV 默认 `0..31`，筛选格式、快捷键和三栏控制布局与 Gen III Static 对齐
 - 固定列宽结果表、排序、CSV、觉醒属性、觉醒威力、个性、电话和音高
-- 独立 `gen4static` Wasm/Worker、独立 G4 存档 schema 与独立 G4 个体值计算器；不复用或删除 G3 控件
+- 独立 `gen4static` Wasm/Worker 与 G4 存档 schema；个体值计算器是跨工作区的单一全局工具，由工具自身选择六个 PokeFinder 数据集
 - 算法、输入边界和参考来源见 [Gen 4 Static](docs/modules/gen4static.md)
 
 当前 Static 工作区包含：
@@ -108,7 +108,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - 全局右下角小型悬浮窗、默认收起、折叠状态记忆和当前存档摘要
 - 悬浮窗展开后点击页面其他区域不会自动收起，避免误触中断存档信息管理。
 
-全局个体值计算器对齐 PokeFinder `IVChecker` 与 `Nature`，支持第三世代物种、性格、觉醒力量、多行能力值交集和下一级提示。该轻量确定性工具使用 TypeScript；大范围 RNG 计算仍只在 C++/Wasm Worker 中执行。
+全局个体值计算器对齐 PokeFinder `IVCalculator`、`IVChecker` 与 `Nature`，支持 Gen III、Platinum、HGSS、BW2、SwSh 和 BDSP 六个数据集，以及物种、形态、性格、个性、觉醒力量、多行能力值交集和下一级提示。该轻量确定性工具使用 TypeScript；大范围 RNG 计算仍只在 C++/Wasm Worker 中执行。
 
 应用左侧模块导航使用默认收起的覆盖式抽屉，避免在桌面和移动视口持续占用计算工作区宽度。
 
@@ -272,7 +272,7 @@ npm run build:web
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、上游方法和算法文档（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（已进入 Git 基线，待部署回归与最终验收）。
-- **阶段 7：`gen4static` Static Generator/Searcher** - 第四世代 Method 1/J/K、独立 G4 存档与个体值计算器、Wasm/Worker 和算法文档（当前合并工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 7：`gen4static` Static Generator/Searcher** - 第四世代 Method 1/J/K、独立 G4 存档、全局个体值计算器、Wasm/Worker 和算法文档（当前合并工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 8：发布加固** - PWA 离线、可访问性、浏览器矩阵、性能预算、许可证与发布流程。
 - **后续** - Egg Searcher、Tanoby Chamber、GameCube、PokeSpot、Jirachi、`gen4id` 与 `gen4wild` 等未实现能力。
 

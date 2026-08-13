@@ -2,12 +2,18 @@
 
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
-> - Git 基线：`bc8f4bf fix: 修复合并后的 ESLint 错误`
-> - 当前阶段：按 HakuStyle 重构右下角悬浮工具交互
-> - 工作区状态：统一工具轨、独立面板与交接文档尚未提交；Codex 不提交、不 push、不部署
+> - Git 基线：`b2c6ade feat: 统一悬浮工具面板交互`
+> - 当前阶段：回归修正模块布局、全局工具入口与侧栏世代分组
+> - 工作区状态：本轮 UI、全局个体值计算器和文档修改尚未提交；Codex 不提交、不 push、不部署
 > - 验收状态：当前生产页 UI 与遇敌查询抽样已记录；新悬浮交互待部署后共同验收
 
 ## 当前状态
+
+- 本轮修复 Initial Seed Finder 虚拟结果表首行偏移：行定位补齐 `top: 0`，并将“结果表第一条不得出现虚假空行”写入 `docs/ai-development.md` 的 UI 回归规则；Static、Wild、Egg 和 Gen4 Static 仍使用已核对的 `translateY(start + 38px)` 表头偏移。
+- 本轮移除 Seed to Time 的两列进制辅助文本、IVs to PID 的 TID 辅助文本、Egg 设置标题右侧的存档版本标签和 Spinda Painter 的 `HEX / 32-bit` 文本。它们不是对应 PokeFinder UI 的独立控件或信息，今后不得擅自添加；规则已写入 UI 回归规则。
+- 本轮将个体值计算器合并为唯一全局浮层 `IvCalculator`，由工具自身选择 Gen III、Platinum、HGSS、BW2、SwSh、BDSP 六个上游数据集；移除未再使用的 `src/features/ivcalculator/Gen3IvCalculator.tsx`，保留 G4 Static 的兼容 Personal 导出。
+- 本轮将侧栏模块分为 `GEN III` 与 `GEN IV` 两组，Encounter Lookup 与 IV Calculator 仍保持右下角全局入口，不随当前工作区限代。Egg 的 Emerald/RS/FRLG 切换仍是上游模块本身的真实功能，不再在标题区域重复显示版本。
+- 本轮已运行定向 `npm run format:files -- ...`、全仓 `npm run format:check` 与 `git diff --check`，均通过；未获项目所有者对 lint、typecheck、测试、构建或浏览器 URL 的新授权，因此这些检查和部署回归未运行。
 
 - 2026-08-13 经项目所有者授权，使用外部 Chrome 检查 `https://haku76.github.io/PokeRNGKit/` 当前生产资源 `index-mLBsBTQF.js`。桌面视口为 `1536×703` 时，旧版三个收起工具宽度分别为 `128/176/128px`；在 `390×844` 窄屏打开 Encounter Lookup 后，旧面板实际宽 `760px`、左边界为负值，依靠页面裁切显示，不是稳定的窄屏面板布局。
 - 当前生产包的 Encounter Lookup 宝可梦组合框已确认支持鼠标按钮展开、点击选择、输入筛选与方向键/Enter；固定抽样继续符合记录：Emerald 皮卡丘为狩猎地带地区 1/2 草丛 `25-27`，Diamond 与 Brilliant Diamond 为自豪的后院草丛 `18-18`，Black 为空集。页面未记录站点自身的 console error；唯一错误来自用户浏览器中的第三方翻译扩展。
@@ -39,13 +45,13 @@
 - 未运行：ESLint、TypeScript 类型检查、Vitest、Web/Wasm 构建、原生夹具、浏览器 UI 或生产回归；本轮授权范围仅为 Actions 日志诊断和格式/SOP 修复。
 
 - 主分支已包含自动完成控件、三代悬浮工具互斥、`gen3seedtotime`、`gen3spindapainter` 与格式化/Actions SOP；本次合并保留这些修改。
-- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3spindapainter`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`、两代独立 `profiles` / `ivcalculator` 与 `encounterlookup`。
+- 当前模块集合：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3spindapainter`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`、G3/G4 独立 `profiles`、全局 `ivcalculator` 与 `encounterlookup`。
 - 主分支此前新增 `encounterlookup`：右下角默认收起的全世代 Encounter Lookup，覆盖 PokeFinder 4.3.2 的 Gen III、Gen IV、Gen V 和 BDSP 共 16 个版本；静态数据由 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 生成。
 - 遇敌查询不进入左侧 RNG 导航，不使用 Wasm/Worker；宝可梦候选、游戏版本、地点、遇敌种类和等级范围均来自本地静态数据。
 - 已清理生成用 `.tmp-encounter-tables/` 与 `.tmp-encounter-tables.zip`；生成脚本和正式 `data.ts` 保留在工作区。
 - 主分支此前新增 `AutoCompleteComboBox`，覆盖 Encounter Lookup 宝可梦、IV Calculator 宝可梦、Egg 蛋种类和 Wild 地点。行为对应 PokeFinder `enableAutoComplete()`：点击展开、包含匹配、弹出候选、方向键/Enter/Escape 和 `NoInsert`。
 - 主分支此前将 G3 存档信息、个体值计算器和遇敌查询纳入同一展开状态；本次合并把相同互斥规则扩展到 G4 工具，并保留两代各自的 localStorage 展开偏好。
-- 本次合并新增 `gen4static`、独立 G4 存档和独立 G4 个体值计算器。Encounter Lookup 在两代页面共用，当前页面的存档、个体值计算器和遇敌查询保持三方互斥。
+- 本次合并新增 `gen4static` 和独立 G4 存档；个体值计算器已合并为全局单一入口。Encounter Lookup 在两代页面共用，当前页面的存档、个体值计算器和遇敌查询保持三方互斥。
 - RNG Wasm 默认构建列表为 `gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3static`、`gen3wild`、`gen3ivtopid`、`gen3egg`、`gen4static`，共 8 个。
 - 正式 Wasm、站点产物和 Pages 部署由 GitHub Actions 生成，不提交 `public/wasm/`、`wasm/build/` 或 `dist/`。
 - 本次合并已运行 `npm run format:changed`、定向 `npm run format:files -- ...`、`npm run format:check` 与 `git diff --check`；最终全仓格式和空白检查通过，未发现残留冲突标记。
@@ -65,9 +71,9 @@
 ## 独立 G4 工具
 
 - 增加独立第四世代存档 schema、IndexedDB/localStorage 键、导入导出和 HGSS 未知图腾字段。
-- 增加独立第四世代个体值计算器，使用 Gen IV 物种、形态、个性和个人数据。
-- G4 控件不读取、覆盖或删除 G3 存档和 G3 个体值计算器状态。
-- Encounter Lookup 在两代页面均保留；G4 存档、G4 个体值计算器和 Encounter Lookup 使用与 G3 相同的三方互斥规则，并分别保存展开偏好。
+- 增加全局个体值计算器，使用 PokeFinder Gen III、Platinum、HGSS、BW2、SwSh 和 BDSP 六个数据集。
+- G4 控件不读取、覆盖或删除 G3 存档；个体值计算器不再保存或读取按世代拆分的展开状态。
+- Encounter Lookup 在两代页面均保留；G4 存档、全局个体值计算器和 Encounter Lookup 使用与 G3 相同的三方互斥规则。
 
 ## Wasm 与 Worker
 
@@ -80,7 +86,7 @@
 - `gen3ivtopid`：第三世代 IVs to PID 查询。
 - `gen3egg`：第三世代 Egg Generator。
 - `gen4static`：第四世代 Static Generator/Searcher。
-- `profiles`、`ivcalculator`：第三世代与第四世代各自独立的存档与个体值计算器。
+- `profiles`、`ivcalculator`：G3/G4 独立存档与全局个体值计算器。
 - `encounterlookup`：右下角遇敌查询悬浮工具，覆盖 PokeFinder 4.3.2 实际支持的 16 个游戏版本。
 - 增加 `gen4static` Wasm API v1、C ABI、原生夹具、Dedicated Worker、Generator/Searcher Worker Pool 和消息协议。
 - 修复 MSVC 参数求值顺序造成的 IV word 对调：先顺序读取 `iv1`、`iv2`，再解码六项 IV。
@@ -111,14 +117,14 @@
 
 ## 下一步
 
-1. 在 GitHub Desktop 审查本次冲突解决，确认第三世代 Seed to Time、Spinda Painter、构建 SOP 与第四世代 Static 均被保留。
-2. 项目所有者明确授权后，运行 `npm run verify`、`npm run wasm:test:native` 与 `npm run wasm:build`，重新验证合并后的八个 Wasm 模块和全部 TypeScript 测试。
-3. 项目所有者提交并推送后，等待 GitHub Actions 完成部署，再以生产 URL 在外部 Chrome 回归 G4 Static、两代独立悬浮工具、Seed to Time、Spinda Painter 和 Encounter Lookup。
+1. 在 GitHub Desktop 审查本轮 Initial Seed 首行、控件对齐、Egg/Spinda 标签、全局工具与侧栏世代分组修改。
+2. 项目所有者明确授权后，运行 `npm run verify`；如需覆盖 Wasm 再单独授权 `npm run wasm:test:native` 与 `npm run wasm:build`。
+3. 项目所有者提交并推送后，等待 GitHub Actions 完成部署，再以实际生产 URL 在外部 Chrome 回归 Initial Seed 首行、Seed to Time 与 IVs to PID 对齐、Egg/Spinda 标签、全局工具六数据集和侧栏分组。
 
 ## 已知限制
 
-- 当前分支：`main`，HEAD `e2787be feat: 合并第四世代定点乱数模块`。
-- PR merge 已提交；当前只包含 Actions lint 修复与进度记录，尚未提交。正式 Pages 仍保持上一成功生产包。
+- 当前分支：`main`，HEAD `b2c6ade feat: 统一悬浮工具面板交互`。
+- 本轮 UI、全局个体值计算器数据和文档修改尚未提交。正式 Pages 仍保持上一成功生产包，不能作为本轮源码的验收证据。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
@@ -126,7 +132,7 @@
 - 工程基础：React 19、TypeScript 6、Vite 8、Vitest、ESLint、Prettier、PWA 和中英日三语；npm 是唯一包管理器。
 - 构建基线：Node.js `24.19.0`、npm `12.0.2`、Emscripten `6.0.6`、CMake runtime `4.3.1`、Ninja runtime `1.13.2`。
 - 法律边界：GPL-3.0-or-later、PokeFinder 署名、对应源码记录和站点免责声明。
-- 已有模块：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3spindapainter`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、`gen4static`、两代独立存档信息和个体值计算器，以及 `encounterlookup`。
+- 已有模块：`gen3id`、`gen3initialseed`、`gen3seedtotime`、`gen3spindapainter`、`gen3static` Generator/Searcher、`gen3wild` Generator/Searcher、`gen3ivtopid`、`gen3egg`、`gen4static`、G3/G4 独立存档信息、全局个体值计算器，以及 `encounterlookup`。
 - UI 基础：默认收起的模块抽屉、全局存档悬浮窗、浅色/深色主题和系统默认字体。
 
 ## 5. 验证状态

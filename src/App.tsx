@@ -21,7 +21,6 @@ import type {
 import { Gen3IdWorkerPool } from "./features/id/worker/Gen3IdWorkerPool";
 import { Gen3EggPanel } from "./features/egg/Gen3EggPanel";
 import { EncounterLookupPanel } from "./features/encounterlookup/EncounterLookupPanel";
-import { Gen3IvCalculator } from "./features/ivcalculator/Gen3IvCalculator";
 import { Gen3ProfileControls } from "./features/profiles/Gen3ProfileControls";
 import {
   initialGen3ProfilePanelExpanded,
@@ -38,7 +37,7 @@ import { Gen3SpindaPainterPanel } from "./features/spindapainter/Gen3SpindaPaint
 import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
 import { Gen3StaticPanel } from "./features/static/Gen3StaticPanel";
 import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
-import { Gen4IvCalculator } from "./features/gen4ivcalculator/Gen4IvCalculator";
+import { IvCalculator } from "./features/gen4ivcalculator/Gen4IvCalculator";
 import { Gen4ProfileControls } from "./features/gen4profiles/Gen4ProfileControls";
 import { DEFAULT_GEN4_PROFILE } from "./features/gen4profiles/domain";
 import {
@@ -69,16 +68,6 @@ const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "rs", label: "rs" },
 ];
 const uiPreviewMode = import.meta.env.MODE === "ui";
-const GEN4_IV_CALCULATOR_EXPANDED_KEY =
-  "pokerngkit-gen4-iv-calculator-expanded";
-
-function initialGen4IvCalculatorExpanded() {
-  try {
-    return localStorage.getItem(GEN4_IV_CALCULATOR_EXPANDED_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
 
 function initialDateTime() {
   const now = new Date();
@@ -101,9 +90,6 @@ function App() {
   const [activeModule, setActiveModule] = useState<ActiveModule>("id");
   const [moduleRailOpen, setModuleRailOpen] = useState(false);
   const [ivCalculatorExpanded, setIvCalculatorExpanded] = useState(false);
-  const [gen4IvCalculatorExpanded, setGen4IvCalculatorExpanded] = useState(
-    initialGen4IvCalculatorExpanded,
-  );
   const [encounterLookupExpanded, setEncounterLookupExpanded] = useState(false);
   const [profileExpanded, setProfileExpanded] = useState(
     initialGen3ProfilePanelExpanded,
@@ -203,6 +189,8 @@ function App() {
     setEncounterLookupExpanded(false);
     setProfileExpanded(false);
     persistGen3ProfilePanelExpanded(false);
+    setGen4ProfileExpanded(false);
+    persistGen4ProfilePanelExpanded(false);
   };
 
   const changeProfileExpanded = (expanded: boolean) => {
@@ -214,30 +202,16 @@ function App() {
     }
   };
 
-  const changeGen4IvCalculatorExpanded = (expanded: boolean) => {
-    setGen4IvCalculatorExpanded(expanded);
-    try {
-      localStorage.setItem(GEN4_IV_CALCULATOR_EXPANDED_KEY, String(expanded));
-    } catch {
-      // The calculator remains usable when storage is unavailable.
-    }
-    if (expanded) {
-      setEncounterLookupExpanded(false);
-      setGen4ProfileExpanded(false);
-      persistGen4ProfilePanelExpanded(false);
-    }
-  };
-
   const changeGen4ProfileExpanded = (expanded: boolean) => {
     setGen4ProfileExpanded(expanded);
     persistGen4ProfilePanelExpanded(expanded);
     if (expanded) {
-      changeGen4IvCalculatorExpanded(false);
+      setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
     }
   };
 
-  const openGen4IvCalculator = () => changeGen4IvCalculatorExpanded(true);
+  const openGen4IvCalculator = openIvCalculator;
 
   const readRequest = (): Id3Request | undefined => {
     const input =
@@ -344,18 +318,14 @@ function App() {
     failed: t("failed"),
   }[status];
   const gen4Tools = activeModule === "gen4static";
-  const activeFloatingTool = gen4Tools
-    ? gen4IvCalculatorExpanded
-      ? "iv"
-      : encounterLookupExpanded
-        ? "encounter"
-        : gen4ProfileExpanded
+  const activeFloatingTool = ivCalculatorExpanded
+    ? "iv"
+    : encounterLookupExpanded
+      ? "encounter"
+      : gen4Tools
+        ? gen4ProfileExpanded
           ? "profile"
           : undefined
-    : ivCalculatorExpanded
-      ? "iv"
-      : encounterLookupExpanded
-        ? "encounter"
         : profileExpanded
           ? "profile"
           : undefined;
@@ -363,19 +333,16 @@ function App() {
   const toggleFloatingTool = (tool: "encounter" | "iv" | "profile") => {
     const expanded = activeFloatingTool !== tool;
     setEncounterLookupExpanded(false);
+    setIvCalculatorExpanded(false);
     if (gen4Tools) {
-      changeGen4IvCalculatorExpanded(false);
       changeGen4ProfileExpanded(false);
     } else {
-      setIvCalculatorExpanded(false);
       changeProfileExpanded(false);
     }
     if (!expanded) return;
     if (tool === "encounter") setEncounterLookupExpanded(true);
-    else if (tool === "iv") {
-      if (gen4Tools) changeGen4IvCalculatorExpanded(true);
-      else setIvCalculatorExpanded(true);
-    } else if (gen4Tools) changeGen4ProfileExpanded(true);
+    else if (tool === "iv") setIvCalculatorExpanded(true);
+    else if (gen4Tools) changeGen4ProfileExpanded(true);
     else changeProfileExpanded(true);
   };
 
@@ -478,6 +445,7 @@ function App() {
               <span aria-hidden="true">×</span>
             </button>
           </div>
+          <div className="rail-section-label">GEN III</div>
           <button
             className={
               activeModule === "id" ? "module-entry active" : "module-entry"
@@ -614,6 +582,7 @@ function App() {
               <small>{t("spindaPainterVersion")}</small>
             </span>
           </button>
+          <div className="rail-section-label">GEN IV</div>
           <button
             className={
               activeModule === "gen4static"
@@ -1132,81 +1101,57 @@ function App() {
         </main>
       </div>
       <div className="floating-tools">
+        <IvCalculator
+          expanded={activeFloatingTool === "iv"}
+          onExpandedChange={(expanded) => {
+            setIvCalculatorExpanded(expanded);
+            if (expanded) {
+              setEncounterLookupExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
+        <EncounterLookupPanel
+          expanded={activeFloatingTool === "encounter"}
+          onExpandedChange={(expanded) => {
+            setEncounterLookupExpanded(expanded);
+            if (expanded) {
+              setIvCalculatorExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
         {gen4Tools ? (
-          <>
-            <Gen4IvCalculator
-              expanded={activeFloatingTool === "iv"}
-              onExpandedChange={changeGen4IvCalculatorExpanded}
-            />
-            <EncounterLookupPanel
-              expanded={activeFloatingTool === "encounter"}
-              onExpandedChange={(expanded) => {
-                setEncounterLookupExpanded(expanded);
-                if (expanded) {
-                  changeGen4IvCalculatorExpanded(false);
-                  changeGen4ProfileExpanded(false);
-                }
-              }}
-            />
-            <Gen4ProfileControls
-              controller={gen4Profiles}
-              expanded={activeFloatingTool === "profile"}
-              onExpandedChange={changeGen4ProfileExpanded}
-            />
-          </>
+          <Gen4ProfileControls
+            controller={gen4Profiles}
+            expanded={activeFloatingTool === "profile"}
+            onExpandedChange={changeGen4ProfileExpanded}
+          />
         ) : (
-          <>
-            <Gen3IvCalculator
-              expanded={activeFloatingTool === "iv"}
-              onExpandedChange={(expanded) => {
-                setIvCalculatorExpanded(expanded);
-                if (expanded) {
-                  setEncounterLookupExpanded(false);
-                  changeProfileExpanded(false);
-                }
-              }}
-            />
-            <EncounterLookupPanel
-              expanded={activeFloatingTool === "encounter"}
-              onExpandedChange={(expanded) => {
-                setEncounterLookupExpanded(expanded);
-                if (expanded) {
-                  setIvCalculatorExpanded(false);
-                  changeProfileExpanded(false);
-                }
-              }}
-            />
-            <Gen3ProfileControls
-              compatibleVersions={
-                activeModule === "static" ||
-                activeModule === "wild" ||
-                activeModule === "egg"
-                  ? "handheld"
-                  : "all"
-              }
-              controller={profiles}
-              expanded={activeFloatingTool === "profile"}
-              onExpandedChange={changeProfileExpanded}
-            />
-          </>
+          <Gen3ProfileControls
+            compatibleVersions={
+              activeModule === "static" ||
+              activeModule === "wild" ||
+              activeModule === "egg"
+                ? "handheld"
+                : "all"
+            }
+            controller={profiles}
+            expanded={activeFloatingTool === "profile"}
+            onExpandedChange={changeProfileExpanded}
+          />
         )}
         <nav aria-label={t("tools")} className="floating-tool-rail">
           <button
-            aria-controls={
-              gen4Tools
-                ? "gen4-iv-calculator-panel"
-                : "gen3-iv-calculator-panel"
-            }
+            aria-controls="iv-calculator-panel"
             aria-expanded={activeFloatingTool === "iv"}
             aria-haspopup="dialog"
             aria-label={t("ivCalculator")}
             className={activeFloatingTool === "iv" ? "active" : undefined}
             data-tone="teal"
-            id={
-              gen4Tools
-                ? "gen4-iv-calculator-trigger"
-                : "gen3-iv-calculator-trigger"
-            }
+            id="iv-calculator-trigger"
             onClick={() => toggleFloatingTool("iv")}
             title={t("ivCalculator")}
             type="button"

@@ -12,12 +12,12 @@ import {
   type Gen4StatValues,
 } from "./domain";
 import {
-  getGen4BaseStats,
-  getGen4Characteristics,
-  getGen4FormCount,
-  getGen4Species,
-  getGen4SpeciesName,
-  type Gen4PersonalDataSet,
+  getIvBaseStats,
+  getIvCharacteristics,
+  getIvFormCount,
+  getIvSpecies,
+  getIvSpeciesName,
+  type IvCalculatorDataSet,
 } from "./gen4IvData";
 
 interface CalculatorRow {
@@ -31,7 +31,7 @@ interface CalculatorResult {
   nextLevels: Gen4StatValues;
 }
 
-interface Gen4IvCalculatorProps {
+interface IvCalculatorProps {
   expanded: boolean;
   onExpandedChange(expanded: boolean): void;
 }
@@ -90,22 +90,33 @@ const hiddenPowerKeys = [
   "powerDragon",
   "powerDark",
 ] as const;
+const gameOptions: Array<{
+  value: IvCalculatorDataSet;
+  label: string;
+}> = [
+  { value: "gen3", label: "ivCalculatorGameGen3" },
+  { value: "platinum", label: "ivCalculatorGameDppT" },
+  { value: "hgss", label: "ivCalculatorGameHgss" },
+  { value: "bw2", label: "ivCalculatorGameBw2" },
+  { value: "swsh", label: "ivCalculatorGameSwsh" },
+  { value: "bdsp", label: "ivCalculatorGameBdsp" },
+];
 function createRow(id: number): CalculatorRow {
   return { id, level: "1", stats: ["1", "1", "1", "1", "1", "1"] };
 }
 
-export function Gen4IvCalculator({
+export function IvCalculator({
   expanded,
   onExpandedChange,
-}: Gen4IvCalculatorProps) {
+}: IvCalculatorProps) {
   const { t, i18n } = useTranslation();
   const nextRowId = useRef(2);
-  const [game, setGame] = useState<Gen4PersonalDataSet>("platinum");
+  const [game, setGame] = useState<IvCalculatorDataSet>("gen3");
   const [species, setSpecies] = useState(1);
   const [speciesInput, setSpeciesInput] = useState({
     language: i18n.language,
     species: 1,
-    text: getGen4Species(i18n.language)[0]?.name ?? "",
+    text: getIvSpecies(i18n.language, "gen3")[0]?.name ?? "",
   });
   const [form, setForm] = useState(0);
   const [nature, setNature] = useState(-1);
@@ -115,15 +126,15 @@ export function Gen4IvCalculator({
   const [result, setResult] = useState<CalculatorResult>();
   const [error, setError] = useState("");
   const speciesOptions = useMemo(
-    () => getGen4Species(i18n.language),
-    [i18n.language],
+    () => getIvSpecies(i18n.language, game),
+    [game, i18n.language],
   );
   const characteristics = useMemo(
-    () => getGen4Characteristics(i18n.language),
-    [i18n.language],
+    () => getIvCharacteristics(i18n.language, game),
+    [game, i18n.language],
   );
-  const formCount = getGen4FormCount(species);
-  const baseStats = getGen4BaseStats(game, species, form);
+  const formCount = getIvFormCount(game, species);
+  const baseStats = getIvBaseStats(game, species, form);
   const displayedSpecies =
     speciesInput.language === i18n.language && speciesInput.species === species
       ? speciesInput.text
@@ -182,14 +193,14 @@ export function Gen4IvCalculator({
 
   return (
     <FloatingToolPanel
-      className="iv-calculator-display gen4-iv-calculator-display"
+      className="iv-calculator-display"
       closeLabel={t("collapse")}
       expanded={expanded}
-      id="gen4-iv-calculator-panel"
+      id="iv-calculator-panel"
       label={t("ivCalculator")}
       onExpandedChange={onExpandedChange}
       tone="teal"
-      triggerId="gen4-iv-calculator-trigger"
+      triggerId="iv-calculator-trigger"
     >
       {expanded && (
         <div className="iv-calculator-body">
@@ -198,13 +209,26 @@ export function Gen4IvCalculator({
               <span>{t("game")}</span>
               <select
                 onChange={(event) => {
-                  setGame(event.target.value as Gen4PersonalDataSet);
+                  const nextGame = event.target.value as IvCalculatorDataSet;
+                  const nextSpecies = getIvSpecies(i18n.language, nextGame)[0];
+                  setGame(nextGame);
+                  setSpecies(nextSpecies?.id ?? 1);
+                  setSpeciesInput({
+                    language: i18n.language,
+                    species: nextSpecies?.id ?? 1,
+                    text: nextSpecies?.name ?? "",
+                  });
+                  setForm(0);
+                  setCharacteristic(-1);
                   setResult(undefined);
                 }}
                 value={game}
               >
-                <option value="platinum">Platinum</option>
-                <option value="hgss">HeartGold / SoulSilver</option>
+                {gameOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {t(option.label)}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="field calculator-pokemon-field">
@@ -243,7 +267,7 @@ export function Gen4IvCalculator({
                 >
                   {Array.from({ length: formCount }, (_, index) => (
                     <option key={index} value={index}>
-                      {getGen4SpeciesName(i18n.language, species, index)}
+                      {getIvSpeciesName(i18n.language, species, index)}
                     </option>
                   ))}
                 </select>
@@ -277,22 +301,24 @@ export function Gen4IvCalculator({
                 ))}
               </select>
             </label>
-            <label className="field">
-              <span>{t("characteristic")}</span>
-              <select
-                onChange={(event) =>
-                  setCharacteristic(Number(event.target.value))
-                }
-                value={characteristic}
-              >
-                <option value={-1}>{t("none")}</option>
-                {characteristics.map((label, index) => (
-                  <option key={label} value={index}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {game !== "gen3" && (
+              <label className="field">
+                <span>{t("characteristic")}</span>
+                <select
+                  onChange={(event) =>
+                    setCharacteristic(Number(event.target.value))
+                  }
+                  value={characteristic}
+                >
+                  <option value={-1}>{t("none")}</option>
+                  {characteristics.map((label, index) => (
+                    <option key={label} value={index}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
           </div>
 
           <div className="calculator-observations">

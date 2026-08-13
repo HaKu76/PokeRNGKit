@@ -279,7 +279,6 @@ export function Gen3IvToPidPanel({ uiPreviewMode }: Gen3IvToPidPanelProps) {
                 }
                 value={tid}
               />
-              <small>DEC / 0 - 65535</small>
             </label>
             <div className="panel-actions ivtopid-actions">
               <button

@@ -842,9 +842,6 @@ export function Gen3EggPanel({
               <span className="panel-index">02</span>
               <h2>{t("settings")}</h2>
             </div>
-            <span className="panel-note">
-              {profile.name} / {profile.version}
-            </span>
           </div>
           <div className="static-form-stack">
             <label className="field">
