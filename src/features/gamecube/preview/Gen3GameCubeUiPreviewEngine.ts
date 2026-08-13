@@ -28,7 +28,7 @@ export class Gen3GameCubeUiPreviewEngine implements GameCubeEngine {
         (value >>> 25) & 31,
       ];
       const ability = value & 1;
-      const gender = 0;
+      const gender = (value >>> 1) & 1;
       const nature = value % 25;
       const shiny = 0;
       if (

@@ -2,10 +2,22 @@
 
 > - 最近更新：2026-08-13
 > - 当前分支：`main`
-> - Git 基线：`cdf8b67 fix: 修复 PWA 预缓存构建上限`
-> - 当前阶段：补全第三世代 PokeFinder 功能模块
-> - 工作区状态：源码和文档尚未提交；Codex 不提交、不 push、不部署
-> - 验收状态：本轮完成静态审查和冲突清理；最终格式检查待本轮编辑收尾，ESLint、TypeScript、测试、构建和浏览器 UI 待授权验证
+> - Git 基线：`0522fc4 feat: 补全第三世代功能模块`
+> - 当前阶段：修复第三世代模块 CI 并更新 HakuStyle
+> - 工作区状态：本轮源码、样式、Skill 和文档修改尚未提交；Codex 不提交、不 push、不部署
+> - 验收状态：`npm run verify` 已通过；原生夹具、Wasm 构建、浏览器 UI 和生产算法回归未运行
+
+## 2026-08-13 第三世代模块 CI 与 HakuStyle 更新
+
+- 修复：根据项目所有者提供的 Actions 日志，移除 GameCube Worker 的无效初始赋值，同时保留 `try/finally` 内存释放；两个 UI 预览引擎移除未使用请求参数；PokeSpot 将地点变化后的物种和槽位重置移回来源事件，消除 5 个 ESLint error。
+- 修复：完整类型检查继续发现 GameCube UI 预览把性别固定为字面量 `0`，现改为从预览值生成 `0/1`，男女筛选均可产生示例结果；生产 Wasm、Worker 协议和 RNG 算法未改变。
+- 优化：PokeSpot 为 Food/Encounter 成对输入使用稳定三轨布局，在窄屏将唯一上游标签移到两个输入上方；PID to IVs 输入占主轨、操作区按内容宽度收敛；Jirachi 操作列表减少空隙并使用等宽数字排版。未新增或改写上游可见标签。
+- 更新：从本地 HakuStyle `C:\Users\Hakuhiro\Documents\Codex\2026-08-12\b\outputs\hakustyle` 的 `b69b444` 同步最新版 `SKILL.md`、8 份渐进参考、交互预览资产、界面元数据和校验脚本；补充成对输入、精确可见标签和 React 依赖状态重置规则。`PyYAML 6.0.3` 与 Skill Creator 校验均通过。
+- 修复：HakuStyle 浏览器 Demo 显式声明 `document`、`navigator` 和 `window`，保持资源继续纳入 ESLint；同一修正已回写本地 HakuStyle 源目录。
+- 修复：新增根目录 `.gitattributes`，统一文本为 LF，消除 Windows 全局 `core.autocrlf=true` 导致本地 Prettier 对 81 个已提交文件的误报；归一化没有为这些文件产生实际内容 diff。
+- 验证：首次有效 `npm run verify` 在 81 个 CRLF 工作树文件的 Prettier 检查停止；第二次在新 Demo 的 25 个浏览器全局 lint error 停止；第三次在 GameCube UI 预览的 TypeScript 字面量比较停止；第四次通过格式、lint、类型和 103 项测试后，在受限终端复制 `public/wasm/gen3egg.mjs` 到 `dist` 时因 Windows `EPERM` 停止。
+- 已通过：非受限环境完整运行 `npm run verify`。Prettier、ESLint（0 error，保留 Egg/Wild 两条既有 TanStack Virtual warning）、TypeScript、28 个 Vitest 文件共 103 项测试、Vite 生产构建和 PWA 42 项预缓存均成功；Vite 仅保留主包超过 500 kB 的非阻断 warning。
+- 未运行：`npm run wasm:test:native`、`npm run wasm:build`、性能、外部浏览器、部署页面和生产算法回归；本轮没有获授权执行这些检查或提供 URL。
 
 ## 2026-08-13 第三世代模块补全
 

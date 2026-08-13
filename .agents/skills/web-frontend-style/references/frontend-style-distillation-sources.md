@@ -2,7 +2,7 @@
 
 这份文档记录前端风格 Skill 的蒸馏来源、观察范围和可迁移结论。它与最终 Skill 分开维护：Skill 保存可执行规则，本文件保存规则的出处和证据，便于回溯与继续迭代。
 
-当前状态：已完成当前 31 组样本的蒸馏，正式 Skill 已初始化；后续样本可继续追加。
+当前状态：已完成 31 组样本的第一轮证据记录与第二轮交叉蒸馏。本文保留来源、观察证据、平台标签和许可边界；归一化后的字体、圆角、布局、交互、主题和反 AI 规则分别维护在同目录的专项文档中，后续样本可继续追加。
 
 ## 1. Leonus 右下角悬浮菜单
 
@@ -741,9 +741,18 @@ License boundary: the Dogument repository is marked CC0-1.0, but that does not a
 - 每个页面选择一个主视觉语言和至多一个辅助特效，避免把 FF 边框、BA 顶栏、霓虹搜索框、玻璃壁纸、宝可梦闪膜、樱花封面、Win7 窗口和移动控制底栏同时堆叠。
 - 只蒸馏可迁移规律，不把原项目源码、字体、角色、Logo、图片、纹理或音频素材直接打包进 Skill。
 
+## 34. 第二次蒸馏产物
+
+- `typography-density-system.md`：将来源中的字号、控件高度、圆角、间距、边框、透明度与装饰规律归一为 HakuStyle 基线。
+- `layout-archetypes.md`：将来源重新组织为工作台、阅读页、个人档案、编辑型画廊、移动控制台和桌面/JRPG 窗口六类页面原型。
+- `interaction-motion-system.md`：将菜单、搜索、侧栏、卡片、轮播、拖拽、主题和反馈整理为状态机与时序预算。
+- `theme-selection-matrix.md`：把用户确认的配色偏好映射到产品类型、材质和特效边界。
+- `anti-ai-ui-checklist.md`：针对小字号、平均卡片、过度透明、无意义圆球、同色描边与文字、泛滥动效等生成式 UI 痕迹建立验收门槛。
+- `source-contribution-index.md`：逐项说明全部 31 个来源在第二次蒸馏中承担的具体职责，保证来源被吸收但不会在单一页面中无条件堆叠。
+
 ## 当前项目状态
 
-- 已记录用户目前提供的全部 31 组来源，并为新增来源补充平台适配标签。
+- 已记录用户目前提供的全部 31 组来源，并完成平台适配标签和第二次交叉蒸馏。
 - 项目暂定名为 `HakuStyle`，仓库 slug 为 `hakustyle`。
 - 正式 Skill 已初始化，目录为 `outputs/hakustyle/`；后续样本可继续追加。
-- Skill 已包含 `SKILL.md`、`agents/openai.yaml`、`references/` 和 README，并通过 Skill Creator 校验。
+- Skill 已包含 `SKILL.md`、`agents/openai.yaml`、专项 `references/` 和 README；第二次蒸馏已通过 Skill Creator 校验。

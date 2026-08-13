@@ -1,8 +1,7 @@
-import type { Gen3JirachiRequest } from "../domain";
 import type { Gen3JirachiSearchEngine } from "../search";
 
 export class Gen3JirachiUiPreviewEngine implements Gen3JirachiSearchEngine {
-  async search(_request: Gen3JirachiRequest) {
+  async search() {
     return {
       actions: [1, 0, 1, 2, 3] as (0 | 1 | 2 | 3)[],
       targetAdvances: 53,

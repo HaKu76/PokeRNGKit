@@ -1,8 +1,7 @@
-import type { Gen3PidToIvRequest } from "../domain";
 import type { Gen3PidToIvSearchEngine } from "../search";
 
 export class Gen3PidToIvUiPreviewEngine implements Gen3PidToIvSearchEngine {
-  async search(_request: Gen3PidToIvRequest) {
+  async search() {
     return {
       states: [
         {

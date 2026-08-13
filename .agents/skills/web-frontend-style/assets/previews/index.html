@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>HakuStyle 设计选择器</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="config-panel" aria-label="HakuStyle 设计选项">
+        <header class="config-header">
+          <div>
+            <p class="brand-kicker">HakuStyle v2</p>
+            <h1>设计选择器</h1>
+          </div>
+          <button
+            class="icon-button"
+            id="modeToggle"
+            type="button"
+            aria-label="切换深浅模式"
+            title="切换深浅模式"
+          >
+            <span aria-hidden="true">◐</span>
+          </button>
+        </header>
+
+        <div class="config-scroll">
+          <section class="question-block" aria-labelledby="question-shell">
+            <div class="question-heading">
+              <span class="question-number">01</span>
+              <div>
+                <h2 id="question-shell">项目类型</h2>
+                <p>决定页面壳和信息顺序</p>
+              </div>
+            </div>
+            <div class="choice-grid two-columns" data-choice-group="shell">
+              <button
+                class="choice-card is-selected"
+                type="button"
+                data-value="workspace"
+              >
+                <strong>工作台</strong>
+                <span>工具、后台、资料库</span>
+              </button>
+              <button class="choice-card" type="button" data-value="reading">
+                <strong>阅读</strong>
+                <span>博客、文档、教程</span>
+              </button>
+              <button class="choice-card" type="button" data-value="profile">
+                <strong>档案</strong>
+                <span>主页、收藏、作品集</span>
+              </button>
+              <button class="choice-card" type="button" data-value="mobile">
+                <strong>移动控制</strong>
+                <span>PWA、状态与快捷操作</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="question-block" aria-labelledby="question-theme">
+            <div class="question-heading">
+              <span class="question-number">02</span>
+              <div>
+                <h2 id="question-theme">主题配色</h2>
+                <p>同一内容即时比较</p>
+              </div>
+            </div>
+            <div class="theme-list" data-choice-group="theme">
+              <button
+                class="theme-choice is-selected"
+                type="button"
+                data-value="ant-neutral"
+              >
+                <span class="theme-swatch swatch-ant" aria-hidden="true"></span>
+                <span><strong>Ant Neutral</strong><small>通用默认</small></span>
+              </button>
+              <button
+                class="theme-choice"
+                type="button"
+                data-value="royal-blueprint"
+              >
+                <span
+                  class="theme-swatch swatch-royal"
+                  aria-hidden="true"
+                ></span>
+                <span
+                  ><strong>Royal Blueprint</strong><small>结构档案</small></span
+                >
+              </button>
+              <button
+                class="theme-choice"
+                type="button"
+                data-value="hakudex-azure"
+              >
+                <span
+                  class="theme-swatch swatch-hakudex"
+                  aria-hidden="true"
+                ></span>
+                <span
+                  ><strong>HakuDex Azure</strong><small>JRPG 图鉴</small></span
+                >
+              </button>
+              <button
+                class="theme-choice"
+                type="button"
+                data-value="indigo-night"
+              >
+                <span
+                  class="theme-swatch swatch-indigo"
+                  aria-hidden="true"
+                ></span>
+                <span
+                  ><strong>Indigo Night</strong><small>暗色工作台</small></span
+                >
+              </button>
+              <button
+                class="theme-choice"
+                type="button"
+                data-value="frosted-lilac"
+              >
+                <span
+                  class="theme-swatch swatch-lilac"
+                  aria-hidden="true"
+                ></span>
+                <span
+                  ><strong>Frosted Lilac</strong><small>冷柔个人感</small></span
+                >
+              </button>
+              <button
+                class="theme-choice"
+                type="button"
+                data-value="blue-archive"
+              >
+                <span
+                  class="theme-swatch swatch-archive"
+                  aria-hidden="true"
+                ></span>
+                <span
+                  ><strong>Blue Archive Dual</strong
+                  ><small>主题博客</small></span
+                >
+              </button>
+              <button
+                class="theme-choice"
+                type="button"
+                data-value="sakura-mist"
+              >
+                <span
+                  class="theme-swatch swatch-sakura"
+                  aria-hidden="true"
+                ></span>
+                <span><strong>Sakura Mist</strong><small>柔和阅读</small></span>
+              </button>
+            </div>
+          </section>
+
+          <section class="question-block" aria-labelledby="question-density">
+            <div class="question-heading">
+              <span class="question-number">03</span>
+              <div>
+                <h2 id="question-density">信息密度</h2>
+                <p>不会提供过小字号</p>
+              </div>
+            </div>
+            <div class="segmented" data-choice-group="density">
+              <button type="button" data-value="compact">紧凑</button>
+              <button class="is-selected" type="button" data-value="standard">
+                标准
+              </button>
+              <button type="button" data-value="comfortable">舒适</button>
+            </div>
+          </section>
+
+          <details class="advanced-options">
+            <summary>高级选项</summary>
+            <div class="advanced-content">
+              <fieldset>
+                <legend>圆角</legend>
+                <div class="segmented" data-choice-group="shape">
+                  <button type="button" data-value="standard">标准</button>
+                  <button
+                    class="is-selected"
+                    type="button"
+                    data-value="rounded"
+                  >
+                    圆润
+                  </button>
+                  <button type="button" data-value="themed">主题硬朗</button>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>材质</legend>
+                <div class="segmented" data-choice-group="material">
+                  <button class="is-selected" type="button" data-value="solid">
+                    实体
+                  </button>
+                  <button type="button" data-value="glass">轻玻璃</button>
+                  <button type="button" data-value="themed">主题材质</button>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>动效</legend>
+                <div class="segmented" data-choice-group="motion">
+                  <button type="button" data-value="quiet">安静</button>
+                  <button class="is-selected" type="button" data-value="smooth">
+                    顺滑
+                  </button>
+                  <button type="button" data-value="vivid">鲜明</button>
+                </div>
+              </fieldset>
+
+              <fieldset>
+                <legend>单一特效</legend>
+                <select id="effectSelect">
+                  <option value="none">无特效</option>
+                  <option value="jrpg">JRPG 重点框</option>
+                  <option value="foil">收藏卡牌材质</option>
+                  <option value="ambient">低速动态背景</option>
+                </select>
+              </fieldset>
+            </div>
+          </details>
+        </div>
+
+        <footer class="config-footer">
+          <button class="secondary-button" id="resetButton" type="button">
+            重置
+          </button>
+          <button class="primary-button" id="contractButton" type="button">
+            查看风格契约
+          </button>
+        </footer>
+      </aside>
+
+      <main class="preview-column">
+        <header class="preview-toolbar">
+          <div>
+            <p class="preview-eyebrow">实时预览</p>
+            <h2 id="previewTitle">工作台 · Ant Neutral</h2>
+          </div>
+          <div class="viewport-switch" aria-label="预览宽度">
+            <button class="is-selected" type="button" data-viewport="desktop">
+              桌面
+            </button>
+            <button type="button" data-viewport="tablet">平板</button>
+            <button type="button" data-viewport="phone">手机</button>
+          </div>
+        </header>
+
+        <div class="preview-stage" id="previewStage">
+          <div
+            class="demo-viewport"
+            id="demoViewport"
+            data-theme="ant-neutral"
+            data-mode="light"
+            data-density="standard"
+            data-shape="rounded"
+            data-material="solid"
+            data-motion="smooth"
+            data-effect="none"
+          >
+            <div class="ambient-layer" aria-hidden="true"></div>
+
+            <section
+              class="demo-view workspace-view is-active"
+              data-view="workspace"
+              aria-label="工作台预览"
+            >
+              <aside class="demo-sidebar">
+                <div class="demo-brand">
+                  <span class="brand-mark">H</span>
+                  <div><strong>HakuDex</strong><small>研究终端</small></div>
+                </div>
+                <nav aria-label="工作台导航">
+                  <p class="nav-label">研究</p>
+                  <a class="nav-item is-active" href="#workspace-main"
+                    ><span>概览</span><kbd>1</kbd></a
+                  >
+                  <a class="nav-item" href="#workspace-main"
+                    ><span>个体计算</span><kbd>2</kbd></a
+                  >
+                  <a class="nav-item" href="#workspace-main"
+                    ><span>遭遇记录</span><kbd>3</kbd></a
+                  >
+                  <p class="nav-label">收藏</p>
+                  <a class="nav-item" href="#workspace-main"
+                    ><span>图鉴</span><span class="nav-count">248</span></a
+                  >
+                  <a class="nav-item" href="#workspace-main"
+                    ><span>队伍方案</span><span class="nav-count">12</span></a
+                  >
+                </nav>
+                <div class="sidebar-account">
+                  <span class="avatar">白</span>
+                  <div><strong>白希洛</strong><small>本地档案</small></div>
+                </div>
+              </aside>
+
+              <div class="workspace-main" id="workspace-main">
+                <header class="demo-topbar">
+                  <div>
+                    <p class="topbar-label">研究工作台</p>
+                    <h3>闪光个体追踪</h3>
+                  </div>
+                  <div class="topbar-actions">
+                    <button
+                      class="demo-icon-button"
+                      type="button"
+                      aria-label="搜索"
+                      title="搜索"
+                    >
+                      ⌕
+                    </button>
+                    <button class="demo-primary" type="button">新建记录</button>
+                  </div>
+                </header>
+
+                <div class="workspace-content">
+                  <section class="metrics-strip" aria-label="研究摘要">
+                    <div>
+                      <span>进行中</span><strong>04</strong
+                      ><small>比昨日 +1</small>
+                    </div>
+                    <div>
+                      <span>本周遭遇</span><strong>1,284</strong
+                      ><small>已同步</small>
+                    </div>
+                    <div>
+                      <span>最佳概率</span><strong>1 / 512</strong
+                      ><small>连锁 31</small>
+                    </div>
+                  </section>
+
+                  <div class="workspace-grid">
+                    <section class="surface-panel task-panel">
+                      <header class="panel-header">
+                        <div>
+                          <p>当前任务</p>
+                          <h4>月亮伊布 · 大量发生</h4>
+                        </div>
+                        <span class="status-label">追踪中</span>
+                      </header>
+                      <div class="progress-row">
+                        <div class="progress-copy">
+                          <strong>386</strong><span>/ 512 次遭遇</span>
+                        </div>
+                        <span>75%</span>
+                      </div>
+                      <div class="progress-track">
+                        <span style="width: 75%"></span>
+                      </div>
+                      <div class="task-actions">
+                        <button class="demo-primary" type="button">
+                          记录一次遭遇
+                        </button>
+                        <button class="demo-secondary" type="button">
+                          查看详情
+                        </button>
+                      </div>
+                    </section>
+
+                    <section class="collectible-card" aria-label="收藏预览">
+                      <div class="foil-layer" aria-hidden="true"></div>
+                      <div class="card-topline">
+                        <span>No. 0197</span><strong>稀有</strong>
+                      </div>
+                      <div class="creature-art" aria-hidden="true">
+                        <span class="creature-core"></span>
+                        <span class="creature-ring ring-one"></span>
+                        <span class="creature-ring ring-two"></span>
+                      </div>
+                      <div class="card-copy">
+                        <p>月光记录</p>
+                        <h4>Umbreon</h4>
+                        <span>夜间 · 恶属性</span>
+                      </div>
+                    </section>
+
+                    <section class="surface-panel records-panel">
+                      <header class="panel-header">
+                        <div>
+                          <p>最近记录</p>
+                          <h4>研究活动</h4>
+                        </div>
+                        <button class="text-button" type="button">
+                          查看全部
+                        </button>
+                      </header>
+                      <div class="record-list">
+                        <div class="record-row">
+                          <span class="record-id">#A124</span>
+                          <div>
+                            <strong>大量发生</strong
+                            ><small>月亮伊布 · 386 次</small>
+                          </div>
+                          <time>10:42</time>
+                        </div>
+                        <div class="record-row">
+                          <span class="record-id">#A123</span>
+                          <div>
+                            <strong>孵化记录</strong
+                            ><small>波克比 · 128 枚</small>
+                          </div>
+                          <time>昨天</time>
+                        </div>
+                        <div class="record-row">
+                          <span class="record-id">#A122</span>
+                          <div>
+                            <strong>定点重置</strong
+                            ><small>水君 · 2,046 次</small>
+                          </div>
+                          <time>周一</time>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="surface-panel activity-panel">
+                      <header class="panel-header">
+                        <div>
+                          <p>下一步</p>
+                          <h4>建议操作</h4>
+                        </div>
+                      </header>
+                      <ol class="next-list">
+                        <li>
+                          <span>1</span>
+                          <div>
+                            <strong>确认闪耀力料理</strong
+                            ><small>剩余 18 分钟</small>
+                          </div>
+                        </li>
+                        <li>
+                          <span>2</span>
+                          <div>
+                            <strong>保持连锁</strong><small>避免切换区域</small>
+                          </div>
+                        </li>
+                        <li>
+                          <span>3</span>
+                          <div>
+                            <strong>512 次后复核</strong
+                            ><small>更新概率模型</small>
+                          </div>
+                        </li>
+                      </ol>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section
+              class="demo-view reading-view"
+              data-view="reading"
+              aria-label="阅读页面预览"
+            >
+              <header class="reading-header">
+                <a class="reading-brand" href="#article">Haku Notes</a>
+                <nav>
+                  <a href="#article">文章</a><a href="#article">图鉴</a
+                  ><a href="#article">关于</a>
+                </nav>
+                <button
+                  class="demo-icon-button"
+                  type="button"
+                  aria-label="搜索文章"
+                  title="搜索文章"
+                >
+                  ⌕
+                </button>
+              </header>
+              <div class="reading-layout" id="article">
+                <article>
+                  <p class="article-category">研究笔记 · 概率系统</p>
+                  <h3>怎样设计一套稳定的闪光追踪流程</h3>
+                  <p class="article-lead">
+                    从记录结构、状态反馈和中断恢复三个方面，整理一套适合长期使用的研究工作流。
+                  </p>
+                  <div class="article-meta">
+                    <span>2026-08-13</span><span>8 分钟阅读</span>
+                  </div>
+                  <h4>先确定记录的最小单位</h4>
+                  <p>
+                    每一次遭遇都不是一张新的视觉卡片。界面只需要保留当前计数、概率条件和最近一次状态变化，让记录本身保持连续。
+                  </p>
+                  <div class="article-callout">
+                    <strong>设计原则</strong>
+                    <p>
+                      用稳定的信息层级承载数据，只有独立记录和可操作工具才需要边界。
+                    </p>
+                  </div>
+                  <h4>让中断可以恢复</h4>
+                  <p>
+                    主题切换、页面刷新和临时离开都不应该清空上下文。当前目标、筛选条件和计数状态需要通过明确的持久化策略恢复。
+                  </p>
+                </article>
+                <aside class="article-toc">
+                  <p>本页目录</p>
+                  <a class="is-active" href="#article">最小记录单位</a>
+                  <a href="#article">状态反馈</a>
+                  <a href="#article">中断恢复</a>
+                </aside>
+              </div>
+            </section>
+
+            <section
+              class="demo-view profile-view"
+              data-view="profile"
+              aria-label="个人档案预览"
+            >
+              <header class="profile-header">
+                <div>
+                  <p>Haku Archive</p>
+                  <h3>白希洛的研究档案</h3>
+                </div>
+                <button class="demo-secondary" type="button">打开图鉴</button>
+              </header>
+              <div class="bento-grid">
+                <section class="bento-item identity-tile">
+                  <p class="tile-label">TRAINER PROFILE</p>
+                  <div class="identity-art" aria-hidden="true">
+                    <span>H</span>
+                  </div>
+                  <div>
+                    <h4>Hakuhiro</h4>
+                    <p>收藏记录、JRPG 研究与前端设计</p>
+                  </div>
+                </section>
+                <section class="bento-item stat-tile">
+                  <span>图鉴进度</span><strong>82%</strong>
+                  <div class="progress-track">
+                    <span style="width: 82%"></span>
+                  </div>
+                </section>
+                <section class="bento-item time-tile">
+                  <span>当前时间</span><strong>22:24</strong
+                  ><small>Asia / Shanghai</small>
+                </section>
+                <section class="bento-item quote-tile">
+                  <span>今日记录</span>
+                  <p>保留真正影响任务的视觉信息。</p>
+                </section>
+                <section class="bento-item collection-tile">
+                  <header>
+                    <span>精选收藏</span
+                    ><button class="text-button" type="button">浏览</button>
+                  </header>
+                  <div class="mini-collection">
+                    <span>0197</span><span>0245</span><span>0359</span>
+                  </div>
+                </section>
+                <section class="bento-item links-tile">
+                  <a href="#profile">研究日志</a><a href="#profile">项目仓库</a
+                  ><a href="#profile">主题设置</a>
+                </section>
+              </div>
+            </section>
+
+            <section
+              class="demo-view mobile-view"
+              data-view="mobile"
+              aria-label="移动控制页面预览"
+            >
+              <div class="mobile-surface">
+                <header class="mobile-header">
+                  <div>
+                    <p>8 月 13 日 · 周四</p>
+                    <h3>晚上好，白希洛</h3>
+                  </div>
+                  <span class="avatar">白</span>
+                </header>
+                <section class="mobile-summary">
+                  <div><span>当前目标</span><strong>月亮伊布</strong></div>
+                  <div><span>今日遭遇</span><strong>386</strong></div>
+                  <div><span>概率</span><strong>1 / 512</strong></div>
+                </section>
+                <section class="mobile-action-card">
+                  <div class="mobile-card-top">
+                    <span class="status-label">追踪中</span
+                    ><small>最后同步 1 分钟前</small>
+                  </div>
+                  <h4>大量发生计数</h4>
+                  <div class="mobile-counter">
+                    <strong>386</strong><span>次</span>
+                  </div>
+                  <button class="demo-primary" type="button">
+                    记录一次遭遇
+                  </button>
+                </section>
+                <section class="mobile-list">
+                  <header>
+                    <h4>快捷操作</h4>
+                    <button class="text-button" type="button">编辑</button>
+                  </header>
+                  <button type="button">
+                    <span>更新料理时间</span><strong>18 分钟</strong>
+                  </button>
+                  <button type="button">
+                    <span>切换目标</span><strong>4 个进行中</strong>
+                  </button>
+                  <button type="button">
+                    <span>查看最近记录</span><strong>12 条</strong>
+                  </button>
+                </section>
+                <nav class="mobile-nav" aria-label="移动导航">
+                  <button class="is-active" type="button">概览</button
+                  ><button type="button">记录</button
+                  ><button type="button">图鉴</button
+                  ><button type="button">我的</button>
+                </nav>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <dialog class="contract-dialog" id="contractDialog">
+      <div class="dialog-header">
+        <div>
+          <p>HakuStyle</p>
+          <h2>生成的风格契约</h2>
+        </div>
+        <button
+          class="icon-button"
+          id="closeDialog"
+          type="button"
+          aria-label="关闭"
+          title="关闭"
+        >
+          ×
+        </button>
+      </div>
+      <pre id="contractOutput"></pre>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="dialogCloseButton" type="button">
+          关闭
+        </button>
+        <button class="primary-button" id="copyContract" type="button">
+          复制契约
+        </button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      已复制风格契约
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>

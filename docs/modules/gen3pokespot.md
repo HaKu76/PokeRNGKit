@@ -31,6 +31,6 @@ API v1 的 `gen3pokespot_generate` 接收固定 29 个 `uint32_t` 参数。每�
 
 ## 验证状态
 
-已加入 `wasm/modules/gen3pokespot/tests/pokespot_native_test.cpp`，覆盖 Food/Encounter 闭区间结果及首末记录。按仓库规则，本轮未运行原生夹具、Wasm 构建、TypeScript、性能或浏览器回归；默认一亿组合的实际耗时与移动设备 Worker 数量需部署后评估。
+已加入 `wasm/modules/gen3pokespot/tests/pokespot_native_test.cpp`，覆盖 Food/Encounter 闭区间结果及首末记录。2026-08-13 经项目所有者授权，非受限环境的 `npm run verify` 已通过 Prettier、ESLint、TypeScript、28 个 Vitest 文件共 103 项测试、Vite 构建和 PWA 预缓存。原生夹具、Wasm 构建、性能和浏览器回归未运行；默认一亿组合的实际耗时与移动设备 Worker 数量需部署后评估。
 
 来源 revision、二进制 SHA-256 和 GPL 归属见 [`third_party/pokefinder/UPSTREAM.md`](../../third_party/pokefinder/UPSTREAM.md)。

@@ -39,6 +39,6 @@ uint32_t gen3jirachi_last_error();
 
 ## 验证状态
 
-已加入 `wasm/modules/gen3jirachi/tests/jirachi_native_test.cpp`，覆盖 API 版本、`compute_seed` 固定值和不可获得目标。按仓库授权规则，本轮未运行原生夹具、Wasm 构建、TypeScript 或浏览器回归。
+已加入 `wasm/modules/gen3jirachi/tests/jirachi_native_test.cpp`，覆盖 API 版本、`compute_seed` 固定值和不可获得目标。2026-08-13 经项目所有者授权，非受限环境的 `npm run verify` 已通过 Prettier、ESLint、TypeScript、28 个 Vitest 文件共 103 项测试、Vite 构建和 PWA 预缓存。原生夹具、Wasm 构建、浏览器和生产算法回归未运行。
 
 上游算法与 SHA-256 记录见 [`third_party/pokefinder/UPSTREAM.md`](../../third_party/pokefinder/UPSTREAM.md)。

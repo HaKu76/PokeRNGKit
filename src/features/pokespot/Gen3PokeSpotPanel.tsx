@@ -164,10 +164,6 @@ export function Gen3PokeSpotPanel({
     ) as Gen3PokeSpotFilters["ivMin"];
 
   useEffect(() => () => engine.dispose(), [engine]);
-  useEffect(() => {
-    setSelectedSpecies(0);
-    setSlotMask(0);
-  }, [location]);
 
   const selectSpecies = (species: number) => {
     setSelectedSpecies(species);
@@ -440,9 +436,11 @@ export function Gen3PokeSpotPanel({
             <label className="field">
               <span>{t("location")}</span>
               <select
-                onChange={(event) =>
-                  setLocation(Number(event.target.value) as 0 | 1 | 2)
-                }
+                onChange={(event) => {
+                  setLocation(Number(event.target.value) as 0 | 1 | 2);
+                  setSelectedSpecies(0);
+                  setSlotMask(0);
+                }}
                 value={location}
               >
                 {POKE_SPOT_LOCATIONS.map((entry) => (

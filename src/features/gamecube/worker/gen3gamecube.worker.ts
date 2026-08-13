@@ -84,30 +84,33 @@ function requestWords(
 }
 function run(message: Extract<GameCubeWorkerRequest, { type: "run" }>) {
   if (!wasm) throw new Error("Gen3 GameCube Wasm module is not initialized.");
+  const currentWasm = wasm;
   const words = requestWords(message);
-  const pointer = wasm._malloc(words.byteLength);
+  const pointer = currentWasm._malloc(words.byteLength);
   if (
     pointer === 0 ||
     pointer % Uint32Array.BYTES_PER_ELEMENT !== 0 ||
-    pointer / Uint32Array.BYTES_PER_ELEMENT + words.length > wasm.HEAPU32.length
+    pointer / Uint32Array.BYTES_PER_ELEMENT + words.length >
+      currentWasm.HEAPU32.length
   ) {
-    if (pointer !== 0) wasm._free(pointer);
+    if (pointer !== 0) currentWasm._free(pointer);
     throw new RangeError(
       "Gen3 GameCube Wasm core returned an invalid request range.",
     );
   }
-  let resultCount = 0;
-  let errorCode = 0;
-  try {
-    wasm.HEAPU32.set(words, pointer / Uint32Array.BYTES_PER_ELEMENT);
-    resultCount =
-      message.request.operation === "generator"
-        ? wasm._gen3gamecube_generate(pointer, words.length)
-        : wasm._gen3gamecube_search(pointer, words.length);
-    errorCode = wasm._gen3gamecube_last_error();
-  } finally {
-    wasm._free(pointer);
-  }
+  const invoke = () => {
+    try {
+      currentWasm.HEAPU32.set(words, pointer / Uint32Array.BYTES_PER_ELEMENT);
+      const resultCount =
+        message.request.operation === "generator"
+          ? currentWasm._gen3gamecube_generate(pointer, words.length)
+          : currentWasm._gen3gamecube_search(pointer, words.length);
+      return [resultCount, currentWasm._gen3gamecube_last_error()] as const;
+    } finally {
+      currentWasm._free(pointer);
+    }
+  };
+  const [resultCount, errorCode] = invoke();
   if (errorCode !== 0 && errorCode !== 2)
     throw new Error(`Gen3 GameCube Wasm core returned error ${errorCode}.`);
   if (

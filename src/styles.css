@@ -1374,6 +1374,11 @@ h1 {
   gap: 6px;
   margin-bottom: 6px;
 }
+.pokespot-control-grid {
+  grid-template-columns:
+    minmax(360px, 410px) minmax(210px, 240px)
+    minmax(360px, 1fr);
+}
 .gen3egg-control-grid {
   display: grid;
   align-items: start;
@@ -1762,6 +1767,18 @@ h1 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
+.pid-to-iv-form-grid {
+  grid-template-columns: minmax(200px, 1fr) auto;
+  align-items: end;
+}
+.pid-to-iv-form-grid .panel-actions,
+.jirachi-actions {
+  margin: 0 0 1px;
+}
+.jirachi-actions {
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
 
 .pokespot-slot-note {
   margin-top: 12px;
@@ -1793,15 +1810,19 @@ h1 {
 
 .jirachi-action-list {
   display: grid;
-  gap: 8px;
+  gap: 0;
   list-style: none;
   margin: 0;
-  padding: 16px 16px 20px;
+  padding: 12px 16px 16px;
 }
 
 .jirachi-action-list li {
   border-bottom: 1px solid var(--line-soft);
-  padding: 8px 0;
+  min-width: 0;
+  padding: 9px 0;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .jirachi-empty-state {
@@ -1938,7 +1959,7 @@ h1 {
 }
 .pokespot-paired-field {
   display: grid;
-  grid-template-columns: minmax(100px, 1fr) repeat(2, minmax(72px, 110px));
+  grid-template-columns: minmax(88px, 1fr) repeat(2, minmax(92px, 112px));
   align-items: center;
   gap: 7px;
 }
@@ -2934,6 +2955,9 @@ h1 {
   .static-control-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .pokespot-control-grid {
+    grid-template-columns: minmax(360px, 1.35fr) minmax(260px, 1fr);
+  }
   .static-filter-panel {
     grid-column: 1 / -1;
   }
@@ -2944,6 +2968,12 @@ h1 {
   .pid-to-iv-form-grid,
   .jirachi-form-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .pokespot-paired-field {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pokespot-paired-field > span {
+    grid-column: 1 / -1;
   }
   .topbar {
     height: auto;
