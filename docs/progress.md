@@ -19,6 +19,12 @@
 - `src/features/shared/FloatingToolPanel.tsx` 的 `restoreTriggerFocus` 已改为 `useCallback` 并加入 effect 依赖，消除本次新增的 Hook warning。
 - 已通过：定向 Prettier、`npm run lint`（仅保留 Gen3 Egg/Wild 的两条既有 TanStack Virtual warning）和 `git diff --check`。未运行 typecheck、测试、构建或浏览器验收。
 
+## 2026-08-13 Actions typecheck 修复
+
+- Actions `npm run verify` 的 Prettier 和 ESLint 已通过；TypeScript 阻断位置为 `src/features/gen4wild/worker/gen4wild.worker.ts`，Generator/Searcher 共用的 chunk 联合类型无法直接读取 Generator 专属的 `initialAdvances` 与 `maxAdvances`。
+- 已在 Generator 分支对 `message.chunk` 显式收窄为 `Gen4WildChunk`，保留 Searcher 原请求路径和既有 75-word Wasm 请求 ABI，不改变算法或边界校验。
+- 本轮已运行：`npm run format:files -- src/features/gen4wild/worker/gen4wild.worker.ts docs/progress.md`、`npm run format:check`、`npm run typecheck` 和 `git diff --check`。`typecheck` 与 `git diff --check` 已通过；全仓 `format:check` 仍被基线中 89 个未格式化文件阻断，未扩大格式化范围。ESLint 仅保留 Egg/Wild 的两条既有 TanStack Virtual warning；未运行测试、构建、Wasm、浏览器验收或部署。
+
 ## 2026-08-13 Contributions
 
 - 新增全局只读 Contributions 面板，从右下角工具栏打开，并复用现有悬浮面板的互斥、点外关闭、`Escape` 和焦点恢复逻辑；不占用按世代划分的 RNG 模块侧栏。

@@ -166,8 +166,8 @@ function run(message: Extract<Gen4WildWorkerRequest, { type: "task" }>) {
   const request = generator
     ? {
         ...message.request,
-        initialAdvances: message.chunk.initialAdvances,
-        maxAdvances: message.chunk.maxAdvances,
+        initialAdvances: (message.chunk as Gen4WildChunk).initialAdvances,
+        maxAdvances: (message.chunk as Gen4WildChunk).maxAdvances,
       }
     : message.request;
   const validationErrors = generator
