@@ -1,11 +1,11 @@
 # 第四世代扩展接口与 AI 交接
 
-> - 状态：第四世代 ID、Seed to Time、Static、Wild、Egg、Wondercard IVs 与 Chained Shiny to SID 已实现；完整工程与生产回归待验证
+> - 状态：第四世代 ID、Seed to Time、Static、Wild、Egg、Advance Finder、Wondercard IVs 与 Chained Shiny to SID 已实现；完整工程与生产回归待验证
 > - 更新日期：2026-08-14
 > - 上游基线：PokeFinder 4.3.2
-> - 当前产品范围：第三世代既有模块与第四世代 ID/Seed to Time/Static/Wild/Egg/Wondercard IVs/Chained Shiny to SID
+> - 当前产品范围：第三世代既有模块与第四世代 ID/Seed to Time/Static/Wild/Egg/Advance Finder/Wondercard IVs/Chained Shiny to SID
 
-本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前已落地 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4event` 与 `gen4chainedsid`；不得据此推断已支持其他第四世代功能。
+本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前已落地 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid`；不得据此推断已支持其他第四世代功能。
 
 ## 1. 已保留接口
 
@@ -16,9 +16,9 @@
 - `RngWorkerInitMessage`：加载 MJS/Wasm 前声明模块、协议和 API 版本。
 - `RngWorkerTaskMessage`：携带 `taskId`、操作、`chunkIndex`、模块请求和分片。
 - `RngWorkerReadyMessage`、`RngWorkerBatchMessage`、`RngWorkerErrorMessage`：握手、批次和失败信封。
-- `GEN4_MODULE_RESERVATIONS`：登记 `gen4id`、`gen4static`、`gen4wild`、`gen4egg`、`gen4event` 与 `gen4chainedsid` 的模块标识和 Generator/Searcher 能力。
+- `GEN4_MODULE_RESERVATIONS`：登记 `gen4id`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid` 的模块标识和 Generator/Searcher 能力。
 
-`gen4id`、`gen4static`、`gen4wild`、`gen4egg`、`gen4event` 与 `gen4chainedsid` 已分别使用 API 版本 `1`、独立 Wasm target、导航入口和 UI 预览引擎；`gen4chainedsid` 为单 Dedicated Worker，其余大范围模块按任务使用 Worker Pool。
+`gen4id`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid` 已分别使用 API 版本 `1`、独立 Wasm target、导航入口和 UI 预览引擎；`gen4chainedsid` 与 `gen4advance` 使用单 Dedicated Worker，其余大范围模块按任务使用 Worker Pool。
 
 ## 2.1 当前已实现：`gen4static`
 
@@ -69,6 +69,16 @@ Generator 的 `Max Advances` 与 PokeFinder 一致，包含起点，因此输入
 
 详细输入、数据、算法、结果布局和验证状态见 [`docs/modules/gen4egg.md`](modules/gen4egg.md)。
 
+## 2.6 当前已实现：`gen4advance`
+
+- 覆盖 PokeFinder `Advance Finder` 的第四世代 Calls 与 Chatot 连续滑动匹配；非 HGSS 上下文隐藏 Calls，默认模式为 Chatot。
+- 空观测显示完整源表，匹配不超过五条时仅保留命中行，超过五条时恢复完整源表并保留真实可能结果数。
+- 独立入口接受本地 `Advances,Value` 数据；嵌入 Static/Wild/Egg/Event Generator 时可直接接收结构化源行并通过回调执行 Jump to Advance。
+- API v1、单 Dedicated Worker、固定宽度 C ABI、取消重建、原生错误边界夹具、TypeScript 域测试和 UI Preview 已实现并接入默认构建列表。
+- Gen V Needle 依赖第五世代结果表与上下文，不在本模块当前范围内。
+
+详细输入、上游行为、算法、结果语义和验证状态见 [`docs/modules/gen4advance.md`](modules/gen4advance.md)。
+
 ## 2. 模块边界
 
 第四世代按 PokeFinder 模块分别落地：
@@ -81,6 +91,7 @@ Generator 的 `Max Advances` 与 PokeFinder 一致，包含起点，因此输入
 | `gen4egg`        | `Form/Gen4/Eggs4`            | `EggGenerator4`、`EggSearcher4`       | `EggGenerator4Test.cpp`、`egg4.json`                                  |
 | `gen4event`      | `Form/Gen4/Event4`           | `EventGenerator4`、`EventSearcher4`   | Web 固定夹具与 PokeFinder Core 行为                                   |
 | `gen4chainedsid` | `Form/Gen4/Tools/ChainedSID` | `ChainedSIDCalc`                      | `ChainedSIDCalcTest.cpp`、`chainedsid.json`                           |
+| `gen4advance`    | `Form/Util/AdvanceFinder`    | `AdvanceSearcher`                     | Web 原生 Calls/Chatot 固定夹具                                        |
 
 每次只实现一个模块。Roamer 等保持独立候选，不并入现有模块。
 

@@ -2,10 +2,10 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`c70037d feat: 实现第四世代配信乱数模块`
+> - Git 基线：`cdc5b30 feat: 接入第四世代孵化乱数`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen4 Egg 已完成共享接入并待提交；Gen4 Advance 私有目录已完成，Gen5 Profiles 正在独立开发；`docs/tech-stack.md` 保留项目所有者改动
-> - 验收状态：Gen4 Egg 工程检查与原生夹具已通过；生产 Wasm 与部署回归待执行
+> - 工作区状态：Gen4 Advance 正在共享接入，Gen5 Profiles 正在独立开发；`docs/tech-stack.md` 保留项目所有者改动
+> - 验收状态：Gen4 Egg 已提交推送；Gen4 Advance 定向检查待共享接入完成后执行，生产 Wasm 与部署回归待执行
 
 ## 2026-08-14 Gen4 Egg
 
@@ -15,6 +15,16 @@
 - 已通过：`npm run format:check`、`git diff --check`、`npm test -- src/features/gen4egg`（2 个文件、11 项测试）、`npm run lint`（0 error，2 条既有 warning）、`npm run typecheck` 与 `$env:POKERNGKIT_WASM_MODULES='gen4egg'; npm run wasm:test:native`（`gen4egg_native_parity` 1/1）。
 - 完整验证：受限文件环境的 `npm run verify` 通过格式、lint、类型和 39 个测试文件共 151 项测试，随后在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`；相同源码状态在受限环境外完整通过 Vite 生产构建与 48 项 PWA 预缓存。
 - 未验收：Emscripten 生产 Wasm、外部 Chrome/Edge 与 GitHub Pages 算法结果待部署完成后和项目所有者共同核对。
+
+## 2026-08-14 Gen4 Advance Finder
+
+- 新增：第四世代 Calls/Chatot 连续观测匹配，覆盖上游半开区间、空序列、五条过滤阈值、完整源表恢复、Jump to Advance、清空和取消。
+- 接入：新增 `gen4advance` Wasm API v1、单 Dedicated Worker、GEN IV 导航、三语模块信息、共享契约和默认 Wasm 构建列表；独立入口支持本地 `Advances,Value` 数据，嵌入接口支持父 Generator 结构化结果。
+- 加固：Worker 验证 operation、请求与 chunk、领域边界、结果计数及 Wasm 请求/结果指针对齐、非空和堆范围；原生夹具补齐非法 mode、空指针、非法 Call、行数和令牌数上限。
+- 限制：本模块仅覆盖第四世代 Calls/Chatot；Gen V Needle 需等待第五世代结果表和上下文底座，不显示为已支持。
+- 已通过：任务文件格式化、完整 `npm run format:check`、`git diff --check`、`npx eslint src/features/gen4advance`、`npm test -- src/features/gen4advance`（2 个文件、5 项测试）、`npm run typecheck` 与 `$env:POKERNGKIT_WASM_MODULES='gen4advance'; npm run wasm:test:native`（`gen4advance_native_parity` 1/1）。
+- 完整验证：受限文件环境外的 `npm run verify` 通过全仓格式、lint（0 error，2 条既有 warning）、TypeScript、39 个测试文件共 151 项测试、Vite 生产构建与 49 项 PWA 预缓存。
+- 未验收：Emscripten 生产 Wasm、外部 Chrome/Edge 与 GitHub Pages 页面行为待部署完成后和项目所有者共同核对。
 
 ## 2026-08-14 Gen4 Wondercard IVs
 
