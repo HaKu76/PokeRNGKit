@@ -1,0 +1,13 @@
+{
+  "id": "gen5adjacentseeds",
+  "generation": 5,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen5adjacentseeds",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen5adjacentseeds.mjs",
+    "wasm": "gen5adjacentseeds.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen V AdjacentSeedsCalculator"
+}

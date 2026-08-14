@@ -1,0 +1,396 @@
+.gen5adjacent-workspace {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(380px, 0.78fr) minmax(560px, 1.22fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.gen5adjacent-profile-panel {
+  display: grid;
+  min-width: 0;
+  grid-column: 1 / -1;
+  gap: 12px;
+  padding: 16px;
+}
+
+.gen5adjacent-heading,
+.gen5adjacent-profile-actions,
+.gen5adjacent-results-heading,
+.gen5adjacent-preview {
+  display: flex;
+  min-width: 0;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gen5adjacent-profile-actions {
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.gen5adjacent-profile-select {
+  width: min(360px, 100%);
+}
+
+.gen5adjacent-profile-select select,
+.gen5adjacent-settings-panel input,
+.gen5adjacent-settings-panel select,
+.gen5adjacent-preview select,
+.gen5adjacent-preview > input {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-size: 14px;
+  transition:
+    border-color var(--motion-fast) var(--ease-out),
+    background-color var(--motion-fast) var(--ease-out);
+}
+
+.gen5adjacent-profile-select select,
+.gen5adjacent-settings-panel input,
+.gen5adjacent-settings-panel select {
+  width: 100%;
+}
+
+.gen5adjacent-profile-select select:focus-visible,
+.gen5adjacent-settings-panel input:focus-visible,
+.gen5adjacent-settings-panel select:focus-visible,
+.gen5adjacent-preview select:focus-visible,
+.gen5adjacent-preview > input:focus-visible {
+  border-color: var(--brand);
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+.gen5adjacent-profile-summary {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.gen5adjacent-profile-summary > div {
+  min-width: 0;
+  padding: 12px 12px 4px 0;
+}
+
+.gen5adjacent-profile-summary dt {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.gen5adjacent-profile-summary dd {
+  overflow: hidden;
+  margin: 2px 0 0;
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 14px;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5adjacent-settings-panel,
+.gen5adjacent-results-panel {
+  min-width: 0;
+  padding: 16px;
+}
+
+.gen5adjacent-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.gen5adjacent-date-field,
+.gen5adjacent-keypresses {
+  grid-column: 1 / -1;
+}
+
+.gen5adjacent-settings-panel .field,
+.gen5adjacent-preview .field {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.gen5adjacent-settings-panel .field > span,
+.gen5adjacent-preview .field > span,
+.gen5adjacent-keypresses legend {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.gen5adjacent-keypresses {
+  min-width: 0;
+  margin: 2px 0 0;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.gen5adjacent-keypresses > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.gen5adjacent-keypresses label {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  gap: 7px;
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+
+.gen5adjacent-keypresses label:hover {
+  background: var(--surface-2);
+}
+
+.gen5adjacent-keypresses input {
+  width: 17px;
+  min-height: 17px;
+  accent-color: var(--brand);
+}
+
+.gen5adjacent-keypress-value {
+  display: flex;
+  min-height: 44px;
+  overflow-x: auto;
+  align-items: center;
+  margin-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 10px;
+  color: var(--muted);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.gen5adjacent-actions {
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.gen5adjacent-results-panel {
+  display: flex;
+  min-height: 620px;
+  flex-direction: column;
+}
+
+.gen5adjacent-results-heading {
+  align-items: center;
+}
+
+.gen5adjacent-table-shell {
+  position: relative;
+  min-height: 420px;
+  overflow: auto;
+  flex: 1;
+  margin-top: 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--table-bg);
+}
+
+.gen5adjacent-virtual-table {
+  position: relative;
+  min-width: 1100px;
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen5adjacent-table-header,
+.gen5adjacent-table-row {
+  display: grid;
+  width: 100%;
+  min-width: 1100px;
+  grid-template-columns: 176px 178px 86px 110px repeat(6, minmax(64px, 1fr));
+}
+
+.gen5adjacent-table-header {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 44px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.gen5adjacent-table-header span,
+.gen5adjacent-table-row span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 8px 11px;
+  white-space: nowrap;
+}
+
+.gen5adjacent-table-row {
+  position: absolute;
+  top: 0;
+  height: 44px;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+
+.gen5adjacent-table-row:hover {
+  background: var(--teal-soft);
+}
+
+.gen5adjacent-table-row.selected {
+  background: color-mix(in srgb, var(--brand) 13%, var(--table-bg));
+}
+
+.gen5adjacent-table-row.target {
+  font-weight: 700;
+}
+
+.gen5adjacent-table-row:focus-visible {
+  z-index: 1;
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+
+.gen5adjacent-progress {
+  height: 5px;
+  overflow: hidden;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+
+.gen5adjacent-progress span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  transition: width 180ms var(--ease-out);
+}
+
+.gen5adjacent-preview {
+  display: grid;
+  grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
+  margin-top: 12px;
+}
+
+.gen5adjacent-preview > input {
+  width: 100%;
+  min-width: 0;
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen5adjacent-preview .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .gen5adjacent-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5adjacent-profile-panel {
+    grid-column: auto;
+  }
+
+  .gen5adjacent-profile-summary {
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+  }
+
+  .gen5adjacent-results-panel {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 720px) {
+  .gen5adjacent-heading,
+  .gen5adjacent-profile-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .gen5adjacent-profile-actions,
+  .gen5adjacent-profile-select {
+    width: 100%;
+  }
+
+  .gen5adjacent-profile-summary,
+  .gen5adjacent-settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5adjacent-date-field,
+  .gen5adjacent-keypresses {
+    grid-column: auto;
+  }
+
+  .gen5adjacent-keypresses > div {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gen5adjacent-preview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 460px) {
+  .gen5adjacent-profile-panel,
+  .gen5adjacent-settings-panel,
+  .gen5adjacent-results-panel {
+    padding: 13px;
+  }
+
+  .gen5adjacent-keypresses > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen5adjacent-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5adjacent-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gen5adjacent-profile-select select,
+  .gen5adjacent-settings-panel input,
+  .gen5adjacent-settings-panel select,
+  .gen5adjacent-preview select,
+  .gen5adjacent-preview > input,
+  .gen5adjacent-keypresses label,
+  .gen5adjacent-table-row,
+  .gen5adjacent-progress span {
+    transition: none;
+  }
+}

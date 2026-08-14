@@ -2,9 +2,9 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`7c267eb fix: 修复移动端模块抽屉交互`
+> - Git 基线：`48f76c1 feat: 实现第五世代ID乱数`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 IDs 已完成共享接入与完整验证，等待独立提交；Gen5 Adjacent Seeds 与 Gen5 IV Cache Finder 保持隔离实现；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Gen5 Adjacent Seeds 已完成共享接入与完整验证，等待独立提交；Gen5 IV Cache Finder 保持隔离实现；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
 
 ## 2026-08-14 Gen5 IDs
@@ -13,6 +13,15 @@
 - 安全边界：TypeScript 使用 BigInt 将有筛选任务的 `Seed x Advances` 总评估限制为 250,000,000；完全无筛选的 Search By 按 100,000 行结果上限计算提前终止边界，使默认 Profile 与默认推进数可以启动。Worker Pool 逐行校验日期时间、Timer0、按键、推进数、TID/SID/TSV 与筛选关系，C++ 同步拒绝任务规模和绝对推进溢出；Worker 崩溃或协议错误会终止并清空槽位，下次搜索重新创建。
 - 上游标签：`ProfileDisplay5` 的简中 `Profile` 与 `Manager` 均为 unfinished，因此界面保留英文，并补回上游 Profile Display 的 `Manager` 命令以跳转第五世代存档管理。
 - 已通过：定向 Prettier、ESLint、TypeScript、3 个测试文件共 9 项测试和 MSVC C++23 原生夹具 1/1；非受限环境完整 `npm run verify` 通过全仓 Prettier、ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、52 个测试文件共 195 项测试、Vite 生产构建与 52 项 PWA 预缓存。受限环境同一命令仅在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`；Actions、生产 Wasm 与部署页面回归待执行。
+
+## 2026-08-14 Gen5 Adjacent Seeds
+
+- 新增：PokeFinder `Adjacent Seeds`，覆盖 BW/BW2 目标日期时间、秒数偏移、Timer0、按键、Encounter、IV advances、十列虚拟结果表，以及所选结果的 `Chatot Pitches` / `Save Needles` 预览。
+- 接入：复用第五世代 Profile 的 MAC、Nazo、VCount、Timer0、GxStat、VFrame、DS 类型、语言和 Memory Link；新增 `gen5adjacentseeds` Wasm API v1、最多四个独立 Worker、GEN V 导航、共享契约和默认 Wasm 构建列表。
+- 加固：浏览器任务限制为 100,000 行，TypeScript、Worker 与 C++ 保留日期时间、推进溢出、指针对齐和堆边界校验；修复 `UINT32_MAX` IV Advance 循环回绕，并在 Worker 崩溃或协议错误后销毁实例、下次任务重新创建。
+- 上游标签：`AdjacentSeeds` 与 `ProfileDisplay5` 的简中条目均为 unfinished，因此控件和模块名保留精确英文源字符串，管理按钮使用上游 `Manager`。
+- 样式：按 HakuStyle Royal Blueprint compact workspace 组织 Profile、设置与结果区，使用 44px 控件、稳定表格轨道、键盘行导航、移动端单列重排和 reduced motion；不新增卡片嵌套、装饰渐变或无语义徽章。
+- 已通过：定向 Prettier、全仓 `npm run format:check`、定向 ESLint、`npm run typecheck`、`npm test -- src/features/gen5adjacentseeds`（3 个文件、6 项测试）与 `$env:POKERNGKIT_WASM_MODULES='gen5adjacentseeds'; npm run wasm:test:native`（`gen5adjacentseeds_native_parity` 1/1）。非受限环境完整 `npm run verify` 通过全仓 Prettier、ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、54 个测试文件共 202 项测试、Vite 生产构建与 53 项 PWA 预缓存；受限环境同一命令仅在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`。Actions、生产 Wasm 与部署页面回归待执行。
 
 ## 2026-08-14 Researcher
 
