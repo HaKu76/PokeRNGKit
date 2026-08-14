@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(POKERNGKIT_WASM_MODULES "gen3id;gen3initialseed;gen3seedtotime;gen3ngcseed;gen3static;gen3wild;gen3ivtopid;gen3pidtoiv;gen3egg;gen3gamecube;gen3pokespot;gen3jirachi;gen4id;gen4seedtotime;gen4static;gen4wild;gen4egg;gen4event;gen4chainedsid;gen4advance;gen5profiles;gen5id;gen5adjacentseeds;gen5ivcache;gen5sha1cache;gen5dreamradar;gen5static;gen5wild;gen5egg;gen5event;gen7id;pokerusfinder;researcher" CACHE STRING "Semicolon-separated Wasm modules to build, or all")
+set(POKERNGKIT_WASM_MODULES "gen3id;gen3initialseed;gen3seedtotime;gen3ngcseed;gen3static;gen3wild;gen3ivtopid;gen3pidtoiv;gen3egg;gen3gamecube;gen3pokespot;gen3jirachi;gen4id;gen4seedtotime;gen4static;gen4wild;gen4egg;gen4event;gen4chainedsid;gen4advance;gen5profiles;gen5id;gen5adjacentseeds;gen5ivcache;gen5sha1cache;gen5dreamradar;gen5static;gen5wild;gen5hiddengrotto;gen5egg;gen5event;gen7id;pokerusfinder;researcher" CACHE STRING "Semicolon-separated Wasm modules to build, or all")
 set(
     POKERNGKIT_WASM_OUTPUT_DIR
     "${CMAKE_CURRENT_SOURCE_DIR}/../public/wasm"
@@ -51,6 +51,7 @@ pokerngkit_add_module(gen5sha1cache)
 pokerngkit_add_module(gen5dreamradar)
 pokerngkit_add_module(gen5static)
 pokerngkit_add_module(gen5wild)
+pokerngkit_add_module(gen5hiddengrotto)
 pokerngkit_add_module(gen5egg)
 pokerngkit_add_module(gen5event)
 pokerngkit_add_module(gen7id)

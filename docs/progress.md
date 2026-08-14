@@ -2,10 +2,24 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`f58bb53 feat: 实现第五世代配信乱数`
+> - Git 基线：`0cf25c6 feat: 实现第五世代野生乱数`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 Event 已提交并推送到 `origin/main`；Gen5 Wild 已完成工程验证并采用独立提交；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Gen5 Hidden Grotto 已完成工程验证，等待独立提交与推送；`docs/tech-stack.md` 和 `src/features/gen5wild/` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 第五世代隐藏洞穴乱数
+
+- 新增：实现 PokeFinder `Hidden Grotto` 的 Grotto Slot Generator/Searcher 与 Pokemon Generator/Searcher，目标游戏固定为 Black 2 / White 2。
+- 数据：内置 20 个隐藏洞穴地点、每地点 4 个 Group，以及每组 3 个宝可梦 Slot、4 个道具 Slot 和 4 个隐藏道具 Slot；运行时不联网读取遭遇数据。
+- 算法：保留洞穴刷新、Grotto Power、Group、Slot、性别、Synchronize、Shiny Charm、隐藏特性、等级、PID、IV、觉醒力量、能力值和 `uint32_t` 推进环绕语义。
+- 接入：增加独立 `gen5hiddengrotto` Wasm API v1、114-word 请求、16-word 结果、四能力握手、最多四个 Worker、确定性分片、进度、取消、250,000,000 次状态评估上限和 100,000 行结果上限。
+- 检索：Slot Searcher 使用 raw Seed；Pokemon Searcher 支持 raw、IV Cache 与 IV+SHA Cache 三条路径，并复用 PokeFinder `.ivcache` / `.sha1cache` 的 Profile、日期和推进范围兼容规则。
+- 界面：按 HakuStyle 紧凑工作台实现 Slot/Pokemon 主标签、Generator/Searcher 次标签、Profile Manager、Adjacent Seeds、可拖动 Advance Finder、IV/能力值切换、排序、虚拟结果表、键盘行导航和移动端单列重排。
+- 已通过：`npm test -- src/features/gen5hiddengrotto` 共 5 个测试文件、29 项测试；定向 `gen5hiddengrotto_native_parity` 1/1。
+- 已通过：完整 `npm run wasm:test:native` 共 35/35 原生夹具。
+- 已通过：使用 Node `24.19.0` 与 npm `12.0.2` 在非受限环境运行完整 `npm run verify`；格式、ESLint、TypeScript、83 个 Vitest 文件共 328 项测试、Vite 生产构建和 61 项 PWA 预缓存通过，仅保留 3 条 TanStack Virtual / React Compiler 非阻断警告与主包体积警告。
+- 环境记录：受限终端首次构建在复制既有 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一命令在非受限环境通过，确认不是源码失败。
+- 待验收：生产 Wasm、Actions 部署、外部 Chrome/Edge 的桌面/移动端交互与实际页面算法回归仍需等待部署完成，并由项目所有者提供准确生产 URL 和单独授权。
 
 ## 2026-08-14 第五世代野生乱数
 

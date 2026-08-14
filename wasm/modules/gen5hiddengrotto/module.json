@@ -1,0 +1,18 @@
+{
+  "id": "gen5hiddengrotto",
+  "generation": 5,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen5hiddengrotto",
+  "operations": [
+    "slot-generator",
+    "slot-searcher",
+    "pokemon-generator",
+    "pokemon-searcher"
+  ],
+  "artifacts": {
+    "loader": "gen5hiddengrotto.mjs",
+    "wasm": "gen5hiddengrotto.wasm"
+  },
+  "source": "PokeFinder 4.3.2 HiddenGrottoGenerator, Searcher5, IVSearcher5, IVCache and SHA1Cache"
+}

@@ -1,0 +1,570 @@
+.gen5hiddengrotto-panel {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.gen5hiddengrotto-profile,
+.gen5hiddengrotto-settings,
+.gen5hiddengrotto-filters,
+.gen5hiddengrotto-results {
+  min-width: 0;
+  padding: 16px;
+}
+
+.gen5hiddengrotto-profile-heading,
+.gen5hiddengrotto-profile-actions,
+.gen5hiddengrotto-results-heading,
+.gen5hiddengrotto-results-actions,
+.gen5hiddengrotto-filter-heading,
+.gen5hiddengrotto-tab-row {
+  display: flex;
+  min-width: 0;
+  align-items: end;
+  gap: 10px;
+}
+
+.gen5hiddengrotto-profile-heading,
+.gen5hiddengrotto-results-heading,
+.gen5hiddengrotto-filter-heading,
+.gen5hiddengrotto-tab-row {
+  justify-content: space-between;
+}
+
+.gen5hiddengrotto-profile h2,
+.gen5hiddengrotto-settings h2,
+.gen5hiddengrotto-filters h2,
+.gen5hiddengrotto-results h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: 0;
+}
+
+.gen5hiddengrotto-profile-actions,
+.gen5hiddengrotto-results-actions {
+  justify-content: flex-end;
+}
+
+.gen5hiddengrotto-profile-actions .field {
+  width: min(320px, 100%);
+}
+
+.gen5hiddengrotto-profile-actions select,
+.gen5hiddengrotto-form-grid input,
+.gen5hiddengrotto-form-grid select,
+.gen5hiddengrotto-filter-grid input,
+.gen5hiddengrotto-filter-grid select,
+.gen5hiddengrotto-level-range input,
+.gen5hiddengrotto-iv-range input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen5hiddengrotto-profile-actions select:focus-visible,
+.gen5hiddengrotto-form-grid input:focus-visible,
+.gen5hiddengrotto-form-grid select:focus-visible,
+.gen5hiddengrotto-filter-grid input:focus-visible,
+.gen5hiddengrotto-filter-grid select:focus-visible,
+.gen5hiddengrotto-level-range input:focus-visible,
+.gen5hiddengrotto-iv-range input:focus-visible {
+  border-color: var(--brand);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.gen5hiddengrotto-profile-values {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(5, minmax(100px, 1fr));
+  gap: 8px;
+  margin: 14px 0 0;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 12px;
+}
+
+.gen5hiddengrotto-profile-values > div {
+  min-width: 0;
+  border-left: 1px solid var(--line-soft);
+  padding-left: 10px;
+}
+
+.gen5hiddengrotto-profile-values dt {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.gen5hiddengrotto-profile-values dd {
+  overflow: hidden;
+  margin: 0;
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5hiddengrotto-tab-row {
+  align-items: stretch;
+}
+
+.gen5hiddengrotto-tabs {
+  display: grid;
+  width: min(100%, 440px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 4px;
+  background: var(--surface-2);
+}
+
+.gen5hiddengrotto-tabs.secondary {
+  width: min(100%, 360px);
+}
+
+.gen5hiddengrotto-tabs button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.gen5hiddengrotto-tabs button:hover,
+.gen5hiddengrotto-tabs button.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--panel-shadow);
+}
+
+.gen5hiddengrotto-tabs button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.gen5hiddengrotto-tabs button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.gen5hiddengrotto-workspace {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(390px, 0.82fr) minmax(620px, 1.18fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.gen5hiddengrotto-controls {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.gen5hiddengrotto-form-grid,
+.gen5hiddengrotto-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.gen5hiddengrotto-wide-field {
+  grid-column: 1 / -1;
+}
+
+.gen5hiddengrotto-section-heading {
+  margin-top: 24px !important;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 20px;
+}
+
+.gen5hiddengrotto-cache-section {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 20px;
+}
+
+.gen5hiddengrotto-file-field {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.gen5hiddengrotto-file-field input {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.gen5hiddengrotto-file-field input::file-selector-button {
+  min-height: 40px;
+  margin-right: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.gen5hiddengrotto-file-field output {
+  grid-column: 2;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5hiddengrotto-cache-status {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+  white-space: pre-line;
+}
+
+.gen5hiddengrotto-toggle {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.gen5hiddengrotto-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand);
+}
+
+.gen5hiddengrotto-iv-range {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.gen5hiddengrotto-iv-range > div {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 36px minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+
+.gen5hiddengrotto-iv-range > div > span:first-child {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gen5hiddengrotto-level-range {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+
+.gen5hiddengrotto-run-actions {
+  display: flex;
+  min-height: 44px;
+  gap: 10px;
+}
+
+.gen5hiddengrotto-run-actions > button {
+  flex: 1;
+}
+
+.gen5hiddengrotto-results {
+  position: sticky;
+  top: 12px;
+  display: grid;
+  min-height: 560px;
+  align-self: start;
+  grid-template-rows: auto 4px auto minmax(0, 1fr);
+  gap: 10px;
+}
+
+.gen5hiddengrotto-results-heading > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.gen5hiddengrotto-results-heading [role="status"] {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.gen5hiddengrotto-results-actions {
+  flex-wrap: wrap;
+}
+
+.gen5hiddengrotto-results-actions strong {
+  min-width: 72px;
+  color: var(--text);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  line-height: 44px;
+  text-align: right;
+}
+
+.gen5hiddengrotto-progress {
+  overflow: hidden;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+
+.gen5hiddengrotto-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand);
+  transition: width 180ms ease;
+}
+
+.gen5hiddengrotto-empty {
+  display: grid;
+  min-height: 420px;
+  place-items: center;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.gen5hiddengrotto-table-shell {
+  overflow: auto;
+  min-width: 0;
+  min-height: 440px;
+  max-height: calc(100vh - 230px);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.gen5hiddengrotto-table {
+  position: relative;
+  min-width: max-content;
+  color: var(--text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+}
+
+.gen5hiddengrotto-table.slot-generator {
+  min-width: 640px;
+  --grotto-columns: 110px 120px 90px 90px minmax(230px, 1fr);
+}
+
+.gen5hiddengrotto-table.slot-searcher {
+  min-width: 1000px;
+  --grotto-columns: 155px 105px 80px minmax(230px, 1fr) 170px 90px 170px;
+}
+
+.gen5hiddengrotto-table.pokemon-generator {
+  min-width: 1810px;
+  --grotto-columns: 105px 110px 80px 70px 105px 75px 120px 170px repeat(6, 72px)
+    120px 80px 100px 190px;
+}
+
+.gen5hiddengrotto-table.pokemon-searcher {
+  min-width: 2160px;
+  --grotto-columns: 155px 105px 105px 70px 105px 75px 120px 170px
+    repeat(6, 72px) 120px 80px 100px 190px 170px 90px 170px;
+}
+
+.gen5hiddengrotto-table-header,
+.gen5hiddengrotto-table-row {
+  display: grid;
+  min-width: 100%;
+  grid-template-columns: var(--grotto-columns);
+}
+
+.gen5hiddengrotto-table-header {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 44px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.gen5hiddengrotto-table-header > span,
+.gen5hiddengrotto-table-row > span {
+  overflow: hidden;
+  min-width: 0;
+  border-right: 1px solid var(--line-soft);
+  padding: 10px 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5hiddengrotto-table-header button {
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+}
+
+.gen5hiddengrotto-table-header button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.gen5hiddengrotto-table-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 42px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.gen5hiddengrotto-table-row:hover {
+  background: var(--surface-2);
+}
+
+.gen5hiddengrotto-table-row.selected {
+  background: color-mix(in srgb, var(--brand) 12%, var(--surface));
+}
+
+.gen5hiddengrotto-table-row:focus-visible {
+  z-index: 1;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.gen5hiddengrotto-advance-finder {
+  width: min(960px, calc(100vw - 24px));
+}
+
+@media (max-width: 1180px) {
+  .gen5hiddengrotto-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5hiddengrotto-results {
+    position: static;
+    min-height: 520px;
+  }
+
+  .gen5hiddengrotto-table-shell {
+    max-height: 620px;
+  }
+}
+
+@media (max-width: 760px) {
+  .gen5hiddengrotto-profile,
+  .gen5hiddengrotto-settings,
+  .gen5hiddengrotto-filters,
+  .gen5hiddengrotto-results {
+    padding: 14px;
+  }
+
+  .gen5hiddengrotto-profile-heading,
+  .gen5hiddengrotto-profile-actions,
+  .gen5hiddengrotto-results-heading,
+  .gen5hiddengrotto-tab-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .gen5hiddengrotto-profile-actions,
+  .gen5hiddengrotto-profile-actions .field,
+  .gen5hiddengrotto-tabs,
+  .gen5hiddengrotto-tabs.secondary {
+    width: 100%;
+  }
+
+  .gen5hiddengrotto-profile-values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen5hiddengrotto-form-grid,
+  .gen5hiddengrotto-filter-grid,
+  .gen5hiddengrotto-iv-range {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5hiddengrotto-file-field {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5hiddengrotto-file-field output {
+    grid-column: 1;
+  }
+
+  .gen5hiddengrotto-results-heading {
+    gap: 12px;
+  }
+
+  .gen5hiddengrotto-results-actions {
+    justify-content: flex-start;
+  }
+
+  .gen5hiddengrotto-results-actions > button {
+    flex: 1;
+  }
+
+  .gen5hiddengrotto-results-actions strong {
+    line-height: 32px;
+    text-align: left;
+  }
+
+  .gen5hiddengrotto-table-shell {
+    min-height: 390px;
+    max-height: 62vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gen5hiddengrotto-tabs button,
+  .gen5hiddengrotto-progress span {
+    transition: none;
+  }
+}

@@ -1,6 +1,12 @@
 export const RNG_MODULE_CONTRACT_VERSION = 1 as const;
 
-export type RngModuleOperation = "generator" | "searcher";
+export type RngModuleOperation =
+  | "generator"
+  | "searcher"
+  | "slot-generator"
+  | "slot-searcher"
+  | "pokemon-generator"
+  | "pokemon-searcher";
 export type GlobalRngModuleId = "researcher";
 export type RngModuleId = `gen${number}${string}` | GlobalRngModuleId;
 
@@ -125,6 +131,17 @@ export const GEN5_MODULE_RESERVATIONS = [
     id: "gen5wild",
     generation: 5,
     operations: ["generator", "searcher"],
+    status: "reserved",
+  },
+  {
+    id: "gen5hiddengrotto",
+    generation: 5,
+    operations: [
+      "slot-generator",
+      "slot-searcher",
+      "pokemon-generator",
+      "pokemon-searcher",
+    ],
     status: "reserved",
   },
   {

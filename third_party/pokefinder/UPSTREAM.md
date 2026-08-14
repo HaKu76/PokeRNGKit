@@ -5,7 +5,7 @@
 - 本地核验来源：`C:\Users\Hakuhiro\Desktop\PokeFinder-master`
 - 导入日期：2026-08-11
 - 许可证：GNU GPL v3 or later
-- 导入范围：第三世代 ID Generator 与 GameCube Generator/Searcher 所需的 Core、共享 LCRNG、状态与筛选父类，以及第五世代 IV Cache Finder 所需的 MT、Jump 表与 RNGList；G3 Static、Wild、IVs to PID、PID to IVs、PokeSpot、Jirachi、Egg、G4 Static 与 G4 Wild 以独立 bridge 对照上游源码实现；Encounter Lookup 以静态生成数据对照上游行为
+- 导入范围：第三世代 ID Generator 与 GameCube Generator/Searcher 所需的 Core、共享 LCRNG、状态与筛选父类，以及第五世代 IV Cache Finder 所需的 MT、Jump 表与 RNGList；G3 Static、Wild、IVs to PID、PID to IVs、PokeSpot、Jirachi、Egg、G4 Static、G4 Wild 与 Gen V Hidden Grotto 以独立 bridge 对照上游源码实现；Encounter Lookup 以静态生成数据对照上游行为
 
 本地核验目录不是构建依赖。PokeRNGKit 构建只使用本目录内的 vendored snapshot；所有文件保留原始版权与 GPL 头部。
 
@@ -378,6 +378,31 @@ ADFEE660B40A033797BD5D6176E5594C0E89690D0333B307EA138621BCE72D31  Core/Util/Enco
 数据生成使用 `scripts/generate_gen4_wild_data.py` 读取 EncounterTableGenerator Gen4 的 DPPt/HGSS、蜂蜜树、捕虫大赛、撞树和狩猎地带二进制，以及 PokeFinder Gen4 Personal 与中英日资源，生成 `src/features/gen4wild/data.ts`。PokeFinder 未完成简中翻译的 `Battle Advances`、`Replacement` 和三条校验提示保留英文。
 
 PokemonRNGGuides revision `c0b2bb664f04a4ef052e6dd4d831351703fa4047` 没有第四世代 Wild Generator/Searcher 文件；仅参考其 React 工作台与任务流程，不作为算法或数据来源。
+
+## Gen V Hidden Grotto 只读核验
+
+`gen5hiddengrotto` 对照 PokeFinder 4.3.2 的 Hidden Grotto Form、Generator、Area、Filter、State、Model 与固定夹具实现独立 C++/Wasm C ABI。上游源码不作为构建依赖；完整输入、四条工作流、遭遇数据、缓存边界和结果布局见 `docs/modules/gen5hiddengrotto.md`。
+
+```text
+802747CBA9074B7EA541C4E57A6E9D981402F6149B1EBE2EA435C0D4320997B3  Form/Gen5/HiddenGrotto.cpp
+87F5AAF4C7311955802C3FDFD4A7DC175E810B53D14C0D0D89EA6DBD50B00AC3  Form/Gen5/HiddenGrotto.ui
+FD5BF503838AC41EBBBCC4C3E6ABAEA0FEEE22847B98F0B1C9848567A3A89C12  Core/Gen5/Generators/HiddenGrottoGenerator.cpp
+6605E483216DEF63891BCDCE55C28BD3302A6AB622E77B2D8AB36AF4E2A3FC04  Core/Gen5/Generators/HiddenGrottoGenerator.hpp
+39352B83F44FD89447F4B6C712DE176DC4CAD9786DCC4C2B718E2EE851EE81A7  Core/Gen5/HiddenGrottoArea.cpp
+9461BBE7A5ABE74DF4F452C772A2A5FF1A1A00CF69DE937291ABF523E76D7471  Core/Gen5/HiddenGrottoArea.hpp
+74D4491545925AEAD605B67F17FB93753F076DAB7BBAC475F8EC53D66149575D  Core/Gen5/States/HiddenGrottoState.hpp
+EE5775654D2A230CC2FB236E8592E15804D2BDB533A463754EDCC6681D5A92FF  Core/Gen5/Filters/HiddenGrottoFilter.cpp
+82A1B618E41382477AB478F7220ACE7B396C884015E615AA70A032254F3EF3C6  Core/Gen5/Filters/HiddenGrottoFilter.hpp
+2B8986AEF129DBD77D1D1E1E932133E93CFCF8B2F8FEC6E042B7CD31A9F26117  Model/Gen5/HiddenGrottoModel.cpp
+349DAA9428142825E5A50BA44859483B58673AB11D5001460F95C33009AE8DBF  Model/Gen5/HiddenGrottoModel.hpp
+A046674A29E5C379B8934A4D928A83F4634D5F3E55BF6EF1C09C1317E2DBDC00  Test/Gen5/HiddenGrottoGeneratorTest.cpp
+18F550912D5C4BF0B9DB32C8096E66BCC1AB16CFB079A8AA2A6D58BCCEBA6161  Test/Gen5/hiddengrotto.json
+51B4F88667748825CE5091600BD2C5EE7F0152912BFC25856004319E41863FCA  Form/Controls/TextBox.cpp
+BB98B0FE73D2310712EE44CA04B255D6E31B8B70D1BD0FB2F759FD14F246140D  Form/i18n/PokeFinder_zh.ts
+D67358790583FEBF22227ABF10B002EBAEC02E797EA08E125093CEA8C36F665F  Form/i18n/PokeFinder_ja.ts
+```
+
+EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 的 BW2 `grotto` NARC 为 4,612 bytes，SHA-256 为 `F4D5EEF5647F4E423D27B77D781620860D5BD0C113596C1B5F63C0022EF7A652`。按同目录 `bw2.py` 的 `hidden_grotto()` 生成的 20 地点静态表为 2,760 bytes，SHA-256 为 `01DF220214F1C6BFDA06E3F1776DEB04ABE44AEE51225584B016C354CA978AF2`，不在运行时联网读取。原始 NARC、生成工作树与本地解压目录只用于来源审计，不应提交。
 
 ## IVs to PID 只读核验
 
