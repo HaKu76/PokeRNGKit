@@ -2,10 +2,18 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`a027503 fix: 保留收款码移动端长按保存`
+> - Git 基线：`110de30 docs: 补充第五世代SHA1验证记录`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 SHA1 Cache Finder 已完成实现与专项验证；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：并行准备 Gen5 Static 与 Gen5 Egg；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 剩余功能模块盘点
+
+- PokeFinder：第三、第四世代主模块和工具已齐；第五世代仍缺 Static、Wild、Event、Egg 与 Hidden Grotto；第八世代仍缺 Profiles、IDs、Egg、Event、Raid、Static、Underground、Wild 与 Den Map，共 14 个主交付单元。
+- 3DSRNGTool：已实现第七世代 ID；第六世代仍缺 Stationary、Event、Wild、Egg、ID、Main Seed Finder 与 TinyMT Timeline；第七世代仍缺 Stationary、Event、Wild/SOS、Egg、Main RNG Tool 与 Egg Seed Finder；公共工具仍缺 Profile Manager、KeyBV 与 Misc. RNG Tool。
+- 架构限制：`NTR Helper` 依赖桌面程序对 3DS 调试端建立原始 TCP/NTR 连接，普通静态浏览器不能直接复刻该通信；在不增加本地桥接程序、浏览器扩展或后端的现有边界下暂不实现，后续须由项目所有者单独确认方案。
+- 实施顺序：当前并行准备 Gen5 Static 与 Gen5 Egg；随后依次处理 Gen5 Event、Wild、Hidden Grotto，再进入第八世代与 3DSRNGTool 模块。每个完整模块独立提交并推送，共享接线在对应模块提交内收口。
+- 验收边界：工程检查、原生夹具与 Actions 只作为工程证据；全部模块部署后仍须使用已连接的外部 Chrome/Edge 检查实际生产 URL，并与项目所有者共同完成最终验收。
 
 ## 2026-08-14 Gen5 SHA1 Cache Finder
 
