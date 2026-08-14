@@ -2,10 +2,23 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`e858751 feat: 实现第五世代孵化乱数`
+> - Git 基线：`f58bb53 feat: 实现第五世代配信乱数`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 Egg 已提交推送；Gen5 Event 已完成实现与提交前工程验证，准备提交；Gen5 Wild 并行开发中；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Gen5 Event 已提交并推送到 `origin/main`；Gen5 Wild 已完成工程验证并采用独立提交；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 第五世代野生乱数
+
+- 新增：实现 PokeFinder `Gen 5 Wild` 的 Generator/Searcher，覆盖 Black、White、Black 2、White 2，以及草丛、深色草丛、摇动草丛、冲浪、水纹冲浪、钓鱼与水纹钓鱼七类遭遇。
+- 算法：保留 Synchronize、Cute Charm、Magnet Pull、Static、Pressure、Hustle、Vital Spirit、Suction Cups、Sticky Hold、Compound Eyes、Dark Grass 双打额外 RNG 消耗、BW/BW2 差异、Lucky Power、Shiny Charm、Memory Link 与 N's Pokémon released 分支。
+- 接入：增加独立 `gen5wild` Wasm API v1、84-word 请求、16-word 结果、最多四个 Worker、确定性分片、进度、取消、250,000,000 次状态评估上限、100,000 行结果上限和默认 Wasm 构建入口。
+- 检索：支持 raw、IV Cache 与 IV+SHA Cache 三条 Searcher 路径；缓存沿用 PokeFinder `.ivcache` / `.sha1cache` 格式，并按 Profile、日期与 IV 推进范围检查兼容性。
+- 界面：提供季节、地点、物种、队首、Lucky Power、遭遇槽位、等级和完整状态筛选；结果包含道具、物种、等级、能力值、Characteristic，并接入 Advance Finder、Adjacent Seeds 与 Profile Manager。
+- 已通过：`npm test -- src/features/gen5wild` 共 6 个测试文件、18 项测试，定向 ESLint、全仓 TypeScript，以及 `gen5wild_native_parity` 1/1。
+- 已通过：完整 `npm run wasm:test:native` 共 34/34 原生夹具，包含 `gen3pidtoiv_native_parity`、Advance Finder API v2、Gen5 Event 与本轮 `gen5wild_native_parity`。
+- 已通过：使用 Node `24.19.0` 与 npm `12.0.2` 在非受限环境运行完整 `npm run verify`；格式、ESLint、TypeScript、78 个 Vitest 文件共 299 项测试、Vite 生产构建和 60 项 PWA 预缓存通过，仅保留两条既有 TanStack Virtual 警告与主包体积警告。
+- 环境记录：锁定运行时在受限终端完成格式、Lint、TypeScript 与全部测试后，复制既有 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一 `verify` 在非受限环境通过，确认不是源码失败。
+- 待验收：生产 Wasm、Actions 部署、外部 Chrome/Edge 的桌面/移动端交互与实际页面算法回归仍需等待部署完成，并由项目所有者提供准确生产 URL 和单独授权。
 
 ## 2026-08-14 第五世代配信乱数
 
@@ -18,6 +31,7 @@
 - 已通过：完整 `npm run wasm:test:native` 共 33/33 原生夹具，包含 `gen3pidtoiv_native_parity`、Advance Finder API v2 与 `gen5event_native_parity`。
 - 已通过：使用 Node `24.19.0` 与 npm `12.0.2` 运行完整 `npm run verify`；格式、ESLint、TypeScript、72 个 Vitest 文件共 281 项测试通过，非受限 Web/PWA 构建成功并生成 `gen5event.worker`，仅保留两条既有 TanStack Virtual 警告与主包体积警告。
 - 环境记录：受限终端在复制 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一构建命令在非受限环境通过，确认不是源码失败。
+- 已提交：`f58bb53 feat: 实现第五世代配信乱数` 已推送到 `origin/main`。
 - 待验收：生产 Wasm、Actions 部署、外部 Chrome/Edge 的桌面/移动端交互与实际页面算法回归仍需等待部署完成，并由项目所有者提供准确生产 URL 和单独授权。
 
 ## 2026-08-14 第五世代孵化乱数
@@ -56,10 +70,10 @@
 
 ## 2026-08-14 剩余功能模块盘点
 
-- PokeFinder：第三、第四世代主模块和工具已齐；第五世代仍缺 Static、Wild、Event、Egg 与 Hidden Grotto；第八世代仍缺 Profiles、IDs、Egg、Event、Raid、Static、Underground、Wild 与 Den Map，共 14 个主交付单元。
+- PokeFinder：第三、第四世代主模块和工具已齐；第五世代 Static、Egg 与 Event 已进入主分支，Wild 当前工作区待工程验证，之后仍缺 Hidden Grotto；第八世代仍缺 Profiles、IDs、Egg、Event、Raid、Static、Underground、Wild 与 Den Map。
 - 3DSRNGTool：已实现第七世代 ID；第六世代仍缺 Stationary、Event、Wild、Egg、ID、Main Seed Finder 与 TinyMT Timeline；第七世代仍缺 Stationary、Event、Wild/SOS、Egg、Main RNG Tool 与 Egg Seed Finder；公共工具仍缺 Profile Manager、KeyBV 与 Misc. RNG Tool。
 - 架构限制：`NTR Helper` 依赖桌面程序对 3DS 调试端建立原始 TCP/NTR 连接，普通静态浏览器不能直接复刻该通信；在不增加本地桥接程序、浏览器扩展或后端的现有边界下暂不实现，后续须由项目所有者单独确认方案。
-- 实施顺序：当前并行准备 Gen5 Static 与 Gen5 Egg；随后依次处理 Gen5 Event、Wild、Hidden Grotto，再进入第八世代与 3DSRNGTool 模块。每个完整模块独立提交并推送，共享接线在对应模块提交内收口。
+- 实施顺序：完成 Gen5 Wild 工程验证、提交与推送后处理 Hidden Grotto，再进入第八世代与 3DSRNGTool 模块。每个完整模块独立提交并推送，共享接线在对应模块提交内收口。
 - 验收边界：工程检查、原生夹具与 Actions 只作为工程证据；全部模块部署后仍须使用已连接的外部 Chrome/Edge 检查实际生产 URL，并与项目所有者共同完成最终验收。
 
 ## 2026-08-14 Gen5 SHA1 Cache Finder

@@ -122,6 +122,12 @@ export const GEN5_MODULE_RESERVATIONS = [
     status: "reserved",
   },
   {
+    id: "gen5wild",
+    generation: 5,
+    operations: ["generator", "searcher"],
+    status: "reserved",
+  },
+  {
     id: "gen5egg",
     generation: 5,
     operations: ["generator", "searcher"],

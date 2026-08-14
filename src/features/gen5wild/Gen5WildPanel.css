@@ -1,0 +1,658 @@
+.gen5wild-panel {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.gen5wild-profile,
+.gen5wild-settings,
+.gen5wild-filters,
+.gen5wild-results {
+  min-width: 0;
+  padding: 16px;
+}
+
+.gen5wild-profile-heading,
+.gen5wild-profile-actions,
+.gen5wild-results-heading {
+  display: flex;
+  min-width: 0;
+  align-items: end;
+  gap: 10px;
+}
+
+.gen5wild-profile-heading,
+.gen5wild-results-heading {
+  justify-content: space-between;
+}
+
+.gen5wild-profile-heading h2,
+.gen5wild-results-heading h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: 0;
+}
+
+.gen5wild-profile-actions {
+  justify-content: flex-end;
+}
+
+.gen5wild-profile-actions .field {
+  width: min(320px, 100%);
+}
+
+.gen5wild-profile-values {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(5, minmax(100px, 1fr));
+  gap: 8px;
+  margin: 14px 0 0;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 12px;
+}
+
+.gen5wild-profile-values > div {
+  min-width: 0;
+  border-left: 1px solid var(--line-soft);
+  padding-left: 10px;
+}
+
+.gen5wild-profile-values dt {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.gen5wild-profile-values dd {
+  overflow: hidden;
+  margin: 0;
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5wild-mode-tabs {
+  display: grid;
+  width: min(100%, 440px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 4px;
+  background: var(--surface-2);
+}
+
+.gen5wild-mode-tabs button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.gen5wild-mode-tabs button:hover,
+.gen5wild-mode-tabs button.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--panel-shadow);
+}
+
+.gen5wild-mode-tabs button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.gen5wild-mode-tabs button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.gen5wild-workspace {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(390px, 0.82fr) minmax(620px, 1.18fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.gen5wild-controls {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.gen5wild-form-grid,
+.gen5wild-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.gen5wild-settings-heading {
+  margin-top: 24px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 20px;
+}
+
+.gen5wild-wide-field {
+  grid-column: 1 / -1;
+}
+
+.gen5wild-form-grid input,
+.gen5wild-form-grid select,
+.gen5wild-filter-grid select,
+.gen5wild-iv-range input,
+.gen5wild-level-range input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen5wild-form-grid input[readonly] {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.gen5wild-form-grid input:focus-visible,
+.gen5wild-form-grid select:focus-visible,
+.gen5wild-filter-grid select:focus-visible,
+.gen5wild-iv-range input:focus-visible {
+  border-color: var(--brand);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.gen5wild-cache-section {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 20px;
+}
+
+.gen5wild-file-field {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.gen5wild-file-field input {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.gen5wild-file-field input::file-selector-button {
+  min-height: 40px;
+  margin-right: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.gen5wild-file-field output {
+  grid-column: 2;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5wild-cache-status {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+  white-space: pre-line;
+}
+
+.gen5wild-toggle {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.gen5wild-toggle + .gen5wild-toggle {
+  margin-left: 18px;
+}
+
+.gen5wild-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand);
+}
+
+.gen5wild-iv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+  margin-top: 10px;
+}
+
+.gen5wild-iv-range {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 34px minmax(0, 1fr) 10px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.gen5wild-level-range {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 54px minmax(0, 1fr) 10px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.gen5wild-slot-filter {
+  min-width: 0;
+  margin: 16px 0 0;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 10px 12px 12px;
+}
+
+.gen5wild-slot-filter legend {
+  padding: 0 5px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.gen5wild-slot-filter > div {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(40px, 1fr));
+  gap: 6px;
+}
+
+.gen5wild-slot-filter label {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.gen5wild-slot-filter input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--brand);
+}
+
+.gen5wild-filter-grid .field {
+  min-width: 0;
+}
+
+.gen5wild-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.gen5wild-actions button {
+  min-width: 112px;
+  min-height: 44px;
+}
+
+.gen5wild-results {
+  display: flex;
+  min-height: 780px;
+  flex-direction: column;
+}
+
+.gen5wild-results-heading {
+  align-items: center;
+}
+
+.gen5wild-results-heading > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.gen5wild-results-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gen5wild-results-actions .secondary-action {
+  min-height: 40px;
+}
+
+.gen5wild-advance-finder {
+  width: min(1080px, calc(100vw - 48px));
+}
+
+.gen5wild-advance-finder .gen4advance-workspace {
+  max-height: calc(100vh - 96px);
+  max-height: calc(100dvh - 96px);
+  overflow: auto;
+  padding: 12px;
+}
+
+.gen5wild-advance-finder .gen4advance-observation-panel,
+.gen5wild-advance-finder .gen4advance-results-panel {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.gen5wild-advance-finder .gen4advance-results-panel {
+  border-left: 1px solid var(--line-soft);
+}
+
+.gen5wild-results-heading span,
+.gen5wild-results-heading > strong {
+  color: var(--muted);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+}
+
+.gen5wild-progress {
+  height: 5px;
+  overflow: hidden;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+
+.gen5wild-progress span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  transition: width 180ms var(--ease-out);
+}
+
+.gen5wild-results .alert {
+  margin-top: 10px;
+}
+
+.gen5wild-table-shell {
+  position: relative;
+  min-height: 520px;
+  overflow: auto;
+  flex: 1;
+  margin-top: 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--table-bg);
+}
+
+.gen5wild-table {
+  position: relative;
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen5wild-table.generator {
+  min-width: 1850px;
+}
+
+.gen5wild-table.searcher {
+  min-width: 2450px;
+}
+
+.gen5wild-table-header,
+.gen5wild-table-row {
+  display: grid;
+  width: 100%;
+}
+
+.gen5wild-table.generator .gen5wild-table-header,
+.gen5wild-table.generator .gen5wild-table-row {
+  min-width: 1850px;
+  grid-template-columns:
+    86px 72px 72px 120px 180px 64px 96px 72px 100px 170px
+    repeat(6, 56px) 102px 66px 92px 150px;
+}
+
+.gen5wild-table.searcher .gen5wild-table-header,
+.gen5wild-table.searcher .gen5wild-table-row {
+  min-width: 2450px;
+  grid-template-columns:
+    176px 86px 94px 120px 180px 64px 96px 72px 100px 170px
+    repeat(6, 56px) 102px 66px 92px 150px 178px 92px 180px;
+}
+
+.gen5wild-table-header {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 44px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.gen5wild-table-header > span,
+.gen5wild-table-row span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 7px 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5wild-table-header button {
+  display: block;
+  width: calc(100% + 18px);
+  height: 44px;
+  margin: -7px -9px;
+  overflow: hidden;
+  border: 0;
+  padding: 7px 9px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5wild-table-header button:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.gen5wild-table-header button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.gen5wild-table-row {
+  position: absolute;
+  top: 0;
+  height: 42px;
+}
+
+.gen5wild-empty-state {
+  position: absolute;
+  top: 44px;
+  display: flex;
+  width: 100%;
+  min-width: inherit;
+  height: 42px;
+  align-items: center;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 7px 9px;
+  color: var(--muted);
+}
+
+.gen5wild-table-row:hover {
+  background: var(--teal-soft);
+}
+
+.gen5wild-table-row.selected {
+  background: var(--brand-soft);
+}
+
+.gen5wild-table-row:focus-visible {
+  z-index: 1;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+@media (max-width: 1180px) {
+  .gen5wild-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5wild-results {
+    min-height: 600px;
+  }
+}
+
+@media (max-width: 720px) {
+  .gen5wild-profile-heading,
+  .gen5wild-profile-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .gen5wild-profile-actions .field {
+    width: 100%;
+  }
+
+  .gen5wild-profile-values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen5wild-form-grid,
+  .gen5wild-filter-grid,
+  .gen5wild-iv-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5wild-slot-filter > div {
+    grid-template-columns: repeat(4, minmax(40px, 1fr));
+  }
+
+  .gen5wild-wide-field {
+    grid-column: auto;
+  }
+
+  .gen5wild-file-field {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .gen5wild-file-field output {
+    grid-column: auto;
+  }
+
+  .gen5wild-toggle + .gen5wild-toggle {
+    margin-left: 0;
+  }
+
+  .gen5wild-results-heading,
+  .gen5wild-results-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .gen5wild-advance-finder {
+    width: calc(100vw - 20px);
+  }
+
+  .gen5wild-advance-finder .gen4advance-workspace {
+    max-height: calc(100vh - 88px);
+    max-height: calc(100dvh - 88px);
+    padding: 10px;
+  }
+
+  .gen5wild-advance-finder .gen4advance-results-panel {
+    border-top: 1px solid var(--line-soft);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 460px) {
+  .gen5wild-profile,
+  .gen5wild-settings,
+  .gen5wild-filters,
+  .gen5wild-results {
+    padding: 13px;
+  }
+
+  .gen5wild-profile-values {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5wild-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5wild-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gen5wild-progress span {
+    transition: none;
+  }
+}
