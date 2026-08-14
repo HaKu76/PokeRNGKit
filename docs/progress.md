@@ -2,10 +2,21 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`a529bad feat: 实现第四世代推进查询`
+> - Git 基线：`ae69352 feat: 实现第五世代存档信息管理与校准`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 Profiles 待提交，Researcher 已完成独立实现并等待共享接入；`docs/tech-stack.md` 保留项目所有者改动
-> - 验收状态：Gen4 Egg 与 Gen4 Advance 已分别提交推送；Gen5 Profiles 已通过完整工程检查，生产 Wasm 与部署回归待执行
+> - 工作区状态：Researcher 已完成实现、共享接入与本地工程检查，等待独立提交；`docs/tech-stack.md` 保留项目所有者改动
+> - 验收状态：Gen5 Profiles 已提交推送；Researcher 生产 Wasm、Actions、部署回归与项目所有者验收待执行
+
+## 2026-08-14 Researcher
+
+- 新增：PokeFinder 全局 Researcher，覆盖 14 种 RNG、四组 Seed 输入、10 个有序 Custom 表达式、当前/上一行引用、十六进制 Custom 显示与结果内 Search/Next。
+- 接入：新增 `researcher` Wasm API v1、单 Dedicated Worker、10,000 行分批、250,000 行浏览器任务上限、确定性 UI Preview、RNG TOOLS 导航、三语模块名称、全局共享契约和默认 Wasm 构建列表。
+- 加固：Worker 校验 API、operation、任务顺序、批次数量、结果宽度、指针对齐和堆范围；取消会终止当前 Worker并在下次生成时重建。桥接层明确将除零和模零定义为 `0`，移位量限制为 `rhs & 63`。
+- 样式：按 HakuStyle Royal Blueprint compact workspace 统一页签、Custom 控件与虚拟结果表，保留桌面四页签单行与移动端两列重排；页签和结果网格支持 roving tabIndex、方向键、Home、End，状态、计数、错误和空结果提供对应 ARIA 语义。
+- 已通过：定向 Prettier、`git diff --check`、定向 ESLint、`npm run typecheck` 与 `npm test -- src/features/researcher`（3 个文件、11 项测试）；`$env:POKERNGKIT_WASM_MODULES='researcher'; npm run wasm:test:native` 的 `researcher_native_parity` 1/1 通过 14 种 RNG 首值、跨行 Custom、批次上限与 `u32` 帧边界。
+- 完整验证：非受限环境 `npm run verify` 通过全仓 Prettier、ESLint（0 error，2 条既有 TanStack Virtual warning）、TypeScript、45 个测试文件共 176 项测试、Vite 生产构建与 51 项 PWA 预缓存；Vite 仅保留大包 warning。受限环境两次在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`，相同源码在非受限环境完整通过。
+- 工具链：最终 `npm run verify` 使用锁定 Node `24.19.0` 与本机 npm `11.6.2`；npm `12.0.2`、全量原生夹具和 Researcher 生产 Wasm 由推送后的 Actions 补齐。本机未激活 Emscripten `6.0.6`，定向 `npm run wasm:build` 因缺少 Emscripten 与 `emcmake` 停止。
+- 未验收：外部 Chrome/Edge 与 GitHub Pages 算法结果待 Actions 部署完成后和项目所有者共同核对。
 
 ## 2026-08-14 Gen5 Profiles
 

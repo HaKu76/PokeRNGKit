@@ -1,7 +1,8 @@
 export const RNG_MODULE_CONTRACT_VERSION = 1 as const;
 
 export type RngModuleOperation = "generator" | "searcher";
-export type RngModuleId = `gen${number}${string}`;
+export type GlobalRngModuleId = "researcher";
+export type RngModuleId = `gen${number}${string}` | GlobalRngModuleId;
 
 export interface RngModuleArtifacts {
   loader: `${string}.mjs`;
@@ -87,6 +88,15 @@ export const GEN5_MODULE_RESERVATIONS = [
 ] as const satisfies readonly RngModuleReservation[];
 
 export type Gen5ModuleId = (typeof GEN5_MODULE_RESERVATIONS)[number]["id"];
+
+export const GLOBAL_RNG_MODULE_RESERVATIONS = [
+  {
+    id: "researcher",
+    generation: 0,
+    operations: ["generator"],
+    status: "reserved",
+  },
+] as const satisfies readonly RngModuleReservation[];
 
 export interface RngWorkerInitMessage<
   TModuleId extends RngModuleId = RngModuleId,
