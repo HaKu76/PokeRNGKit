@@ -1,7 +1,7 @@
 # PokeRNGKit 产品需求
 
-> - 状态：PR #3 合并冲突已处理；合并结果待工程检查与部署验收
-> - 更新日期：2026-08-14
+> - 状态：第三世代模块清单已实现；工程检查、部署回归与最终验收待完成
+> - 更新日期：2026-08-15
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
 
@@ -11,14 +11,14 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前按 PokeFinder 功能模块逐个落地。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi、存档信息和个体值计算器已进入工作区；第四世代 ID、Seed to Time、Static/Wild、Egg、Advance Finder、Wondercard IVs、Chained Shiny to SID、独立 G4 存档、宝可病毒与 Encounter Lookup 也已进入工作区；第五世代 Profile Manager 与 Profile Calibrator 已进入工作区。个体值计算器是跨工作区的全局工具，Encounter Lookup 是跨世代静态查询工具。
+当前开发范围仅限 PokeFinder 4.3.2 Generation III。第三世代 ID、Initial Seed、Seed to Time、Static/Wild Generator/Searcher、IVs to PID、Egg、Spinda Painter、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi、存档信息和个体值计算器已进入 Git 基线。Encounter Lookup 保留第三世代查询能力。
 
-当前工作区额外加入基于 DevonStudios Pokerus Finder 的宝可病毒查询，覆盖第三世代、第四世代 DP 与第四世代 Pt/HGSS 三种交互模式。
+仓库中已经存在的第四世代、第五世代、第七世代、第八世代、Researcher 与跨世代工具代码继续保留，但不属于当前新增功能范围。除非项目所有者另行作出最终决定，不继续实现后续世代模块。
 
 ## 2. 已确认边界
 
 - 英文工程名为 PokeRNGKit，不设置中文名。
-- RNG Generator/Searcher 当前覆盖第三世代既有模块与已实现的第四世代 ID、Static、Wild、Egg 和 Wondercard IVs；Encounter Lookup 是跨世代静态工具。
+- RNG Generator/Searcher 的当前活动范围仅覆盖第三世代；已存在的后续世代模块保持冻结，不作为继续开发的依据。
 - 只使用 npm 管理 JavaScript 依赖和工程命令。
 - RNG Core 采用 C++ -> Emscripten -> Wasm，不在 TypeScript 中重写上游算法。
 - TypeScript 负责界面、校验、任务编排、Worker 协议、持久化和导出。
@@ -624,13 +624,13 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 9. 后续 MVP
 
-第四世代 ID/Static/Wild 与 Encounter Lookup 通过工程检查、部署页面回归和项目所有者最终验收后，按以下顺序推进：
+第三世代模块清单完成后，按以下顺序推进：
 
-1. 第四世代 Wild 的 Actions、Pages 部署回归和项目所有者最终验收。
-2. Tanoby Chamber form 数据、来源记录与固定夹具。
-3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
+1. 经项目所有者明确授权，完成 `npm run verify`、`npm run wasm:test:native` 与 `npm run wasm:build` 的当前基线检查。
+2. GitHub Actions 完成部署后，由项目所有者提供准确生产 URL 并授权第三世代算法回归。
+3. 完成第三世代桌面/移动端交互、PWA 离线、浏览器矩阵、可访问性和性能基线。
 
-第四世代当前实现 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid`；第五世代当前实现 `gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache`、`gen5sha1cache`、`gen5dreamradar`、`gen5static`、`gen5wild`、`gen5hiddengrotto`、`gen5egg` 与 `gen5event`；第八世代当前实现 `gen8profiles` 与 `gen8id`；全局工具当前实现 `researcher`。其他功能按 PokeFinder 与 3DSRNGTool 模块清单继续逐项实现、验证和提交。
+已存在的后续世代模块只保留当前实现与来源记录；在项目所有者明确扩大范围前，不新增模块、不把后续世代写为下一步。
 
 ## 10. 非目标
 
@@ -738,20 +738,22 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 14. 阶段划分
 
+当前只推进阶段 0 至阶段 6B、第三世代存档和第三世代相关静态工具。后续世代条目仅记录仓库已有实现，保持冻结。
+
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 2A：`gen3static` Generator** - 独立 Wasm/Worker、Method 1/4、游走缺陷、筛选和结果（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2B：Static Searcher** - 反向恢复、搜索协议、结果边界和上游一致性测试（已进入 Git 基线，待部署回归与最终验收）。
 - **阶段 2C：`gen3initialseed`** - RS TID/SID 与目标 Seed 初始种子反推、独立 Wasm/Worker、分片、进度、取消、排序和 CSV（已进入 Git 基线，待部署回归与最终验收）。
-- **阶段 2D：`gen3seedtotime`** - 第三世代 Seed 到日期时间、32 位回推、独立 Wasm/Worker、固定夹具和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
-- **阶段 2E：`gen3ngcseed` GameCube Seed Finder** - XD、竞技场、频道、Precalc、独立 Wasm/Worker Pool 和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 2D：`gen3seedtotime`** - 第三世代 Seed 到日期时间、32 位回推、独立 Wasm/Worker、固定夹具和算法文档（已进入 Git 基线，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 2E：`gen3ngcseed` GameCube Seed Finder** - XD、竞技场、频道、Precalc、独立 Wasm/Worker Pool 和算法文档（已进入 Git 基线，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 3：三代存档信息** - IndexedDB、localStorage 镜像、CRUD、导入导出、清除和悬浮窗（已进入 Git 基线，待项目所有者验收）。
 - **阶段 4A：`gen3wild` Generator** - 遭遇数据、独立 Wasm/Worker、特殊规则、完整筛选和一致性夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 4B：Wild Searcher** - IV 反向检索、完整 Wild 筛选和独立 Worker Pool（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 5：`gen3ivtopid` IVs to PID** - 六项 IV 反推第三世代 PID、独立 Wasm/Worker、九列结果、输入校验和算法文档（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 6：`gen3egg` Egg Generator** - 第三世代 Emerald 与 RS/FRLG 孵化生成、亲代遗传、筛选、结果表、独立 Wasm/Worker 和算法文档（已进入 Git 基线，待部署回归与最终验收）。
-- **阶段 6A：`gen3gamecube` GameCube RNG** - XD/Colosseum/Channel Generator/Searcher、模板数据、独立 Wasm/Worker Pool 和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
-- **阶段 6B：`gen3pidtoiv`、`gen3pokespot`、`gen3jirachi`** - 第三世代 PID to IVs、XD PokeSpot、Channel Jirachi Advancer、独立 Wasm/Worker 和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 6A：`gen3gamecube` GameCube RNG** - XD/Colosseum/Channel Generator/Searcher、模板数据、独立 Wasm/Worker Pool 和算法文档（已进入 Git 基线，待工程检查、Actions、部署回归与最终验收）。
+- **阶段 6B：`gen3pidtoiv`、`gen3pokespot`、`gen3jirachi`** - 第三世代 PID to IVs、XD PokeSpot、Channel Jirachi Advancer、独立 Wasm/Worker 和算法文档（已进入 Git 基线，待工程检查、Actions、部署回归与最终验收）。
 - **静态工具：`encounterlookup`** - PokeFinder 4.3.2 支持的 Gen III、Gen IV、Gen V 与 BDSP 遇敌查询（已进入上游基线，待部署回归与最终验收）。
 - **阶段 6B：`gen3spindapainter`** - PID 与晃晃斑斑点双向映射、原始 PNG、拖动和键盘交互、输入边界及模块文档（已进入主分支，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 7：`gen4static` Static Generator/Searcher** - 第四世代 Method 1/J/K、独立 G4 存档、全局个体值计算器、Wasm/Worker 和算法文档（当前合并工作区，待工程检查、Actions、部署回归与最终验收）。

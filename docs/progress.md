@@ -1,11 +1,21 @@
 # PokeRNGKit 项目进度与交接
 
-> - 最近更新：2026-08-14
+> - 最近更新：2026-08-15
 > - 当前分支：`main`
-> - Git 基线：`365b31e feat: 实现第八世代存档信息管理`
-> - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen8 ID API v2 已完成实现、原生 parity 与完整 `npm run verify`；下一步独立提交推送后进入 Gen8 Egg；`docs/tech-stack.md` 和 `src/features/gen5wild/` 保留项目所有者改动
-> - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+> - Git 基线：`613e7d8 feat: 实现第八世代 ID 乱数`
+> - 当前阶段：第三世代模块加固与验收
+> - 工作区状态：`main` 与 `origin/main` 基线对齐；当前仅有 `README.md`、`docs/requirements.md` 与 `docs/progress.md` 的本任务文档改动，尚未提交
+> - 验收状态：第三世代实现完成；当前基线工程检查、生产页面算法回归与项目所有者最终验收待完成
+
+## 2026-08-15 第三世代范围恢复与模块盘点
+
+- 决定：活动开发范围恢复为 Generation III。仓库中既有 Gen IV、Gen V、Gen VII、Gen VIII 与 Researcher 代码继续保留，但不继续新增后续世代模块。
+- 核对：对照 PokeFinder 4.3.2 `Form/MainWindow.cpp`、`Form/MainWindow.ui` 与 `Form/Gen3/`，确认 IDs、Eggs、GameCube、Static、Wild、Profile Manager、GameCube Seed Finder、IVs to PID、PID to IVs、Jirachi Advancer、PokeSpot、Seed to Time 与 Spinda Painter 均有对应实现和模块文档。
+- 结果：第三世代当前没有缺失的 PokeFinder 功能模块；后续工作转为工程检查、生产算法回归、交互验收与加固，不进入 Gen8 Egg。
+- 已运行：只读核对 `git status --short --branch`、`git log -5 --oneline --decorate`、上游 Gen3 Form 清单、仓库功能目录与模块文档。
+- 已通过：`npm run format:files -- README.md docs/requirements.md docs/progress.md`、全仓 `npm run format:check` 与 `git diff --check`。
+- 未运行：未获本轮测试、构建、Wasm、性能、浏览器或部署 URL 授权，因此没有运行相关检查。
+- 下一步：项目所有者明确授权具体工程检查命令，或在 Actions 部署完成后提供准确生产 URL 并授权第三世代回归。
 
 ## 2026-08-14 第八世代 ID 乱数
 
@@ -17,7 +27,7 @@
 - 已通过：定向 `gen8id_native_parity` 1/1；覆盖四组 `id8.json` 九行结果、每组全部非零分片起点、六种筛选、空筛选、零 Seed 边界、零状态、Advances 回绕、单批上限和 250,000,000 次任务边界；模块内四个上游副本与 PokeFinder 4.3.2 对应文件 SHA-256 一致。
 - 已通过：项目所有者在本地终端运行完整 `npm run verify`；全仓 Prettier、ESLint（0 error、3 条既有 TanStack Virtual warning）、TypeScript、88 个测试文件共 360 项测试、2073 个 Vite 模块的 Web/PWA 生产构建和 62 项 PWA 预缓存全部通过，仅保留大型 chunk 提示。
 - 环境记录：受限终端此前在复制既有 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；后续非受限审批请求因审批服务 502 未启动。项目所有者手动执行同一命令通过，确认不是源码失败。
-- 下一步：以 `feat: 实现第八世代 ID 乱数` 单独提交并推送。随后实现 `gen8egg`；Gen8 Egg 只支持 BDSP，接入前需把 Gen8 Profile controller 提升为 Manager 与 Egg 共用的单一状态来源。
+- 状态：本模块已由 `613e7d8 feat: 实现第八世代 ID 乱数` 进入 `main` 与 `origin/main`；后续世代开发现已冻结，不进入 `gen8egg`。
 - 待验收：生产 Wasm、Actions 部署、外部 Chrome/Edge 的桌面/移动端交互和实际页面算法回归，仍需在提交部署后与项目所有者共同完成。
 
 ## 2026-08-14 第八世代存档信息管理
@@ -512,14 +522,14 @@
 
 ## 下一步
 
-1. 在 GitHub Desktop 审查 `feat/gen4-wild` 的源码、7.5 MB 生成数据、vendored PokeFinder 文件、测试和文档。
-2. 项目所有者明确授权后运行 `npm run verify`、`npm run wasm:test:native` 与 `npm run wasm:build`；提交并推送后等待 Actions。
-3. 项目所有者提供实际生产 URL 并授权后，在外部 Chrome/Edge 回归 Route 222 Method J、HGSS Method K、甜甜蜜树、宝可追踪、捕虫大赛、狩猎地带、取消和结果列。
+1. 项目所有者明确授权后，在当前 `main` 基线运行 `npm run verify`、`npm run wasm:test:native` 与 `npm run wasm:build`。
+2. GitHub Actions 完成部署后，项目所有者提供准确生产 URL 并授权第三世代算法回归。
+3. 使用外部 Chrome/Edge 完成第三世代桌面/移动端交互、取消、导出、持久化、PWA 与最终验收记录。
 
 ## 已知限制
 
-- 当前分支：`feat/gen4-wild`，HEAD `3895d2d feat: 新增NGC Seed查询`。
-- 本轮 G4 Wild 源码、静态数据、vendored Core、测试和文档尚未提交。正式 Pages 仍保持上一成功生产包，不能作为本轮源码的验收证据。
+- 当前分支：`main`，HEAD `613e7d8 feat: 实现第八世代 ID 乱数`，任务开始时与 `origin/main` 对齐。
+- 第三世代模块虽然已经实现，但当前 HEAD 的完整 Wasm 构建、生产页面算法回归和项目所有者最终验收仍不能由历史模块完成状态替代。
 - GitHub Pages 是当前测试目标；Cloudflare Pages 与 `hakuhiro.top` 留到 Pages 验收后配置。
 
 ## 4. 已进入 Git 基线
