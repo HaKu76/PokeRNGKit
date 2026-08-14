@@ -114,13 +114,6 @@ form.
 - Keep a sidebar navigation row at `44-48px`; never compress labels until adjacent
   rows become difficult to hit.
 - Reserve label width during loading and selection changes so controls do not jump.
-- For paired or multi-value controls, reserve explicit tracks for the shared label
-  and every input with `minmax()` or an equivalent layout primitive. Move the
-  shared label above the inputs at the narrow breakpoint instead of compressing
-  either value until it clips.
-- When a product must preserve one exact upstream visible label for a paired or
-  multi-value control, render that label once. Distinguish each input with its
-  programmatic accessible name rather than inventing extra visible labels.
 
 ## 5. Spacing
 
@@ -199,6 +192,60 @@ global synonym for modern design.
   text, muted text, and a moving wallpaper together.
 - Provide a no-wallpaper or solid-surface mode when personalization exposes glass
   or wallpaper controls.
+
+### PokeRNGKit solid-backed glass chrome
+
+Use this recipe for operational navigation and floating utilities when the product
+needs a cool glass impression without the readability and GPU cost of real blur.
+The observed source does not use `backdrop-filter`.
+
+1. Start with an opaque cool-tinted shell for the top bar, sidebar, footer, or
+   command rail. Do not make the page content surface transparent.
+2. Place controls inside that shell using a white fill around `.06-.08`, a light
+   border around `.20-.28`, and `8-10px` radii. Use about `.045` for a quiet hover
+   layer and a cool accent fill around `.16-.20` for selection.
+3. Separate depth mechanisms: a small directional shadow for fixed chrome, a larger
+   shadow for drawers/floating panels, and scrims around `.28`, `.46`, and `.66` for
+   utility, drawer, and modal layers respectively.
+4. Keep content panels, forms, tables, dropdowns, and long text on opaque surfaces.
+   The glass impression belongs to navigation chrome and compact controls.
+5. Preserve geometry across themes and states. Recommended source-derived sizes are
+   `40px` chrome buttons, `46px` sidebar rows, `48px` floating tools, `14px` rail
+   radius, `16px` content-card radius, and `18px` floating-panel radius.
+6. If a wallpaper genuinely requires background blur, treat it as an enhancement:
+   raise the shell fill to the ordinary readable-glass alpha range above, add a
+   bounded `12-16px` blur behind `@supports`, and retain the opaque tinted fallback.
+
+```css
+.glass-chrome {
+  --chrome-bg: #102344;
+  --chrome-control: rgb(255 255 255 / 0.06);
+  --chrome-border: rgb(255 255 255 / 0.24);
+  --chrome-selected: rgb(123 167 241 / 0.18);
+
+  color: #f7fbff;
+  background: var(--chrome-bg);
+  border: 1px solid var(--chrome-border);
+  box-shadow: 0 8px 24px rgb(9 16 35 / 0.22);
+}
+
+.glass-chrome__control {
+  min-width: 40px;
+  min-height: 40px;
+  border: 1px solid var(--chrome-border);
+  border-radius: 10px;
+  background: var(--chrome-control);
+}
+
+.glass-chrome__control[aria-current="true"],
+.glass-chrome__control[aria-pressed="true"] {
+  background: var(--chrome-selected);
+}
+```
+
+Do not call this a backdrop-blur implementation in documentation or code comments.
+Name it `glass-chrome`, `frosted-chrome`, or `solid-backed-glass` so the fallback is
+understood as the actual material rather than a degraded accident.
 
 ## 9. Decoration semantics
 

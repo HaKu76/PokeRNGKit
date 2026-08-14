@@ -22,9 +22,6 @@ available -> hover/focus -> pressed -> pending
 - Restore focus after menus, drawers, dialogs, previews, and command panels close.
 - Offer undo for reversible destructive actions; confirm only when consequence and
   recovery justify interruption.
-- Reset dependent UI state in the event handler, reducer, or state transition that
-  changes its parent value. Reserve effects for external synchronization,
-  subscriptions, timers, resource cleanup, and other systems outside render state.
 
 ## 2. Timing tokens
 

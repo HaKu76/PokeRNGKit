@@ -28,7 +28,7 @@ visible UI change:
    `references/core-palette-system.md` whenever choosing or changing color, theme,
    wallpaper, glass, or themed material.
 6. Read `references/source-contribution-index.md` when selecting source recipes or
-   checking how the complete 31-source corpus contributes to a design.
+   checking how the complete 32-source corpus contributes to a design.
 7. Read `references/usage-choice-workflow.md` when the request is open-ended, the
    user asks to choose/compare styles, or a style contract has not been established.
 8. Read only the relevant section of
@@ -59,6 +59,9 @@ default border: quiet neutral 1px, only when needed
 - Do not make border and text the same saturated color in a normal state.
 - Do not use glass as a global default. Important text and controls need a stable,
   readable surface.
+- For low-cost tool chrome, prefer PokeRNGKit's solid-backed glass recipe: an opaque
+  tinted shell, `.06-.08` inner control fills, quiet light borders, graded scrims,
+  and opaque content panels. Do not claim or require blur when none is used.
 - Do not add isolated decorative dots, orbs, blobs, bokeh, glow, badges, or lines
   without a state, navigation, material, or identity purpose.
 - Do not put cards inside cards or turn every page section into a floating card.
@@ -122,7 +125,7 @@ Prioritize:
 3. information density.
 
 Ask shape, material, and motion only when their answers would materially change the
-result. Do not ask the user to choose among 31 source names. Do not repeat questions
+result. Do not ask the user to choose among 32 source names. Do not repeat questions
 whose answers are already explicit in the request or repository.
 
 ### 5. Write a style contract before editing
