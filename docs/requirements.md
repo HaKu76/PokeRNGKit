@@ -531,6 +531,16 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细输入、MT 读取顺序、文件格式、执行边界和固定夹具见 [Gen 5 IV Cache Finder](modules/gen5ivcache.md)。
 
+## 8.21 当前功能需求：`gen5dreamradar`
+
+- **FR-G5DREAMRADAR-01** 提供 PokeFinder `Dream Radar` 的 `Generator` 与 `Searcher`，目标游戏固定为 Black 2 / White 2，支持最多六个连续 Slot、徽章等级、Memory Link、性别、个体值、性格和觉醒力量条件。
+- **FR-G5DREAMRADAR-02** Slot 物种、性别、Genie 位置、Seed、推进数、徽章、日期与筛选范围同时通过 HTML 和 domain 校验；空 Seed 与推进值按上游数值控件解释为 `0`，绝对推进不得溢出 `uint32_t`。
+- **FR-G5DREAMRADAR-03** BWRNG、MT、SHA-1、按键组合、初始推进、PID、个体值和筛选只在独立 `gen5dreamradar` Wasm API v1 与最多四个 Worker 中运行；单次浏览器任务最多执行 250,000,000 次状态评估并返回 100,000 行。
+- **FR-G5DREAMRADAR-04** 固定模板在 PID 生成时保留上游模板性别 RNG 消耗，结果再按 personal data 显示无性别；Generator 保留 Needle，Searcher 保留 Seed、日期时间、Timer0 与 Buttons。
+- **FR-G5DREAMRADAR-05** 模块支持进度、取消、确定性分片归并、Worker 致命错误后重建、虚拟结果表、个体值/能力值切换和 Profile Manager 跳转；UI Preview 不加载 Wasm。
+
+详细输入、Slot/模板规则、算法顺序、结果布局和固定夹具见 [Gen 5 Dream Radar](modules/gen5dreamradar.md)。
+
 ## 9. 后续 MVP
 
 第四世代 ID/Static/Wild 与 Encounter Lookup 通过工程检查、部署页面回归和项目所有者最终验收后，按以下顺序推进：
@@ -539,7 +549,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 2. Tanoby Chamber form 数据、来源记录与固定夹具。
 3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
-第四世代当前实现 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid`；第五世代当前实现 `gen5profiles`、`gen5id`、`gen5adjacentseeds` 与 `gen5ivcache`；全局工具当前实现 `researcher`。其他功能按 PokeFinder 与 3DSRNGTool 模块清单继续逐项实现、验证和提交。
+第四世代当前实现 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid`；第五世代当前实现 `gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache` 与 `gen5dreamradar`；全局工具当前实现 `researcher`。其他功能按 PokeFinder 与 3DSRNGTool 模块清单继续逐项实现、验证和提交。
 
 ## 10. 非目标
 
@@ -601,8 +611,8 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
-3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、NGC Seed C ABI 输入边界、G3 Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、PID to IVs、GameCube Channel、PokeSpot、Jirachi、Egg Emerald/RSFRLG、G4 Static Method 1/J/K、Synchronize、Cute Charm、Searcher、G4 Wild Route 222 Generator/Searcher、G4 Egg DPPt/HGSS/Masuda/Searcher、G4 Advance Calls/Chatot 与错误边界、G4 Chained SID `54320`、Gen V Profiles BW/BW2 Seed/IV/Needle/Memory Link、Gen V ID Search By/Seed Finder、Gen V Adjacent Seeds、Gen V IV Cache、Gen7 ID、宝可病毒与错误边界夹具。
-4. `npm run wasm:build` 生成默认二十七个模块的 MJS/Wasm 产物，包括 `gen4egg`、`gen4event`、`gen4chainedsid`、`gen4advance`、`gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache` 与 `researcher`。
+3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、NGC Seed C ABI 输入边界、G3 Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、PID to IVs、GameCube Channel、PokeSpot、Jirachi、Egg Emerald/RSFRLG、G4 Static Method 1/J/K、Synchronize、Cute Charm、Searcher、G4 Wild Route 222 Generator/Searcher、G4 Egg DPPt/HGSS/Masuda/Searcher、G4 Advance Calls/Chatot 与错误边界、G4 Chained SID `54320`、Gen V Profiles BW/BW2 Seed/IV/Needle/Memory Link、Gen V ID Search By/Seed Finder、Gen V Adjacent Seeds、Gen V IV Cache、Gen V Dream Radar、Gen7 ID、宝可病毒与错误边界夹具。
+4. `npm run wasm:build` 生成默认二十八个模块的 MJS/Wasm 产物，包括 `gen4egg`、`gen4event`、`gen4chainedsid`、`gen4advance`、`gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache`、`gen5dreamradar` 与 `researcher`。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。

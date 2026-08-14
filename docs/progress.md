@@ -4,7 +4,7 @@
 > - 当前分支：`main`
 > - Git 基线：`e214060 feat: 实现第五世代IV缓存`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：赞助入口等待独立提交；Dream Radar 保持隔离研究；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Dream Radar 接线与工程检查中；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
 
 ## 2026-08-14 赞助入口
@@ -15,6 +15,17 @@
 - 样式：按 HakuStyle 标准产品密度使用 15px 标签、12px 图片圆角和安静边框；桌面双列、窄屏单列，不裁切二维码，不增加装饰渐变、嵌套卡片或说明性填充文案。
 - 已通过：任务文件定向 Prettier、全仓 `npm run format:check`、`git diff --check`、定向 ESLint、`npm run typecheck`；完整 `npm run verify` 首次通过格式、lint、TypeScript 与 57 个测试文件共 211 项测试，仅在受限环境复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`，非受限重跑通过 Vite 生产构建与 54 项 PWA 预缓存。
 - 未验收：外部 Chrome/Edge 与部署页面视觉、长按保存行为等待提交部署后和项目所有者共同核对。
+
+## 2026-08-14 Gen5 Dream Radar
+
+- 新增：PokeFinder `Dream Radar` Generator/Searcher，覆盖 Black 2 / White 2 Profile、最多六个连续 Slot、徽章等级、Memory Link、个体值、性格、觉醒力量、Needle、按键和日期时间结果。
+- 接入：新增 `gen5dreamradar` Wasm API v1、最多四个独立 Worker、58-word 请求 ABI、11-word 结果 ABI、250,000,000 次状态评估上限、100,000 行结果上限、GEN V 导航、共享契约和默认 Wasm 构建清单。
+- 算法：移植 BWRNG、MT、SHA-1、按键、初始推进、PID、个体值和派生值规则；固定模板使用模板性别生成 PID 并按 personal data 显示无性别，保留 Lugia 等模板所需 RNG 消耗。
+- 界面：按 HakuStyle 紧凑工作台密度统一 40px 控件、13px 最小元数据与移动端 44px 触控目标；模式页签支持方向键、Home/End、roving tabIndex 和关联区域，结果改为只读 table 语义并复用上游简中表头。
+- 已通过：定向 ESLint；3 个 Vitest 文件共 8 项测试；MSVC C++23 原生夹具 1/1，完整比较 Tornadus、Lugia、Staryu、`Staryu -> Slowpoke` 四组各 10 帧，共 40 帧 PID、IV、Nature、Needle、Hidden Power、Ability、Gender、Advance、Level 与 Ability Index。
+- 已通过：本次共享接线后的任务文件 Prettier、全仓 `npm run format:check`、`git diff --check`、TypeScript、定向 ESLint、3 个测试文件共 8 项测试与 Dream Radar 原生夹具。
+- 完整验证：受限环境首次在 `build:web` 复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`，一次非受限重跑又被并行 Gen7 ID 文件的未格式化状态拦截；隔离 Dream Radar 暂存区后，非受限 `npm run verify` 通过全仓 Prettier、ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、57 个测试文件共 211 项测试、Vite 生产构建与 55 项 PWA 预缓存。
+- 未验收：生产 Wasm、Actions 部署页面算法回归、外部 Chrome/Edge 视觉与交互，以及项目所有者最终验收。
 
 ## 2026-08-14 Gen5 IV Cache Finder
 
