@@ -2,10 +2,22 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`cdc5b30 feat: 接入第四世代孵化乱数`
+> - Git 基线：`a529bad feat: 实现第四世代推进查询`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen4 Advance 正在共享接入，Gen5 Profiles 正在独立开发；`docs/tech-stack.md` 保留项目所有者改动
-> - 验收状态：Gen4 Egg 已提交推送；Gen4 Advance 定向检查待共享接入完成后执行，生产 Wasm 与部署回归待执行
+> - 工作区状态：Gen5 Profiles 待提交，Researcher 已完成独立实现并等待共享接入；`docs/tech-stack.md` 保留项目所有者改动
+> - 验收状态：Gen4 Egg 与 Gen4 Advance 已分别提交推送；Gen5 Profiles 已通过完整工程检查，生产 Wasm 与部署回归待执行
+
+## 2026-08-14 Gen5 Profiles
+
+- 新增：第五世代 Black/White/Black 2/White 2 Profile Manager 与 Profile Calibrator，覆盖档案 CRUD、选择、复制、排序、JSON 导入导出、IV Search、Needle Search、Seed Search 和 BW2 Memory Link。
+- 存储：使用独立 IndexedDB 数据库与 `pokerngkit-gen5-profiles-v1` localStorage 镜像，保持 Gen III、Gen IV、Gen V 档案数据隔离，并在 IndexedDB 不可用或损坏时回退到镜像。
+- 接入：新增 `gen5profiles` Wasm API v1、最多四个独立 Worker 排队消费最多八个确定性 VFrame 分片、固定宽度 C ABI、确定性 UI Preview、GEN V 导航、三语模块名称、共享契约和默认 Wasm 构建列表。
+- 加固：领域层校验版本、语言、机型、日期时间、十六进制字段、校准范围、IV、Needle、结果上限和浏览器任务上限；Worker 校验 API、operation、分片、结果计数、指针对齐和堆边界。档案写入通过全局队列串行持久化，避免旧渲染快照覆盖后续选择、复制、排序或导入。
+- 对齐：MAC、Seed 与十六进制数字输入接受空值和不足最大位宽的文本并按 `0` 读取；新建档案默认启用全部 9 个 Keypress 数量选项，校准创建档案不再带入测试 TID/SID；Needle 方向编码、BW2 依赖选项清理、Profile Editor 的 `MAC` 标签与 Timer0 保存边界均按上游修正。
+- 可访问性：档案表支持键盘选择和上下移动，主页面与校准模式页签支持方向键、Home、End、roving tabIndex 和关联 tabpanel；加载、错误、搜索状态与进度提供 live region 或对应 ARIA 语义。
+- 已通过：定向 Prettier、`git diff --check`、`npx eslint src/features/gen5profiles`、`npm run typecheck`、`npm test -- src/features/gen5profiles`（3 个文件、14 项测试）与 `$env:POKERNGKIT_WASM_MODULES='gen5profiles'; npm run wasm:test:native`（`gen5profiles_native_parity` 1/1）。
+- 完整验证：非受限环境 `npm run verify` 通过全仓 Prettier、ESLint（0 error，2 条既有 TanStack Virtual warning）、TypeScript、45 个测试文件共 176 项测试、Vite 生产构建与 50 项 PWA 预缓存；Vite 仅保留大包非阻断 warning。
+- 未验收：Emscripten 生产 Wasm、外部 Chrome/Edge 与 GitHub Pages 算法结果待部署完成后和项目所有者共同核对。
 
 ## 2026-08-14 Gen4 Egg
 

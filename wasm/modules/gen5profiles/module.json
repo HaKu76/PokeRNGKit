@@ -1,0 +1,13 @@
+{
+  "id": "gen5profiles",
+  "generation": 5,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen5profiles",
+  "operations": ["searcher"],
+  "artifacts": {
+    "loader": "gen5profiles.mjs",
+    "wasm": "gen5profiles.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen V ProfileSearcher5/Profile Calibrator"
+}
