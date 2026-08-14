@@ -34,4 +34,21 @@ describe("Gen4AdvanceUiPreviewEngine", () => {
     expect(summary.cancelled).toBe(true);
     expect(summary.processedRows).toBe(0);
   });
+
+  it("matches exact and Any needle observations", async () => {
+    const summary = await new Gen4AdvanceUiPreviewEngine().search({
+      mode: "needles",
+      rows: [
+        { advances: 100, value: 7 },
+        { advances: 101, value: 0 },
+        { advances: 102, value: 7 },
+        { advances: 103, value: 4 },
+      ],
+      tokens: [7, 8],
+    });
+    expect(summary.matches).toEqual([
+      { row: 0, advances: 100 },
+      { row: 2, advances: 102 },
+    ]);
+  });
 });

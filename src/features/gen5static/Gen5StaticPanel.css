@@ -1,0 +1,589 @@
+.gen5static-panel {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.gen5static-profile,
+.gen5static-settings,
+.gen5static-filters,
+.gen5static-results {
+  min-width: 0;
+  padding: 16px;
+}
+
+.gen5static-profile-heading,
+.gen5static-profile-actions,
+.gen5static-results-heading {
+  display: flex;
+  min-width: 0;
+  align-items: end;
+  gap: 10px;
+}
+
+.gen5static-profile-heading,
+.gen5static-results-heading {
+  justify-content: space-between;
+}
+
+.gen5static-profile-heading h2,
+.gen5static-results-heading h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: 0;
+}
+
+.gen5static-profile-actions {
+  justify-content: flex-end;
+}
+
+.gen5static-profile-actions .field {
+  width: min(320px, 100%);
+}
+
+.gen5static-profile-values {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(5, minmax(100px, 1fr));
+  gap: 8px;
+  margin: 14px 0 0;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 12px;
+}
+
+.gen5static-profile-values > div {
+  min-width: 0;
+  border-left: 1px solid var(--line-soft);
+  padding-left: 10px;
+}
+
+.gen5static-profile-values dt {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.gen5static-profile-values dd {
+  overflow: hidden;
+  margin: 0;
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5static-mode-tabs {
+  display: grid;
+  width: min(100%, 440px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 4px;
+  background: var(--surface-2);
+}
+
+.gen5static-mode-tabs button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.gen5static-mode-tabs button:hover,
+.gen5static-mode-tabs button.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--panel-shadow);
+}
+
+.gen5static-mode-tabs button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.gen5static-mode-tabs button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.gen5static-workspace {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(390px, 0.82fr) minmax(620px, 1.18fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.gen5static-controls {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.gen5static-form-grid,
+.gen5static-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.gen5static-settings-heading {
+  margin-top: 24px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 20px;
+}
+
+.gen5static-wide-field {
+  grid-column: 1 / -1;
+}
+
+.gen5static-form-grid input,
+.gen5static-form-grid select,
+.gen5static-filter-grid select,
+.gen5static-iv-range input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen5static-form-grid input[readonly] {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.gen5static-form-grid input:focus-visible,
+.gen5static-form-grid select:focus-visible,
+.gen5static-filter-grid select:focus-visible,
+.gen5static-iv-range input:focus-visible {
+  border-color: var(--brand);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.gen5static-cache-section {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 20px;
+}
+
+.gen5static-file-field {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.gen5static-file-field input {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.gen5static-file-field input::file-selector-button {
+  min-height: 40px;
+  margin-right: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.gen5static-file-field output {
+  grid-column: 2;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5static-cache-status {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+  white-space: pre-line;
+}
+
+.gen5static-toggle {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.gen5static-toggle + .gen5static-toggle {
+  margin-left: 18px;
+}
+
+.gen5static-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand);
+}
+
+.gen5static-iv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+  margin-top: 10px;
+}
+
+.gen5static-iv-range {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 34px minmax(0, 1fr) 10px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.gen5static-filter-grid .field {
+  min-width: 0;
+}
+
+.gen5static-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.gen5static-actions button {
+  min-width: 112px;
+  min-height: 44px;
+}
+
+.gen5static-results {
+  display: flex;
+  min-height: 780px;
+  flex-direction: column;
+}
+
+.gen5static-results-heading {
+  align-items: center;
+}
+
+.gen5static-results-heading > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.gen5static-results-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gen5static-results-actions .secondary-action {
+  min-height: 40px;
+}
+
+.gen5static-advance-finder {
+  width: min(1080px, calc(100vw - 48px));
+}
+
+.gen5static-advance-finder .gen4advance-workspace {
+  max-height: calc(100vh - 96px);
+  max-height: calc(100dvh - 96px);
+  overflow: auto;
+  padding: 12px;
+}
+
+.gen5static-advance-finder .gen4advance-observation-panel,
+.gen5static-advance-finder .gen4advance-results-panel {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.gen5static-advance-finder .gen4advance-results-panel {
+  border-left: 1px solid var(--line-soft);
+}
+
+.gen5static-results-heading span,
+.gen5static-results-heading > strong {
+  color: var(--muted);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+}
+
+.gen5static-progress {
+  height: 5px;
+  overflow: hidden;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+
+.gen5static-progress span {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  transition: width 180ms var(--ease-out);
+}
+
+.gen5static-results .alert {
+  margin-top: 10px;
+}
+
+.gen5static-table-shell {
+  position: relative;
+  min-height: 520px;
+  overflow: auto;
+  flex: 1;
+  margin-top: 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--table-bg);
+}
+
+.gen5static-table {
+  position: relative;
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen5static-table.generator {
+  min-width: 1480px;
+}
+
+.gen5static-table.searcher {
+  min-width: 2040px;
+}
+
+.gen5static-table-header,
+.gen5static-table-row {
+  display: grid;
+  width: 100%;
+}
+
+.gen5static-table.generator .gen5static-table-header,
+.gen5static-table.generator .gen5static-table-row {
+  min-width: 1480px;
+  grid-template-columns:
+    86px 72px 72px 110px 70px 112px 180px repeat(6, 56px)
+    102px 66px 92px 150px;
+}
+
+.gen5static-table.searcher .gen5static-table-header,
+.gen5static-table.searcher .gen5static-table-row {
+  min-width: 2040px;
+  grid-template-columns:
+    176px 86px 94px 110px 70px 112px 180px repeat(6, 56px)
+    102px 66px 92px 150px 178px 92px 180px;
+}
+
+.gen5static-table-header {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 44px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.gen5static-table-header > span,
+.gen5static-table-row span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 7px 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5static-table-header button {
+  display: block;
+  width: calc(100% + 18px);
+  height: 44px;
+  margin: -7px -9px;
+  overflow: hidden;
+  border: 0;
+  padding: 7px 9px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen5static-table-header button:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.gen5static-table-header button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.gen5static-table-row {
+  position: absolute;
+  top: 0;
+  height: 42px;
+}
+
+.gen5static-table-row:hover {
+  background: var(--teal-soft);
+}
+
+.gen5static-table-row.selected {
+  background: var(--brand-soft);
+}
+
+.gen5static-table-row:focus-visible {
+  z-index: 1;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+@media (max-width: 1180px) {
+  .gen5static-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5static-results {
+    min-height: 600px;
+  }
+}
+
+@media (max-width: 720px) {
+  .gen5static-profile-heading,
+  .gen5static-profile-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .gen5static-profile-actions .field {
+    width: 100%;
+  }
+
+  .gen5static-profile-values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen5static-form-grid,
+  .gen5static-filter-grid,
+  .gen5static-iv-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5static-wide-field {
+    grid-column: auto;
+  }
+
+  .gen5static-file-field {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .gen5static-file-field output {
+    grid-column: auto;
+  }
+
+  .gen5static-toggle + .gen5static-toggle {
+    margin-left: 0;
+  }
+
+  .gen5static-results-heading,
+  .gen5static-results-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .gen5static-advance-finder {
+    width: calc(100vw - 20px);
+  }
+
+  .gen5static-advance-finder .gen4advance-workspace {
+    max-height: calc(100vh - 88px);
+    max-height: calc(100dvh - 88px);
+    padding: 10px;
+  }
+
+  .gen5static-advance-finder .gen4advance-results-panel {
+    border-top: 1px solid var(--line-soft);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 460px) {
+  .gen5static-profile,
+  .gen5static-settings,
+  .gen5static-filters,
+  .gen5static-results {
+    padding: 13px;
+  }
+
+  .gen5static-profile-values {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5static-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5static-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gen5static-progress span {
+    transition: none;
+  }
+}

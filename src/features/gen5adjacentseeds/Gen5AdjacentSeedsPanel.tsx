@@ -10,6 +10,7 @@ import {
   validateGen5AdjacentSeedsRequest,
   type Gen5AdjacentPreviewMode,
   type Gen5AdjacentSeedResult,
+  type Gen5AdjacentSeedsInitialContext,
   type Gen5AdjacentSeedsSummary,
 } from "./domain";
 import { Gen5AdjacentSeedsUiPreviewEngine } from "./preview/Gen5AdjacentSeedsUiPreviewEngine";
@@ -123,12 +124,14 @@ function profileKeypresses(profile: Gen5Profile) {
 
 export interface Gen5AdjacentSeedsPanelProps {
   uiPreviewMode: boolean;
+  initialContext?: Gen5AdjacentSeedsInitialContext;
   onOpenProfileManager(): void;
   onOpenIvCalculator(): void;
 }
 
 export function Gen5AdjacentSeedsPanel({
   uiPreviewMode,
+  initialContext,
   onOpenProfileManager,
   onOpenIvCalculator,
 }: Gen5AdjacentSeedsPanelProps) {
@@ -142,7 +145,20 @@ export function Gen5AdjacentSeedsPanel({
         : new Gen5AdjacentSeedsWorkerPool(),
     [uiPreviewMode],
   );
-  const initial = useMemo(loadSettings, []);
+  const initial = useMemo(() => {
+    const settings = loadSettings();
+    if (!initialContext) return settings;
+    return {
+      ...settings,
+      dateTime: normalizeGen5AdjacentDateTime(
+        initialContext.dateTime.replace(" ", "T"),
+      ),
+      buttonMask: initialContext.buttonMask,
+      encounter: initialContext.encounter,
+    };
+    // Static result handoff is a mount-time initial value, matching Qt's constructor.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [dateTime, setDateTime] = useState(initial.dateTime);
   const [seconds, setSeconds] = useState(initial.seconds);
   const [buttonMask, setButtonMask] = useState(initial.buttonMask);

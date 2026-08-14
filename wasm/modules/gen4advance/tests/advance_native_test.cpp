@@ -5,7 +5,7 @@
 
 int main()
 {
-    assert(gen4advance_api_version() == 1);
+    assert(gen4advance_api_version() == 2);
 
     const Gen4AdvancePackedRow calls[] = {
         { 40, 0 }, { 41, 1 }, { 42, 2 }, { 43, 0 }, { 44, 1 }, { 45, 2 },
@@ -24,6 +24,15 @@ int main()
     const auto *chatotMatches = reinterpret_cast<const Gen4AdvancePackedMatch *>(gen4advance_result_ptr());
     assert(chatotMatches[0].row == 1 && chatotMatches[0].advances == 101);
 
+    const Gen4AdvancePackedRow needles[] = {
+        { 200, 7 }, { 201, 0 }, { 202, 7 }, { 203, 4 },
+    };
+    const std::uint32_t needleTokens[] = { 7, 8 };
+    assert(gen4advance_search(2, needles, 4, needleTokens, 2) == 2);
+    const auto *needleMatches = reinterpret_cast<const Gen4AdvancePackedMatch *>(gen4advance_result_ptr());
+    assert(needleMatches[0].row == 0 && needleMatches[0].advances == 200);
+    assert(needleMatches[1].row == 2 && needleMatches[1].advances == 202);
+
     const std::uint32_t invalidToken[] = { 10 };
     assert(gen4advance_search(1, chatot, 6, invalidToken, 1) == 0);
     assert(gen4advance_last_error() == 1);
@@ -31,7 +40,7 @@ int main()
     const Gen4AdvancePackedRow invalidCall[] = { { 0, 3 } };
     assert(gen4advance_search(0, invalidCall, 1, callTokens, 1) == 0);
     assert(gen4advance_last_error() == 1);
-    assert(gen4advance_search(2, calls, 6, callTokens, 3) == 0);
+    assert(gen4advance_search(3, calls, 6, callTokens, 3) == 0);
     assert(gen4advance_last_error() == 1);
     assert(gen4advance_search(0, nullptr, 1, callTokens, 1) == 0);
     assert(gen4advance_last_error() == 1);

@@ -1,11 +1,13 @@
-export const GEN4_ADVANCE_API_VERSION = 1;
+export const GEN4_ADVANCE_API_VERSION = 2;
 export const GEN4_ADVANCE_MAX_ROWS = 1_000_000;
 export const GEN4_ADVANCE_MAX_TOKENS = 100_000;
 
-export type Gen4AdvanceMode = "calls" | "chatot";
+export type Gen4AdvanceMode = "calls" | "chatot" | "needles";
 export type Gen4AdvanceCallToken = 0 | 1 | 2;
 export type Gen4AdvanceChatotToken = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-export type Gen4AdvanceToken = Gen4AdvanceCallToken | Gen4AdvanceChatotToken;
+export type Gen4AdvanceNeedleToken = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type Gen4AdvanceToken =
+  Gen4AdvanceCallToken | Gen4AdvanceChatotToken | Gen4AdvanceNeedleToken;
 
 export interface Gen4AdvanceRow {
   advances: number;
@@ -41,13 +43,32 @@ export const gen4AdvanceChatotLabels = [
   "Mid / Mid-Low",
   "Mid-Low / Low",
 ] as const;
+export const gen4AdvanceNeedleLabels = [
+  "\u2191",
+  "\u2197",
+  "\u2192",
+  "\u2198",
+  "\u2193",
+  "\u2199",
+  "\u2190",
+  "\u2196",
+  "Any",
+] as const;
 
 function validU32(value: number) {
   return Number.isInteger(value) && value >= 0 && value <= 0xffff_ffff;
 }
 
 export function gen4AdvanceModeToWasm(mode: Gen4AdvanceMode) {
-  return mode === "calls" ? 0 : 1;
+  return mode === "calls" ? 0 : mode === "chatot" ? 1 : 2;
+}
+
+function valueMaximum(mode: Gen4AdvanceMode) {
+  return mode === "calls" ? 2 : mode === "chatot" ? 99 : 7;
+}
+
+function tokenMaximum(mode: Gen4AdvanceMode) {
+  return mode === "calls" ? 2 : mode === "chatot" ? 9 : 8;
 }
 
 export function validateGen4AdvanceRequest(request: Gen4AdvanceRequest) {
@@ -60,7 +81,7 @@ export function validateGen4AdvanceRequest(request: Gen4AdvanceRequest) {
         !validU32(row.advances) ||
         !Number.isInteger(row.value) ||
         row.value < 0 ||
-        row.value > (request.mode === "calls" ? 2 : 99),
+        row.value > valueMaximum(request.mode),
     )
   )
     errors.push("rows");
@@ -72,7 +93,7 @@ export function validateGen4AdvanceRequest(request: Gen4AdvanceRequest) {
       (token) =>
         !Number.isInteger(token) ||
         token < 0 ||
-        token > (request.mode === "calls" ? 2 : 9),
+        token > tokenMaximum(request.mode),
     )
   )
     errors.push("tokens");
@@ -95,7 +116,7 @@ function parseValue(mode: Gen4AdvanceMode, text: string) {
   }
   if (!/^\d{1,2}$/.test(text)) return undefined;
   const value = Number(text);
-  return value <= (mode === "calls" ? 2 : 99) ? value : undefined;
+  return value <= valueMaximum(mode) ? value : undefined;
 }
 
 export function parseGen4AdvanceRows(mode: Gen4AdvanceMode, text: string) {
@@ -150,7 +171,9 @@ export function gen4AdvanceTokenLabel(
   mode: Gen4AdvanceMode,
   token: Gen4AdvanceToken,
 ) {
-  return mode === "calls"
-    ? gen4AdvanceCallLabels[token as Gen4AdvanceCallToken]
-    : gen4AdvanceChatotLabels[token as Gen4AdvanceChatotToken];
+  if (mode === "calls")
+    return gen4AdvanceCallLabels[token as Gen4AdvanceCallToken];
+  if (mode === "chatot")
+    return gen4AdvanceChatotLabels[token as Gen4AdvanceChatotToken];
+  return gen4AdvanceNeedleLabels[token as Gen4AdvanceNeedleToken];
 }

@@ -13,7 +13,7 @@
 
 .gen4advance-tabs {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
   margin-top: 12px;
 }
 
@@ -29,6 +29,10 @@
 
 .gen4advance-token-grid.chatot {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gen4advance-token-grid.needles {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .gen4advance-token-grid button {

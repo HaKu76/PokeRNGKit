@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   gen4AdvanceCallLabels,
   gen4AdvanceChatotLabels,
+  gen4AdvanceNeedleLabels,
   gen4AdvanceTokenLabel,
   parseGen4AdvanceRows,
   validateGen4AdvanceRequest,
@@ -34,6 +35,9 @@ export interface Gen4AdvancePanelProps {
   uiPreviewMode: boolean;
   sourceRows?: Partial<Record<Gen4AdvanceMode, Gen4AdvanceRow[]>>;
   supportsCalls?: boolean;
+  supportsNeedles?: boolean;
+  initialMode?: Gen4AdvanceMode;
+  showHeading?: boolean;
   onJump?(match: Gen4AdvanceMatch, source: Gen4AdvanceRow): void;
 }
 
@@ -43,7 +47,11 @@ function rowText(rows: Gen4AdvanceRow[]) {
 
 function tokenLabels(mode: Gen4AdvanceMode, chinese: boolean) {
   const labels =
-    mode === "calls" ? gen4AdvanceCallLabels : gen4AdvanceChatotLabels;
+    mode === "calls"
+      ? gen4AdvanceCallLabels
+      : mode === "chatot"
+        ? gen4AdvanceChatotLabels
+        : gen4AdvanceNeedleLabels;
   return labels.map((label, token) => ({
     label: chinese && label === "Any" ? "任意" : label,
     token: token as Gen4AdvanceToken,
@@ -54,6 +62,9 @@ export function Gen4AdvancePanel({
   uiPreviewMode,
   sourceRows,
   supportsCalls = true,
+  supportsNeedles = false,
+  initialMode = "chatot",
+  showHeading = true,
   onJump,
 }: Gen4AdvancePanelProps) {
   const { i18n, t } = useTranslation();
@@ -65,13 +76,13 @@ export function Gen4AdvancePanel({
         : new Gen4AdvanceWorker(),
     [uiPreviewMode],
   );
-  const initialMode: Gen4AdvanceMode = "chatot";
   const [mode, setMode] = useState<Gen4AdvanceMode>(initialMode);
   const [speaker, setSpeaker] = useState<"elm" | "irwin">("irwin");
   const [sourceText, setSourceText] = useState<Record<Gen4AdvanceMode, string>>(
     {
       calls: sourceRows?.calls ? rowText(sourceRows.calls) : "",
       chatot: sourceRows?.chatot ? rowText(sourceRows.chatot) : "",
+      needles: sourceRows?.needles ? rowText(sourceRows.needles) : "",
     },
   );
   const [tokens, setTokens] = useState<Gen4AdvanceToken[]>([]);
@@ -204,16 +215,19 @@ export function Gen4AdvancePanel({
     search: chinese ? "检索" : "Search",
   };
   const labels = tokenLabels(mode, chinese);
-  const valueLabel = mode === "calls" ? copy.call : copy.chatot;
+  const valueLabel =
+    mode === "calls" ? copy.call : mode === "chatot" ? copy.chatot : "Needle";
   const canJump = Boolean(onJump || !sourceRows?.[mode]);
 
   return (
     <form className="gen4advance-workspace" onSubmit={run}>
       <section className="panel gen4advance-observation-panel">
-        <div className="panel-heading compact">
-          <h2>Advance Finder</h2>
-          <span className="panel-note">PokeFinder / AdvanceSearcher</span>
-        </div>
+        {showHeading && (
+          <div className="panel-heading compact">
+            <h2>Advance Finder</h2>
+            <span className="panel-note">PokeFinder / AdvanceSearcher</span>
+          </div>
+        )}
         <div
           aria-label="Advance Finder"
           className="operation-tabs gen4advance-tabs"
@@ -239,6 +253,17 @@ export function Gen4AdvancePanel({
           >
             {copy.chatot}
           </button>
+          {supportsNeedles && (
+            <button
+              aria-selected={mode === "needles"}
+              className={mode === "needles" ? "active" : ""}
+              onClick={() => changeMode("needles")}
+              role="tab"
+              type="button"
+            >
+              Needles
+            </button>
+          )}
         </div>
 
         {mode === "calls" && (

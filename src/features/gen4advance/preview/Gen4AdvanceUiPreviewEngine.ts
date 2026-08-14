@@ -24,7 +24,8 @@ const chatotRanges = [
 
 function range(mode: Gen4AdvanceMode, token: Gen4AdvanceToken) {
   if (mode === "calls") return [token, token + 1] as const;
-  return chatotRanges[token];
+  if (mode === "chatot") return chatotRanges[token];
+  return token === 8 ? ([0, 8] as const) : ([token, token + 1] as const);
 }
 
 export class Gen4AdvanceUiPreviewEngine implements Gen4AdvanceEngine {

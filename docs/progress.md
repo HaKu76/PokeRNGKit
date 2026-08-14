@@ -2,10 +2,30 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`110de30 docs: 补充第五世代SHA1验证记录`
+> - Git 基线：`540862a chore: 更新HakuStyle设计规范`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：并行准备 Gen5 Static 与 Gen5 Egg；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Gen5 Static 已完成工程验证并准备提交，Gen5 Egg 待共享接线；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 第五世代定点乱数
+
+- 新增：实现 PokeFinder `Gen 5 Static` 的 Generator/Searcher，覆盖 Black、White、Black 2、White 2 与九类上游模板，并保留普通定点、野生定点、赠送蛋和游走分支。
+- 修复：Worker 缓存键加入日期范围与筛选后内容指纹；连续使用同一 SHA Cache 搜索不同日期范围时会重新加载，避免复用旧子集造成漏结果或 `InvalidChunk`。
+- 修复：Hardy、Docile、Serious、Bashful 与 Quirky 五种中性性格按 `1.0` 计算能力值；UI Preview 的“取消筛选”不再继续套用 IV、性格、特性、性别和异色条件。
+- 优化：Generator/Searcher 结果表支持全列表头排序、鼠标与键盘选中；`Lucky Power` 的 Level 3 文案改为上游原文 `3/S`。
+- 接入：增加独立 `gen5static` Wasm API v1、最多四个 Worker、确定性分片、进度、取消和虚拟结果表；Generator 通过可拖动居中弹层打开 Advance Finder，Searcher 把已选结果带入 Adjacent Seeds。
+- 更新：共享 `gen4advance` Wasm API 升级为 v2，增加第五世代 Needles 精确/Any 匹配，并保留 Calls/Chatot 请求格式。
+- 已通过：`npm test -- src/features/gen4advance src/features/gen5static` 共 6 个文件、21 项测试，定向 ESLint，以及 `gen4advance_native_parity` / `gen5static_native_parity` 2/2。
+- 已通过：使用 Node `24.19.0` 与 npm `12.0.2` 在非受限环境运行完整 `npm run verify`；格式、ESLint、TypeScript、67 个 Vitest 文件共 255 项测试和 Web/PWA 构建通过，仅保留两条既有 TanStack Virtual 警告与主包体积警告。
+- 环境记录：受限终端首次构建在复制 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一命令在非受限环境通过，确认不是源码失败。
+- 待验收：生产 Wasm、Actions 部署与实际页面算法回归仍需等待部署完成，并由项目所有者提供准确生产 URL 和单独授权。
+
+## 2026-08-14 HakuStyle Skill 更新
+
+- 更新：从项目所有者指定的 `C:\Users\Hakuhiro\Documents\Codex\2026-08-12\b\outputs\hakustyle` 同步仓库内 `.agents/skills/web-frontend-style`，后续模块继续使用更新后的 HakuStyle 规则。
+- 规范：增加 PokeRNGKit 实底玻璃导航外壳规则，明确透明层仅用于导航与浮动工具外壳，表单、表格、弹层正文和长文本继续使用不透明内容面。
+- 来源：设计来源索引由 31 个更新为 32 个，交互、字体密度与来源映射同步更新；未复制来源仓库的 `.git`、README 或其他非 Skill 文件。
+- 已通过：仓库 Skill 自带 `scripts/validate.ps1` 与 `skill-creator` 的 `quick_validate.py` 均通过；任务文件已按仓库 Prettier 规则格式化，`git diff --check` 通过。
 
 ## 2026-08-14 剩余功能模块盘点
 
@@ -131,9 +151,9 @@
 ## 2026-08-14 Gen4 Advance Finder
 
 - 新增：第四世代 Calls/Chatot 连续观测匹配，覆盖上游半开区间、空序列、五条过滤阈值、完整源表恢复、Jump to Advance、清空和取消。
-- 接入：新增 `gen4advance` Wasm API v1、单 Dedicated Worker、GEN IV 导航、三语模块信息、共享契约和默认 Wasm 构建列表；独立入口支持本地 `Advances,Value` 数据，嵌入接口支持父 Generator 结构化结果。
+- 接入：初版使用 `gen4advance` Wasm API v1、单 Dedicated Worker、GEN IV 导航、三语模块信息、共享契约和默认 Wasm 构建列表；独立入口支持本地 `Advances,Value` 数据，嵌入接口支持父 Generator 结构化结果。
 - 加固：Worker 验证 operation、请求与 chunk、领域边界、结果计数及 Wasm 请求/结果指针对齐、非空和堆范围；原生夹具补齐非法 mode、空指针、非法 Call、行数和令牌数上限。
-- 限制：本模块仅覆盖第四世代 Calls/Chatot；Gen V Needle 需等待第五世代结果表和上下文底座，不显示为已支持。
+- 当时限制：初版仅覆盖第四世代 Calls/Chatot；该限制已在 Gen5 Static 接入时由 API v2 的 Needles 模式解除。
 - 已通过：任务文件格式化、完整 `npm run format:check`、`git diff --check`、`npx eslint src/features/gen4advance`、`npm test -- src/features/gen4advance`（2 个文件、5 项测试）、`npm run typecheck` 与 `$env:POKERNGKIT_WASM_MODULES='gen4advance'; npm run wasm:test:native`（`gen4advance_native_parity` 1/1）。
 - 完整验证：受限文件环境外的 `npm run verify` 通过全仓格式、lint（0 error，2 条既有 warning）、TypeScript、39 个测试文件共 151 项测试、Vite 生产构建与 49 项 PWA 预缓存。
 - 未验收：Emscripten 生产 Wasm、外部 Chrome/Edge 与 GitHub Pages 页面行为待部署完成后和项目所有者共同核对。

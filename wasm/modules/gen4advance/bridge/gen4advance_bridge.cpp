@@ -25,7 +25,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maximumRows = 1000000;
     constexpr std::uint32_t maximumTokens = 100000;
 
@@ -33,6 +33,7 @@ namespace
     {
         Calls = 0,
         Chatot = 1,
+        Needles = 2,
     };
 
     enum ErrorCode : std::uint32_t
@@ -53,6 +54,14 @@ namespace
             if (token > 2) return false;
             minimum = token;
             maximum = token + 1;
+            return true;
+        }
+
+        if (mode == Mode::Needles)
+        {
+            if (token > 8) return false;
+            minimum = token == 8 ? 0 : token;
+            maximum = token == 8 ? 8 : token + 1;
             return true;
         }
 
@@ -86,7 +95,7 @@ extern "C"
     {
         results.clear();
         lastError = ErrorCode::None;
-        if (modeValue > static_cast<std::uint32_t>(Mode::Chatot)
+        if (modeValue > static_cast<std::uint32_t>(Mode::Needles)
             || (rowCount != 0 && rows == nullptr) || (tokenCount != 0 && tokens == nullptr))
         {
             lastError = ErrorCode::InvalidInput;
@@ -104,7 +113,7 @@ extern "C"
         }
 
         const auto mode = static_cast<Mode>(modeValue);
-        const auto valueMaximum = mode == Mode::Calls ? 2U : 99U;
+        const auto valueMaximum = mode == Mode::Calls ? 2U : mode == Mode::Chatot ? 99U : 7U;
         for (std::uint32_t index = 0; index < rowCount; index++)
         {
             if (rows[index].value > valueMaximum)

@@ -31,6 +31,13 @@ export interface Gen5AdjacentSeedsRequest {
   maxIVAdvances: number;
 }
 
+export interface Gen5AdjacentSeedsInitialContext {
+  requestId: number;
+  dateTime: string;
+  buttonMask: number;
+  encounter: Gen5AdjacentEncounter;
+}
+
 export interface Gen5AdjacentSeedsChunk {
   index: number;
   minSecondOffset: number;
