@@ -14,7 +14,7 @@
 - 接入：新增 `gen5sha1cache` Wasm API v1、14-word 请求、4-word 结果、最多四个独立 Worker、GEN V 导航、共享契约和默认 Wasm 构建清单；每个 Worker 只接收一次三类 IV Seed，任务按 `Timer0 + 日期 + 按键` 分发。
 - 界面：按 HakuStyle 工作台密度复用第五世代 Profile 选择器，提供日期范围、IV Cache 上传、Output File、Search/Cancel、文件系统写入回退、响应式布局和 UI Preview；简中控件逐字使用 PokeFinder 上游译文。
 - 加固：校验 `.ivcache` magic、计数、精确长度、排序去重、1,000,000 个 Seed 输入上限、100,000 条单元结果上限与 1,000,000 条文件结果上限；协议、指针、缓冲区、进度或 Worker 错误均终止任务且不写部分文件。
-- 已通过：定向 3 个 Vitest 文件共 8 项测试、TypeScript、定向 ESLint、全仓 Prettier、`git diff --check`，以及 `POKERNGKIT_WASM_MODULES=gen5sha1cache npm run wasm:test:native` 原生 CTest 1/1；完整 `npm run wasm:test:native` 通过全部 30 项原生夹具。
+- 已通过：定向 3 个 Vitest 文件共 9 项测试、TypeScript、定向 ESLint、全仓 Prettier、`git diff --check`，以及 `POKERNGKIT_WASM_MODULES=gen5sha1cache npm run wasm:test:native` 原生 CTest 1/1；完整 `npm run wasm:test:native` 通过全部 30 项原生夹具。
 - 完整验证：受限环境首次在 `build:web` 复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`；非受限 `npm run verify` 通过 Prettier、ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、60 个测试文件共 226 项测试、Vite 生产构建与 56 项 PWA 预缓存。
 - 环境限制：本机没有 Emscripten 6.0.6，`emcc/emcmake` 均不可用，因此未生成本地生产 Wasm；该产物继续由 Actions 工具链构建。Actions 部署页面算法回归、外部 Chrome/Edge 视觉与交互和项目所有者最终验收待提交部署后完成。
 

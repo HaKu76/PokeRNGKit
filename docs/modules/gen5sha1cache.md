@@ -84,7 +84,7 @@ API v1 的 14-word 请求为：`version, language, dsType, macLow, macHigh, vcou
 
 - `domain.test.ts` 覆盖日期边界、2144 个上游有效按键组合、BW/BW2 Normal 桶、损坏文件、单元映射、分类解码和 54 字节头布局。
 - `Gen5Sha1CacheUiPreviewEngine.test.ts` 固定预览结果和完整进度。
-- `gen5sha1cache_native_test.cpp` 覆盖 Black/Black 2 SHA-1、三类分类、全天扫描、结果上限、非法日期、非法按键、空指针和未排序 Seed 列表。
+- `gen5sha1cache_native_test.cpp` 精确覆盖 Black、White、Black 2、White 2 的默认 `2000-01-01 00:00:00` SHA-1、三类分类、全天扫描、结果上限、非法日期、非法按键、空指针和未排序 Seed 列表。
 - 已通过 `POKERNGKIT_WASM_MODULES=gen5sha1cache npm run wasm:test:native`，原生 CTest `1/1` 通过。
 
 完整日期范围和宽 Timer0 范围属于生产长任务，不在单元测试中执行；算法结果仍须在部署完成后由项目所有者授权在生产页面回归。
