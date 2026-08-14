@@ -2,10 +2,24 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`0cf25c6 feat: 实现第五世代野生乱数`
+> - Git 基线：`be28506 fix: 修正隐藏洞穴版本标识`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 Hidden Grotto 已完成工程验证，等待独立提交与推送；`docs/tech-stack.md` 和 `src/features/gen5wild/` 保留项目所有者改动
+> - 工作区状态：Gen5 Hidden Grotto 已提交并推送；Gen8 Profiles 已完成工程验证；下一步实现 Gen8 ID；`docs/tech-stack.md` 和 `src/features/gen5wild/` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 第八世代存档信息管理
+
+- 新增：实现 PokeFinder `Profile Manager Gen 8` 与 `Profile Editor Gen 8`，支持 Sword、Shield、Brilliant Diamond、Shining Pearl，以及 Profile Name、TID、SID、National Dex、Shiny Charm、Oval Charm。
+- 管理：支持新建、编辑、完全复制、删除、选择、拖动重排、显式上下移动和键盘行导航；桌面表格按上游保留 6 个数据列，National Dex 只在编辑器和领域模型中保存。
+- 持久化：增加独立 IndexedDB `pokerngkit-gen8/profile-data/gen8-profiles`、localStorage 镜像 `pokerngkit-gen8-profiles-v1` 和 `pokerngkit.gen8-profiles` schema v1 备份；镜像写入成功但 IndexedDB 写入失败时记录待同步状态，后续优先恢复较新镜像；导入按稳定 id 合并，清空不影响其他世代且任一副本清除失败会显示错误。
+- 界面：按 HakuStyle 工作台密度实现 Lucide 工具图标、居中可访问 modal、焦点约束、`Escape`、滚动锁定、焦点恢复、桌面宽表和移动端记录列表。
+- 上游一致性：TID/SID 为空按 `0`、限制为十进制 `0..65535`；Profile Name 只用 trim 后内容校验是否为空，保存时保留原始文本；日文未完成 Gen 8 Profile 词条保留 English source。
+- 依赖：使用 npm 增加 `lucide-react`，仅作为本地打包的标准工具图标，不使用运行时 CDN。
+- 已通过：`npm test -- src/features/gen8profiles` 共 2 个测试文件、13 项测试；领域、存储和面板的定向 ESLint、TypeScript、Prettier 与 `git diff --check` 通过。
+- 已通过：完整 `npm run verify`，包含全仓 Prettier、ESLint、TypeScript、85 个测试文件共 341 项测试，以及 Web/PWA 构建。
+- 已知警告：Gen 3 Egg、Gen 3 Wild 与 Gen 5 Hidden Grotto 保留 3 条 TanStack Virtual React Compiler 兼容警告；Vite 保留主包与大型 Wasm chunk 的默认体积提示。
+- 不适用：本模块不执行 RNG，不含 Wasm、Worker 或原生 C++ 夹具。
+- 待验收：部署后的桌面/移动端界面、拖动、键盘、导入导出和浏览器持久化仍需使用外部 Chrome/Edge 与项目所有者共同确认。
 
 ## 2026-08-14 第五世代隐藏洞穴乱数
 

@@ -602,6 +602,16 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细输入、PGF 字段、算法顺序、结果布局、Advance Finder 和固定夹具见 [Gen 5 Event](modules/gen5event.md)。
 
+## 8.28 当前功能需求：`gen8profiles`
+
+- **FR-G8PROFILES-01** 提供 PokeFinder `Profile Manager Gen 8` 与 `Profile Editor Gen 8`，支持 Sword、Shield、Brilliant Diamond、Shining Pearl，以及 Profile Name、TID、SID、National Dex、Shiny Charm、Oval Charm 七个业务字段。
+- **FR-G8PROFILES-02** TID/SID 使用十进制 `0..65535`、最多 5 位，空值读取为 `0`；Profile Name 只用去空白后的内容判断是否为空，保存时保留原始文本；四个版本只能从固定候选选择。
+- **FR-G8PROFILES-03** Manager 支持新建、编辑、完全复制、删除、单选、拖动重排、显式上下移动和键盘行导航；桌面表格保持上游的 Profile Name、Version、TID、SID、Shiny Charm、Oval Charm 六个数据列，National Dex 只在编辑器和领域模型中保存。
+- **FR-G8PROFILES-04** 使用独立 IndexedDB `pokerngkit-gen8/profile-data/gen8-profiles` 与 localStorage `pokerngkit-gen8-profiles-v1`；IndexedDB 写入失败时标记并优先恢复较新的镜像，清空任一副本失败时保留界面状态并显示错误；JSON backup 使用 `pokerngkit.gen8-profiles` schema v1，导入完整校验后按稳定 id 合并，导出与清空只影响第八世代档案。
+- **FR-G8PROFILES-05** 编辑器为居中 modal，支持焦点约束、`Escape`、遮罩关闭、滚动锁定和焦点恢复；移动端使用记录列表重排，不缩小桌面宽表。模块不执行 RNG，不使用 Wasm 或 Worker。
+
+详细上游字段、输入边界、标签、持久化差异和来源哈希见 [Gen 8 Profiles](modules/gen8profiles.md)。
+
 ## 9. 后续 MVP
 
 第四世代 ID/Static/Wild 与 Encounter Lookup 通过工程检查、部署页面回归和项目所有者最终验收后，按以下顺序推进：
@@ -610,7 +620,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 2. Tanoby Chamber form 数据、来源记录与固定夹具。
 3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
-第四世代当前实现 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid`；第五世代当前实现 `gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache`、`gen5sha1cache`、`gen5dreamradar`、`gen5static`、`gen5wild`、`gen5hiddengrotto`、`gen5egg` 与 `gen5event`；全局工具当前实现 `researcher`。其他功能按 PokeFinder 与 3DSRNGTool 模块清单继续逐项实现、验证和提交。
+第四世代当前实现 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid`；第五世代当前实现 `gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache`、`gen5sha1cache`、`gen5dreamradar`、`gen5static`、`gen5wild`、`gen5hiddengrotto`、`gen5egg` 与 `gen5event`；第八世代当前实现 `gen8profiles`；全局工具当前实现 `researcher`。其他功能按 PokeFinder 与 3DSRNGTool 模块清单继续逐项实现、验证和提交。
 
 ## 10. 非目标
 
