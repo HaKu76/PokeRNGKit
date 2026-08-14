@@ -2,10 +2,20 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`48f76c1 feat: 实现第五世代ID乱数`
+> - Git 基线：`973a3e8 feat: 实现第五世代相邻种子`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 Adjacent Seeds 已完成共享接入与完整验证，等待独立提交；Gen5 IV Cache Finder 保持隔离实现；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Gen5 IV Cache Finder 已完成共享接线、语义加固和定向验证，等待独立提交；Dream Radar 保持隔离研究；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 Gen5 IV Cache Finder
+
+- 新增：PokeFinder `IV Cache Finder`，覆盖完整 `2^32` MT Seed 空间、Entralink/Normal/Roamer 三种读取顺序、高个体 Seed 筛选和 `.ivcache` 导出。
+- 接入：新增 `gen5ivcache` Wasm API v1、最多四个独立 Worker、65,536 个半开区间分片、结果确定性归并、File System Access API 写入和下载回退；UI Preview 不加载 Wasm。
+- 加固：保留上游 `Advance32Bit` 的 `uint32_t` 解析和文件字段，但执行入口要求 `Initial Advances = 0`、`Max Advances <= 20`。原因是上游搜索器写入相对桶，而 PokeFinder 读取端按绝对 Initial Advances 访问；非零初始帧会生成错帧 `.ivcache`，Roamer 还无法表示非零起点。
+- 加固：单批结果不超过 `65,536` 条，累计结果不超过 `1,000,000` 条；结果数量、缓冲区、指针对齐、堆边界、协议版本和 Worker 崩溃均有防御校验。`appendGen5IvCacheHits`、进度回调或批次异常后会销毁整个池，下一次搜索重新建 Worker。
+- 文档：新增 [Gen 5 IV Cache Finder](modules/gen5ivcache.md)，更新需求、README、默认 Wasm 模块清单和上游 MT/RNGList 归属记录；`docs/tech-stack.md` 保留项目所有者改动，Dream Radar 不纳入本次接线。
+- 已通过：定向 Prettier、全仓 `npm run format:check`、`git diff --check`、定向 ESLint、`npm run typecheck`、`npm test -- src/features/gen5ivcache`（3 个文件、12 项测试）与 `$env:POKERNGKIT_WASM_MODULES='gen5ivcache'; npm run wasm:test:native`（固定结果与 C++ 写入前限流 2/2）。
+- 完整验证：锁定 Node `24.19.0` 与本机 npm `11.6.2` 下的非受限 `npm run verify` 通过全仓 Prettier、ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、57 个测试文件共 211 项测试、Vite 生产构建与 54 项 PWA 预缓存；受限环境首次在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`。CI 使用锁定 npm `12.0.2` 复核；Actions、生产 Wasm 与部署页面回归待提交推送后执行。
 
 ## 2026-08-14 Gen5 IDs
 

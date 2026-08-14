@@ -97,6 +97,12 @@ export const GEN5_MODULE_RESERVATIONS = [
     operations: ["generator"],
     status: "reserved",
   },
+  {
+    id: "gen5ivcache",
+    generation: 5,
+    operations: ["searcher"],
+    status: "reserved",
+  },
 ] as const satisfies readonly RngModuleReservation[];
 
 export type Gen5ModuleId = (typeof GEN5_MODULE_RESERVATIONS)[number]["id"];

@@ -1,0 +1,146 @@
+.gen5ivcache-panel {
+  width: min(100%, 760px);
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  background: var(--surface);
+  box-shadow: var(--panel-shadow);
+}
+
+.gen5ivcache-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.gen5ivcache-heading h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: 0;
+}
+
+.gen5ivcache-advance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.gen5ivcache-output-row {
+  display: grid;
+  grid-template-columns: minmax(132px, auto) minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.gen5ivcache-output-row .secondary-action,
+.gen5ivcache-output-name {
+  height: 44px;
+}
+
+.gen5ivcache-panel input,
+.gen5ivcache-panel button {
+  min-height: 44px;
+  font-size: 15px;
+}
+
+.gen5ivcache-output-name {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 14px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+}
+
+.gen5ivcache-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.gen5ivcache-progress-section {
+  margin-top: 20px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 20px;
+}
+
+.gen5ivcache-status {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.gen5ivcache-status progress {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 4px;
+  background: var(--line);
+  color: var(--brand);
+}
+
+.gen5ivcache-status progress::-webkit-progress-bar {
+  border-radius: 4px;
+  background: var(--line);
+}
+
+.gen5ivcache-status progress::-webkit-progress-value {
+  border-radius: 4px;
+  background: var(--brand);
+}
+
+.gen5ivcache-status progress::-moz-progress-bar {
+  border-radius: 4px;
+  background: var(--brand);
+}
+
+.gen5ivcache-status span,
+.gen5ivcache-status output {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.gen5ivcache-error {
+  display: grid;
+  gap: 2px;
+  margin-top: 16px;
+}
+
+@media (max-width: 720px) {
+  .gen5ivcache-panel {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .gen5ivcache-advance-grid,
+  .gen5ivcache-output-row,
+  .gen5ivcache-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen5ivcache-output-row .secondary-action,
+  .gen5ivcache-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gen5ivcache-status progress {
+    animation: none;
+  }
+}
