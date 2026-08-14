@@ -1,5 +1,6 @@
 import {
   type KeyboardEvent,
+  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -13,6 +14,7 @@ export interface AutoCompleteOption<T extends string | number> {
 }
 
 interface AutoCompleteComboBoxProps<T extends string | number> {
+  readonly disabled?: boolean;
   readonly inputValue: string;
   readonly label: string;
   readonly onInputChange: (value: string) => void;
@@ -23,6 +25,7 @@ interface AutoCompleteComboBoxProps<T extends string | number> {
 
 /** Mirrors PokeFinder ComboBox::enableAutoComplete with NoInsert semantics. */
 export function AutoCompleteComboBox<T extends string | number>({
+  disabled = false,
   inputValue,
   label,
   onInputChange,
@@ -49,25 +52,30 @@ export function AutoCompleteComboBox<T extends string | number>({
   const selectedIndex = filteredOptions.findIndex(
     (option) => option.value === value,
   );
+  const selectedOption = options.find((option) => option.value === value);
   const visibleActiveIndex = Math.min(
     Math.max(activeIndex, 0),
     Math.max(filteredOptions.length - 1, 0),
   );
   const activeOption = filteredOptions[visibleActiveIndex];
   const optionId = (index: number) => `${listboxId}-option-${index}`;
+  const restoreSelection = useCallback(() => {
+    onInputChange(selectedOption?.label ?? "");
+    setFilterText(undefined);
+    setOpen(false);
+  }, [onInputChange, selectedOption?.label]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || disabled) return;
     const closeOnOutsidePointer = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-        setFilterText(undefined);
+        restoreSelection();
       }
     };
     document.addEventListener("pointerdown", closeOnOutsidePointer);
     return () =>
       document.removeEventListener("pointerdown", closeOnOutsidePointer);
-  }, [open]);
+  }, [disabled, open, restoreSelection]);
 
   useEffect(() => {
     if (!open) return;
@@ -116,8 +124,7 @@ export function AutoCompleteComboBox<T extends string | number>({
     }
     if (event.key === "Escape" && open) {
       event.preventDefault();
-      setOpen(false);
-      setFilterText(undefined);
+      restoreSelection();
     }
   };
 
@@ -129,9 +136,19 @@ export function AutoCompleteComboBox<T extends string | number>({
         }
         aria-autocomplete="list"
         aria-controls={listboxId}
-        aria-expanded={open}
+        aria-expanded={open && !disabled}
         aria-label={label}
         autoComplete="off"
+        disabled={disabled}
+        onBlur={(event) => {
+          if (
+            event.relatedTarget instanceof Node &&
+            rootRef.current?.contains(event.relatedTarget)
+          ) {
+            return;
+          }
+          restoreSelection();
+        }}
         onChange={(event) => {
           onInputChange(event.target.value);
           setFilterText(event.target.value);
@@ -147,6 +164,7 @@ export function AutoCompleteComboBox<T extends string | number>({
       <button
         aria-label={label}
         className="autocomplete-combobox-trigger"
+        disabled={disabled}
         onClick={() => {
           if (open) {
             setOpen(false);
@@ -161,7 +179,7 @@ export function AutoCompleteComboBox<T extends string | number>({
       >
         <span aria-hidden="true">v</span>
       </button>
-      {open && filteredOptions.length > 0 && (
+      {open && !disabled && filteredOptions.length > 0 && (
         <div
           className="autocomplete-combobox-menu"
           id={listboxId}

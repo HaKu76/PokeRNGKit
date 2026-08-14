@@ -2,10 +2,23 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`540862a chore: 更新HakuStyle设计规范`
+> - Git 基线：`3433bd1 docs: 补充第五世代定点乱数验证记录`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 Static 已完成工程验证并准备提交，Gen5 Egg 待共享接线；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Gen5 Egg 已完成实现与提交前工程验证，准备提交；Gen5 Event 已完成独立实现，待下一模块接线；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 第五世代孵化乱数
+
+- 新增：实现 PokeFinder `Gen 5 Eggs` 的 Generator/Searcher，覆盖 Black、White、Black 2、White 2、双亲 IV/特性/性别/道具/性格、异国孵化、隐藏特性遗传和特殊蛋种派生。
+- 接入：增加独立 `gen5egg` Wasm API v1、最多四个 Worker、确定性分片、进度、取消、250,000,000 次状态评估上限、100,000 行结果上限和默认 Wasm 构建入口。
+- 界面：按 HakuStyle 紧凑工作台密度实现三列到单列的响应式表单、完整筛选、遗传来源、能力值切换、排序、CSV、虚拟结果表和鼠标/键盘行选择。
+- 工具：Generator 使用居中、可拖动的共享弹层打开 Advance Finder，复用 API v2 的 Chatot 联合区间与 Needles 精确/Any 连续匹配；跳转后选中对应结果并滚动到该行。
+- 完善：Searcher 选中结果后可打开 Adjacent Seeds；空十进制输入按上游读取为 `0`，物种必须从候选列表确认，双亲交换后的遗传来源按当次请求保持 A/B 映射，虚拟结果表补齐网格 ARIA 与方向键、Home、End 导航。
+- 已通过：`npm test -- src/features/gen4advance src/features/gen5egg` 共 5 个测试文件、23 项测试，定向 ESLint、全仓 TypeScript，以及 `gen4advance_native_parity` / `gen5egg_native_parity` 2/2。
+- 已通过：完整 `npm run wasm:test:native` 共 32/32 原生夹具，包含 `gen3pidtoiv_native_parity`、Advance Finder API v2 与 `gen5egg_native_parity`。
+- 已通过：使用 Node `24.19.0` 与 npm `12.0.2` 在非受限环境运行完整 `npm run verify`；格式、ESLint、TypeScript、72 个 Vitest 文件共 278 项测试和 Web/PWA 构建通过，仅保留两条既有 TanStack Virtual 警告与主包体积警告。
+- 环境记录：受限终端在复制 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一命令在非受限环境通过，确认不是源码失败。
+- 待验收：生产 Wasm、Actions 部署、外部 Chrome/Edge 的桌面/移动端交互与实际页面算法回归仍需等待部署完成，并由项目所有者提供准确生产 URL 和单独授权。
 
 ## 2026-08-14 第五世代定点乱数
 
@@ -16,6 +29,7 @@
 - 接入：增加独立 `gen5static` Wasm API v1、最多四个 Worker、确定性分片、进度、取消和虚拟结果表；Generator 通过可拖动居中弹层打开 Advance Finder，Searcher 把已选结果带入 Adjacent Seeds。
 - 更新：共享 `gen4advance` Wasm API 升级为 v2，增加第五世代 Needles 精确/Any 匹配，并保留 Calls/Chatot 请求格式。
 - 已通过：`npm test -- src/features/gen4advance src/features/gen5static` 共 6 个文件、21 项测试，定向 ESLint，以及 `gen4advance_native_parity` / `gen5static_native_parity` 2/2。
+- 已通过：完整 `npm run wasm:test:native` 共 31/31 原生夹具，包含附件曾失败的 `gen3pidtoiv_native_parity` 以及本轮 `gen4advance_native_parity` / `gen5static_native_parity`。
 - 已通过：使用 Node `24.19.0` 与 npm `12.0.2` 在非受限环境运行完整 `npm run verify`；格式、ESLint、TypeScript、67 个 Vitest 文件共 255 项测试和 Web/PWA 构建通过，仅保留两条既有 TanStack Virtual 警告与主包体积警告。
 - 环境记录：受限终端首次构建在复制 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一命令在非受限环境通过，确认不是源码失败。
 - 待验收：生产 Wasm、Actions 部署与实际页面算法回归仍需等待部署完成，并由项目所有者提供准确生产 URL 和单独授权。

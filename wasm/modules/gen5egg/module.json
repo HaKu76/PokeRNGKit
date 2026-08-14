@@ -1,0 +1,13 @@
+{
+  "id": "gen5egg",
+  "generation": 5,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen5egg",
+  "operations": ["generator", "searcher"],
+  "artifacts": {
+    "loader": "gen5egg.mjs",
+    "wasm": "gen5egg.wasm"
+  },
+  "source": "PokeFinder 4.3.2 EggGenerator5 and Searcher5"
+}
