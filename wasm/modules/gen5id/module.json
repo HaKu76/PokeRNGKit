@@ -1,0 +1,13 @@
+{
+  "id": "gen5id",
+  "generation": 5,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen5id",
+  "operations": ["generator", "searcher"],
+  "artifacts": {
+    "loader": "gen5id.mjs",
+    "wasm": "gen5id.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen V IDs5/IDGenerator5/IDSearcher5"
+}

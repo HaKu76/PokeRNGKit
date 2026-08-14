@@ -2,10 +2,17 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`45a84d9 feat: 实现全局研究工具`
+> - Git 基线：`7c267eb fix: 修复移动端模块抽屉交互`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：共享移动端模块抽屉修复已完成验证；Gen5 IDs、Gen5 Adjacent Seeds 与 Gen5 IV Cache Finder 已完成隔离实现，等待逐模块接入；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Gen5 IDs 已完成共享接入与完整验证，等待独立提交；Gen5 Adjacent Seeds 与 Gen5 IV Cache Finder 保持隔离实现；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 Gen5 IDs
+
+- 新增：PokeFinder `Gen 5 TID/SID` 的 Search By 与 Seed Finder，覆盖 BW/BW2 SHA-1、初始 ID 推进、PID/TID/SID 筛选、第五世代 Profile、九列虚拟结果表、取消和结果上限。
+- 安全边界：TypeScript 使用 BigInt 将有筛选任务的 `Seed x Advances` 总评估限制为 250,000,000；完全无筛选的 Search By 按 100,000 行结果上限计算提前终止边界，使默认 Profile 与默认推进数可以启动。Worker Pool 逐行校验日期时间、Timer0、按键、推进数、TID/SID/TSV 与筛选关系，C++ 同步拒绝任务规模和绝对推进溢出；Worker 崩溃或协议错误会终止并清空槽位，下次搜索重新创建。
+- 上游标签：`ProfileDisplay5` 的简中 `Profile` 与 `Manager` 均为 unfinished，因此界面保留英文，并补回上游 Profile Display 的 `Manager` 命令以跳转第五世代存档管理。
+- 已通过：定向 Prettier、ESLint、TypeScript、3 个测试文件共 9 项测试和 MSVC C++23 原生夹具 1/1；非受限环境完整 `npm run verify` 通过全仓 Prettier、ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、52 个测试文件共 195 项测试、Vite 生产构建与 52 项 PWA 预缓存。受限环境同一命令仅在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`；Actions、生产 Wasm 与部署页面回归待执行。
 
 ## 2026-08-14 Researcher
 
@@ -27,7 +34,8 @@
 - 响应式：进入桌面断点时清除移动抽屉状态且不抢占当前焦点，回到窄屏后保持关闭；关闭状态继续使用 `inert` 与 `aria-hidden`，桌面收起行为不变。
 - 已通过：定向 Prettier、`npx eslint src/App.tsx`、`git diff --check`、全仓 `npm run format:check`，以及非受限环境完整 `npm run verify`；后者覆盖 ESLint（0 error，2 条既有 TanStack Virtual warning）、TypeScript、51 个测试文件共 194 项测试、Vite 生产构建与 51 项 PWA 预缓存。
 - 验证重试：受限环境在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`；一次 1 秒执行器超时只进入 Prettier，另一次非受限重跑捕获并行 IV Cache 文件尚未完成格式化。并行写入停止并重新格式化后，同一完整命令通过。
-- 待验证：源码修复尚未提交和部署；部署后仍需使用外部 Chrome 复验滚动锁、焦点循环、内部关闭、浮动工具互斥和断点切换，并与项目所有者共同完成最终验收。
+- 已部署：提交 `7c267eb` 对应 Actions run `31769597386` 的 `build` 与 `deploy` 成功，`deploy-cloudflare` 按配置跳过；GitHub Pages 刷新后加载 `index-BTDNg88F.js`。
+- 生产回归：经项目所有者授权，使用已连接的外部 Google Chrome 检查 `https://haku76.github.io/PokeRNGKit/`；`390px` 下抽屉打开会锁定页面滚动并把焦点移入当前模块，`Shift+Tab` / `Tab` 在内部关闭按钮与末项间循环，内部关闭会恢复顶部菜单焦点，浮动工具与抽屉不会同时保持展开。`390px -> 1280px -> 390px` 切换会解除滚动锁、移除桌面对话框语义并在返回窄屏时保持抽屉关闭；自动化结果仅作为工程证据，项目所有者最终验收仍待共同确认。
 
 ## 2026-08-14 Gen5 Profiles
 
