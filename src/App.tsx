@@ -181,6 +181,8 @@ function App() {
       typeof window !== "undefined" &&
       window.matchMedia("(min-width: 901px)").matches,
   );
+  const moduleMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const moduleRailRef = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => () => searchEngine.dispose(), [searchEngine]);
@@ -190,19 +192,70 @@ function App() {
   }, [language]);
   useEffect(() => {
     const media = window.matchMedia("(min-width: 901px)");
-    const updateViewport = () => setWideViewport(media.matches);
+    const updateViewport = () => {
+      setWideViewport(media.matches);
+      if (media.matches) setModuleRailOpen(false);
+    };
     updateViewport();
     media.addEventListener("change", updateViewport);
     return () => media.removeEventListener("change", updateViewport);
   }, []);
   useEffect(() => {
-    if (!moduleRailOpen) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setModuleRailOpen(false);
+    if (!moduleRailOpen || wideViewport) return;
+
+    const rail = moduleRailRef.current;
+    const menuButton = moduleMenuButtonRef.current;
+    const previousBodyOverflow = document.body.style.overflow;
+    const getFocusableElements = () =>
+      rail
+        ? Array.from(
+            rail.querySelectorAll<HTMLElement>(
+              'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            ),
+          ).filter((element) => element.offsetParent !== null)
+        : [];
+
+    document.body.style.overflow = "hidden";
+    const focusFrame = window.requestAnimationFrame(() => {
+      const activeEntry = rail?.querySelector<HTMLElement>(
+        ".module-entry.active",
+      );
+      (activeEntry ?? getFocusableElements()[0])?.focus();
+    });
+    const handleDrawerKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setModuleRailOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const focusableElements = getFocusableElements();
+      if (focusableElements.length === 0) return;
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      } else if (!rail?.contains(document.activeElement)) {
+        event.preventDefault();
+        first.focus();
+      }
     };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [moduleRailOpen]);
+
+    window.addEventListener("keydown", handleDrawerKeyDown);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener("keydown", handleDrawerKeyDown);
+      document.body.style.overflow = previousBodyOverflow;
+      if (!window.matchMedia("(min-width: 901px)").matches) {
+        menuButton?.focus();
+      }
+    };
+  }, [moduleRailOpen, wideViewport]);
 
   const calculatedRsSeed = useMemo(() => {
     if (deadBattery) return 0x05a0;
@@ -237,6 +290,7 @@ function App() {
   };
 
   const openIvCalculator = () => {
+    setModuleRailOpen(false);
     setIvCalculatorExpanded(true);
     setEncounterLookupExpanded(false);
     setContributionsExpanded(false);
@@ -250,6 +304,7 @@ function App() {
     setProfileExpanded(expanded);
     persistGen3ProfilePanelExpanded(expanded);
     if (expanded) {
+      setModuleRailOpen(false);
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
       setContributionsExpanded(false);
@@ -260,6 +315,7 @@ function App() {
     setGen4ProfileExpanded(expanded);
     persistGen4ProfilePanelExpanded(expanded);
     if (expanded) {
+      setModuleRailOpen(false);
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
       setContributionsExpanded(false);
@@ -404,10 +460,7 @@ function App() {
             ? "profile"
             : undefined;
 
-  const toggleFloatingTool = (
-    tool: "contributions" | "encounter" | "iv" | "profile",
-  ) => {
-    const expanded = activeFloatingTool !== tool;
+  const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
     setIvCalculatorExpanded(false);
     setContributionsExpanded(false);
@@ -416,6 +469,14 @@ function App() {
     } else {
       changeProfileExpanded(false);
     }
+  };
+
+  const toggleFloatingTool = (
+    tool: "contributions" | "encounter" | "iv" | "profile",
+  ) => {
+    const expanded = activeFloatingTool !== tool;
+    setModuleRailOpen(false);
+    closeFloatingTools();
     if (!expanded) return;
     if (tool === "contributions") setContributionsExpanded(true);
     else if (tool === "encounter") setEncounterLookupExpanded(true);
@@ -445,6 +506,7 @@ function App() {
               if (wideViewport) {
                 setModuleRailCollapsed((current) => !current);
               } else {
+                if (!moduleRailOpen) closeFloatingTools();
                 setModuleRailOpen((current) => !current);
               }
             }}
@@ -457,6 +519,7 @@ function App() {
                   ? "closeModules"
                   : "openModules",
             )}
+            ref={moduleMenuButtonRef}
             type="button"
           >
             <span aria-hidden="true">☰</span>
@@ -541,6 +604,8 @@ function App() {
           />
         )}
         <aside
+          aria-label={!wideViewport ? t("modules") : undefined}
+          aria-modal={!wideViewport ? true : undefined}
           aria-hidden={
             (!wideViewport && !moduleRailOpen) ||
             (wideViewport && moduleRailCollapsed)
@@ -555,7 +620,22 @@ function App() {
               ? true
               : undefined
           }
+          ref={moduleRailRef}
+          role={!wideViewport ? "dialog" : undefined}
         >
+          {!wideViewport && (
+            <div className="module-drawer-heading">
+              <button
+                aria-label={t("closeModules")}
+                className="module-drawer-close"
+                onClick={() => setModuleRailOpen(false)}
+                title={t("closeModules")}
+                type="button"
+              >
+                <span aria-hidden="true">&larr;</span>
+              </button>
+            </div>
+          )}
           <nav aria-label={t("modules")} className="module-navigation">
             <div className="rail-section-label">GEN III</div>
             <button
@@ -1684,6 +1764,7 @@ function App() {
           onExpandedChange={(expanded) => {
             setContributionsExpanded(expanded);
             if (expanded) {
+              setModuleRailOpen(false);
               setIvCalculatorExpanded(false);
               setEncounterLookupExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
@@ -1696,6 +1777,7 @@ function App() {
           onExpandedChange={(expanded) => {
             setIvCalculatorExpanded(expanded);
             if (expanded) {
+              setModuleRailOpen(false);
               setEncounterLookupExpanded(false);
               setContributionsExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
@@ -1708,6 +1790,7 @@ function App() {
           onExpandedChange={(expanded) => {
             setEncounterLookupExpanded(expanded);
             if (expanded) {
+              setModuleRailOpen(false);
               setIvCalculatorExpanded(false);
               setContributionsExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);

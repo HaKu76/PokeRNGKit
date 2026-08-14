@@ -2,10 +2,10 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`ae69352 feat: 实现第五世代存档信息管理与校准`
+> - Git 基线：`45a84d9 feat: 实现全局研究工具`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Researcher 已完成实现、共享接入与本地工程检查，等待独立提交；`docs/tech-stack.md` 保留项目所有者改动
-> - 验收状态：Gen5 Profiles 已提交推送；Researcher 生产 Wasm、Actions、部署回归与项目所有者验收待执行
+> - 工作区状态：共享移动端模块抽屉修复已完成验证；Gen5 IDs、Gen5 Adjacent Seeds 与 Gen5 IV Cache Finder 已完成隔离实现，等待逐模块接入；`docs/tech-stack.md` 保留项目所有者改动
+> - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
 
 ## 2026-08-14 Researcher
 
@@ -16,7 +16,18 @@
 - 已通过：定向 Prettier、`git diff --check`、定向 ESLint、`npm run typecheck` 与 `npm test -- src/features/researcher`（3 个文件、11 项测试）；`$env:POKERNGKIT_WASM_MODULES='researcher'; npm run wasm:test:native` 的 `researcher_native_parity` 1/1 通过 14 种 RNG 首值、跨行 Custom、批次上限与 `u32` 帧边界。
 - 完整验证：非受限环境 `npm run verify` 通过全仓 Prettier、ESLint（0 error，2 条既有 TanStack Virtual warning）、TypeScript、45 个测试文件共 176 项测试、Vite 生产构建与 51 项 PWA 预缓存；Vite 仅保留大包 warning。受限环境两次在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`，相同源码在非受限环境完整通过。
 - 工具链：最终 `npm run verify` 使用锁定 Node `24.19.0` 与本机 npm `11.6.2`；npm `12.0.2`、全量原生夹具和 Researcher 生产 Wasm 由推送后的 Actions 补齐。本机未激活 Emscripten `6.0.6`，定向 `npm run wasm:build` 因缺少 Emscripten 与 `emcmake` 停止。
-- 未验收：外部 Chrome/Edge 与 GitHub Pages 算法结果待 Actions 部署完成后和项目所有者共同核对。
+- 已部署：提交 `45a84d9` 对应 Actions run `31766341675` 的 `build` 与 `deploy` 成功，`deploy-cloudflare` 按配置跳过；GitHub Pages 刷新后加载 `index-BomXgEd3.js`、`index-aKq41HjQ.css` 与 `researcher.worker-DHLB9crx.js`。
+- 生产回归：经项目所有者授权，使用已连接的外部 Google Chrome 检查 `https://haku76.github.io/PokeRNGKit/`。LCRNG 全零 Seed 首行返回 `00006073`；Xoroshiro 全零 Seed 首行返回 `82A2B175229D6A5B`；Search 定位 `E97E7B6A` 第 1 帧，Next 无后续匹配时返回“找不到结果”；四组页签方向键、roving `tabIndex`、结果网格 ARIA 选中状态和 `390px` 两列重排均可用。
+- 控制台：站点自身没有 error 或 warning；仅记录用户浏览器 Immersive Translate 扩展的版本不匹配错误。自动化结果仅作为工程证据，Researcher 仍需与项目所有者共同完成最终验收。
+
+## 2026-08-14 移动端模块抽屉
+
+- 修复：移动端模块抽屉打开时关闭其他浮动工具并锁定页面滚动；浮动工具打开时也会关闭模块抽屉，避免两套模态层同时争用焦点、`Escape` 和滚动锁。
+- 可访问性：窄屏模块侧栏补充对话框名称、模态语义和内部返回按钮，将焦点移入当前模块，使用 `Tab` / `Shift+Tab` 约束焦点循环，并在 `Escape`、遮罩、返回按钮或模块切换关闭后恢复顶部菜单按钮焦点。
+- 响应式：进入桌面断点时清除移动抽屉状态且不抢占当前焦点，回到窄屏后保持关闭；关闭状态继续使用 `inert` 与 `aria-hidden`，桌面收起行为不变。
+- 已通过：定向 Prettier、`npx eslint src/App.tsx`、`git diff --check`、全仓 `npm run format:check`，以及非受限环境完整 `npm run verify`；后者覆盖 ESLint（0 error，2 条既有 TanStack Virtual warning）、TypeScript、51 个测试文件共 194 项测试、Vite 生产构建与 51 项 PWA 预缓存。
+- 验证重试：受限环境在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`；一次 1 秒执行器超时只进入 Prettier，另一次非受限重跑捕获并行 IV Cache 文件尚未完成格式化。并行写入停止并重新格式化后，同一完整命令通过。
+- 待验证：源码修复尚未提交和部署；部署后仍需使用外部 Chrome 复验滚动锁、焦点循环、内部关闭、浮动工具互斥和断点切换，并与项目所有者共同完成最终验收。
 
 ## 2026-08-14 Gen5 Profiles
 
