@@ -2,10 +2,19 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`973a3e8 feat: 实现第五世代相邻种子`
+> - Git 基线：`e214060 feat: 实现第五世代IV缓存`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 IV Cache Finder 已完成共享接线、语义加固和定向验证，等待独立提交；Dream Radar 保持隔离研究；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：赞助入口等待独立提交；Dream Radar 保持隔离研究；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 赞助入口
+
+- 新增：页脚增加“赞助”入口，与贡献榜保持同一信息层级；点击后使用共享浮动工具弹层居中显示支付宝和微信支付两张收款码。
+- 资源：将项目所有者提供的 `Alipay.jpg` 与 `WeChatPay.jpg` 收纳到独立功能目录并通过 Vite 静态导入，保留原始分辨率、完整方形画面和离线 PWA 资源哈希。
+- 交互：弹层支持遮罩点击、`Escape`、关闭按钮、焦点约束与恢复、滚动锁、桌面指针拖动和键盘方向键移动；二维码使用同源原图链接，移动端可长按保存，也可轻点或键盘激活直接下载原始 JPG。
+- 样式：按 HakuStyle 标准产品密度使用 15px 标签、12px 图片圆角和安静边框；桌面双列、窄屏单列，不裁切二维码，不增加装饰渐变、嵌套卡片或说明性填充文案。
+- 已通过：任务文件定向 Prettier、全仓 `npm run format:check`、`git diff --check`、定向 ESLint、`npm run typecheck`；完整 `npm run verify` 首次通过格式、lint、TypeScript 与 57 个测试文件共 211 项测试，仅在受限环境复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`，非受限重跑通过 Vite 生产构建与 54 项 PWA 预缓存。
+- 未验收：外部 Chrome/Edge 与部署页面视觉、长按保存行为等待提交部署后和项目所有者共同核对。
 
 ## 2026-08-14 Gen5 IV Cache Finder
 
@@ -16,6 +25,7 @@
 - 文档：新增 [Gen 5 IV Cache Finder](modules/gen5ivcache.md)，更新需求、README、默认 Wasm 模块清单和上游 MT/RNGList 归属记录；`docs/tech-stack.md` 保留项目所有者改动，Dream Radar 不纳入本次接线。
 - 已通过：定向 Prettier、全仓 `npm run format:check`、`git diff --check`、定向 ESLint、`npm run typecheck`、`npm test -- src/features/gen5ivcache`（3 个文件、12 项测试）与 `$env:POKERNGKIT_WASM_MODULES='gen5ivcache'; npm run wasm:test:native`（固定结果与 C++ 写入前限流 2/2）。
 - 完整验证：锁定 Node `24.19.0` 与本机 npm `11.6.2` 下的非受限 `npm run verify` 通过全仓 Prettier、ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、57 个测试文件共 211 项测试、Vite 生产构建与 54 项 PWA 预缓存；受限环境首次在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`。CI 使用锁定 npm `12.0.2` 复核；Actions、生产 Wasm 与部署页面回归待提交推送后执行。
+- 已提交：`e214060 feat: 实现第五世代IV缓存` 已推送到 `origin/main`；Actions 部署与生产页面回归待执行。
 
 ## 2026-08-14 Gen5 IDs
 

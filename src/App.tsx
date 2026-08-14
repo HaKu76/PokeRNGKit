@@ -47,6 +47,7 @@ import { Gen3WildPanel } from "./features/wild/Gen3WildPanel";
 import { Gen7IdPanel } from "./features/gen7id/Gen7IdPanel";
 import { PokerusFinderPanel } from "./features/pokerusfinder/PokerusFinderPanel";
 import { ContributionsPanel } from "./features/contributions/ContributionsPanel";
+import { SponsorshipPanel } from "./features/sponsorship/SponsorshipPanel";
 import { IvCalculator } from "./features/gen4ivcalculator/Gen4IvCalculator";
 import { Gen4ProfileControls } from "./features/gen4profiles/Gen4ProfileControls";
 import { DEFAULT_GEN4_PROFILE } from "./features/gen4profiles/domain";
@@ -137,6 +138,7 @@ function App() {
   const [ivCalculatorExpanded, setIvCalculatorExpanded] = useState(false);
   const [encounterLookupExpanded, setEncounterLookupExpanded] = useState(false);
   const [contributionsExpanded, setContributionsExpanded] = useState(false);
+  const [sponsorshipExpanded, setSponsorshipExpanded] = useState(false);
   const [profileExpanded, setProfileExpanded] = useState(
     initialGen3ProfilePanelExpanded,
   );
@@ -300,6 +302,7 @@ function App() {
     setIvCalculatorExpanded(true);
     setEncounterLookupExpanded(false);
     setContributionsExpanded(false);
+    setSponsorshipExpanded(false);
     setProfileExpanded(false);
     persistGen3ProfilePanelExpanded(false);
     setGen4ProfileExpanded(false);
@@ -314,6 +317,7 @@ function App() {
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
       setContributionsExpanded(false);
+      setSponsorshipExpanded(false);
     }
   };
 
@@ -325,6 +329,7 @@ function App() {
       setIvCalculatorExpanded(false);
       setEncounterLookupExpanded(false);
       setContributionsExpanded(false);
+      setSponsorshipExpanded(false);
     }
   };
 
@@ -459,24 +464,27 @@ function App() {
     activeModule !== "gen5adjacentseeds" &&
     activeModule !== "gen5ivcache" &&
     activeModule !== "researcher";
-  const activeFloatingTool = contributionsExpanded
-    ? "contributions"
-    : ivCalculatorExpanded
-      ? "iv"
-      : encounterLookupExpanded
-        ? "encounter"
-        : profileTools && gen4Tools
-          ? gen4ProfileExpanded
-            ? "profile"
-            : undefined
-          : profileTools && profileExpanded
-            ? "profile"
-            : undefined;
+  const activeFloatingTool = sponsorshipExpanded
+    ? "sponsorship"
+    : contributionsExpanded
+      ? "contributions"
+      : ivCalculatorExpanded
+        ? "iv"
+        : encounterLookupExpanded
+          ? "encounter"
+          : profileTools && gen4Tools
+            ? gen4ProfileExpanded
+              ? "profile"
+              : undefined
+            : profileTools && profileExpanded
+              ? "profile"
+              : undefined;
 
   const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
     setIvCalculatorExpanded(false);
     setContributionsExpanded(false);
+    setSponsorshipExpanded(false);
     if (gen4Tools) {
       changeGen4ProfileExpanded(false);
     } else {
@@ -485,13 +493,14 @@ function App() {
   };
 
   const toggleFloatingTool = (
-    tool: "contributions" | "encounter" | "iv" | "profile",
+    tool: "contributions" | "encounter" | "iv" | "profile" | "sponsorship",
   ) => {
     const expanded = activeFloatingTool !== tool;
     setModuleRailOpen(false);
     closeFloatingTools();
     if (!expanded) return;
-    if (tool === "contributions") setContributionsExpanded(true);
+    if (tool === "sponsorship") setSponsorshipExpanded(true);
+    else if (tool === "contributions") setContributionsExpanded(true);
     else if (tool === "encounter") setEncounterLookupExpanded(true);
     else if (tool === "iv") setIvCalculatorExpanded(true);
     else if (gen4Tools) changeGen4ProfileExpanded(true);
@@ -1860,6 +1869,20 @@ function App() {
         </main>
       </div>
       <div className="floating-tools">
+        <SponsorshipPanel
+          expanded={activeFloatingTool === "sponsorship"}
+          onExpandedChange={(expanded) => {
+            setSponsorshipExpanded(expanded);
+            if (expanded) {
+              setModuleRailOpen(false);
+              setIvCalculatorExpanded(false);
+              setEncounterLookupExpanded(false);
+              setContributionsExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
         <ContributionsPanel
           expanded={activeFloatingTool === "contributions"}
           onExpandedChange={(expanded) => {
@@ -1868,6 +1891,7 @@ function App() {
               setModuleRailOpen(false);
               setIvCalculatorExpanded(false);
               setEncounterLookupExpanded(false);
+              setSponsorshipExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
               else changeProfileExpanded(false);
             }
@@ -1881,6 +1905,7 @@ function App() {
               setModuleRailOpen(false);
               setEncounterLookupExpanded(false);
               setContributionsExpanded(false);
+              setSponsorshipExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
               else changeProfileExpanded(false);
             }
@@ -1894,6 +1919,7 @@ function App() {
               setModuleRailOpen(false);
               setIvCalculatorExpanded(false);
               setContributionsExpanded(false);
+              setSponsorshipExpanded(false);
               if (gen4Tools) changeGen4ProfileExpanded(false);
               else changeProfileExpanded(false);
             }
@@ -1987,8 +2013,20 @@ function App() {
       </div>
       <footer className="legal-footer">
         <button
+          aria-controls="sponsorship-panel"
+          aria-expanded={activeFloatingTool === "sponsorship"}
+          aria-haspopup="dialog"
+          className="legal-footer-action"
+          id="sponsorship-trigger"
+          onClick={() => toggleFloatingTool("sponsorship")}
+          type="button"
+        >
+          {t("sponsorship")}
+        </button>
+        <button
           aria-controls="contributions-panel"
           aria-expanded={activeFloatingTool === "contributions"}
+          aria-haspopup="dialog"
           className="legal-footer-action"
           id="contributions-trigger"
           onClick={() => toggleFloatingTool("contributions")}
