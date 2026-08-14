@@ -50,6 +50,12 @@ export const GEN4_MODULE_RESERVATIONS = [
     status: "reserved",
   },
   {
+    id: "gen4egg",
+    generation: 4,
+    operations: ["generator", "searcher"],
+    status: "reserved",
+  },
+  {
     id: "gen4event",
     generation: 4,
     operations: ["generator", "searcher"],

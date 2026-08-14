@@ -2,10 +2,19 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`592eef2 feat: 补齐个体值查询PID迷人之躯结果`
+> - Git 基线：`c70037d feat: 实现第四世代配信乱数模块`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen4 Event 与 Gen4 Egg 正在分模块实现；Gen4 Event 已进入共享接入
-> - 验收状态：Gen4 Event 定向 TypeScript 检查与原生夹具已通过；完整 Wasm 与部署回归待执行
+> - 工作区状态：Gen4 Egg 已完成共享接入并待提交；Gen4 Advance 私有目录已完成，Gen5 Profiles 正在独立开发；`docs/tech-stack.md` 保留项目所有者改动
+> - 验收状态：Gen4 Egg 工程检查与原生夹具已通过；生产 Wasm 与部署回归待执行
+
+## 2026-08-14 Gen4 Egg
+
+- 新增：第四世代 DPPt/HGSS Egg Generator/Searcher，覆盖 MT19937 PID、异国孵化 ARNG 重抽、三项遗传 IV、双亲组合、221 个合法蛋种、筛选、Poketch 与电话结果。
+- 接入：新增 `gen4egg` Wasm API v1、Generator/Searcher Worker Pool、固定宽度 C ABI、GEN IV 导航、三语词条、共享契约和默认 Wasm 构建列表；简中模块名逐字使用上游“第四世代孵化乱数”。
+- 加固：Worker 验证 operation、请求与分片类型、`chunkIndex`、领域边界、单批上限、结果计数及 Wasm 指针对齐、非空和堆范围；Pool 按分片索引有序归并并在取消时重建 Worker。
+- 已通过：`npm run format:check`、`git diff --check`、`npm test -- src/features/gen4egg`（2 个文件、11 项测试）、`npm run lint`（0 error，2 条既有 warning）、`npm run typecheck` 与 `$env:POKERNGKIT_WASM_MODULES='gen4egg'; npm run wasm:test:native`（`gen4egg_native_parity` 1/1）。
+- 完整验证：受限文件环境的 `npm run verify` 通过格式、lint、类型和 39 个测试文件共 151 项测试，随后在复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`；相同源码状态在受限环境外完整通过 Vite 生产构建与 48 项 PWA 预缓存。
+- 未验收：Emscripten 生产 Wasm、外部 Chrome/Edge 与 GitHub Pages 算法结果待部署完成后和项目所有者共同核对。
 
 ## 2026-08-14 Gen4 Wondercard IVs
 

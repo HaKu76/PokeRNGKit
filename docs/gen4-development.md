@@ -1,11 +1,11 @@
 # 第四世代扩展接口与 AI 交接
 
-> - 状态：第四世代 ID、Seed to Time、Static、Wild、Wondercard IVs 与 Chained Shiny to SID 已实现；完整工程与生产回归待验证
+> - 状态：第四世代 ID、Seed to Time、Static、Wild、Egg、Wondercard IVs 与 Chained Shiny to SID 已实现；完整工程与生产回归待验证
 > - 更新日期：2026-08-14
 > - 上游基线：PokeFinder 4.3.2
-> - 当前产品范围：第三世代既有模块与第四世代 ID/Seed to Time/Static/Wild/Wondercard IVs/Chained Shiny to SID
+> - 当前产品范围：第三世代既有模块与第四世代 ID/Seed to Time/Static/Wild/Egg/Wondercard IVs/Chained Shiny to SID
 
-本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前已落地 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4event` 与 `gen4chainedsid`；不得据此推断已支持其他第四世代功能。
+本文用于另一位开发者或 AI 在新会话中恢复第四世代模块。当前已落地 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4event` 与 `gen4chainedsid`；不得据此推断已支持其他第四世代功能。
 
 ## 1. 已保留接口
 
@@ -16,9 +16,9 @@
 - `RngWorkerInitMessage`：加载 MJS/Wasm 前声明模块、协议和 API 版本。
 - `RngWorkerTaskMessage`：携带 `taskId`、操作、`chunkIndex`、模块请求和分片。
 - `RngWorkerReadyMessage`、`RngWorkerBatchMessage`、`RngWorkerErrorMessage`：握手、批次和失败信封。
-- `GEN4_MODULE_RESERVATIONS`：登记 `gen4id`、`gen4static`、`gen4wild`、`gen4event` 与 `gen4chainedsid` 的模块标识和 Generator/Searcher 能力。
+- `GEN4_MODULE_RESERVATIONS`：登记 `gen4id`、`gen4static`、`gen4wild`、`gen4egg`、`gen4event` 与 `gen4chainedsid` 的模块标识和 Generator/Searcher 能力。
 
-`gen4id`、`gen4static`、`gen4wild`、`gen4event` 与 `gen4chainedsid` 已分别使用 API 版本 `1`、独立 Wasm target、导航入口和 UI 预览引擎；`gen4chainedsid` 为单 Dedicated Worker，其余大范围模块按任务使用 Worker Pool。
+`gen4id`、`gen4static`、`gen4wild`、`gen4egg`、`gen4event` 与 `gen4chainedsid` 已分别使用 API 版本 `1`、独立 Wasm target、导航入口和 UI 预览引擎；`gen4chainedsid` 为单 Dedicated Worker，其余大范围模块按任务使用 Worker Pool。
 
 ## 2.1 当前已实现：`gen4static`
 
@@ -60,6 +60,15 @@ Generator 的 `Max Advances` 与 PokeFinder 一致，包含起点，因此输入
 
 详细输入、算法、结果布局和验证状态见 [`docs/modules/gen4event.md`](modules/gen4event.md)。
 
+## 2.5 当前已实现：`gen4egg`
+
+- 覆盖 PokeFinder 第四世代 `Gen 4 Eggs` 的 DPPt/HGSS Generator/Searcher、蛋生成与领取双 Seed/Advance、异国孵化和三项遗传 IV。
+- 双亲设置覆盖六项 IV、性别与百变怪组合，物种数据固定为上游 `EggSettings.cpp` 的 221 个合法蛋种，并保留尼多兰♀与电萤虫伴生种映射。
+- Generator 显示 DPPt Poketch 操作或 HGSS 电话；Searcher 枚举 `ab/cd/delay` 初始 Seed 空间，并按分片索引恢复确定顺序。
+- API v1、独立 Wasm target、Generator/Searcher Worker Pool、固定宽度请求/结果、原生夹具、TypeScript 边界测试和 UI Preview 已实现并接入默认构建列表。
+
+详细输入、数据、算法、结果布局和验证状态见 [`docs/modules/gen4egg.md`](modules/gen4egg.md)。
+
 ## 2. 模块边界
 
 第四世代按 PokeFinder 模块分别落地：
@@ -69,10 +78,11 @@ Generator 的 `Max Advances` 与 PokeFinder 一致，包含起点，因此输入
 | `gen4id`         | `Form/Gen4/IDs4`             | `IDGenerator4`、`IDSearcher4`         | `IDGenerator4Test.cpp`、`IDSearcher4Test.cpp`、`id4.json`             |
 | `gen4static`     | `Form/Gen4/Static4`          | `StaticGenerator4`、`StaticSearcher4` | `StaticGenerator4Test.cpp`、`StaticSearcher4Test.cpp`、`static4.json` |
 | `gen4wild`       | `Form/Gen4/Wild4`            | `WildGenerator4`、`WildSearcher4`     | `WildGenerator4Test.cpp`、`WildSearcher4Test.cpp`、`wild4.json`       |
+| `gen4egg`        | `Form/Gen4/Eggs4`            | `EggGenerator4`、`EggSearcher4`       | `EggGenerator4Test.cpp`、`egg4.json`                                  |
 | `gen4event`      | `Form/Gen4/Event4`           | `EventGenerator4`、`EventSearcher4`   | Web 固定夹具与 PokeFinder Core 行为                                   |
 | `gen4chainedsid` | `Form/Gen4/Tools/ChainedSID` | `ChainedSIDCalc`                      | `ChainedSIDCalcTest.cpp`、`chainedsid.json`                           |
 
-每次只实现一个模块。Egg、Roamer 等保持独立候选，不并入现有模块。
+每次只实现一个模块。Roamer 等保持独立候选，不并入现有模块。
 
 ## 3. AI 必读顺序
 
