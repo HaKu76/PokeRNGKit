@@ -1,0 +1,6 @@
+{
+  "id": "gen5event",
+  "target": "gen5event",
+  "apiVersion": 1,
+  "artifacts": ["gen5event.mjs", "gen5event.wasm"]
+}

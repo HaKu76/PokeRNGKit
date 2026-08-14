@@ -2,10 +2,23 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`3433bd1 docs: 补充第五世代定点乱数验证记录`
+> - Git 基线：`e858751 feat: 实现第五世代孵化乱数`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 Egg 已完成实现与提交前工程验证，准备提交；Gen5 Event 已完成独立实现，待下一模块接线；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Gen5 Egg 已提交推送；Gen5 Event 已完成实现与提交前工程验证，准备提交；Gen5 Wild 并行开发中；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 第五世代配信乱数
+
+- 新增：实现 PokeFinder `Gen 5 Event` 的 Generator/Searcher，覆盖 Black、White、Black 2、White 2，以及 204 字节 `.pgf` 配信卡导入。
+- 参数：支持配信 TID/SID、物种、固定或随机性格、性别、特性、异色、等级、蛋标记、六项固定或随机个体值，以及个体值、性格、觉醒属性、特性、性别和异色筛选。
+- 接入：增加独立 `gen5event` Wasm API v1、最多四个 Worker、确定性分片、进度、取消、250,000,000 次状态评估上限、100,000 行结果上限和默认 Wasm 构建入口。
+- 界面：按 HakuStyle 紧凑工作台实现三列到单列响应式表单、Profile 摘要、PGF 导入、虚拟结果表、鼠标/键盘行选择、能力值切换和可拖动 Advance Finder；Searcher 日期使用本地持久化降级。
+- 完善：物种必须从自动完成候选确认；能力值固定使用当次任务的物种与结果等级；结果表使用合法可选择网格语义；Worker 把有效结果上限传入任务并限制解码；Generator 允许 Profile 九项 Keypresses 全关闭。
+- 已通过：`npm test -- src/features/gen5event` 共 5 个测试文件、22 项测试，定向 ESLint、全仓 TypeScript，以及 `gen4advance_native_parity` / `gen5event_native_parity` 2/2。
+- 已通过：完整 `npm run wasm:test:native` 共 33/33 原生夹具，包含 `gen3pidtoiv_native_parity`、Advance Finder API v2 与 `gen5event_native_parity`。
+- 已通过：使用 Node `24.19.0` 与 npm `12.0.2` 运行完整 `npm run verify`；格式、ESLint、TypeScript、72 个 Vitest 文件共 281 项测试通过，非受限 Web/PWA 构建成功并生成 `gen5event.worker`，仅保留两条既有 TanStack Virtual 警告与主包体积警告。
+- 环境记录：受限终端在复制 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一构建命令在非受限环境通过，确认不是源码失败。
+- 待验收：生产 Wasm、Actions 部署、外部 Chrome/Edge 的桌面/移动端交互与实际页面算法回归仍需等待部署完成，并由项目所有者提供准确生产 URL 和单独授权。
 
 ## 2026-08-14 第五世代孵化乱数
 
