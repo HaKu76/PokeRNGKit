@@ -35,10 +35,7 @@ import {
   type Gen8Profile,
   type Gen8ProfileDraft,
 } from "./domain";
-import {
-  useGen8Profiles,
-  type Gen8ProfilesController,
-} from "./useGen8Profiles";
+import type { Gen8ProfilesController } from "./useGen8Profiles";
 import "./Gen8ProfilesPanel.css";
 
 interface Labels {
@@ -840,13 +837,16 @@ function MobileProfiles({
   );
 }
 
-export function Gen8ProfilesPanel() {
+export function Gen8ProfilesPanel({
+  controller,
+}: {
+  controller: Gen8ProfilesController;
+}) {
   const { i18n, t } = useTranslation();
   const labels = useMemo(
     () => getLabels(t, i18n.language.startsWith("zh")),
     [i18n.language, t],
   );
-  const controller = useGen8Profiles();
   const [editor, setEditor] = useState<{ original?: Gen8Profile }>();
   const [draggedId, setDraggedId] = useState<string>();
   const [importError, setImportError] = useState("");

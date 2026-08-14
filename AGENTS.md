@@ -3,13 +3,15 @@
 ## Product Scope
 
 - PokeRNGKit is the confirmed English project name. Do not add a Chinese project name unless the owner makes a separate final decision.
-- Implement Generation III only until the owner explicitly expands the scope.
+- Implement every PokeFinder 4.3.2 product module. Generation III, Generation IV, and Generation V are complete; finish the remaining Generation VIII modules before moving to the 3DSRNGTool scope.
+- Implement every 3DSRNGTool module in `docs/module-inventory.md` except `NTR Helper`. `NTR Helper` is explicitly excluded because raw NTR/TCP access is outside the static-browser architecture.
 - Keep the application fully static and local-first. Do not add a backend, account system, telemetry, runtime CDN, or cloud profile storage.
 - Use npm for dependency installation and scripts. Do not introduce pnpm, Yarn, or Bun metadata.
 
 ## Upstream And Naming
 
 - Treat `C:\Users\Hakuhiro\Desktop\PokeFinder-master` as a read-only PokeFinder 4.3.2 reference.
+- Treat `C:\Users\Hakuhiro\source\repos\3DSRNGTool` revision `359bdd7a9ff7c145fec12302cf43da932923fa62` as the read-only 3DSRNGTool reference.
 - Name product modules after their corresponding PokeFinder modules.
 - For every control label, use the exact Simplified Chinese translation from `Form/i18n/PokeFinder_zh.ts` when it exists.
 - If PokeFinder has no Simplified Chinese translation for a control, keep the exact English source label. Do not create an independent Chinese translation.
@@ -25,6 +27,12 @@
 - Store profiles in IndexedDB and maintain a localStorage mirror/fallback. Store lightweight settings such as language and theme in localStorage.
 - Keep each feature under `src/features/<module>` and each Wasm target under `wasm/modules/<module>`.
 - Add or update `docs/modules/<module>.md` whenever a functional RNG module changes.
+
+## Frontend Composition
+
+- On desktop, keep the primary form and actions within the available viewport whenever practical. The page shell should avoid vertical scrolling; prefer the results table as the main scroll region. Only allow page scrolling when the module's real control set cannot be reduced without hiding required behavior.
+- Use tabs, segmented modes, compact field grids, and collapsible advanced settings to fit dense modules. Do not shrink text or touch targets below the established HakuStyle baseline to force a fit.
+- Keep core Generator/Searcher workflows as independent module workspaces. Consolidate lightweight global tools, profile managers, lookup helpers, templates, and module-support utilities into the floating tool menu when this shortens navigation without obscuring ownership.
 
 ## Workflow
 

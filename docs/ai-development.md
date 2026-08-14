@@ -16,7 +16,7 @@
 8. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)：README、进度、提交、构建与发布说明格式。
 9. [HakuStyle Web 前端 Skill](../.agents/skills/web-frontend-style/SKILL.md)：页面布局、视觉层级、响应式、交互样式、可访问性与动效规则。
 
-如项目所有者明确要求启动第四世代模块，还必须读取[第四世代扩展接口与 AI 交接](gen4-development.md)和 `src/features/shared/rngModuleContract.ts`。当前仅保留接口，不得自行添加第四世代算法、导航或默认构建项。
+修改第四世代模块时，还必须读取[第四世代扩展接口与 AI 交接](gen4-development.md)和 `src/features/shared/rngModuleContract.ts`。开始未实现模块前先核对[模块库存](module-inventory.md)，每次只完成一个独立模块并收口对应导航、文档、测试与构建清单。
 
 读取完成后先运行 `git status --short --branch`。工作区中的已有修改视为项目所有者内容，不得重置、覆盖或顺手重构。
 
@@ -28,7 +28,7 @@
 | 当前进度和下一步     | `docs/progress.md`                                          |
 | Web 架构、版本和协议 | `docs/tech-stack.md`、`package.json`、lockfile              |
 | RNG 算法             | `C:\Users\Hakuhiro\Desktop\PokeFinder-master\Core` 只读源码 |
-| Qt 业务流程          | 上游 `Form/Gen3` 实现与 `.ui` 文件                          |
+| Qt 业务流程          | 上游对应世代的 `Form` 实现与 `.ui` 文件                     |
 | 输入进制、位宽和空值 | 上游 `Form/Controls/TextBox.cpp` 与模块 Form 代码           |
 | 简体中文控件名       | 上游 `Form/i18n/PokeFinder_zh.ts`                           |
 | 英文、日文控件名     | 上游对应源字符串与 `PokeFinder_ja.ts`                       |
@@ -40,7 +40,7 @@
 
 每次只完成一个 PokeFinder 功能模块：
 
-1. 在 `docs/progress.md` 确认模块和前置条件，不提前开始后续世代或功能。
+1. 在 `docs/progress.md` 与 `docs/module-inventory.md` 确认模块和前置条件，不并行混入其他未完成模块。
 2. 读取上游 Form、Core、测试、翻译和资源文件，记录用到的文件。
 3. 核对每个输入的进制、最小值、最大值、字符数、空值行为和跨字段约束。
 4. 在 `wasm/modules/<module>/` 建立或修改独立 CMake target、C ABI、manifest 和原生夹具。

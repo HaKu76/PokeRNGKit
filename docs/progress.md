@@ -2,10 +2,33 @@
 
 > - 最近更新：2026-08-15
 > - 当前分支：`main`
-> - Git 基线：`613e7d8 feat: 实现第八世代 ID 乱数`
-> - 当前阶段：第三世代模块加固与验收
-> - 工作区状态：`main` 与 `origin/main` 基线对齐；当前仅有 `README.md`、`docs/requirements.md` 与 `docs/progress.md` 的本任务文档改动，尚未提交
-> - 验收状态：第三世代实现完成；当前基线工程检查、生产页面算法回归与项目所有者最终验收待完成
+> - Git 基线：`af194e9 docs: 恢复第三世代开发范围`
+> - 当前阶段：补齐 PokeFinder Gen VIII 与除 NTR Helper 外的全部 3DSRNGTool 模块
+> - 工作区状态：`main` 与 `origin/main` 基线对齐；当前包含全模块范围文档与 Gen 8 Eggs 实现，尚未提交
+> - 验收状态：完整产品范围尚未实现；全部模块、Actions 部署、生产页面算法回归与项目所有者最终验收待完成
+
+## 2026-08-15 全模块范围授权与库存纠正
+
+- 决定：项目所有者将活动范围扩大为完整 PokeFinder 4.3.2，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能；此前“仅第三世代”的决定不再适用，但保留原记录作为历史轨迹。
+- 授权：项目所有者明确授权 Codex 自主开发、运行 `npm run verify`、`npm run wasm:test:native` 与 `npm run wasm:build`、逐模块提交并推送；全部模块部署后，在 `https://haku76.github.io/PokeRNGKit/` 使用外部 Chrome 或 Edge 完成一次生产回归。
+- 库存：PokeFinder Gen III、Gen IV、Gen V 与全局工具已齐；Gen VIII Profiles、IDs 与 Eggs 已实现，仍缺 Event、Raids、Static、Underground、Wild 与 Den Map。完整状态写入 `docs/module-inventory.md`。
+- 3DSRNGTool：Gen VII ID 已完成；其余 Gen VI、Gen VII 与公共工具全部计划实现，仅 `NTR Helper` 明确排除。
+- 架构：继续保持纯静态、本地优先、C++/Emscripten Wasm + 独立 Web Worker；不因 NTR 功能增加后端、本地桥接、浏览器扩展、原始 TCP 或云端服务。
+- 界面：项目所有者要求 PC 端参数和主要操作尽量收纳在首屏，页面滚动主要留给结果表；复杂模块使用标签、紧凑字段网格和折叠高级设置。轻量全局工具、档案与辅助输入可合并到悬浮工具菜单，核心 Generator/Searcher 保持独立工作区。侧边栏整体外壳必须直角，内部导航项可保留交互圆角。
+- 下一步：完成 Gen 8 Eggs 的工程检查、提交与推送，然后实现 PokeFinder Gen 8 Event。
+
+## 2026-08-15 Gen 8 Eggs 实现
+
+- 新增：`gen8egg` C++/Wasm API v1、BDSP 个人数据、原生固定夹具、Dedicated Worker Pool、领域校验、UI 预览与三层 TypeScript 测试。
+- 新增：Gen 8 Eggs 工作区接入侧栏、Gen 8 Profile、全局个体值计算器、三语键、虚拟结果表、排序、CSV、进度与取消。
+- 核对：对照 PokeFinder 4.3.2 `Eggs8`、`EggSettings`、`EggGenerator8`、`EggState8`、`EggModel8`、`egg8.json` 与简中翻译，记录 64/32 位输入、双亲、护符、红线、特殊蛋种和结果列边界。
+- 优化：侧边栏整体外壳改为直角；Gen 8 Eggs 在宽屏使用并排 RNG 与设置/筛选标签，结果表独立滚动，`1280px` 以下重排。
+- 已通过：`npm run wasm:test:native` 37/37，包含 `gen8egg_native_parity` 的 Bulbasaur、Nidoran、Volbeat / Illumise 固定结果与输入错误边界。
+- 已通过：`npm run verify` 的 Prettier、ESLint（0 error、3 条既有 warning）、TypeScript 和 91 个 Vitest 文件共 373 项测试；2079 个 Vite 模块完成转换。
+- 受限：`verify` 的 `build:web` 在复制既有 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；非受限重试因审批服务 502 未启动。该状态与此前同一路径的受限终端问题一致，但本轮没有项目所有者手动通过记录。
+- 未运行：`npm run wasm:build` 因当前会话缺少 Emscripten 与 `emcmake` 在 doctor 阶段停止；常见本机路径未发现 emsdk。CMake、Ninja 与 Visual Studio Build Tools 2026 x64 可用。
+- 环境：Node.js `24.13.0`、npm `11.6.2`；低于仓库锁定的 Node.js `24.19.0`、npm `12.0.2`。完整生产构建与锁定工具链验证交给 GitHub Actions。
+- 提交阻塞：沙箱拒绝创建 `.git/index.lock`；按授权申请非受限 `git add -A` 时审批服务返回 502，命令未启动。当前没有暂存、提交或推送；下一步先恢复 Git 写入授权，再提交 `feat: 实现第八世代孵化乱数`。
 
 ## 2026-08-15 第三世代范围恢复与模块盘点
 

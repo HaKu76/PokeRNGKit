@@ -287,7 +287,7 @@ select:focus-visible {
   border: 1px solid var(--rail-line);
   border-top: 0;
   border-bottom: 0;
-  border-radius: 0 14px 14px 0;
+  border-radius: 0;
   padding: 16px 12px 12px;
   background: var(--rail-bg);
   color: var(--rail-text);
