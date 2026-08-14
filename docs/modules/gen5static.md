@@ -143,6 +143,7 @@ Searcher 保留上游 20 列：`Seed, Advances, IV Advances, PID, Shiny, Nature,
 
 - 已通过定向 ESLint 与 `npm test -- src/features/gen5static`：4 个文件、15 项测试。
 - 已通过 `$env:POKERNGKIT_WASM_MODULES='gen4advance,gen5static'; npm run wasm:test:native`：`gen4advance_native_parity` 与 `gen5static_native_parity` 2/2。
+- 已通过完整 `npm run wasm:test:native`：Visual Studio 2026 x64 环境中的 31/31 原生夹具全部通过，包含 `gen3pidtoiv_native_parity`、`gen4advance_native_parity` 与 `gen5static_native_parity`。
 - 已通过 Node `24.19.0`、npm `12.0.2` 的完整 `npm run verify`：格式、ESLint、TypeScript、67 个 Vitest 文件共 255 项测试及 Web/PWA 构建通过；仅保留两条既有 TanStack Virtual 警告与主包体积警告。
 - 受限终端曾在 Vite 复制现有 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；同一命令在非受限环境通过。
 

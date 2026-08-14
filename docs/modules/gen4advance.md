@@ -116,6 +116,7 @@ wasm/modules/gen4advance/
 - Worker 在复制 Wasm 数据前验证任务信封、领域请求、chunk、结果计数、指针对齐和堆范围；
 - API v2 已通过 `npm test -- src/features/gen4advance src/features/gen5static`（6 个文件、21 项测试）、定向 ESLint、全仓 TypeScript、格式与差异检查；
 - `$env:POKERNGKIT_WASM_MODULES='gen4advance,gen5static'; npm run wasm:test:native` 已通过 `gen4advance_native_parity` 与 `gen5static_native_parity` 2/2；
+- 完整 `npm run wasm:test:native` 已通过 31/31 原生夹具，包含 API v2 的 Calls、Chatot 与 Needles 覆盖；
 - 受限文件环境外的完整 `npm run verify` 已通过 67 个测试文件共 255 项测试、Vite 生产构建和 57 项 PWA 预缓存；
 - Emscripten 生产 Wasm 与 GitHub Pages 页面回归仍待部署完成后与项目所有者共同验收。
 
