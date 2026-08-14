@@ -104,6 +104,12 @@ export const GEN5_MODULE_RESERVATIONS = [
     status: "reserved",
   },
   {
+    id: "gen5sha1cache",
+    generation: 5,
+    operations: ["searcher"],
+    status: "reserved",
+  },
+  {
     id: "gen5dreamradar",
     generation: 5,
     operations: ["generator", "searcher"],
