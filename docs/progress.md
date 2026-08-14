@@ -12,8 +12,9 @@
 - 新增：页脚增加“赞助”入口，与贡献榜保持同一信息层级；点击后使用共享浮动工具弹层居中显示支付宝和微信支付两张收款码。
 - 资源：将项目所有者提供的 `Alipay.jpg` 与 `WeChatPay.jpg` 收纳到独立功能目录并通过 Vite 静态导入，保留原始分辨率、完整方形画面和离线 PWA 资源哈希。
 - 交互：弹层支持遮罩点击、`Escape`、关闭按钮、焦点约束与恢复、滚动锁、桌面指针拖动和键盘方向键移动；二维码使用同源原图链接，移动端可长按保存，也可轻点或键盘激活直接下载原始 JPG。
+- 优化：移除二维码图片上的拖动禁用和触摸拦截，触摸设备保留 iOS/Android 原生长按菜单，桌面端继续提供点击下载原图。
 - 样式：按 HakuStyle 标准产品密度使用 15px 标签、12px 图片圆角和安静边框；桌面双列、窄屏单列，不裁切二维码，不增加装饰渐变、嵌套卡片或说明性填充文案。
-- 已通过：任务文件定向 Prettier、全仓 `npm run format:check`、`git diff --check`、定向 ESLint、`npm run typecheck`；完整 `npm run verify` 首次通过格式、lint、TypeScript 与 57 个测试文件共 211 项测试，仅在受限环境复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`，非受限重跑通过 Vite 生产构建与 54 项 PWA 预缓存。
+- 已通过：任务文件定向 Prettier、全仓 `npm run format:check`、`git diff --check`；完整 `npm run verify` 通过 ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、57 个测试文件共 217 项测试、Vite 生产构建与 55 项 PWA 预缓存。受限环境复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`，非受限环境重跑通过。
 - 未验收：外部 Chrome/Edge 与部署页面视觉、长按保存行为等待提交部署后和项目所有者共同核对。
 
 ## 2026-08-14 Gen5 Dream Radar

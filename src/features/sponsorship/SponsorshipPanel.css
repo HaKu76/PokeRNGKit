@@ -49,6 +49,10 @@
   border-radius: 12px;
   background: #fff;
   object-fit: contain;
+  -webkit-touch-callout: default;
+  -webkit-user-drag: auto;
+  touch-action: auto;
+  user-select: auto;
 }
 
 .sponsorship-code-link:hover img {
@@ -68,5 +72,12 @@
 
   .sponsorship-codes {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .sponsorship-code-link {
+    -webkit-touch-callout: default;
+    touch-action: auto;
   }
 }

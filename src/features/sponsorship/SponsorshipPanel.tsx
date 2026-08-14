@@ -40,7 +40,6 @@ export function SponsorshipPanel({
               <img
                 alt={t("alipayPaymentCode")}
                 decoding="async"
-                draggable={false}
                 height="1708"
                 src={alipayCode}
                 width="1708"
@@ -59,7 +58,6 @@ export function SponsorshipPanel({
               <img
                 alt={t("wechatPayPaymentCode")}
                 decoding="async"
-                draggable={false}
                 height="500"
                 src={weChatPayCode}
                 width="500"
