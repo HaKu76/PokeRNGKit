@@ -346,7 +346,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 ## 8.4 当前功能需求：`gen3ivtopid` IVs to PID
 
 - **FR-IVTOPID-01** 提供 PokeFinder `IVs to PID` 的六项 IV、Nature 和 TID 输入；六项 IV 为 `0..31`，Nature 为 `0..24`，TID 为 `0..65535`，空 TID 作为 `0`。
-- **FR-IVTOPID-02** 计算第三世代 Method 1、Reverse Method 1、Method 2、Method 4、XD/Colo 和 Channel；不输出第四世代 Cute Charm。
+- **FR-IVTOPID-02** 完整保留 PokeFinder 同一工具返回的 Method 1、Reverse Method 1、Method 2、Method 4、XD/Colo、Channel、Cute Charm (DPPt) 和 Cute Charm (HGSS)。
 - **FR-IVTOPID-03** 输出 Seed、PID、SID、Method、Ability、12.5%、25%、50% 和 75% 性别比例九列，排序和 CSV 使用同一结果模型。
 - **FR-IVTOPID-04** SID、PID 半字、性格和 Channel 固定 TID 修正规则必须与 `Core/Util/IVToPIDCalculator.cpp` 一致，React 不得复写 RNG 恢复算法。
 - **FR-IVTOPID-05** 使用独立 `gen3ivtopid` Wasm API v1、C ABI 和 Dedicated Worker；计算期间主界面保持可交互，取消后必须销毁旧 Worker。
@@ -537,7 +537,7 @@ Egg Searcher、Masuda、第四世代孵化等第三世代/第四世代功能在�
 9. Wild Generator/Searcher 的 Route 111、Feebas、Safari、Rock Smash、Synchronize、Cute Charm、Pressure、Magnet Pull 与 Static 固定输入比对。
 10. Seed to Time 使用 `00000000 / 2000` 核对 7 条时间、首条 `2000-03-30 18:22:00` 和末条 `2000-12-29 02:10:00`；再以 `40000000 / 2000` 核对回写原始 Seed `1AA5` 与 Advances `66861`。
 11. NGC Seed 逐页签与 PokeFinder 4.3.2 比对多轮结果、Channel 方向输入、Precalc Yes/No 决策、单结果复制、取消和 Gales 首轮已记录差异；空 HP 与直接输入 `0` 的行为分别核对。
-12. IVs to PID 使用 `0/0/0/0/0/0`、Nature `0`、TID `12345` 核对 Channel 的 `56654838 / DC2DA271 / 48333`，并使用 `31/31/31/0/31/31`、Nature `0`、TID `12345` 核对 Method 2 的 `36E6808A / 02B0100B / 8832`；确认空 TID 等价于 `0` 且不显示第四世代 Cute Charm。
+12. IVs to PID 使用 `0/0/0/0/0/0`、Nature `0`、TID `12345` 核对 Channel 的 `56654838 / DC2DA271 / 48333`，并使用 `31/31/31/0/31/31`、Nature `0`、TID `12345` 核对 Method 2 的 `36E6808A / 02B0100B / 8832`；确认空 TID 等价于 `0`，并抽样核对 Cute Charm (DPPt/HGSS) 的五个性别阈值结果。
 13. G4 Static 使用已记录固定输入核对 Method 1/J/K、Synchronize、Cute Charm、`Max Advances + 1`、Searcher Seed、PID 和六项 IV；同时确认 G3/G4 存档独立，个体值计算器保持全局单一入口。
 14. G4 Wild 使用已记录 Route 222 固定输入核对 Method J Generator/Searcher，并抽样 HGSS Method K、甜甜蜜树、宝可追踪、捕虫大赛、狩猎地带、单槽与 31 IV 约束；确认 Searcher 不显示 Delay/Hour。
 15. G4 Chained Shiny to SID 使用 TID `12345` 与三条 Lake of Rage Gyrados 观测核对唯一 SID `54320`；确认逐条收窄、TID 锁定、清空和取消行为。

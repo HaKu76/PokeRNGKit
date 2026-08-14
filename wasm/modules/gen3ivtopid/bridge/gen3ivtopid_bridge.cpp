@@ -30,7 +30,8 @@
 namespace
 {
     constexpr std::uint32_t apiVersion = 1;
-    constexpr std::uint32_t maxResults = 128;
+    constexpr std::uint32_t maxResults = 256;
+    constexpr std::array<std::uint8_t, 5> genderThresholds = { 0, 0x32, 0x4b, 0x96, 0xc8 };
 
     enum ErrorCode : std::uint32_t
     {
@@ -210,6 +211,26 @@ namespace
             if (pid % 25 == nature) append(seed, pid, sid, 1);
             pid = (static_cast<u32>(low) << 16) | high;
             if (pid % 25 == nature) append(seed, pid, sid, 2);
+
+            if ((low / 0x5556) != 0 && (high / 0xa3e) == nature)
+            {
+                for (const auto threshold : genderThresholds)
+                {
+                    pid = nature + threshold;
+                    const auto cuteCharmSid = static_cast<u16>((pid ^ tid) & 0xfff8);
+                    append(seed, pid, cuteCharmSid, 7);
+                }
+            }
+
+            if ((low % 3) != 0 && (high % 25) == nature)
+            {
+                for (const auto threshold : genderThresholds)
+                {
+                    pid = nature + threshold;
+                    const auto cuteCharmSid = static_cast<u16>((pid ^ tid) & 0xfff8);
+                    append(seed, pid, cuteCharmSid, 8);
+                }
+            }
         }
         for (u32 index = 0; index < seeds.count; index++)
         {

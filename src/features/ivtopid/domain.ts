@@ -1,5 +1,5 @@
 export const GEN3_IVTOPID_API_VERSION = 1;
-export const GEN3_IVTOPID_MAX_RESULTS = 128;
+export const GEN3_IVTOPID_MAX_RESULTS = 256;
 export const GEN3_IVTOPID_RESULT_WORDS = 9;
 
 export type Gen3IvToPidRequest = {
@@ -14,7 +14,14 @@ export type Gen3IvToPidRequest = {
 };
 
 export type Gen3IvToPidMethod =
-  "method1" | "reverse-method1" | "method2" | "method4" | "xd-colo" | "channel";
+  | "method1"
+  | "reverse-method1"
+  | "method2"
+  | "method4"
+  | "xd-colo"
+  | "channel"
+  | "cute-charm-dppt"
+  | "cute-charm-hgss";
 
 export interface Gen3IvToPidState {
   seed: number;
@@ -77,6 +84,8 @@ export function decodeGen3IvToPidStates(
       "method4",
       "xd-colo",
       "channel",
+      "cute-charm-dppt",
+      "cute-charm-hgss",
     ][words[source + 3]] as Gen3IvToPidMethod | undefined;
     if (!method) throw new RangeError("Unknown Gen3 IVs to PID method.");
     states[target] = {
@@ -108,5 +117,9 @@ export const gen3IvToPidMethodLabel = (method: Gen3IvToPidMethod) => {
       return "XD/Colo";
     case "channel":
       return "Channel";
+    case "cute-charm-dppt":
+      return "Cute Charm (DPPt)";
+    case "cute-charm-hgss":
+      return "Cute Charm (HGSS)";
   }
 };

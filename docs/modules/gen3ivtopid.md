@@ -15,7 +15,9 @@
 | `XD/Colo`          | `Method::XDColo`         | XD/竞技场 XDRNG           |
 | `Channel`          | `Method::Channel`        | Pokémon Channel 基拉祈    |
 
-PokeFinder 的同一 Core 计算器还返回 `Cute Charm (DPPt)` 与 `Cute Charm (HGSS)`。它们属于第四世代，PokeRNGKit 当前只做第三世代，因此不生成、不显示，也不写入当前 Wasm API。
+同一上游计算器返回 `Cute Charm (DPPt)` 与 `Cute Charm (HGSS)`。PokeRNGKit 现在完整保留这两种结果，并继续把 `IVs to PID` 作为全局工具单一入口；结果表的生成方式列直接显示上游英文标签。
+
+`Cute Charm (DPPt)` 仅在 `low / 0x5556 != 0` 且 `high / 0xA3E == nature` 时成立；`Cute Charm (HGSS)` 仅在 `low % 3 != 0` 且 `high % 25 == nature` 时成立。两者按 `0 / 0x32 / 0x4B / 0x96 / 0xC8` 五个性别阈值构造 PID，并使用 `(PID XOR TID) & 0xFFF8` 计算 SID 基准值。
 
 ## 2. 输入与输出
 
@@ -128,7 +130,7 @@ gender12.5 / gender25 / gender50 / gender75
 
 Worker 完成 API 版本握手后调用 C ABI，把连续结果缓冲区复制为 `ArrayBuffer` 并通过 transfer list 返回。React 只负责输入、排序、显示和 CSV，不复写生产 RNG。
 
-桥接层最多返回 128 条记录。Worker 在复制前校验结果数量、4 字节对齐和 Wasm 堆边界；取消或发生错误时主线程销毁对应 Worker，后续请求重新初始化实例。
+桥接层最多返回 256 条记录。该上限覆盖 Method 1/Reverse/2/4、XD/Colo、Channel 与两种 Cute Charm 的理论候选总量。Worker 在复制前校验结果数量、4 字节对齐和 Wasm 堆边界；取消或发生错误时主线程销毁对应 Worker，后续请求重新初始化实例。
 
 ## 8. 翻译来源
 

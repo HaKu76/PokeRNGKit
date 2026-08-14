@@ -28,6 +28,17 @@ const previewStates: Gen3IvToPidState[] = [
     gender50: true,
     gender75: true,
   },
+  {
+    seed: 0x36a3_2c78,
+    pid: 0x0000_0032,
+    sid: 0x3008,
+    method: "cute-charm-dppt",
+    ability: 0,
+    gender12_5: true,
+    gender25: false,
+    gender50: false,
+    gender75: false,
+  },
 ];
 
 export class Gen3IvToPidUiPreviewEngine implements Gen3IvToPidSearchEngine {

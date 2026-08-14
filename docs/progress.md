@@ -7,6 +7,14 @@
 > - 工作区状态：Gen4 Chained SID 与第三世代 Tanoby Chamber 均在当前工作区，分模块提交中
 > - 验收状态：Gen4 Chained SID 与 Tanoby Chamber 原生夹具已通过；完整 Wasm 与部署回归待执行
 
+## 2026-08-14 IVs to PID Cute Charm
+
+- 补齐：全局 `IVs to PID` 工具现在按 PokeFinder 4.3.2 返回 `Cute Charm (DPPt)` 与 `Cute Charm (HGSS)`，每种方法保留五个性别阈值 PID 与对应 SID 基准值。
+- 更新：TypeScript 固定宽度结果解码、UI 预览、模块说明、需求与工程门槛同步接受方法代码 `7/8`；工具仍保持九列结果和单 Dedicated Worker。
+- 已通过：定向 `npm run format:files -- ...`、完整 `npm run format:check`、`git diff --check`、`npm test -- src/features/ivtopid`、`npm run typecheck` 与 `$env:POKERNGKIT_WASM_MODULES='gen3ivtopid'; npm run wasm:test:native`，原生 parity 1/1 通过。
+- 完整验证：`npm run verify` 已通过格式与 lint，随后因并行开发中的 `src/features/gen4event/Gen4EventPanel.tsx` 六项 TypeScript 错误停止；本模块未出现新增错误，待 Gen4 Event 完成类型修正后重跑。
+- 未验收：生产 Wasm 与 GitHub Pages 页面仍需部署完成后在外部 Chrome/Edge 核对 Cute Charm 实际结果。
+
 ## 2026-08-14 Gen3 Tanoby Chamber
 
 - 新增：第三世代 Wild 的 FireRed / LeafGreen 七个 Tanoby Chamber，补齐未知图腾 `A..Z`、`!`、`?` form 映射、Generator/Searcher PID 顺序和形态回溯。

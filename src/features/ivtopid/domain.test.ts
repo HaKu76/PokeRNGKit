@@ -47,4 +47,13 @@ describe("Gen3 IVs to PID domain", () => {
       },
     ]);
   });
+
+  it("decodes the upstream Cute Charm methods", () => {
+    const buffer = new Uint32Array([
+      1, 0, 12344, 7, 0, 0, 0, 0, 0, 2, 50, 12392, 8, 0, 1, 0, 0, 0,
+    ]).buffer;
+    expect(
+      decodeGen3IvToPidStates(buffer).map((state) => state.method),
+    ).toEqual(["cute-charm-dppt", "cute-charm-hgss"]);
+  });
 });

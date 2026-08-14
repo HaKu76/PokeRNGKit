@@ -65,7 +65,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 当前 IVs to PID 工作区包含：
 
 - 六项 IV、性格、TID 输入；空 TID 按上游行为作为 `0`
-- Method 1、Reverse Method 1、Method 2、Method 4、XD/Colo、Channel
+- Method 1、Reverse Method 1、Method 2、Method 4、XD/Colo、Channel、Cute Charm (DPPt/HGSS)
 - Seed、PID、SID、Ability、四种性别比例和 Method 结果列
 - 独立 `gen3ivtopid` Wasm、Dedicated Worker、排序和 CSV
 - 算法、输入边界和上游文件见 [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md)；本轮未构建或验收
