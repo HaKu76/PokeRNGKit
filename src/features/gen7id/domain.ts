@@ -9,6 +9,15 @@ export type Gen7GameVersion = "sun" | "moon" | "ultra-sun" | "ultra-moon";
 
 export interface Gen7IdFilters {
   mode: Gen7IdFilterMode;
+  /** The upstream ID_Disable/Skip checkbox. */
+  disabled?: boolean;
+  /** The upstream ID_RE checkbox. */
+  regularExpression?: boolean;
+  /** TextBox.Lines-compatible filter lists. */
+  idText?: string;
+  tsvText?: string;
+  randText?: string;
+  /** Legacy single-value fields kept for saved requests and older previews. */
   value?: number;
   valueText?: string;
   tsv?: number;
@@ -46,6 +55,211 @@ export interface Gen7IdChunk {
   stateCount: number;
 }
 
+function splitFilterLines(value: string): string[] {
+  return value === "" ? [] : value.replace(/\r\n?/g, "\n").split("\n");
+}
+
+function parseUnsignedDecimal(value: string): number | undefined {
+  const trimmed = value.trim();
+  if (!/^\+?\d+$/.test(trimmed)) return undefined;
+  const parsed = Number(trimmed);
+  return Number.isSafeInteger(parsed) && parsed >= 0 && parsed <= 0xffff_ffff
+    ? parsed
+    : undefined;
+}
+
+function parseFullIdLine(value: string): number | undefined {
+  let input = value.replaceAll(" ", "");
+  const commentIndex = input.lastIndexOf("//");
+  if (commentIndex > 0) input = input.slice(0, commentIndex);
+  if (input.includes("/")) {
+    const parts = input.split("/");
+    if (parts.length !== 2) return undefined;
+    const tid = parseUnsignedDecimal(parts[0]);
+    const sid = parseUnsignedDecimal(parts[1]);
+    if (tid === undefined || sid === undefined) return undefined;
+    return ((sid << 16) | tid) >>> 0;
+  }
+  if (!/^[\da-f]+$/i.test(input)) return undefined;
+  const parsed = Number.parseInt(input, 16);
+  return Number.isSafeInteger(parsed) && parsed >= 0 && parsed <= 0xffff_ffff
+    ? parsed
+    : undefined;
+}
+
+function parseTsvLines(value: string): Set<number> {
+  return new Set(
+    splitFilterLines(value)
+      .map((line) => line.trim())
+      .filter((line) => /^\+?\d+$/.test(line))
+      .map(Number)
+      .filter(
+        (entry) => Number.isSafeInteger(entry) && entry >= 0 && entry <= 4095,
+      ),
+  );
+}
+
+function legacyIdText(filters: Gen7IdFilters): string {
+  if (filters.idText !== undefined) return filters.idText;
+  if (filters.valueText !== undefined) return filters.valueText;
+  if (filters.mode === "full" && filters.value !== undefined)
+    return filters.value.toString(16).toUpperCase();
+  return "";
+}
+
+function legacyTsvText(filters: Gen7IdFilters): string {
+  if (filters.tsvText !== undefined) return filters.tsvText;
+  return filters.tsv === undefined ? "" : String(filters.tsv);
+}
+
+function legacyRandText(filters: Gen7IdFilters): string {
+  if (filters.randText !== undefined) return filters.randText;
+  return filters.rand ?? "";
+}
+
+interface PreparedGen7IdFilters {
+  disabled: boolean;
+  mode: Gen7IdFilterMode;
+  regularExpression: boolean;
+  idLines: string[];
+  idValues: Set<number>;
+  idPatterns: RegExp[];
+  tsvLines: string[];
+  tsvValues: Set<number>;
+  randLines: string[];
+  randPatterns: RegExp[];
+}
+
+function compilePatterns(lines: string[], enabled: boolean): RegExp[] {
+  return enabled ? lines.map((line) => new RegExp(line)) : [];
+}
+
+function prepareGen7IdFilters(filters: Gen7IdFilters): PreparedGen7IdFilters {
+  const disabled = filters.disabled ?? false;
+  const regularExpression = filters.regularExpression ?? false;
+  const idLines = splitFilterLines(legacyIdText(filters));
+  const tsvLines = splitFilterLines(legacyTsvText(filters));
+  const randLines = splitFilterLines(legacyRandText(filters));
+  return {
+    disabled,
+    mode: filters.mode,
+    regularExpression,
+    idLines,
+    idValues: new Set(
+      filters.mode === "full"
+        ? idLines.flatMap((line) => {
+            const parsed = parseFullIdLine(line);
+            return parsed === undefined ? [] : [parsed];
+          })
+        : [],
+    ),
+    idPatterns: compilePatterns(
+      filters.mode === "full" || filters.mode === "none" ? [] : idLines,
+      regularExpression && !disabled,
+    ),
+    tsvLines,
+    tsvValues: parseTsvLines(legacyTsvText(filters)),
+    randLines,
+    randPatterns: compilePatterns(randLines, regularExpression && !disabled),
+  };
+}
+
+function preparedMatches(
+  filters: PreparedGen7IdFilters,
+  tid: number,
+  sid: number,
+  tsv: number,
+  g7tid: number,
+  randString: string,
+): boolean {
+  if (filters.disabled) return true;
+  if (filters.idLines.length > 0) {
+    if (filters.mode === "full") {
+      if (!filters.idValues.has((sid * 0x1_0000 + tid) >>> 0)) return false;
+    } else if (filters.mode !== "none") {
+      const value = (
+        filters.mode === "g7tid" ? g7tid : filters.mode === "sid" ? sid : tid
+      )
+        .toString()
+        .padStart(filters.mode === "g7tid" ? 6 : 5, "0");
+      const matched = filters.regularExpression
+        ? filters.idPatterns.some((pattern) => pattern.test(value))
+        : filters.idLines.some((line) => line !== "" && value.includes(line));
+      if (!matched) return false;
+    }
+  }
+  if (filters.tsvLines.length > 0 && !filters.tsvValues.has(tsv)) return false;
+  if (filters.randLines.length > 0) {
+    const matched = filters.regularExpression
+      ? filters.randPatterns.some((pattern) => pattern.test(randString))
+      : filters.randLines.some(
+          (line) => line !== "" && randString.includes(line.toUpperCase()),
+        );
+    if (!matched) return false;
+  }
+  return true;
+}
+
+export function createGen7IdStateMatcher(
+  filters: Gen7IdFilters,
+): (
+  state: Pick<Gen7IdState, "tid" | "sid" | "tsv" | "g7tid" | "rand64">,
+) => boolean {
+  const prepared = prepareGen7IdFilters(filters);
+  return (state) =>
+    preparedMatches(
+      prepared,
+      state.tid,
+      state.sid,
+      state.tsv,
+      state.g7tid,
+      formatHex64(state.rand64),
+    );
+}
+
+/** Filter packed Wasm states without moving RNG work onto the React thread. */
+export function filterGen7IdPackedStates(
+  words: Uint32Array,
+  filters: Gen7IdFilters,
+): Uint32Array {
+  if (words.length % 8 !== 0)
+    throw new RangeError("Invalid Gen7 ID result buffer length.");
+  const prepared = prepareGen7IdFilters(filters);
+  if (prepared.disabled) return words;
+  if (
+    prepared.idLines.length === 0 &&
+    prepared.tsvLines.length === 0 &&
+    prepared.randLines.length === 0
+  )
+    return words;
+  const output = new Uint32Array(words.length);
+  let target = 0;
+  for (let source = 0; source < words.length; source += 8) {
+    const tidSid = words[source + 2];
+    const tsvTrv = words[source + 3];
+    const randString =
+      prepared.randLines.length > 0
+        ? `${words[source + 1].toString(16).padStart(8, "0")}${words[source]
+            .toString(16)
+            .padStart(8, "0")}`.toUpperCase()
+        : "";
+    if (
+      preparedMatches(
+        prepared,
+        tidSid & 0xffff,
+        tidSid >>> 16,
+        tsvTrv & 0xffff,
+        words[source + 5],
+        randString,
+      )
+    ) {
+      output.set(words.subarray(source, source + 8), target);
+      target += 8;
+    }
+  }
+  return output.slice(0, target);
+}
+
 export function validateGen7IdRequest(request: Gen7IdRequest): string[] {
   const errors: string[] = [];
   if (
@@ -57,6 +271,12 @@ export function validateGen7IdRequest(request: Gen7IdRequest): string[] {
   const uint32 = (value: number) =>
     Number.isInteger(value) && value >= 0 && value <= 0xffff_ffff;
   if (!uint32(request.seed)) errors.push("seed");
+  if (
+    !(["none", "tid", "sid", "full", "g7tid"] as const).includes(
+      request.filters.mode,
+    )
+  )
+    errors.push("filterMode");
   if (
     !Number.isInteger(request.minAdvances) ||
     request.minAdvances < gen7IdStartingFrame(request.version) ||
@@ -78,7 +298,7 @@ export function validateGen7IdRequest(request: Gen7IdRequest): string[] {
     request.correction > 16
   )
     errors.push("correction");
-  if (request.filters.mode !== "none") {
+  if (request.filters.mode !== "none" && request.filters.idText === undefined) {
     if (request.filters.mode === "full") {
       if (!uint32(request.filters.value ?? Number.NaN))
         errors.push("filterValue");
@@ -91,15 +311,31 @@ export function validateGen7IdRequest(request: Gen7IdRequest): string[] {
         errors.push("filterValue");
     }
   }
+  const idText = legacyIdText(request.filters);
+  const randText = legacyRandText(request.filters);
+  if (request.filters.regularExpression && !request.filters.disabled) {
+    try {
+      if (request.filters.mode !== "full")
+        compilePatterns(splitFilterLines(idText), true);
+      compilePatterns(splitFilterLines(randText), true);
+    } catch {
+      errors.push("regularExpression");
+    }
+  }
   if (
     request.filters.tsv !== undefined &&
-    (!Number.isInteger(request.filters.tsv) ||
+    request.filters.tsvText === undefined
+  ) {
+    if (
+      !Number.isInteger(request.filters.tsv) ||
       request.filters.tsv < 0 ||
-      request.filters.tsv > 4095)
-  )
-    errors.push("tsv");
+      request.filters.tsv > 4095
+    )
+      errors.push("tsv");
+  }
   if (
     request.filters.rand !== undefined &&
+    request.filters.randText === undefined &&
     !/^[0-9a-f]{1,16}$/i.test(request.filters.rand)
   )
     errors.push("rand");

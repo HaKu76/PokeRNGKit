@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-import { GEN7_ID_API_VERSION } from "../domain";
+import { filterGen7IdPackedStates, GEN7_ID_API_VERSION } from "../domain";
 import type { Gen7IdWorkerRequest, Gen7IdWorkerResponse } from "./messages";
 interface Gen7IdWasm {
   HEAPU32: Uint32Array;
@@ -50,41 +50,36 @@ async function initialize(moduleUrl: string) {
 function run(message: Extract<Gen7IdWorkerRequest, { type: "run" }>) {
   if (!wasm) throw new Error("Gen7 ID Wasm module is not initialized.");
   const startedAt = performance.now();
-  const filter = message.request.filters;
-  const mode =
-    filter.mode === "none"
-      ? 0
-      : filter.mode === "tid"
-        ? 1
-        : filter.mode === "sid"
-          ? 2
-          : filter.mode === "full"
-            ? 3
-            : 4;
-  const rand = filter.rand
-    ? BigInt(`0x${filter.rand}`).toString(16).padStart(16, "0")
-    : "ffffffffffffffff";
-  const resultCount = wasm._gen7id_generate(
+  // IDFilters contains upstream multiline/regex semantics that belong to the
+  // Worker boundary. Wasm remains responsible only for SFMT state generation.
+  const generatedCount = wasm._gen7id_generate(
     message.request.seed,
     message.chunk.minAdvances,
     message.chunk.maxAdvances,
     message.request.correction,
-    mode,
-    filter.mode === "full"
-      ? (filter.value ?? 0)
-      : Number.parseInt(filter.valueText ?? "0", 10),
-    filter.valueText?.length ?? 0,
-    filter.tsv ?? 0xffffffff,
-    Number.parseInt(rand.slice(8), 16),
-    Number.parseInt(rand.slice(0, 8), 16),
-    filter.rand?.length ?? 0,
+    0,
+    0,
+    0,
+    0xffffffff,
+    0xffffffff,
+    0xffffffff,
+    0,
   );
   if (wasm._gen7id_last_error() !== 0)
     throw new Error("Gen7 ID Wasm core returned an error.");
-  if (wasm._gen7id_result_count() !== resultCount)
+  if (
+    wasm._gen7id_result_count() !== generatedCount ||
+    generatedCount !== message.chunk.stateCount
+  )
     throw new Error("Gen7 ID Wasm core returned an inconsistent result count.");
   const pointer = wasm._gen7id_result_ptr() >>> 2;
-  const words = wasm.HEAPU32.slice(pointer, pointer + resultCount * 8);
+  const generated = wasm.HEAPU32.slice(pointer, pointer + generatedCount * 8);
+  const words = filterGen7IdPackedStates(generated, message.request.filters);
+  const resultCount = words.length / 8;
+  const buffer: ArrayBuffer =
+    words.buffer instanceof ArrayBuffer
+      ? words.buffer
+      : new Uint32Array(words).buffer;
   post(
     {
       type: "batch",
@@ -93,9 +88,9 @@ function run(message: Extract<Gen7IdWorkerRequest, { type: "run" }>) {
       stateCount: message.chunk.stateCount,
       resultCount,
       elapsedMs: performance.now() - startedAt,
-      buffer: words.buffer,
+      buffer,
     },
-    [words.buffer],
+    [buffer],
   );
 }
 scope.onmessage = async ({ data }: MessageEvent<Gen7IdWorkerRequest>) => {

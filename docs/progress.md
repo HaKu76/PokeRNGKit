@@ -2,9 +2,9 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`e214060 feat: 实现第五世代IV缓存`
+> - Git 基线：`46d8747 feat: 实现第五世代梦境雷达`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Dream Radar 接线与工程检查中；`docs/tech-stack.md` 保留项目所有者改动
+> - 工作区状态：Gen7 ID 筛选已完成；下一模块为 Gen5 SHA1 Cache Finder；`docs/tech-stack.md` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
 
 ## 2026-08-14 赞助入口
@@ -26,6 +26,16 @@
 - 已通过：本次共享接线后的任务文件 Prettier、全仓 `npm run format:check`、`git diff --check`、TypeScript、定向 ESLint、3 个测试文件共 8 项测试与 Dream Radar 原生夹具。
 - 完整验证：受限环境首次在 `build:web` 复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`，一次非受限重跑又被并行 Gen7 ID 文件的未格式化状态拦截；隔离 Dream Radar 暂存区后，非受限 `npm run verify` 通过全仓 Prettier、ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、57 个测试文件共 211 项测试、Vite 生产构建与 55 项 PWA 预缓存。
 - 未验收：生产 Wasm、Actions 部署页面算法回归、外部 Chrome/Edge 视觉与交互，以及项目所有者最终验收。
+
+## 2026-08-14 Gen7 ID
+
+- 新增：补全第七世代 ID Generator 的多行 TID、SID、Full ID、Gen7TID、TSV 与 Random Number 筛选输入。
+- 筛选：支持普通包含匹配、逐行正则、Full ID 空格与 `//` 注释解析，以及 `Disable Filters`；筛选在独立 Worker 中对 Wasm 分片结果执行。
+- 样式：按 HakuStyle 工作台密度重排三组 textarea 和响应式筛选区，窄屏改为单列并保留触控目标。
+- 文档：记录 SFMT、起始帧、时钟修正、筛选范围与上游 `3DSRNGTool` 来源。
+- 已通过：Gen7 ID 定向 ESLint、`npm run typecheck`、13 项 Vitest、`gen7id_native_parity` 原生夹具、`npm run format:check` 与 `git diff --check`。
+- 完整验证：恢复文件后首次任务格式化发现并修复筛选模式集合的括号损坏；首次 `npm run verify` 在一项有符号/无符号夹具断言失败，规范为 `uint32` 后受限重跑通过 57 个测试文件共 217 项测试，但在 `build:web` 复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`；非受限完整重跑通过 Prettier、ESLint（0 error、2 条既有 TanStack Virtual warning）、TypeScript、全部 217 项测试、Vite 生产构建与 55 项 PWA 预缓存。
+- 未验收：生产页面算法回归、外部 Chrome/Edge 视觉与移动端长文本交互，以及项目所有者最终验收。
 
 ## 2026-08-14 Gen5 IV Cache Finder
 

@@ -1,4 +1,5 @@
 import {
+  createGen7IdStateMatcher,
   GEN7_ID_MAX_RESULTS,
   type Gen7IdRequest,
   type Gen7IdState,
@@ -30,47 +31,6 @@ function previewState(request: Gen7IdRequest, advances: number): Gen7IdState {
   };
 }
 
-function matches(request: Gen7IdRequest, state: Gen7IdState) {
-  const { mode, value, valueText, tsv, rand } = request.filters;
-  if (
-    mode === "tid" &&
-    !state.tid
-      .toString()
-      .padStart(5, "0")
-      .includes(valueText ?? "")
-  )
-    return false;
-  if (
-    mode === "sid" &&
-    !state.sid
-      .toString()
-      .padStart(5, "0")
-      .includes(valueText ?? "")
-  )
-    return false;
-  if (mode === "full" && ((state.sid << 16) | state.tid) >>> 0 !== value)
-    return false;
-  if (
-    mode === "g7tid" &&
-    !state.g7tid
-      .toString()
-      .padStart(6, "0")
-      .includes(valueText ?? "")
-  )
-    return false;
-  if (tsv !== undefined && state.tsv !== tsv) return false;
-  if (
-    rand !== undefined &&
-    !state.rand64
-      .toString(16)
-      .toUpperCase()
-      .padStart(16, "0")
-      .includes(rand.toUpperCase())
-  )
-    return false;
-  return true;
-}
-
 export class Gen7IdUiPreviewEngine implements Gen7IdSearchEngine {
   private cancelled = false;
   async search(
@@ -84,6 +44,7 @@ export class Gen7IdUiPreviewEngine implements Gen7IdSearchEngine {
     );
     const maxResults = options.maxResults ?? GEN7_ID_MAX_RESULTS;
     const results: Gen7IdState[] = [];
+    const matches = createGen7IdStateMatcher(request.filters);
     this.cancelled = options.signal?.aborted ?? false;
     const cancel = () => {
       this.cancelled = true;
@@ -92,7 +53,7 @@ export class Gen7IdUiPreviewEngine implements Gen7IdSearchEngine {
     try {
       for (let offset = 0; offset < totalStates && !this.cancelled; offset++) {
         const state = previewState(request, request.minAdvances + offset);
-        if (matches(request, state)) results.push(state);
+        if (matches(state)) results.push(state);
       }
       const accepted = results.slice(0, maxResults);
       options.onBatch?.(accepted);

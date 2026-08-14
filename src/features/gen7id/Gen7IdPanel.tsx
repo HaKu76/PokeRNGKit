@@ -7,7 +7,6 @@ import {
   GEN7_ID_MAX_ADVANCES,
   gen7IdStartingFrame,
   parseDecimal,
-  parseFullId,
   parseHex,
   validateGen7IdRequest,
   type Gen7GameVersion,
@@ -35,18 +34,6 @@ function filterLabel(mode: Gen7IdFilterMode) {
           : "";
 }
 
-function normalizeFilterDigits(value: string, maxDigits: number) {
-  return value.replace(/\D/g, "").slice(0, maxDigits);
-}
-
-function normalizeFilterHex(value: string, maxDigits: number) {
-  return value
-    .replace(/^0x/i, "")
-    .replace(/[^0-9a-f]/gi, "")
-    .toUpperCase()
-    .slice(0, maxDigits);
-}
-
 export function Gen7IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
   const { t } = useTranslation();
   const engine = useMemo<Gen7IdSearchEngine>(
@@ -59,10 +46,12 @@ export function Gen7IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
   const [minAdvances, setMinAdvances] = useState("1012");
   const [maxAdvances, setMaxAdvances] = useState("50000");
   const [correction, setCorrection] = useState("0");
-  const [filterMode, setFilterMode] = useState<Gen7IdFilterMode>("none");
-  const [filterValue, setFilterValue] = useState("");
-  const [tsv, setTsv] = useState("");
-  const [rand, setRand] = useState("");
+  const [filterMode, setFilterMode] = useState<Gen7IdFilterMode>("g7tid");
+  const [idText, setIdText] = useState("");
+  const [tsvText, setTsvText] = useState("");
+  const [randText, setRandText] = useState("");
+  const [regularExpression, setRegularExpression] = useState(false);
+  const [filtersDisabled, setFiltersDisabled] = useState(false);
   const [results, setResults] = useState<Gen7IdState[]>([]);
   const [status, setStatus] = useState<
     "ready" | "calculating" | "completed" | "failed"
@@ -96,10 +85,11 @@ export function Gen7IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
       correction: parseDecimal(correction) ?? Number.NaN,
       filters: {
         mode: filterMode,
-        value: filterMode === "full" ? parseFullId(filterValue) : undefined,
-        valueText: filterMode === "full" ? undefined : filterValue,
-        tsv: tsv === "" ? undefined : parseDecimal(tsv),
-        rand: rand === "" ? undefined : rand,
+        disabled: filtersDisabled,
+        regularExpression,
+        idText,
+        tsvText,
+        randText,
       },
     };
     const errors = validateGen7IdRequest(request);
@@ -166,7 +156,7 @@ export function Gen7IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
   };
   return (
     <>
-      <form className="control-grid" onSubmit={run}>
+      <form className="control-grid gen7id-control-grid" onSubmit={run}>
         <section className="panel input-panel">
           <div className="panel-heading">
             <div>
@@ -275,7 +265,7 @@ export function Gen7IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
             )}
           </div>
         </section>
-        <section className="panel filter-panel">
+        <section className="panel filter-panel gen7id-filter-panel">
           <div className="panel-heading">
             <div>
               <span className="panel-index">02</span>
@@ -288,67 +278,69 @@ export function Gen7IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
               <span>{t("gen7IdFilter")}</span>
               <select
                 value={filterMode}
-                onChange={(event) => {
-                  setFilterMode(event.target.value as Gen7IdFilterMode);
-                  setFilterValue("");
-                }}
+                onChange={(event) =>
+                  setFilterMode(event.target.value as Gen7IdFilterMode)
+                }
               >
-                <option value="none">{t("noFilter")}</option>
                 <option value="tid">TID</option>
                 <option value="sid">SID</option>
                 <option value="full">TID/SID</option>
                 <option value="g7tid">Gen7TID</option>
               </select>
             </label>
-            {filterMode !== "none" && (
-              <label className="field">
+            <div className="gen7id-filter-lists">
+              <label className="field gen7id-filter-list gen7id-id-list">
                 <span>{filterLabel(filterMode)}</span>
-                <input
-                  maxLength={filterMode === "full" ? 11 : 6}
-                  value={filterValue}
-                  onChange={(event) =>
-                    setFilterValue(
-                      filterMode === "full"
-                        ? event.target.value
-                            .replace(/[^0-9a-f/]/gi, "")
-                            .toUpperCase()
-                            .slice(0, 11)
-                        : normalizeFilterDigits(
-                            event.target.value,
-                            filterMode === "g7tid" ? 6 : 5,
-                          ),
-                    )
-                  }
+                <textarea
+                  aria-label={`${filterLabel(filterMode)} list`}
+                  onChange={(event) => setIdText(event.target.value)}
+                  rows={7}
+                  spellCheck={false}
+                  value={idText}
                 />
-                {filterMode === "full" && <small>HEX / TID/SID</small>}
               </label>
-            )}
-            <label className="field">
-              <span>TSV</span>
-              <input
-                inputMode="numeric"
-                maxLength={4}
-                value={tsv}
-                onChange={(event) =>
-                  setTsv(normalizeDecimalInput(event.target.value, 4095, 4))
-                }
-              />
-              <small>0 - 4095</small>
-            </label>
-            <label className="field">
-              <span>{t("gen7RandomNumber")}</span>
-              <div className="prefixed-input">
-                <span>0x</span>
-                <input
-                  maxLength={16}
-                  value={rand}
-                  onChange={(event) =>
-                    setRand(normalizeFilterHex(event.target.value, 16))
-                  }
+              <label className="field gen7id-filter-list gen7id-tsv-list">
+                <span>TSV</span>
+                <textarea
+                  aria-label="TSV list"
+                  inputMode="numeric"
+                  onChange={(event) => setTsvText(event.target.value)}
+                  rows={7}
+                  spellCheck={false}
+                  value={tsvText}
                 />
-              </div>
-              <small>HEX / 64-bit</small>
-            </label>
+              </label>
+              <label className="field gen7id-filter-list gen7id-rand-list">
+                <span>{t("gen7RandomNumber")}</span>
+                <textarea
+                  aria-label={`${t("gen7RandomNumber")} list`}
+                  onChange={(event) => setRandText(event.target.value)}
+                  rows={7}
+                  spellCheck={false}
+                  value={randText}
+                />
+              </label>
+            </div>
+            <div className="gen7id-filter-options">
+              <label className="toggle-field">
+                <input
+                  checked={regularExpression}
+                  onChange={(event) =>
+                    setRegularExpression(event.target.checked)
+                  }
+                  type="checkbox"
+                />
+                <span>Regular Expression</span>
+              </label>
+              <label className="toggle-field disable-filters">
+                <input
+                  checked={filtersDisabled}
+                  onChange={(event) => setFiltersDisabled(event.target.checked)}
+                  type="checkbox"
+                />
+                <span>{t("disableFilters")}</span>
+              </label>
+            </div>
           </div>
         </section>
       </form>

@@ -3021,6 +3021,40 @@ h1 {
   font-size: 13px;
   text-transform: uppercase;
 }
+.gen7id-control-grid {
+  grid-template-columns: minmax(360px, 0.74fr) minmax(560px, 1.26fr);
+}
+.gen7id-filter-panel {
+  min-width: 0;
+}
+.gen7id-filter-lists {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.7fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.gen7id-filter-list textarea {
+  min-height: 184px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--control-bg);
+  color: var(--text);
+  padding: 10px 12px;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  line-height: 22px;
+}
+.gen7id-filter-list textarea:focus-visible {
+  outline: 2px solid var(--brand-strong);
+  outline-offset: 2px;
+}
+.gen7id-filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
 .encounter-lookup-display {
   overflow: hidden;
 }
@@ -3314,6 +3348,9 @@ h1 {
 }
 
 @media (min-width: 901px) and (max-width: 1180px) {
+  .gen7id-control-grid {
+    grid-template-columns: 1fr;
+  }
   .static-control-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3326,6 +3363,10 @@ h1 {
 }
 
 @media (max-width: 560px) {
+  .gen7id-filter-lists {
+    grid-template-columns: 1fr;
+  }
+
   .gen4-seed-to-time-fields,
   .gen4-calibration-fields {
     grid-template-columns: 1fr;
