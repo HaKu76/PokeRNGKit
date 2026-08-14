@@ -312,7 +312,7 @@
 
 .gen5wild-slot-filter label {
   display: flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   gap: 6px;

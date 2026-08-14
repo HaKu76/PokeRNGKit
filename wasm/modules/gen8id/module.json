@@ -1,0 +1,13 @@
+{
+  "id": "gen8id",
+  "generation": 8,
+  "contractVersion": 1,
+  "apiVersion": 2,
+  "target": "gen8id",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen8id.mjs",
+    "wasm": "gen8id.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen VIII IDs8/IDGenerator8"
+}

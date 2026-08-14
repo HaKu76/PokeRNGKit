@@ -695,10 +695,15 @@ src/
     |   |-- preview/
     |   `-- worker/
     |-- gen4wild/
+    |   |-- domain.ts
+    |   |-- Gen4WildPanel.tsx
+    |   |-- search.ts
+    |   |-- preview/
+    |   `-- worker/
     |-- gen4chainedsid/
     |   |-- data.ts
     |   |-- domain.ts
-    |   |-- Gen4WildPanel.tsx
+    |   |-- Gen4ChainedSidPanel.tsx
     |   |-- preview/
     |   `-- worker/
     |-- gen4profiles/

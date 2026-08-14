@@ -612,6 +612,16 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细上游字段、输入边界、标签、持久化差异和来源哈希见 [Gen 8 Profiles](modules/gen8profiles.md)。
 
+## 8.29 当前功能需求：`gen8id`
+
+- **FR-G8ID-01** 提供 PokeFinder `Gen 8 TID/SID` Generator。Seed 0/1 使用 64 位十六进制、最多 16 位且空值读取为 `0`；Initial Advances 与 Max Advances 使用十进制 `uint32_t`、最多 10 位，默认分别为 `0` 与 `100000`。只有两个 Seed 同时为 `0` 时拒绝生成。
+- **FR-G8ID-02** Max Advances 表示状态数量，`0` 返回空结果，结果帧为 `initialAdvances..initialAdvances + maxAdvances - 1` 并允许 `uint32_t` 自然回绕。筛选固定提供 TID、SID、TID/SID、PID、TSV 与 Display TID；切换模式清空文本，空文本表示不筛选，同一模式多行按 OR 匹配。
+- **FR-G8ID-03** Xorshift、`RNGList<u32, Xorshift, 2, gen>`、零 `sidtid` 重读、ID 派生和筛选只在独立 `gen8id` Wasm API v2 与 Dedicated Worker Pool 中执行。单个 Worker 调用最多处理 100,000 个状态，单次浏览器任务最多执行 250,000,000 次状态评估并返回 100,000 行；任务按确定性 chunk 顺序归并，不依赖 SharedArrayBuffer、Wasm pthread 或跨源隔离。
+- **FR-G8ID-04** 结果固定显示 Advances、Display TID、TID、SID、TSV 五列普通十进制整数，不补前导零；默认 100,000 行使用虚拟滚动、横向滚动和稳定 44px 表头/行高，支持鼠标与键盘行选择、进度、取消、CSV、清空、错误、空结果与结果上限状态。
+- **FR-G8ID-05** 桌面使用 RNG Info 与 Filters 双栏工作台，窄屏重排为单栏；控件保持 44px 触控目标。模块不读取 Gen 8 Profile，不显示版本选择，不增加 operation tabs；UI Preview 不加载或替代生产 Wasm 算法。
+
+完整输入边界、Qt 文本清洗、翻译状态、算法、结果 ABI、四组固定夹具和来源哈希见 [Gen 8 ID](modules/gen8id.md)。
+
 ## 9. 后续 MVP
 
 第四世代 ID/Static/Wild 与 Encounter Lookup 通过工程检查、部署页面回归和项目所有者最终验收后，按以下顺序推进：
@@ -620,7 +630,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 2. Tanoby Chamber form 数据、来源记录与固定夹具。
 3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
-第四世代当前实现 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid`；第五世代当前实现 `gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache`、`gen5sha1cache`、`gen5dreamradar`、`gen5static`、`gen5wild`、`gen5hiddengrotto`、`gen5egg` 与 `gen5event`；第八世代当前实现 `gen8profiles`；全局工具当前实现 `researcher`。其他功能按 PokeFinder 与 3DSRNGTool 模块清单继续逐项实现、验证和提交。
+第四世代当前实现 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4egg`、`gen4advance`、`gen4event` 与 `gen4chainedsid`；第五世代当前实现 `gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache`、`gen5sha1cache`、`gen5dreamradar`、`gen5static`、`gen5wild`、`gen5hiddengrotto`、`gen5egg` 与 `gen5event`；第八世代当前实现 `gen8profiles` 与 `gen8id`；全局工具当前实现 `researcher`。其他功能按 PokeFinder 与 3DSRNGTool 模块清单继续逐项实现、验证和提交。
 
 ## 10. 非目标
 
@@ -682,8 +692,8 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
-3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、NGC Seed C ABI 输入边界、G3 Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、PID to IVs、GameCube Channel、PokeSpot、Jirachi、Egg Emerald/RSFRLG、G4 Static Method 1/J/K、Synchronize、Cute Charm、Searcher、G4 Wild Route 222 Generator/Searcher、G4 Egg DPPt/HGSS/Masuda/Searcher、Advance Finder Calls/Chatot/Needles 与错误边界、G4 Chained SID `54320`、Gen V Profiles BW/BW2 Seed/IV/Needle/Memory Link、Gen V ID Search By/Seed Finder、Gen V Adjacent Seeds、Gen V IV Cache、Gen V SHA1 Cache、Gen V Dream Radar、Gen V Static、Gen V Wild、Gen V Hidden Grotto、Gen V Egg、Gen V Event、Gen7 ID、宝可病毒与错误边界夹具。
-4. `npm run wasm:build` 生成默认三十四个模块的 MJS/Wasm 产物，包括 `gen4egg`、`gen4event`、`gen4chainedsid`、`gen4advance`、`gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache`、`gen5sha1cache`、`gen5dreamradar`、`gen5static`、`gen5wild`、`gen5hiddengrotto`、`gen5egg`、`gen5event` 与 `researcher`。
+3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、NGC Seed C ABI 输入边界、G3 Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、PID to IVs、GameCube Channel、PokeSpot、Jirachi、Egg Emerald/RSFRLG、G4 Static Method 1/J/K、Synchronize、Cute Charm、Searcher、G4 Wild Route 222 Generator/Searcher、G4 Egg DPPt/HGSS/Masuda/Searcher、Advance Finder Calls/Chatot/Needles 与错误边界、G4 Chained SID `54320`、Gen V Profiles BW/BW2 Seed/IV/Needle/Memory Link、Gen V ID Search By/Seed Finder、Gen V Adjacent Seeds、Gen V IV Cache、Gen V SHA1 Cache、Gen V Dream Radar、Gen V Static、Gen V Wild、Gen V Hidden Grotto、Gen V Egg、Gen V Event、Gen7 ID、Gen8 ID 四组 `id8.json`、宝可病毒与错误边界夹具。
+4. `npm run wasm:build` 生成默认三十五个模块的 MJS/Wasm 产物，包括 `gen4egg`、`gen4event`、`gen4chainedsid`、`gen4advance`、`gen5profiles`、`gen5id`、`gen5adjacentseeds`、`gen5ivcache`、`gen5sha1cache`、`gen5dreamradar`、`gen5static`、`gen5wild`、`gen5hiddengrotto`、`gen5egg`、`gen5event`、`gen7id`、`gen8id` 与 `researcher`。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
@@ -713,7 +723,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 19. GameCube RNG 使用 Channel Jirachi 和至少一个 XD/Colosseum Shadow 模板核对 Generator/Searcher；PID to IVs 使用 PID `0`；PokeSpot 使用两个 Seed `0` 与 `0..9`；Jirachi 使用上游固定 `compute_seed` 和操作序列。
 20. Gen V Profiles 使用 Black/Black 2 固定数据核对 Seed、IV、Needle 与 Memory Link Needle；确认 G3/G4/G5 存储键隔离、CRUD、导入导出、排序、三种校准、进度和取消。
 21. Researcher 使用 14 种 RNG 首值、跨行 Custom、Search/Next、10,000 行批次边界与 `u32` 最大帧范围夹具核对；确认取消后下一次生成可重建 Worker。
-22. GitHub Pages 在线加载三十三个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
+22. GitHub Pages 在线加载三十五个 Worker/Wasm 模块，控制台无资源、API 握手或 Worker 错误。
 23. 记录部署 URL、对应 commit/Actions run、浏览器版本、输入、预期、实际结果和未覆盖项。
 
 算法回归必须使用真实生产 Wasm，不能使用 `ui` 预览模式。无法从部署页面确认的原生夹具、移动设备性能或离线安装行为必须明确列为未覆盖。
@@ -749,6 +759,8 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **阶段 7C：`gen4chainedsid` Chained Shiny to SID** - 第四世代连锁异色观测、SID 候选收窄、独立 Wasm/Worker、原生夹具和算法文档（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 7D：`gen4egg` Egg Generator/Searcher** - DPPt/HGSS 孵化、异国孵化、双亲遗传、Searcher、独立 Wasm/Worker Pool 和算法文档（当前工作区，待生产 Wasm、Actions、部署回归与最终验收）。
 - **阶段 7E：`gen4advance` Advance Finder** - Calls/Chatot/Needles 连续观测匹配、独立 Wasm/Worker、Jump to Advance 和算法文档（当前工作区，待生产 Wasm、Actions、部署回归与最终验收）。
+- **阶段 8A：`gen8profiles` Profile Manager** - 第八世代 Sword/Shield/BDSP 档案 CRUD、独立 IndexedDB/localStorage、JSON 备份、响应式表格和上游输入文档（当前工作区，待部署回归与最终验收）。
+- **阶段 8B：`gen8id` Gen 8 TID/SID** - 第八世代 Xorshift ID Generator、六种筛选、独立 Wasm/Worker、虚拟结果表和四组上游固定夹具（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 8：发布加固** - 浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

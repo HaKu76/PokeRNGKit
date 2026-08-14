@@ -404,8 +404,8 @@ export function Gen5WildPanel({
   }, [endDate, startDate]);
 
   const labels = {
-    profile: chinese ? "配置" : "Profile",
-    manager: chinese ? "管理配置" : "Profile Manager",
+    profile: "Profile",
+    manager: "Manager",
     generator: chinese ? "生成器" : "Generator",
     searcher: chinese ? "检索器" : "Searcher",
     rngInfo: chinese ? "乱数信息" : "RNG Info",
@@ -436,7 +436,7 @@ export function Gen5WildPanel({
     ability: chinese ? "特性" : "Ability",
     gender: chinese ? "性别" : "Gender",
     shiny: chinese ? "异色" : "Shiny",
-    disableFilters: chinese ? "禁用筛选" : "Disable Filters",
+    disableFilters: chinese ? "取消筛选" : "Disable Filters",
     showStats: chinese ? "显示能力值" : "Show Stats",
     ivCache: "IV Cache",
     shaCache: "SHA Cache",
@@ -1504,7 +1504,9 @@ export function Gen5WildPanel({
             <div
               aria-colcount={columns.length}
               aria-label={labels.results}
-              aria-rowcount={sortedResults.length + 1}
+              aria-rowcount={
+                sortedResults.length === 0 ? 2 : sortedResults.length + 1
+              }
               className={`gen5wild-table ${mode}`}
               role="grid"
               style={{
@@ -1560,9 +1562,13 @@ export function Gen5WildPanel({
                 >
                   <span role="gridcell">
                     {busy
-                      ? chinese
-                        ? "检索中"
-                        : "Searching"
+                      ? mode === "generator"
+                        ? chinese
+                          ? "生成中"
+                          : "Generating"
+                        : chinese
+                          ? "检索中"
+                          : "Searching"
                       : chinese
                         ? "无结果"
                         : "No results"}

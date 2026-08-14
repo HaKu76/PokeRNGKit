@@ -5,9 +5,9 @@
 - 本地核验来源：`C:\Users\Hakuhiro\Desktop\PokeFinder-master`
 - 导入日期：2026-08-11
 - 许可证：GNU GPL v3 or later
-- 导入范围：第三世代 ID Generator 与 GameCube Generator/Searcher 所需的 Core、共享 LCRNG、状态与筛选父类，以及第五世代 IV Cache Finder 所需的 MT、Jump 表与 RNGList；G3 Static、Wild、IVs to PID、PID to IVs、PokeSpot、Jirachi、Egg、G4 Static、G4 Wild 与 Gen V Hidden Grotto 以独立 bridge 对照上游源码实现；Encounter Lookup 以静态生成数据对照上游行为
+- 导入范围：第三世代 ID Generator 与 GameCube Generator/Searcher 所需的 Core、共享 LCRNG、状态与筛选父类，以及第五世代 IV Cache Finder 所需的 MT、Jump 表与 RNGList；Gen VIII ID 使用模块内逐字复制的 IDGenerator8 与 Xorshift，并复用共享 IDFilter/IDState8；G3 Static、Wild、IVs to PID、PID to IVs、PokeSpot、Jirachi、Egg、G4 Static、G4 Wild 与 Gen V Hidden Grotto 以独立 bridge 对照上游源码实现；Encounter Lookup 以静态生成数据对照上游行为
 
-本地核验目录不是构建依赖。PokeRNGKit 构建只使用本目录内的 vendored snapshot；所有文件保留原始版权与 GPL 头部。
+本地核验目录不是构建依赖。PokeRNGKit 构建使用本目录内的 vendored snapshot，以及 `wasm/modules/gen8id/upstream/` 内逐字复制的 Gen VIII IDGenerator8/Xorshift；所有复制文件保留原始版权与 GPL 头部。
 
 ## 导入文件 SHA-256
 
@@ -407,6 +407,12 @@ EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 的 
 ## Gen VIII Profiles 只读核验
 
 `gen8profiles` 对照 PokeFinder 4.3.2 的 Profile8、ProfileLoader8、Profile Editor、Profile Manager、Profile Display、ProfileModel8、输入控件与翻译实现独立浏览器持久化。上游源码不作为构建依赖；完整字段、输入边界、Manager 行为、PokeFinder JSON 差异和 27 个来源文件 SHA-256 见 `docs/modules/gen8profiles.md`。
+
+## Gen VIII ID 来源
+
+`gen8id` 对照 PokeFinder 4.3.2 `Gen 8 TID/SID`、`IDGenerator8`、`IDState8`、`IDFilter`、`Xorshift`、`RNGList`、`TextBox` 与 `id8.json` 实现独立 Wasm/Worker。`wasm/modules/gen8id/upstream/` 内的 `IDGenerator8.cpp/.hpp` 与 `Xorshift.cpp/.hpp` 是上游逐字副本；共享 `IDFilter`、`IDState8`、`IDState`、`IDGenerator`、`RNGList` 与 `Global` 来自本目录 vendored snapshot。
+
+模块保留两段 64 位 Seed、状态数量、`uint32_t` Advances 回绕、六种筛选和四组固定夹具。完整 Qt 输入限制、翻译状态、算法调用、结果 ABI、上游文件 SHA-256 与浏览器保护边界见 `docs/modules/gen8id.md`。
 
 ```text
 2AC04F57405233ED252F9DEBAE0CADCBA9F56A6A1D8CF42355CE7E3AB6885899  Core/Enum/Game.hpp

@@ -2,10 +2,23 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`be28506 fix: 修正隐藏洞穴版本标识`
+> - Git 基线：`365b31e feat: 实现第八世代存档信息管理`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen5 Hidden Grotto 已提交并推送；Gen8 Profiles 已完成工程验证；下一步实现 Gen8 ID；`docs/tech-stack.md` 和 `src/features/gen5wild/` 保留项目所有者改动
+> - 工作区状态：Gen8 ID API v2 已完成实现、原生 parity 与完整 `npm run verify`；下一步独立提交推送后进入 Gen8 Egg；`docs/tech-stack.md` 和 `src/features/gen5wild/` 保留项目所有者改动
 > - 验收状态：Researcher 已提交推送并完成生产部署工程回归；项目所有者最终验收待共同确认
+
+## 2026-08-14 第八世代 ID 乱数
+
+- 新增：实现 PokeFinder `Gen 8 TID/SID` Generator，支持两段 64 位 Seed、Initial Advances、状态数量，以及 TID、SID、TID/SID、PID、TSV、Display TID 六种多行 OR 筛选；空筛选不过滤，两个 Seed 同为 `0` 时拒绝。
+- 算法：增加独立 `gen8id` Wasm API v2，复用上游 `IDGenerator8`、`Xorshift`、`RNGList`、`IDFilter` 与 `IDState8` 语义，保留零 `sidtid` 重读、`uint32_t` Advances 回绕和 `rng.next(0x80000000, 0x7fffffff)` 的特殊范围行为。
+- 接入：增加最多八个独立 Worker、100,000 状态分片、250,000,000 次状态评估上限、确定性乱序归并、进度、取消、预中止、100,000 行结果上限、协议握手、运行时请求/分片/结果校验、崩溃后重建、默认 Wasm 构建清单和三语导航。
+- 界面：按 HakuStyle operational workspace 与 compact workspace 密度实现双栏到单栏响应式控制区、44px 控件、纵向筛选工作流、固定五列表、虚拟滚动、键盘行导航、CSV、清空、错误、空结果与结果上限状态；模块不读取 Gen 8 Profile，也不增加 operation tabs。
+- 修复：PID 文本按 Qt 的数值溢出规则处理前导零；未知筛选枚举不再退化为无筛选；无筛选批次必须完整连续返回每个状态；Worker 逐行验证 Advances、非零 TID/SID、TSV、Display TID、筛选命中、结果指针与顺序；运行时锁定输入，结果上限会停止剩余 Worker，非法分片参数不再把 Pool 卡在运行状态。
+- 已通过：定向 `gen8id_native_parity` 1/1；覆盖四组 `id8.json` 九行结果、每组全部非零分片起点、六种筛选、空筛选、零 Seed 边界、零状态、Advances 回绕、单批上限和 250,000,000 次任务边界；模块内四个上游副本与 PokeFinder 4.3.2 对应文件 SHA-256 一致。
+- 已通过：项目所有者在本地终端运行完整 `npm run verify`；全仓 Prettier、ESLint（0 error、3 条既有 TanStack Virtual warning）、TypeScript、88 个测试文件共 360 项测试、2073 个 Vite 模块的 Web/PWA 生产构建和 62 项 PWA 预缓存全部通过，仅保留大型 chunk 提示。
+- 环境记录：受限终端此前在复制既有 `public/wasm/gen3egg.mjs` 到 `dist` 时返回 Windows `EPERM`；后续非受限审批请求因审批服务 502 未启动。项目所有者手动执行同一命令通过，确认不是源码失败。
+- 下一步：以 `feat: 实现第八世代 ID 乱数` 单独提交并推送。随后实现 `gen8egg`；Gen8 Egg 只支持 BDSP，接入前需把 Gen8 Profile controller 提升为 Manager 与 Egg 共用的单一状态来源。
+- 待验收：生产 Wasm、Actions 部署、外部 Chrome/Edge 的桌面/移动端交互和实际页面算法回归，仍需在提交部署后与项目所有者共同完成。
 
 ## 2026-08-14 第八世代存档信息管理
 
