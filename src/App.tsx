@@ -57,6 +57,7 @@ import {
 import { useGen4Profiles } from "./features/gen4profiles/useGen4Profiles";
 import { Gen4StaticPanel } from "./features/gen4static/Gen4StaticPanel";
 import { Gen4WildPanel } from "./features/gen4wild/Gen4WildPanel";
+import { Gen4EventPanel } from "./features/gen4event/Gen4EventPanel";
 import { Gen4IdPanel } from "./features/gen4id/Gen4IdPanel";
 import { Gen4SeedToTimePanel } from "./features/gen4seedtotime/Gen4SeedToTimePanel";
 import { Gen4ChainedSidPanel } from "./features/gen4chainedsid/Gen4ChainedSidPanel";
@@ -82,6 +83,7 @@ type ActiveModule =
   | "gen4id"
   | "gen4seedtotime"
   | "gen4static"
+  | "gen4event"
   | "gen4chainedsid"
   | "gen7id"
   | "pokerusfinder"
@@ -366,7 +368,8 @@ function App() {
     activeModule === "gen4id" ||
     activeModule === "gen4seedtotime" ||
     activeModule === "gen4static" ||
-    activeModule === "gen4wild";
+    activeModule === "gen4wild" ||
+    activeModule === "gen4event";
   const gen4Module = gen4Tools || activeModule === "gen4chainedsid";
   const gen7Module = activeModule === "gen7id";
   const pokerusModule = activeModule === "pokerusfinder";
@@ -862,6 +865,24 @@ function App() {
             </button>
             <button
               className={
+                activeModule === "gen4event"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("gen4event");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">19</span>
+              <span>
+                <strong>{t("gen4EventModule")}</strong>
+                <small>{t("gen4EventVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
                 activeModule === "gen4chainedsid"
                   ? "module-entry active"
                   : "module-entry"
@@ -872,7 +893,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">19</span>
+              <span className="module-index">20</span>
               <span>
                 <strong>{t("gen4ChainedSidModule")}</strong>
                 <small>{t("gen4ChainedSidVersion")}</small>
@@ -892,7 +913,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">20</span>
+              <span className="module-index">21</span>
               <span>
                 <strong>{t("pokerusFinderModule")}</strong>
                 <small>{t("pokerusGen4Version")}</small>
@@ -911,7 +932,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">21</span>
+              <span className="module-index">22</span>
               <span>
                 <strong>{t("gen7IdModule")}</strong>
                 <small>{t("gen7IdVersion")}</small>
@@ -935,6 +956,7 @@ function App() {
                 activeModule === "gen4seedtotime" ||
                 activeModule === "gen4static" ||
                 activeModule === "gen4wild" ||
+                activeModule === "gen4event" ||
                 activeModule === "gen4chainedsid"
                   ? "GEN IV / RNG LAB"
                   : gen7Module
@@ -985,9 +1007,12 @@ function App() {
                                                         "gen4static"
                                                       ? "gen4StaticEngine"
                                                       : activeModule ===
-                                                          "gen4chainedsid"
-                                                        ? "gen4ChainedSidEngine"
-                                                        : "gen4WildEngine",
+                                                          "gen4event"
+                                                        ? "gen4EventEngine"
+                                                        : activeModule ===
+                                                            "gen4chainedsid"
+                                                          ? "gen4ChainedSidEngine"
+                                                          : "gen4WildEngine",
                 )}
               </h1>
             </div>
@@ -1032,9 +1057,12 @@ function App() {
                                                       "gen4static"
                                                     ? "gen4StaticVersion"
                                                     : activeModule ===
-                                                        "gen4chainedsid"
-                                                      ? "gen4ChainedSidVersion"
-                                                      : "gen4WildVersion",
+                                                        "gen4event"
+                                                      ? "gen4EventVersion"
+                                                      : activeModule ===
+                                                          "gen4chainedsid"
+                                                        ? "gen4ChainedSidVersion"
+                                                        : "gen4WildVersion",
               )}
             </div>
           </div>
@@ -1492,6 +1520,12 @@ function App() {
             <Gen4SeedToTimePanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "gen4static" ? (
             <Gen4StaticPanel
+              onOpenIvCalculator={openGen4IvCalculator}
+              profile={gen4Profiles.selectedProfile ?? DEFAULT_GEN4_PROFILE}
+              uiPreviewMode={uiPreviewMode}
+            />
+          ) : activeModule === "gen4event" ? (
+            <Gen4EventPanel
               onOpenIvCalculator={openGen4IvCalculator}
               profile={gen4Profiles.selectedProfile ?? DEFAULT_GEN4_PROFILE}
               uiPreviewMode={uiPreviewMode}

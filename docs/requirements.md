@@ -414,7 +414,19 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细算法、输入、数据来源和验证状态见 [Gen 4 Wild](modules/gen4wild.md)。
 
-## 8.9 当前功能需求：`gen4chainedsid`
+## 8.9 当前功能需求：`gen4event`
+
+- **FR-G4EVENT-01** 提供 PokeFinder `Wondercard IVs` 的 Generator/Searcher，支持 Diamond、Pearl、Platinum、HeartGold 与 SoulSilver 存档。
+- **FR-G4EVENT-02** Generator 接受 32 位 Seed、Initial Advances、Max Advances 与 Offset；空 Seed/Offset 按 `0`，组合推进不得超过 `0xFFFFFFFF`，单次最多处理 2,000,000 个状态。
+- **FR-G4EVENT-03** Searcher 接受六项 IV 闭区间、Delay 与 Advance 闭区间；按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 枚举，IV 组合最多 2,000,000 组。
+- **FR-G4EVENT-04** Generator 只按 IV 过滤，保留上游不应用 Hidden Power 筛选的行为；Searcher 同时应用 IV 与 Hidden Power 筛选，并保留上游重复最高位异或候选语义。
+- **FR-G4EVENT-05** 结果对齐 `EventModel4`：DPPt Generator 显示 Advances、Chatot 与 IV，HGSS 增加 Call；Searcher 显示 Seed、Delay、Advances 与 IV，不显示内部 Hour。
+- **FR-G4EVENT-06** 使用独立 `gen4event` Wasm API v1、C ABI、Dedicated Worker Pool、500 状态分片和固定宽度结果；不在 React 主线程或 TypeScript 中重写生产 RNG。
+- **FR-G4EVENT-07** 简体中文模块名逐字使用上游“第四世代配信乱数”；上游日文翻译 unfinished 时保留英文 `Wondercard IVs`。
+
+详细算法、输入限制、ABI 和固定夹具见 [Gen 4 Wondercard IVs](modules/gen4event.md)。
+
+## 8.10 当前功能需求：`gen4chainedsid`
 
 - **FR-G4CHAINEDSID-01** 提供 PokeFinder `Chained Shiny to SID` 的物种、特性、性别、性格、TID 和六项能力值输入；首条成功观测后锁定 TID。
 - **FR-G4CHAINEDSID-02** TID 使用十进制 `0..65535`，空值按 `0`；物种限制为全国图鉴 `1..492`；能力值保留 Qt Form 的独立上限，并在 C++ 算法边界按上游 `u8` 参数转换。
@@ -424,7 +436,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细算法、输入限制、ABI 和固定夹具见 [Gen 4 Chained Shiny to SID](modules/gen4chainedsid.md)。
 
-## 8.10 当前功能需求：第三世代补全模块
+## 8.11 当前功能需求：第三世代补全模块
 
 - **FR-G3GC-01** `gen3gamecube` 提供 XD、Colosseum、Channel 的 GameCube Generator/Searcher，覆盖 Non Shadow Locks、Channel、Shadow Locks、First Shadow Unset 和上游 69/1/77 条模板。
 - **FR-G3GC-02** Generator 使用 Seed、Initial/Max Advances、Offset 和完整 StateFilter；Searcher 按六项 IV 闭区间枚举，两个入口均使用独立 Worker Pool 和 API v1 C ABI。
@@ -436,7 +448,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 详细算法、输入限制、ABI 和验证状态见 [GameCube RNG](modules/gen3gamecube.md)、[PID to IVs](modules/gen3pidtoiv.md)、[PokeSpot](modules/gen3pokespot.md) 和 [Jirachi Advancer](modules/gen3jirachiadvancer.md)。
 
-## 8.11 当前功能需求：`pokerusfinder`
+## 8.12 当前功能需求：`pokerusfinder`
 
 - **FR-POKERUS-01** 提供 DevonStudios Pokerus Finder 的 Gen III、Gen IV DP 和 Gen IV PtHGSS 三个模式；中文产品名称为“宝可病毒”，第三世代和第四世代入口分别归入对应世代主分组，不建立独立工具分组。
 - **FR-POKERUS-02** Gen III/DP 复用上游 `Initial Seed`、`Frame`、`Delay` 控件语义和十六进制/十进制边界；Gen III 最大 9,999,999 帧，DP 最大 99,999 帧。
@@ -454,7 +466,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 2. Tanoby Chamber form 数据、来源记录与固定夹具。
 3. PWA 离线加固、浏览器矩阵、可访问性和性能基线。
 
-Egg Searcher、Masuda、第四世代孵化等第三世代/第四世代功能在上述 MVP 后评估。第四世代当前实现 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild` 与 `gen4chainedsid`；其他第四世代功能仍为候选边界。
+Egg Searcher、Masuda、第四世代孵化等第三世代/第四世代功能在上述 MVP 后评估。第四世代当前实现 `gen4id`、`gen4seedtotime`、`gen4static`、`gen4wild`、`gen4event` 与 `gen4chainedsid`；其他第四世代功能仍为候选边界。
 
 ## 10. 非目标
 

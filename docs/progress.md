@@ -2,10 +2,19 @@
 
 > - 最近更新：2026-08-14
 > - 当前分支：`main`
-> - Git 基线：`d21ec9b feat: 新增第四世代Seed查询时间`
+> - Git 基线：`592eef2 feat: 补齐个体值查询PID迷人之躯结果`
 > - 当前阶段：补全 PokeFinder 与 3DSRNGTool 功能模块
-> - 工作区状态：Gen4 Chained SID 与第三世代 Tanoby Chamber 均在当前工作区，分模块提交中
-> - 验收状态：Gen4 Chained SID 与 Tanoby Chamber 原生夹具已通过；完整 Wasm 与部署回归待执行
+> - 工作区状态：Gen4 Event 与 Gen4 Egg 正在分模块实现；Gen4 Event 已进入共享接入
+> - 验收状态：Gen4 Event 定向 TypeScript 检查与原生夹具已通过；完整 Wasm 与部署回归待执行
+
+## 2026-08-14 Gen4 Wondercard IVs
+
+- 新增：第四世代 `Wondercard IVs` Generator/Searcher，覆盖 DPPt/HGSS、Seed/Advance/Offset、IV/Hidden Power、Delay/Advance Searcher、能力值显示、排序、虚拟表、进度与取消。
+- 接入：新增 `gen4event` Wasm API v1、Generator/Searcher Worker Pool、模块 manifest、共享契约、GEN IV 导航、三语名称和默认 Wasm 构建列表；简中模块名逐字复用上游“第四世代配信乱数”。
+- 已通过：`npm run typecheck`、`npm run lint`（0 error，仅保留 Egg/Wild 两条既有 TanStack Virtual warning）、`npm test -- src/features/gen4event`（2 文件、11 测试）、`$env:POKERNGKIT_WASM_MODULES='gen4event'; npm run wasm:test:native`（`gen4event_native_parity` 1/1）与 `git diff --check`。
+- 加固：Worker 现在校验 operation、请求/分片类型、`chunkIndex`、单批状态上限、领域请求、Searcher 组合范围、结果计数以及 Wasm 指针的对齐、非空与堆边界，再复制结果缓冲区。
+- 已通过：完整 `npm run verify`，覆盖全仓 Prettier、ESLint、TypeScript、38 个 Vitest 文件共 149 项测试、Vite 生产构建与 47 项 PWA 预缓存；受限文件环境连续两次在复制既有 `gen3egg.mjs` 时返回 `EPERM`，在不受该文件限制的相同源码快照上完整通过。
+- 未验收：生产 Wasm、外部 Chrome/Edge 页面与 GitHub Pages 算法结果待部署后和项目所有者共同核对。
 
 ## 2026-08-14 IVs to PID Cute Charm
 

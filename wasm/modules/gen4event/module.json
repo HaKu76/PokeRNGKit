@@ -1,0 +1,13 @@
+{
+  "id": "gen4event",
+  "generation": 4,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen4event",
+  "operations": ["generator", "searcher"],
+  "artifacts": {
+    "loader": "gen4event.mjs",
+    "wasm": "gen4event.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen IV EventGenerator4/EventSearcher4"
+}
