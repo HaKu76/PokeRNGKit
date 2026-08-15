@@ -16,7 +16,7 @@
 8. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)：README、进度、提交、构建与发布说明格式。
 9. [HakuStyle Web 前端 Skill](../.agents/skills/web-frontend-style/SKILL.md)：页面布局、视觉层级、响应式、交互样式、可访问性与动效规则。
 
-修改第四世代模块时，还必须读取[第四世代扩展接口与 AI 交接](gen4-development.md)和 `src/features/shared/rngModuleContract.ts`。开始未实现模块前先核对[模块库存](module-inventory.md)，每次只完成一个独立模块并收口对应导航、文档、测试与构建清单。
+修改第四世代模块时，还必须读取对应的 `docs/modules/gen4<module>.md` 和 `src/features/shared/rngModuleContract.ts`。开始未实现模块前先核对[模块库存](module-inventory.md)，每次只完成一个独立模块并收口对应导航、文档、测试与构建清单。
 
 读取完成后先运行 `git status --short --branch`。工作区中的已有修改视为项目所有者内容，不得重置、覆盖或顺手重构。
 

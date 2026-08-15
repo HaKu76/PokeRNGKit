@@ -23,6 +23,75 @@
 
 namespace pokerngkit::gen7
 {
+    class TinyMT
+    {
+      public:
+        static constexpr std::uint32_t mat1 = 0x8f7011eeU;
+        static constexpr std::uint32_t mat2 = 0xfc78ff1fU;
+        static constexpr std::uint32_t tmat = 0x3793fdffU;
+
+        explicit TinyMT(const std::array<std::uint32_t, 4> &status) : currentStatus(status) {}
+
+        explicit TinyMT(std::uint32_t seed)
+        {
+            currentStatus = { seed, mat1, mat2, tmat };
+            for (std::uint32_t i = 1; i < 8; i++)
+            {
+                currentStatus[i & 3U] ^=
+                    i + 1812433253U *
+                            (currentStatus[(i - 1U) & 3U] ^ (currentStatus[(i - 1U) & 3U] >> 30));
+            }
+            certifyPeriod();
+            advance(8);
+        }
+
+        void nextState()
+        {
+            auto y = currentStatus[3];
+            auto x = (currentStatus[0] & 0x7fffffffU) ^ currentStatus[1] ^ currentStatus[2];
+            x ^= x << 1;
+            y ^= (y >> 1) ^ x;
+            currentStatus[0] = currentStatus[1];
+            currentStatus[1] = currentStatus[2];
+            currentStatus[2] = x ^ (y << 10);
+            currentStatus[3] = y;
+            if ((y & 1U) != 0)
+            {
+                currentStatus[1] ^= mat1;
+                currentStatus[2] ^= mat2;
+            }
+        }
+
+        std::uint32_t nextUint()
+        {
+            nextState();
+            auto t0 = currentStatus[3];
+            const auto t1 = currentStatus[0] + (currentStatus[2] >> 8);
+            t0 ^= t1;
+            if ((t1 & 1U) != 0) t0 ^= tmat;
+            return t0;
+        }
+
+        void advance(std::uint32_t count)
+        {
+            for (std::uint32_t i = 0; i < count; i++) nextState();
+        }
+
+        const std::array<std::uint32_t, 4> &status() const { return currentStatus; }
+
+      private:
+        std::array<std::uint32_t, 4> currentStatus {};
+
+        void certifyPeriod()
+        {
+            if ((currentStatus[0] & 0x7fffffffU) == 0 && currentStatus[1] == 0 &&
+                currentStatus[2] == 0 && currentStatus[3] == 0)
+            {
+                currentStatus = { 'T', 'I', 'N', 'Y' };
+            }
+        }
+    };
+
     class SFMT
     {
       public:

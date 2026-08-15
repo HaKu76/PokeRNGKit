@@ -1,0 +1,13 @@
+{
+  "id": "gen7egg",
+  "generation": 7,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen7egg",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen7egg.mjs",
+    "wasm": "gen7egg.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 Egg7/EggRNG/Gen7EggPath"
+}

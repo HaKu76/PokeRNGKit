@@ -2,10 +2,29 @@
 
 > - 最近更新：2026-08-15
 > - 当前分支：`main`
-> - Git 基线：`efbb6eb feat: 实现第七世代SOS乱数`
+> - Git 基线：`2684400 fix: 修复第七世代野生验证错误`
 > - 当前阶段：按 Stationary、Wild、SOS、Egg、Battle Tree、Event 的顺序实现第七世代主模块
-> - 工作区状态：Gen VII Wild 与 SOS 已由项目所有者提交并推送；当前包含未提交的 Actions lint/typecheck 与 Wild 测试修复
-> - 验收状态：本地格式、lint、typecheck 与 394 项测试通过；受限终端的生产构建仍因复制既有 Wasm 文件时返回 `EPERM` 而未完成
+> - 工作区状态：Gen VII Egg 与第四世代临时交接文档清理已完成，等待项目所有者提交
+> - 验收状态：本地源码、类型、测试与原生夹具已通过；生产 Web 构建受限于既有文件复制 `EPERM`，提交后暂停，不开始 Battle Tree
+
+## 2026-08-15 第四世代阶段性交接清理
+
+- 移除：删除已失去恢复用途的 `docs/gen4-development.md`；第四世代长期事实继续由 `docs/modules/gen4*.md`、`docs/module-inventory.md` 和 `src/features/shared/rngModuleContract.ts` 维护。
+- 更新：README、AI 开发入口与技术栈不再引用阶段性交接文档，避免已完成模块继续依赖重复且可能过时的说明。
+
+## 2026-08-15 第七世代 Egg RNG
+
+- 新增：增加 `gen7egg` C++/Wasm API v1、187-word 请求、20-word 结果、`begin()` / `step()` 连续会话、单 Dedicated Worker、UI Preview、领域校验和三层 TypeScript 测试。
+- 算法：移植 TinyMT、`Egg7` 性别/性格/特性/遗传/IV/EC/PID/球种生成顺序，支持闪耀护符、异国孵化、尼多型、同图鉴、其他 TSV、闪数提醒、Frame Range、Egg Number 与 Shortest Path。
+- 路径：按 `Gen7EggPath.Calc()` 的 Accept / Reject 等权前向图计算最短路径；使用增量线性松弛代替保存全部 Egg 结果和重复嵌套传播，浏览器执行目标上限为 `5,000,000`。
+- 界面：增加四字 TinyMT 状态、双亲与孵化设置、完整筛选、三种模式、进度、取消、虚拟滚动、排序、CSV、清空、当前/领取后状态回写与 Egg Number / Shortest Path 摘要。
+- 边界：同步校验百变怪与性别比、尼多型、同图鉴、其他 TSV、闪数提醒和不变之石的上游跨字段行为；Frame / Target 保留上游 `1,000,000,000` 输入上限，蛋数为 `1..10,000`。
+- 文档：增加 `docs/modules/gen7egg.md`，并同步 README、库存、需求和技术方案；下一模块改为 Battle Tree。
+- 已通过：`npm test -- src/features/gen7egg`，3 个测试文件、10 项测试；`npm run typecheck`；`npm run lint` 为 0 error，保留 6 条 TanStack Virtual / React Compiler 非阻断 warning；仅 `gen7egg` 的原生 C++ 会话夹具 1/1 通过。
+- 已通过：全量 `npm run verify` 中的 Prettier、ESLint、TypeScript 与 103 个 Vitest 文件共 404 项测试；Vite 随后完成 2102 个模块转换。
+- 受限：生产 Web 构建在 Vite 将既有 `public/wasm/gen3egg.mjs` 复制到 `dist/wasm/gen3egg.mjs` 时返回 Windows `EPERM`；申请在非受限环境重跑 `npm run build:web` 时审批服务返回 `502 Bad Gateway`，命令未启动。该结果不等于 Web 构建通过。
+- 未运行：未生成 `gen7egg` Emscripten 产物，未使用外部 Chrome / Edge 做本地 UI 或 Worker 检查，未执行生产页面算法回归。
+- 交付：本阶段完成本地验证后由项目所有者提交；Codex 不提交、不推送，交付后暂停工作。
 
 ## 2026-08-15 Gen VII Wild 测试修复
 
