@@ -1,0 +1,13 @@
+{
+  "id": "gen7stationary",
+  "generation": 7,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen7stationary",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen7stationary.mjs",
+    "wasm": "gen7stationary.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 Gen VII Stationary7/Search7_Normal"
+}

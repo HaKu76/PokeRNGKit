@@ -2,10 +2,24 @@
 
 > - 最近更新：2026-08-15
 > - 当前分支：`main`
-> - Git 基线：`af194e9 docs: 恢复第三世代开发范围`
-> - 当前阶段：补齐 PokeFinder Gen VIII 与除 NTR Helper 外的全部 3DSRNGTool 模块
-> - 工作区状态：`main` 与 `origin/main` 基线对齐；当前包含全模块范围文档与 Gen 8 Eggs 实现，尚未提交
-> - 验收状态：完整产品范围尚未实现；全部模块、Actions 部署、生产页面算法回归与项目所有者最终验收待完成
+> - Git 基线：`b4d4e77 feat: 实现第八世代孵化乱数`
+> - 当前阶段：按 Stationary、Wild、SOS、Egg、Battle Tree、Event 的顺序实现第七世代主模块
+> - 工作区状态：`main` 与 `origin/main` 基线对齐；当前包含 Gen VII Stationary 源码、测试、文档与构建接入，尚未提交
+> - 验收状态：Gen VII Stationary 已实现但未运行测试、构建或浏览器检查；Actions 部署、生产页面算法回归与项目所有者最终验收待完成
+
+## 2026-08-15 第七世代 Stationary RNG
+
+- 决定：项目所有者指定当前第七世代主模块顺序为 `Stationary -> Wild -> SOS -> Egg -> Battle Tree -> Event`；本轮先完成 Stationary，下一模块为 Wild。
+- 新增：增加 `gen7stationary` C++/Wasm API v1、57-word 请求、9-word 结果、`begin()` / `step()` 连续会话、原生固定夹具、单 Dedicated Worker、UI Preview、领域校验和三层 TypeScript 测试。
+- 数据：从 3DSRNGTool revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `Gen7/PKM7.cs` 生成 228 条 SM/USUM 版本限定模板，覆盖普通定点、礼物、交换、Poke Pelago、Totem、传说、Ultra Beast 与 Ultra Space Wilds。
+- 算法：移植 SFMT、`Search7_Normal()`、`ModelStatus`、Raining phase、Blink / Safe Frame、DelayType 1..27、Trade、Pelago、Ditto 固定性格、Shiny Lock、Forced Shiny、Shiny Charm 与固定 3V；连续状态不做帧分片。
+- 界面：增加 Gen VII Stationary 导航与双列工作台，支持版本、模板、NPC、Delay、自定义目标、完整筛选、进度、取消、100000 行结果上限、虚拟滚动、排序、CSV 和清空；移动端控件保持至少 44px 触控目标。
+- 修复：模板测试改为直接核对固定 3V 与 In-Game Trade 数据不变量；CSV 按表格显示格式导出特性、性别、异色、同步与 PRV；清空结果同时重置状态、进度、错误和摘要。
+- 静态核对：逐段对照 `MainForm_Core.cs::Search7_Normal`、`MainForm.cs::getsetting/getStaSettings`、`Stationary7.cs`、`ModelStatus.cs`、`RNGPool.cs`、`SFMT.cs`、`FuncUtil.cs` 与 `PKM7.cs`，并记录输入限制和浏览器 `5000000` 绝对帧保护上限。
+- 已通过：对本任务全部文件运行 `npm run format:files -- <files>`，全仓 `npm run format:check` 输出 `All matched files use Prettier code style!`，`git diff --check` 无输出。
+- 未运行：本轮未获测试、类型检查、原生夹具、Wasm 构建、Vite 构建、性能或浏览器检查授权；源码和夹具存在不等于算法或界面已通过。
+- 交付：项目所有者本轮自行提交、推送和构建；历史记录中的 Codex 提交/推送授权不用于本轮。GitHub Actions 部署后，由项目所有者提供准确生产 URL 并单独授权回归。
+- 下一步：开始 Gen VII Wild，先核对其 Qt/WinForms 输入设置、Core 参数、模板数据和普通野生分支边界。
 
 ## 2026-08-15 全模块范围授权与库存纠正
 
