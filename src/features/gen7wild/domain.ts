@@ -202,7 +202,9 @@ export function gen7WildSpecials(
 ) {
   if (category !== "ub" && category !== "island-scan") return [];
   return GEN7_WILD_SPECIALS.filter(
-    (entry) => entry.category === category && entry.versions.includes(version),
+    (entry) =>
+      entry.category === category &&
+      entry.versions.some((candidate) => candidate === version),
   );
 }
 
@@ -522,7 +524,7 @@ export function encodeGen7WildRequest(request: Gen7WildRequest) {
     species[index + 1] = slot.species | (slot.form << 11);
     metadata[index + 1] = packedSlotMetadata(slot);
   });
-  const distribution = [...gen7WildSlotChances(request.encounter)];
+  const distribution: number[] = [...gen7WildSlotChances(request.encounter)];
   while (distribution.length < 12) distribution.push(0);
   const filters = request.filters;
   const words = [

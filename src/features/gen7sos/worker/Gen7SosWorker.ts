@@ -124,12 +124,13 @@ export class Gen7SosWorker implements Gen7SosEngine {
 
     try {
       await this.slot!.ready;
-      if (!this.active) return completion;
+      const active = this.active as ActiveSearch | undefined;
+      if (!active) return completion;
       const message: Gen7SosWorkerRequest = {
         type: "task",
         moduleId: "gen7sos",
         apiVersion: GEN7_SOS_API_VERSION,
-        taskId: this.active.taskId,
+        taskId: active.taskId,
         operation: "generator",
         request: workerRequest,
         stepSize,

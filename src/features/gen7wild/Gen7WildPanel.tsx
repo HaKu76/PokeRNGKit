@@ -38,7 +38,6 @@ import {
   type Gen7WildIvTuple,
   type Gen7WildLanguage,
   type Gen7WildLead,
-  type Gen7WildRequest,
   type Gen7WildResult,
   type Gen7WildShinyFilter,
   type Gen7WildTrigger,
@@ -536,7 +535,7 @@ export function Gen7WildPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
             ? t("shinyStar")
             : "-";
       default:
-        return String(result[key]);
+        return String(result[key as keyof Gen7WildResult]);
     }
   }
 

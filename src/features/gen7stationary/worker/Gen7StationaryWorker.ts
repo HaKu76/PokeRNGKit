@@ -123,12 +123,13 @@ export class Gen7StationaryWorker implements Gen7StationaryEngine {
 
     try {
       await this.slot!.ready;
-      if (!this.active) return completion;
+      const active = this.active as ActiveSearch | undefined;
+      if (!active) return completion;
       const message: Gen7StationaryWorkerRequest = {
         type: "task",
         moduleId: "gen7stationary",
         apiVersion: GEN7_STATIONARY_API_VERSION,
-        taskId: this.active.taskId,
+        taskId: active.taskId,
         operation: "generator",
         request: workerRequest,
         stepSize,

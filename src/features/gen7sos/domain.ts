@@ -254,7 +254,9 @@ export function gen7SosSpeciesName(
 }
 
 export function gen7SosPersonal(specForm: number): Gen7SosSlot {
-  const personal = GEN7_SOS_PERSONAL[String(specForm)];
+  const personal = (GEN7_SOS_PERSONAL as Record<string, Gen7SosPersonal>)[
+    String(specForm)
+  ];
   if (!personal) {
     throw new RangeError(`Missing Gen 7 SOS personal data for ${specForm}.`);
   }
@@ -282,8 +284,11 @@ function ruleMatches(
   ultra: boolean,
 ) {
   if (rule.locations.length === 0) return rule.ultra === ultra;
-  if (rule.ultra === null) return rule.locations.includes(location);
-  return rule.ultra === ultra && rule.locations.includes(location);
+  const containsLocation = rule.locations.some(
+    (candidate) => candidate === location,
+  );
+  if (rule.ultra === null) return containsLocation;
+  return rule.ultra === ultra && containsLocation;
 }
 
 function regularAllies(

@@ -87,7 +87,7 @@ describe("Gen 7 Stationary domain", () => {
       tradeTemplates.every(
         (entry) =>
           entry.nature < 25 &&
-          entry.ability !== 0 &&
+          entry.ability >= 1 &&
           !entry.randomGender &&
           [0, 1, 2].includes(entry.genderSetting),
       ),

@@ -2,10 +2,17 @@
 
 > - 最近更新：2026-08-15
 > - 当前分支：`main`
-> - Git 基线：`ffeb456 feat: 实现第七世代定点乱数`
+> - Git 基线：`efbb6eb feat: 实现第七世代SOS乱数`
 > - 当前阶段：按 Stationary、Wild、SOS、Egg、Battle Tree、Event 的顺序实现第七世代主模块
-> - 工作区状态：Gen VII Stationary 已由项目所有者提交并推送；当前包含未提交的 Gen VII Wild 与 SOS 源码、数据、测试、文档与构建接入
-> - 验收状态：Gen VII Wild 与 SOS 未运行测试、构建或浏览器检查；本模块交付后由项目所有者先提交，后续模块继续在同一工作区开发
+> - 工作区状态：Gen VII Wild 与 SOS 已由项目所有者提交并推送；当前包含未提交的 Actions lint/typecheck 修复
+> - 验收状态：Actions `verify` 首次在 lint 阶段失败；本地 lint 与 typecheck 修复后已通过，测试与构建尚未重跑
+
+## 2026-08-15 Gen VII Actions 验证修复
+
+- 阻断：Actions run `31867793978` 的 `npm run verify` 在 ESLint 阶段因 `Gen7WildRequest` 未使用而退出，后续 typecheck、测试与构建未执行。
+- 修复：移除 Wild 面板未使用类型，并修正 Stationary / Wild / SOS 生成数据的字面量推断、只读索引、结果键访问和 Worker 活动任务窄化；不改变 RNG 算法或请求 ABI。
+- 已通过：`npm run lint` 退出码为 `0`，仅保留五个 TanStack Virtual / React Compiler 非阻断警告；`npm run typecheck`、`npm run format:check` 与 `git diff --check` 通过。
+- 未运行：未运行单元测试、原生夹具、Wasm/Vite 构建或浏览器检查；等待项目所有者提交修复并由 Actions 重新执行完整 `verify`。
 
 ## 2026-08-15 第七世代 SOS RNG
 

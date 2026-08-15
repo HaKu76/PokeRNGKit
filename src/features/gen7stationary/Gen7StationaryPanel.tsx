@@ -182,8 +182,8 @@ export function Gen7StationaryPanel({
   const [syncNature, setSyncNature] = useState<string>("");
   const [considerDelay, setConsiderDelay] = useState(true);
   const [pelagoShift, setPelagoShift] = useState("0");
-  const [category, setCategory] = useState(DEFAULT_TEMPLATE.category);
-  const [templateId, setTemplateId] = useState(DEFAULT_TEMPLATE.id);
+  const [category, setCategory] = useState<string>(DEFAULT_TEMPLATE.category);
+  const [templateId, setTemplateId] = useState<string>(DEFAULT_TEMPLATE.id);
   const [encounter, setEncounter] = useState<Gen7StationaryEncounter>(() =>
     gen7StationaryEncounterFromTemplate(DEFAULT_TEMPLATE),
   );

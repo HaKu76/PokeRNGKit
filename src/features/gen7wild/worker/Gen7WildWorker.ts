@@ -124,12 +124,13 @@ export class Gen7WildWorker implements Gen7WildEngine {
 
     try {
       await this.slot!.ready;
-      if (!this.active) return completion;
+      const active = this.active as ActiveSearch | undefined;
+      if (!active) return completion;
       const message: Gen7WildWorkerRequest = {
         type: "task",
         moduleId: "gen7wild",
         apiVersion: GEN7_WILD_API_VERSION,
-        taskId: this.active.taskId,
+        taskId: active.taskId,
         operation: "generator",
         request: workerRequest,
         stepSize,
