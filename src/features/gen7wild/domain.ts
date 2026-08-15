@@ -332,7 +332,7 @@ export function gen7WildEncounterFromArea(options: {
     fishing,
     biteDelay,
     platformDelay: bubbling ? 19 : 14,
-    pokemonDelay: Math.trunc((timedDelay + 4) / 2),
+    pokemonDelay: fishing ? Math.trunc((timedDelay + 4) / 2) : 1,
     hookedItemThresholds: fishing
       ? hookedItemThresholds(area, bubbling)
       : ([0, 0] as const),

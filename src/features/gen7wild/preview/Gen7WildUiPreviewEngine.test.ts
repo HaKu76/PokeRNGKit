@@ -56,10 +56,15 @@ describe("Gen7WildUiPreviewEngine", () => {
     });
 
     expect(results).toHaveLength(1);
-    expect(results[0]).toMatchObject({
-      frame: 478,
-      species: request.encounter.slots[0].species,
-    });
+    expect(results[0]).toMatchObject({ frame: 478 });
+    expect(results[0].slot).toBeGreaterThanOrEqual(1);
+    expect(results[0].slot).toBeLessThanOrEqual(request.encounter.slots.length);
+    expect(
+      request.encounter.slots.some(
+        (slot) =>
+          slot.species === results[0].species && slot.form === results[0].form,
+      ),
+    ).toBe(true);
     expect(summary).toMatchObject({
       cancelled: false,
       processedStates: 1,

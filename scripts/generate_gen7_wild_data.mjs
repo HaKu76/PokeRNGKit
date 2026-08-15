@@ -269,8 +269,8 @@ function parseArea(body, kind) {
   };
 }
 
-function parseSlotTypes(encounterSource) {
-  const block = balancedBlock(encounterSource, "SlotType = new byte[][]");
+function parseByteArrays(source, marker) {
+  const block = balancedBlock(source, marker);
   return [...block.matchAll(/new\s+byte\s*\[\s*\]\s*\{([^}]*)\}/g)].map(
     (match) => [...match[1].matchAll(/\d+/g)].map((entry) => Number(entry[0])),
   );
@@ -461,6 +461,7 @@ function buildBerryAreas(normalAreas, personal) {
 
 const locationTablePath = option("--location-table");
 const encounterAreaPath = option("--encounter-area");
+const wildRngPath = option("--wild-rng");
 const pkmw7Path = option("--pkmw7");
 const personalPath = option("--personal");
 const outputPath = option("--output");
@@ -485,6 +486,7 @@ const sourcePaths = {
 const [
   locationSource,
   encounterSource,
+  wildRngSource,
   pkmw7Source,
   personal,
   speciesEn,
@@ -499,6 +501,7 @@ const [
 ] = await Promise.all([
   readFile(locationTablePath, "utf8"),
   readFile(encounterAreaPath, "utf8"),
+  readFile(wildRngPath, "utf8"),
   readFile(pkmw7Path, "utf8"),
   readFile(personalPath),
   readFile(sourcePaths.species.en, "utf8"),
@@ -512,19 +515,23 @@ const [
   readFile(sourcePaths.locations.zh, "utf8"),
 ]);
 
-const slotTypes = parseSlotTypes(encounterSource);
+const slotMaps = parseByteArrays(encounterSource, "SlotType = new byte[][]");
+const slotDistributions = parseByteArrays(
+  wildRngSource,
+  "SlotDistribution = new byte[][]",
+);
 const normalSm = buildNormalAreas(
   locationSource,
   "EncounterArea7[] SMTable =",
   "sm",
-  slotTypes,
+  slotMaps,
   personal,
 );
 const normalUsum = buildNormalAreas(
   locationSource,
   "EncounterArea7[] USUMTable =",
   "usum",
-  slotTypes,
+  slotMaps,
   personal,
 );
 const fishingSm = buildSimpleAreas(
@@ -664,7 +671,7 @@ export const GEN7_WILD_LOCATIONS = ${JSON.stringify(
   2,
 )} as const;
 
-export const GEN7_WILD_SLOT_DISTRIBUTIONS = ${JSON.stringify(slotTypes, null, 2)} as const;
+export const GEN7_WILD_SLOT_DISTRIBUTIONS = ${JSON.stringify(slotDistributions, null, 2)} as const;
 
 export const GEN7_WILD_AREAS = ${JSON.stringify(areas, null, 2)} as const satisfies readonly Gen7WildArea[];
 

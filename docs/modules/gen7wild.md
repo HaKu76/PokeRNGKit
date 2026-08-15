@@ -54,7 +54,7 @@ Poke Pelago 特殊遭遇已归入 `Stationary RNG`，不在 Wild 中重复实现
 
 ## 遭遇数据
 
-生成脚本 `scripts/generate_gen7_wild_data.mjs` 读取 `Gen7/Gen7Encounter`、`PKMW7` 和关联数据文件，输出 `src/features/gen7wild/data.ts`：
+生成脚本 `scripts/generate_gen7_wild_data.mjs` 分别读取 `EncounterArea7.SlotType` 的物种槽位映射、`WildRNG.SlotDistribution` 的概率分布、`Gen7/Gen7Encounter`、`PKMW7` 和关联数据文件，输出 `src/features/gen7wild/data.ts`：
 
 - 普通地点：SM 89、USUM 91。
 - Fishing：SM 21、USUM 19。
@@ -69,7 +69,7 @@ Poke Pelago 特殊遭遇已归入 `Stationary RNG`，不在 Wild 中重复实现
 
 `Search7_Normal()` 同时维护 SFMT 主流、NPC `ModelStatus`、当前长帧模型快照与 Blink 标记。每个目标帧先根据遭遇类型执行特殊率、槽位、等级和 Lead 判定，再执行 Wild Delay、EC、PID、IV、特性、性格、性别和持有物抽取。
 
-Fishing 保留冒泡、Overview、咬勾、平台、宝可梦出现和钓起物品阈值；Ambush 保留全局 Delay、Inline Delay2、Honey 修正和 Cry；Berry Tree 固定使用脚本等级和单槽位。Ultra Beast 特殊分支保留锁闪与固定 3V 元数据。
+Fishing 保留冒泡、Overview、咬勾、平台、宝可梦出现和钓起物品阈值；内部 `Pokemon delay` 按上游 `((Timedelay + 4) / 2)` 派生为 `1 / 2`，非 Fishing 请求在该 ABI 字段写入 `1`，实际遭遇延时仍使用各分类自己的 `delayTime`。Ambush 保留全局 Delay、Inline Delay2、Honey 修正和 Cry；Berry Tree 固定使用脚本等级和单槽位。Ultra Beast 特殊分支保留锁闪与固定 3V 元数据。
 
 连续状态不能按帧范围并行拆开，因此模块使用单个会话式 Dedicated Worker。Wasm `begin()` 初始化状态，`step()` 允许 `1..65536` 帧，Worker 默认每批处理 `16384` 帧并让出事件循环；取消时终止 Worker，下一任务重新创建实例。
 

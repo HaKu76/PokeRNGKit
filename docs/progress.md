@@ -4,8 +4,17 @@
 > - 当前分支：`main`
 > - Git 基线：`efbb6eb feat: 实现第七世代SOS乱数`
 > - 当前阶段：按 Stationary、Wild、SOS、Egg、Battle Tree、Event 的顺序实现第七世代主模块
-> - 工作区状态：Gen VII Wild 与 SOS 已由项目所有者提交并推送；当前包含未提交的 Actions lint/typecheck 修复
-> - 验收状态：Actions `verify` 首次在 lint 阶段失败；本地 lint 与 typecheck 修复后已通过，测试与构建尚未重跑
+> - 工作区状态：Gen VII Wild 与 SOS 已由项目所有者提交并推送；当前包含未提交的 Actions lint/typecheck 与 Wild 测试修复
+> - 验收状态：本地格式、lint、typecheck 与 394 项测试通过；受限终端的生产构建仍因复制既有 Wasm 文件时返回 `EPERM` 而未完成
+
+## 2026-08-15 Gen VII Wild 测试修复
+
+- 根因：非 Fishing 遭遇错误地把分类 `Timedelay` 换算到仅供钓鱼使用的 `pokemonDelay`，普通野生与 Berry Tree 因此生成 `6 / 4` 并触发 `1..2` 领域校验；现仅在 Fishing 分支按上游 `((Timedelay + 4) / 2)` 派生，其他分类写入不参与算法的合法 ABI 占位值 `1`。
+- 根因：`scripts/generate_gen7_wild_data.mjs` 把 `EncounterArea7.SlotType` 的物种槽位映射误导出为 `WildRNG.SlotDistribution` 概率表；现分别读取两份上游数据，重新生成 56 组总和为 100 的概率分布，并增加 281 个区域、全部昼夜槽位与 Fishing 冒泡变体的不变量测试。
+- 修复：UI Preview 测试改为验证结果槽位范围与物种/形态属于所选遭遇表，不再错误固定第一槽位。
+- 已通过：`npm test -- src/features/gen7wild`，3 个测试文件、8 项测试全部通过；`npm run verify` 的全仓 Prettier、ESLint（0 error、5 条既有 TanStack Virtual / React Compiler warning）、TypeScript 与 100 个 Vitest 文件共 394 项测试通过。
+- 受限：`npm run verify` 的 `build:web` 在复制既有 `public/wasm/gen3egg.mjs` 到 `dist/wasm/gen3egg.mjs` 时返回 Windows `EPERM`；申请在非受限环境重跑 `npm run build:web` 时审批服务返回 `502 Bad Gateway`，命令未启动。
+- 环境：Node.js `24.13.0`、npm `11.6.2`，低于仓库锁定的 Node.js `24.19.0`、npm `12.0.2`；下一步由项目所有者使用锁定工具链运行完整 `npm run verify`，或提交后由 GitHub Actions 完成生产构建。
 
 ## 2026-08-15 Gen VII Actions 验证修复
 
