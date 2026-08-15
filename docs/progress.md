@@ -2,10 +2,32 @@
 
 > - 最近更新：2026-08-15
 > - 当前分支：`main`
-> - Git 基线：`b4d4e77 feat: 实现第八世代孵化乱数`
+> - Git 基线：`ffeb456 feat: 实现第七世代定点乱数`
 > - 当前阶段：按 Stationary、Wild、SOS、Egg、Battle Tree、Event 的顺序实现第七世代主模块
-> - 工作区状态：`main` 与 `origin/main` 基线对齐；当前包含 Gen VII Stationary 源码、测试、文档与构建接入，尚未提交
-> - 验收状态：Gen VII Stationary 已实现但未运行测试、构建或浏览器检查；Actions 部署、生产页面算法回归与项目所有者最终验收待完成
+> - 工作区状态：Gen VII Stationary 已由项目所有者提交并推送；当前包含未提交的 Gen VII Wild 与 SOS 源码、数据、测试、文档与构建接入
+> - 验收状态：Gen VII Wild 与 SOS 未运行测试、构建或浏览器检查；本模块交付后由项目所有者先提交，后续模块继续在同一工作区开发
+
+## 2026-08-15 第七世代 SOS RNG
+
+- 新增：增加 `gen7sos` C++/Wasm API v1、77-word 请求、14-word 结果、`begin()` / `step()` 连续会话、原生会话夹具、单 Dedicated Worker、UI Preview、领域校验和三层 TypeScript 测试。
+- 算法：覆盖 Pokemon Generation 的 Main SFMT64 / 战斗 SFMT32 双流、Call Prediction 的 `SOSRNG.Generate()`、Caller/Ally、天气槽位、Rate 1 / Rate 2、链长保底 IV、HA、同步、槽位、等级、道具与结果筛选。
+- 界面：增加 Pokemon Generation / Call Prediction 分段工作流、Caller 与九个 Ally 槽位、完整战斗条件、Pokemon/Calls 筛选、进度、取消、虚拟滚动、排序、CSV、选中行 Path Finder 和清空。
+- Path Finder：按 `MiscRNGTool.SOSPathFinder()` 生成 Nothing / CallOnly / Both 三组条件；根据上游实际访问范围只重算目标帧前 27 帧，避免浏览器保留无限时间线。
+- 文档：增加 `docs/modules/gen7sos.md`，记录上游输入边界、77/14-word 契约、`Rate 2` 的来源差异、Path Finder 窗口和结果列；README、需求、技术方案与库存同步将下一模块改为 Egg。
+- 未运行：本轮未获测试、类型检查、原生夹具、Wasm 构建、Vite 构建、性能或浏览器检查授权；源码和夹具存在不等于算法或界面已通过。
+- 交付：按项目所有者要求本模块完成后先交由项目所有者提交；不执行提交、推送或构建。
+- 下一步：实现 Gen VII Egg，继续保留当前未提交的 Wild 与 SOS 改动。
+
+## 2026-08-15 第七世代 Wild RNG
+
+- 新增：增加 `gen7wild` C++/Wasm API v1、91-word 请求、11-word 结果、`begin()` / `step()` 连续会话、原生会话夹具、单 Dedicated Worker、UI Preview、领域校验和三层 TypeScript 测试。
+- 数据：从 3DSRNGTool revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 生成 SM / USUM 四版本昼夜遭遇数据，覆盖普通地点 180 条、Fishing 40 条、Ambush Encounters 40 条、Berry Tree 21 条、Ultra Beast 10 条与 Island Scan 56 条。
+- 算法：移植 SFMT、`Search7_Normal()`、`ModelStatus`、Wild Delay、六类遭遇、Fishing Bubbling / Overview、Ambush Trigger / Delay2 / Wild Cry、完整 Lead、Shiny Charm、固定 3V、槽位、等级、道具与筛选顺序；连续状态不做帧分片。
+- 界面：增加 Gen VII Wild 导航与双列工作台，支持版本、分类、特殊宝可梦、地点、昼夜、遭遇参数、Lead、完整筛选、进度、取消、100000 行结果上限、虚拟滚动、排序、CSV 和清空。
+- 文档：增加 `docs/modules/gen7wild.md`，记录控件进制、范围、空值、跨字段约束、91/11-word 契约、浏览器 `10000000` 绝对帧保护和上游来源；README、需求、技术方案与库存同步将下一模块改为 SOS。
+- 未运行：本轮未获测试、类型检查、原生夹具、Wasm 构建、Vite 构建、性能或浏览器检查授权；源码和夹具存在不等于算法或界面已通过。
+- 交付：按项目所有者要求继续完成全部第七世代剩余功能，期间不提交、不推送、不构建；全部完成后统一交付项目所有者提交。
+- 下一步：实现 Gen VII SOS，先核对 `SOSRNG.cs`、`SOSResult.cs`、`SOSAllies.cs`、`Data/SOSCall.md` 和 MainForm 的 Chain / Ally 输入边界。
 
 ## 2026-08-15 第七世代 Stationary RNG
 

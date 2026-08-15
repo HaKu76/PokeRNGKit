@@ -41,8 +41,8 @@ PokeFinder 核对入口：
 | 10   | Gen VI  | TinyMT Timeline Tool                     | 计划   |
 | 11   | Gen VII | Stationary RNG                           | 已实现 |
 | 12   | Gen VII | Event / Mystery Gift RNG                 | 计划   |
-| 13   | Gen VII | Wild RNG                                 | 计划   |
-| 14   | Gen VII | SOS RNG                                  | 计划   |
+| 13   | Gen VII | Wild RNG                                 | 已实现 |
+| 14   | Gen VII | SOS RNG                                  | 已实现 |
 | 15   | Gen VII | Egg RNG                                  | 计划   |
 | 16   | Gen VII | ID RNG                                   | 已实现 |
 | 17   | Gen VII | Main RNG Tool                            | 计划   |
@@ -79,7 +79,7 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 ## 实施顺序
 
-1. 当前第七世代主模块按 `Stationary -> Wild -> SOS -> Egg -> Battle Tree -> Event` 推进；Stationary 已实现，下一模块为 Wild。
+1. 当前第七世代主模块按 `Stationary -> Wild -> SOS -> Egg -> Battle Tree -> Event` 推进；Stationary、Wild 与 SOS 已实现，下一模块为 Egg。
 2. 第七世代主模块完成后，继续核对 Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG 与其余模块库存，不提前合并不同上游工作流。
 3. PokeFinder Gen 8 剩余模块、3DSRNGTool Gen VI 与公共工具继续保留在完整产品范围内，`NTR Helper` 除外。
 4. 全部模块完成后执行全仓验证、Actions 部署和生产页面回归。

@@ -1,0 +1,13 @@
+{
+  "id": "gen7sos",
+  "generation": 7,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen7sos",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen7sos.mjs",
+    "wasm": "gen7sos.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 SOSRNG/Wild7/MiscRNGTool"
+}

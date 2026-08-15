@@ -10,6 +10,11 @@ export type RngModuleOperation =
 export type GlobalRngModuleId = "researcher";
 export type RngModuleId = `gen${number}${string}` | GlobalRngModuleId;
 
+export interface RngModuleEnvelope {
+  moduleId: RngModuleId;
+  apiVersion: number;
+}
+
 export interface RngModuleArtifacts {
   loader: `${string}.mjs`;
   wasm: `${string}.wasm`;

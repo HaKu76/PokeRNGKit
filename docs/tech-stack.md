@@ -1,6 +1,6 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII Profiles / IDs / Eggs 与 Gen VII Stationary / ID 已实现，当前继续第七世代主模块
+> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII Profiles / IDs / Eggs 与 Gen VII Stationary / Wild / ID 已实现，当前继续 SOS
 > - 更新日期：2026-08-15
 > - 当前范围：完整 PokeFinder 4.3.2，以及 `docs/module-inventory.md` 中除 `NTR Helper` 外的全部 3DSRNGTool 功能
 > - 包管理器：npm
@@ -106,7 +106,7 @@ Vite 的 `ui` mode 在编译期选择本地 UI 预览引擎。该引擎只生成
 
 React 负责高交互表单、进度状态和虚拟化结果视图。TypeScript 为 RNG 请求、Worker 消息、Wasm 解码和状态机提供静态边界。
 
-各 RNG 工作区继续由所属 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理；Gen VII Stationary 与 Gen VII ID 也保持独立状态、Worker 和 Wasm 生命周期。存档信息分别由各世代 profile hook 与 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；Spinda Painter 与 Encounter Lookup 使用本地确定性数据，不进入 RNG Worker 状态。
+各 RNG 工作区继续由所属 React 组件的 `useState`、`useMemo` 和明确的搜索引擎实例管理；Gen VII Stationary、Wild 与 ID 也保持独立状态、Worker 和 Wasm 生命周期。存档信息分别由各世代 profile hook 与 repository 层持有，不引入 Zustand、Redux 或其他全局状态框架；Spinda Painter 与 Encounter Lookup 使用本地确定性数据，不进入 RNG Worker 状态。
 
 ### 5.2 路由
 
@@ -150,7 +150,7 @@ PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等�
 - `localStorage`：两代独立存档镜像、语言、主题和各悬浮窗折叠状态。
 - Worker/Wasm：任务期间的临时计算状态。
 - 页面刷新：终止任务并重建 Worker，不持久化结果。
-- UI 预览：ID、Initial Seed、GameCube Seed Finder、G3/G4 Static、Wild、IVs to PID、Egg 与 Gen VII Stationary 各自使用同一请求边界的确定性样例引擎，不读取或生成 Wasm；预览结果只用于界面交互验收。`gen3spindapainter` 是不涉及 RNG 的确定性 PID/坐标映射，直接由 React domain 计算，不创建 Wasm 或 Worker。
+- UI 预览：ID、Initial Seed、GameCube Seed Finder、G3/G4 Static、Wild、IVs to PID、Egg 与 Gen VII Stationary / Wild 各自使用同一请求边界的确定性样例引擎，不读取或生成 Wasm；预览结果只用于界面交互验收。`gen3spindapainter` 是不涉及 RNG 的确定性 PID/坐标映射，直接由 React domain 计算，不创建 Wasm 或 Worker。
 
 ### 6.2 存档 repository
 
@@ -183,6 +183,8 @@ gen4static
 gen4wild
 gen4chainedsid
 gen7stationary
+gen7wild
+gen7sos
 gen7id
 ```
 
@@ -277,6 +279,16 @@ wasm/
     |   |-- module.json
     |   |-- bridge/
     |   `-- tests/
+    |-- gen7wild/
+    |   |-- CMakeLists.txt
+    |   |-- module.json
+    |   |-- bridge/
+    |   `-- tests/
+    |-- gen7sos/
+    |   |-- CMakeLists.txt
+    |   |-- module.json
+    |   |-- bridge/
+    |   `-- tests/
     `-- pokerusfinder/
         |-- CMakeLists.txt
         |-- module.json
@@ -316,6 +328,10 @@ public/wasm/                        # 生成物，忽略
 |-- gen4chainedsid.wasm
 |-- gen7stationary.mjs
 |-- gen7stationary.wasm
+|-- gen7wild.mjs
+|-- gen7wild.wasm
+|-- gen7sos.mjs
+|-- gen7sos.wasm
 |-- gen7id.mjs
 |-- gen7id.wasm
 |-- pokerusfinder.mjs
@@ -326,7 +342,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7id` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。
+当前 `gen3id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7id` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。
 
 `gen7stationary` 使用连续会话 C ABI，57 个 32 位请求字在 `begin()` 时初始化 SFMT、NPC 模型状态和长帧快照，`step()` 每批推进有限状态并返回 9 个 `uint32_t` 的结果记录：
 
@@ -345,6 +361,17 @@ uint32_t gen7stationary_last_error();
 ```
 
 结果记录为 `frame / realTimeFrames / randomLow / randomHigh / ec / pid / packedIvs / metadata / delay`。该模块只使用一个 Dedicated Worker，不按帧范围分片；取消时终止 Worker 并在下一任务重新创建会话。
+
+`gen7wild` 同样使用连续会话 C ABI。91 个 32 位请求字包含版本、Seed、帧范围、TSV/TRV、Lead、NPC/Raining、六类遭遇参数、11 个物种字、11 个槽位元数据字、12 个分布字和完整筛选；`step()` 返回 11 个 32 位字的结果记录：
+
+```text
+frame / realTimeFrames / randomLow / randomHigh / ec / pid /
+packedIvs / metadata / delay / packedEncounter / specialValue
+```
+
+该模块只使用一个 Dedicated Worker，默认每批处理 16384 帧；取消时终止 Worker 并重新创建连续会话。完整协议见 [Gen 7 Wild](modules/gen7wild.md)。
+
+`gen7sos` 使用 77 个 32 位请求字和 14 个 32 位结果字的连续会话 C ABI。请求包含 Pokemon Generation / Call Prediction 模式、双随机数种子、帧范围、九个 Ally 槽位、战斗条件和两组筛选；结果包含 Pokemon 或 Call 记录及实际 Battle Advance。模块只使用一个 Dedicated Worker，默认每批处理 16384 帧；Calls Path Finder 只重算目标帧前 27 帧的必要窗口。完整协议见 [Gen 7 SOS](modules/gen7sos.md)。
 
 ID C ABI 为：
 
@@ -617,7 +644,7 @@ type ModuleWorkerResponse =
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
 - ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi Advancer、Static、Wild、IVs to PID、Egg 与 Gen VII Stationary 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time、PID to IVs、Jirachi 与 IVs to PID 每次输入都是有限任务；GameCube Seed Finder、GameCube RNG 和 PokeSpot 使用模块自己的分片协议；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入；Gen VII Stationary 以 `batchIndex` 提交连续 `step()` 批次，不使用多 Worker 乱序归并。
 
-`gen4id`、`gen4static`、`gen4wild`、`gen4chainedsid` 与 `gen7stationary` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`；第四世代任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`，Gen VII Stationary 固定声明 `operation: "generator"`。这一契约不改写三代消息类型。
+`gen4id`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild` 与 `gen7sos` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`；第四世代任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`，Gen VII Stationary、Wild 与 SOS 固定声明 `operation: "generator"`。这一契约不改写三代消息类型。
 
 ## 9. 源码与许可证边界
 
@@ -625,7 +652,7 @@ type ModuleWorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4id_*`、`gen4static_*`、`gen4wild_*`、`gen4chainedsid_*`、`gen7stationary_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4id_*`、`gen4static_*`、`gen4wild_*`、`gen4chainedsid_*`、`gen7stationary_*`、`gen7wild_*`、`gen7sos_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 

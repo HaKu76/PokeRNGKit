@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V 已实现；当前按 Stationary、Wild、SOS、Egg、Battle Tree、Event 的顺序实现第七世代主模块
+> - 状态：PokeFinder Gen III、Gen IV、Gen V 已实现；Gen VII Stationary、Wild 与 SOS 已实现，当前继续 Egg、Battle Tree、Event
 > - 更新日期：2026-08-15
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V 与全局工具已进入 Git 基线；Gen VIII Profiles、IDs 与 Eggs 已实现。当前会话按项目所有者指定顺序完成第七世代主模块，Stationary 已实现，下一模块为 Wild。
+当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V 与全局工具已进入 Git 基线；Gen VIII Profiles、IDs 与 Eggs 已实现。当前会话按项目所有者指定顺序完成第七世代主模块，Stationary、Wild 与 SOS 已实现，下一模块为 Egg。
 
 3DSRNGTool `NTR Helper` 已明确排除。它依赖桌面程序对 3DS 调试端进行原始 TCP/NTR 通信，普通静态浏览器无法在不增加本地桥接、扩展或后端的情况下复刻。完整模块库存和当前状态见 [`docs/module-inventory.md`](module-inventory.md)。
 
@@ -85,6 +85,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 ### 3.13 第七世代 Stationary RNG 用户
 
 用户选择 Sun、Moon、Ultra Sun 或 Ultra Moon 的定点模板，输入 SFMT Seed、帧范围、TSV/TRV、同步、NPC、Delay 与筛选条件，查看连续 Stationary7 帧的 Random Number、EC、PID、IV、性格、特性、性别、觉醒力量、异色、Blink 与 Delay。Poke Pelago、In-Game Trade、Totem、Ultra Space Wilds、固定 3V、锁闪和强制异色按各自模板规则生成。
+
+### 3.14 第七世代 Wild RNG 用户
+
+用户选择 Sun、Moon、Ultra Sun 或 Ultra Moon 的普通野生、Ultra Beast、Island Scan、Fishing、Ambush Encounters 或 Berry Tree，输入 SFMT Seed、帧范围、TSV/TRV、Lead、NPC、遭遇参数与筛选，查看连续 Wild7 帧的 Random Number、物种、槽位、等级、EC、PID、IV、性格、特性、性别、觉醒力量、道具、特殊遭遇、异色、Blink 与 Delay。
 
 ## 4. 当前功能需求：`gen3id`
 
@@ -648,9 +652,29 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、模板权限、连续状态算法、Worker/Wasm 契约和上游文件见 [Gen 7 Stationary](modules/gen7stationary.md)。
 
+## 8.32 当前功能需求：`gen7wild`
+
+- **FR-G7WILD-01** 提供 3DSRNGTool Gen VII `Wild RNG` 连续帧工作流，支持 Sun、Moon、Ultra Sun、Ultra Moon 的普通野生、Ultra Beast、Island Scan、Fishing、Ambush Encounters 与 Berry Tree；SM 起始帧为 `418`，USUM 为 `478`，上游帧上限为 `1000000000`，当前浏览器绝对帧保护上限为 `10000000`。
+- **FR-G7WILD-02** 遭遇数据必须保留四版本昼夜槽位、地点、等级、NPC、Correction、Raining、出现率、Fishing Bubbling / Overview、Ambush Trigger、Bite Delay、Delay2、Wild Cry、固定 3V 与 Electric / Steel 元数据。
+- **FR-G7WILD-03** SFMT、`Search7_Normal()`、`ModelStatus`、Wild Delay、槽位、等级、Lead、EC、PID、IV、性格、特性、性别和持有物生成只在独立 `gen7wild` Wasm API v1 中执行。模块使用 91-word 请求、11-word 结果和单 Dedicated Worker 的 `begin()` / `step()` 会话，不对连续状态做 Worker 分片。
+- **FR-G7WILD-04** 支持 Shiny Charm、Synchronize、Cute Charm、Static、Magnet Pull、Compound Eyes、Suction Cups / Sticky Hold、Pressure / Hustle / Vital Spirit、Black / White Flute，以及 IV、性格、觉醒力量、性别、特性、异色、方块异色、槽位、特殊遭遇、等级、完美 IV 数量和 Blink 筛选。
+- **FR-G7WILD-05** 提供进度、取消、100000 行结果上限、虚拟滚动、排序、CSV、清空、错误与空结果状态；桌面使用参数区与结果区双列工作台，窄屏重排为单列。简体中文逐字复用 3DSRNGTool 已有词条，无词条时保留 English source label。
+
+完整输入限制、遭遇数据、连续状态算法、Worker/Wasm 契约和上游文件见 [Gen 7 Wild](modules/gen7wild.md)。
+
+## 8.33 当前功能需求：`gen7sos`
+
+- **FR-G7SOS-01** 提供 Gen VII SOS 的 Pokemon Generation 与 Call Prediction 两个工作流，支持 Sun、Moon、Ultra Sun、Ultra Moon、Caller、九个普通/天气 Ally 槽位、链长、等级、天气、Call Rate、HP 条、Adrenaline Orb、Intimidate、Last Turn、Super Effective、Existing Perfect IVs、Lead、NPC、主延迟与 SOS Seed/Frame。
+- **FR-G7SOS-02** 输入控件必须遵循上游空值、进制、最小值、最大值、步长和跨字段约束：Main Frame 按版本从 `418`/`478` 开始，浏览器绝对帧上限 `10,000,000`，SOS Frame `1,000,000`，Calls Delay `10,000`，Main Delay `4,000` 且为偶数，Chain `255`，NPC `100`，等级 `1..100`。
+- **FR-G7SOS-03** SFMT64 主流、SFMT32 战斗流、`SOSRNG.Generate()`、Caller/Ally 数据、Rate 1 / Rate 2、固定 IV、HA、同步、槽位、等级、道具、筛选和结果打包只在独立 `gen7sos` Wasm API v1 中执行。模块使用 77-word 请求、14-word 结果、`begin()` / `step()` 连续会话和单 Dedicated Worker，不使用线程共享内存。
+- **FR-G7SOS-04** Pokemon 结果保留 Frame、Realtime、Random、EC、PID、六项 IV、Nature、Ability、Gender、Hidden Power、Shiny、Sync、Blink、Delay、Species、Form、Level、Slot、Item、Call 状态、Perfect IV mask 与 Battle Advance；Calls 结果保留 Frame、Random、Call rolls、Rates、Success、Sync、Slot、Level、Item、Perfect IV mask、HA 与 Advance。
+- **FR-G7SOS-05** 结果表支持虚拟滚动、排序、CSV、清空、进度、取消、错误、空结果、结果上限和 Calls 行选择。Path Finder 按 `MiscRNGTool.SOSPathFinder()` 计算 Nothing / CallOnly / Both 三组条件，并只重算目标帧前 27 帧的必要窗口。
+
+完整输入限制、`Rate 2` 来源差异、遭遇数据、连续状态算法、Path Finder、Worker/Wasm 契约和上游文件见 [Gen 7 SOS](modules/gen7sos.md)。
+
 ## 9. 后续实施顺序
 
-1. 当前第七世代主模块按 `Stationary -> Wild -> SOS -> Egg -> Battle Tree -> Event` 推进；Stationary 已实现。
+1. 当前第七世代主模块按 `Stationary -> Wild -> SOS -> Egg -> Battle Tree -> Event` 推进；Stationary、Wild 与 SOS 已实现，下一模块为 Egg。
 2. 第七世代主模块完成后，继续按模块库存完成 Gen VIII、Gen VI 与公共工具；仅 `NTR Helper` 不开发。
 3. Codex 在每个模块完成后执行格式收尾；测试、原生夹具、Wasm 构建、提交和推送仅按项目所有者当次授权执行。本轮由项目所有者提交、推送和构建。
 4. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
