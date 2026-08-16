@@ -1,0 +1,13 @@
+{
+  "id": "gen7main",
+  "generation": 7,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen7main",
+  "operations": ["seed-search", "qr-search", "time-calculator"],
+  "artifacts": {
+    "loader": "gen7main.mjs",
+    "wasm": "gen7main.wasm"
+  },
+  "source": "3DSRNGTool Gen7MainRNGTool and Admiral-Fish/needle-searcher"
+}
