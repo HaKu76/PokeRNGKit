@@ -1,11 +1,27 @@
 # PokeRNGKit 项目进度与交接
 
-> - 最近更新：2026-08-16
+> - 最近更新：2026-08-17
 > - 当前分支：`main`
-> - Git 基线：`c497591 feat: 实现第七世代对战树乱数`
-> - 当前阶段：Gen VII Event 已实现，下一模块为 Main RNG Tool
-> - 工作区状态：Gen VII Event 功能、导航、文档与工程检查已完成，等待独立提交和推送
-> - 验收状态：Event 定向与全量 TypeScript 测试、类型检查、lint、Web 构建和外部 Chrome UI Preview 已通过；原生夹具与 Emscripten 构建受自动审批服务 502 阻止，生产页面算法回归待部署后授权
+> - Git 功能基线：`f2e241e feat: 实现第七世代孵化Seed检索`
+> - 当前阶段：Gen VII Main RNG Tool 与 Egg Seed Finder 已实现，下一模块为 Festival Plaza Facility RNG
+> - 工作区状态：SFMT 修复、Main RNG Tool、Egg Seed Finder 和共享接入已分别提交并推送；本条进度记录单独收口
+> - 验收状态：9/9 Gen VII 原生夹具、9 个 Gen VII Wasm、114 个 Vitest 文件共 430 项测试和生产 Web/PWA 构建已通过；外部 Chrome/Edge UI 检查与生产页面算法回归未运行
+
+## 2026-08-17 第七世代 Main RNG Tool 与 Egg Seed Finder
+
+- 新增：增加 `gen7main` 的读档/ID Clock Seed 反查、QR 指针帧定位与 Time Calculator；Seed 全空间检索使用最多 8 个独立 Worker 和 `2^20` Seed 分片，不保留 3DSRNGTool 的远程 API 依赖。
+- 新增：增加 `gen7eggseedfinder` 的新存档 8 蛋性格检索与 127 鲤鱼王计算器；完整 32 位 Seed 空间默认按 `2^20` 项分片，取消返回已经按 `chunkIndex` 完成的前缀结果。
+- 修复：将 Gen VII SFMT 状态长度从错误的 `N=157` 改为上游 `N=156`，同步更新 Battle Tree 固定夹具；Stationary、Wild、SOS、Egg、Battle Tree、Event、Main 与 ID 原生结果均重新验证。
+- 修复：逐行对照 `MagikarpCalc.mul()`，将逆矩阵输出从错误的四组 32 位改为 TinyMT 的 `31 + 32 + 32 + 32` 位有效状态布局；127 个 `1` 的正确结果为 `3050EADD,89435273,785B9C60,7E46E861`。
+- 界面：增加 Main RNG Tool 与 Egg Seed Finder 导航、三语文案、Clock 图片、双工作区表单、进度、取消、CSV、错误和空结果状态；Egg Seed Finder 标签页与进度条补齐可访问语义，127 位输入只忽略空白，不再静默删除非法字符。
+- 文档：增加 `docs/modules/gen7main.md`、`docs/modules/gen7eggseedfinder.md` 与 `third_party/needle-searcher/UPSTREAM.md`，同步 README、库存、需求、技术方案、Wasm 清单和 PWA JPG 缓存规则。
+- 已通过：Node.js `24.19.0`、npm `12.0.2`；`npm run verify` 的 Prettier、ESLint、TypeScript 与 114 个 Vitest 文件共 430 项测试，ESLint 为 0 error，保留 6 条既有 TanStack Virtual / React Compiler warning。
+- 已通过：WinLibs GCC `16.1.0` 重新配置原生构建缓存后，9 个受影响 Gen VII 原生夹具为 9/9；Emscripten `6.0.6` 重建同一组 9 个 Gen VII `.mjs/.wasm`。
+- 已通过：直接加载真实 Wasm，Main RNG Tool 返回 SM `BD1646F7`、USUM `C31A2F06`、SM ID `F9337724 / correction 15`；Egg Seed Finder 的 127 鲤鱼王和 Seed `0` 性格夹具均与模块文档一致。
+- Web 构建：受限 `npm run verify` 在复制既有 `public/wasm/gen3egg.mjs` 时返回 Windows `EPERM`；非受限 `npm run build:web` 随后完成 2140 个模块转换，并在全部 Gen VII Wasm 重建后生成 150 项、约 16.8 MiB 的 PWA 预缓存，仅保留既有大 chunk warning。
+- 提交：`6867fe5 fix: 修复第七世代 SFMT 状态长度`、`3d057c2 feat: 实现第七世代主乱数工具`、`f2e241e feat: 实现第七世代孵化Seed检索` 已推送到 `origin/main`。
+- 未运行：外部 Chrome / Edge UI 检查和生产页面算法回归。UI 预览不能替代真实 Wasm 验收；生产回归仍需 GitHub Actions 部署完成后由项目所有者提供准确 URL 并单独授权。
+- 下一步：实现 Festival Plaza Facility RNG；先核对 3DSRNGTool 的窗体、输入类型、生成算法、简体中文词条和固定数据，不提前混入 Profile Manager。
 
 ## 2026-08-16 第七世代 Event RNG
 
