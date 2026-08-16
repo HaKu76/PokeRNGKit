@@ -26,11 +26,11 @@ int main()
     const auto *results = reinterpret_cast<const Gen7BattleTreePackedResult *>(gen7battletree_result_ptr());
     assert(results != nullptr);
     constexpr Gen7BattleTreePackedResult expected[] {
-        { 418, 422, 0, 0x9a2b761eU, 0x7222bb13U, 4, 0 },
-        { 419, 423, 2, 0x75bb3978U, 0x56aca29bU, 5, 0 },
-        { 420, 424, 4, 0x33fb58c0U, 0x2b21f856U, 35, 0 },
-        { 421, 425, 6, 0x9e431202U, 0x8ae5a4c5U, 14, 0 },
-        { 422, 426, 8, 0x9d9495c8U, 0x70450df1U, 44, 0 },
+        { 418, 422, 0, 0xcd3d5e71U, 0x662ef8bbU, 45, 0 },
+        { 419, 423, 2, 0xaa99d08eU, 0xb55ba669U, 22, 0 },
+        { 420, 424, 4, 0xc131f9ffU, 0x47acc346U, 14, 0 },
+        { 421, 425, 6, 0x4e769f38U, 0xd36d2f2bU, 13, 0 },
+        { 422, 426, 8, 0x853332cfU, 0xe0798ecaU, 33, 0 },
     };
     for (std::uint32_t i = 0; i < 5; i++)
     {

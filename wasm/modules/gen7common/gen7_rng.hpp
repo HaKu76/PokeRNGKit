@@ -95,7 +95,7 @@ namespace pokerngkit::gen7
     class SFMT
     {
       public:
-        static constexpr int N = 157;
+        static constexpr int N = 156;
         static constexpr int N32 = N * 4;
         static constexpr int POS1 = 122;
         static constexpr int SL1 = 18;
