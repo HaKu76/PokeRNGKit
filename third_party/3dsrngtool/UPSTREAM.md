@@ -2,7 +2,7 @@
 
 第七世代 `gen7id` 模块以本地优化项目为主要行为来源：
 
-- 本地项目：`C:\Users\Hakuhiro\source\repos\3DSRNGTool`
+- 本地项目：`C:\Users\Hakuhiro\Documents\Github\3DSRNGTool_CHN`
 - 本地来源仓库：[HaKu76/3DSRNGTool_CHN](https://github.com/HaKu76/3DSRNGTool_CHN)
 - 本地核验提交：`359bdd7a9ff7c145fec12302cf43da932923fa62`
 - 公开祖先仓库：[wwwwwwzx/3DSRNGTool](https://github.com/wwwwwwzx/3DSRNGTool)

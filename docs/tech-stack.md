@@ -1,11 +1,11 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII Profiles / IDs / Eggs 与 Gen VII Stationary / Wild / SOS / Egg / ID 已实现，下一模块为 Battle Tree
-> - 更新日期：2026-08-15
+> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII Profiles / IDs / Eggs 与 Gen VII Stationary / Wild / SOS / Egg / Battle Tree / ID 已实现，下一模块为 Event
+> - 更新日期：2026-08-16
 > - 当前范围：完整 PokeFinder 4.3.2，以及 `docs/module-inventory.md` 中除 `NTR Helper` 外的全部 3DSRNGTool 功能
 > - 包管理器：npm
 
-3DSRNGTool 模块使用本地优化版 `C:\Users\Hakuhiro\source\repos\3DSRNGTool` revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 作为主要行为来源，公开仓库只作为祖先归属记录；实现路径与差异范围见 `third_party/3dsrngtool/UPSTREAM.md`。`pokerusfinder` 使用 DevonStudios Pokerus Finder 的 GPL-3.0 源码行为作为第三/四世代帧查询基线，来源记录见 `third_party/pokerusfinder/UPSTREAM.md`。
+3DSRNGTool 模块使用本地优化版 `C:\Users\Hakuhiro\Documents\Github\3DSRNGTool_CHN` revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 作为主要行为来源，公开仓库只作为祖先归属记录；实现路径与差异范围见 `third_party/3dsrngtool/UPSTREAM.md`。`pokerusfinder` 使用 DevonStudios Pokerus Finder 的 GPL-3.0 源码行为作为第三/四世代帧查询基线，来源记录见 `third_party/pokerusfinder/UPSTREAM.md`。
 
 ## 1. 技术结论
 
@@ -59,7 +59,8 @@ React UI
         |-- Gen7StationaryWorker ------------> gen7stationary.mjs + gen7stationary.wasm
         |-- Gen7WildWorker ------------------> gen7wild.mjs + gen7wild.wasm
         |-- Gen7SosWorker -------------------> gen7sos.mjs + gen7sos.wasm
-        `-- Gen7EggWorker -------------------> gen7egg.mjs + gen7egg.wasm
+        |-- Gen7EggWorker -------------------> gen7egg.mjs + gen7egg.wasm
+        `-- Gen7BattleTreeWorker ------------> gen7battletree.mjs + gen7battletree.wasm
                                             |
                                             `-- narrow C ABI bridges
                                              `-- PokeFinder 4.3.2 / 3DSRNGTool rules
@@ -190,6 +191,7 @@ gen7stationary
 gen7wild
 gen7sos
 gen7egg
+gen7battletree
 gen7id
 ```
 
@@ -299,6 +301,11 @@ wasm/
     |   |-- module.json
     |   |-- bridge/
     |   `-- tests/
+    |-- gen7battletree/
+    |   |-- CMakeLists.txt
+    |   |-- module.json
+    |   |-- bridge/
+    |   `-- tests/
     `-- pokerusfinder/
         |-- CMakeLists.txt
         |-- module.json
@@ -344,6 +351,8 @@ public/wasm/                        # 生成物，忽略
 |-- gen7sos.wasm
 |-- gen7egg.mjs
 |-- gen7egg.wasm
+|-- gen7battletree.mjs
+|-- gen7battletree.wasm
 |-- gen7id.mjs
 |-- gen7id.wasm
 |-- pokerusfinder.mjs
@@ -354,7 +363,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7egg`、`gen7id` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。
+当前 `gen3id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7egg`、`gen7battletree`、`gen7id` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。
 
 `gen7stationary` 使用连续会话 C ABI，57 个 32 位请求字在 `begin()` 时初始化 SFMT、NPC 模型状态和长帧快照，`step()` 每批推进有限状态并返回 9 个 `uint32_t` 的结果记录：
 
@@ -386,6 +395,8 @@ packedIvs / metadata / delay / packedEncounter / specialValue
 `gen7sos` 使用 77 个 32 位请求字和 14 个 32 位结果字的连续会话 C ABI。请求包含 Pokemon Generation / Call Prediction 模式、双随机数种子、帧范围、九个 Ally 槽位、战斗条件和两组筛选；结果包含 Pokemon 或 Call 记录及实际 Battle Advance。模块只使用一个 Dedicated Worker，默认每批处理 16384 帧；Calls Path Finder 只重算目标帧前 27 帧的必要窗口。完整协议见 [Gen 7 SOS](modules/gen7sos.md)。
 
 `gen7egg` 使用 187 个 32 位请求字和 20 个 32 位结果字的连续会话 C ABI。请求包含 Frame Range / Egg Number / Shortest Path 模式、四字 TinyMT 状态、双亲与孵化设置、完整 4096-bit Other TSV mask 和筛选；结果包含当前/领取后状态、Egg 结果、遗传来源与操作。模块只使用一个 Dedicated Worker，默认每批处理 16384 个状态；Shortest Path 使用增量前向松弛并将浏览器目标限制为 `5,000,000`。完整协议见 [Gen 7 Egg](modules/gen7egg.md)。
+
+`gen7battletree` 使用 9 个 32 位请求字和 7 个 32 位结果字的连续会话 C ABI。请求包含 Seed、闭区间帧范围、版本、NPC、Delay、Streak、Trainer ID 筛选和结果上限；结果包含 Index、Actual Hit、Real Time Frames、64 位 Random Number、Trainer ID 与 Mark。模块只使用一个 Dedicated Worker，默认每批处理 16384 帧；当前浏览器绝对帧限制为 `5,000,000`。完整协议见 [Gen 7 Battle Tree](modules/gen7battletree.md)。
 
 ID C ABI 为：
 
@@ -656,9 +667,9 @@ type ModuleWorkerResponse =
 - 批次缓冲区使用 transfer list 移交所有权。
 - 取消通过终止 Pool 中的 Worker 实现，下一任务重新初始化。
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
-- ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi Advancer、Static、Wild、IVs to PID、Egg 与 Gen VII Stationary / Wild / SOS / Egg 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time、PID to IVs、Jirachi 与 IVs to PID 每次输入都是有限任务；GameCube Seed Finder、GameCube RNG 和 PokeSpot 使用模块自己的分片协议；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入；Gen VII 连续会话以 `batchIndex` 提交 `step()` 批次，不使用多 Worker 乱序归并。
+- ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi Advancer、Static、Wild、IVs to PID、Egg 与 Gen VII Stationary / Wild / SOS / Egg / Battle Tree 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time、PID to IVs、Jirachi 与 IVs to PID 每次输入都是有限任务；GameCube Seed Finder、GameCube RNG 和 PokeSpot 使用模块自己的分片协议；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入；Gen VII 连续会话以 `batchIndex` 提交 `step()` 批次，不使用多 Worker 乱序归并。
 
-`gen4id`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos` 与 `gen7egg` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`；第四世代任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`，Gen VII Stationary、Wild、SOS 与 Egg 固定声明 `operation: "generator"`。这一契约不改写三代消息类型。
+`gen4id`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7egg` 与 `gen7battletree` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`；第四世代任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`，Gen VII Stationary、Wild、SOS、Egg 与 Battle Tree 固定声明 `operation: "generator"`。这一契约不改写三代消息类型。
 
 ## 9. 源码与许可证边界
 
@@ -666,7 +677,7 @@ type ModuleWorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4id_*`、`gen4static_*`、`gen4wild_*`、`gen4chainedsid_*`、`gen7stationary_*`、`gen7wild_*`、`gen7sos_*`、`gen7egg_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4id_*`、`gen4static_*`、`gen4wild_*`、`gen4chainedsid_*`、`gen7stationary_*`、`gen7wild_*`、`gen7sos_*`、`gen7egg_*`、`gen7battletree_*`、`gen7id_*`、`pokerusfinder_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 

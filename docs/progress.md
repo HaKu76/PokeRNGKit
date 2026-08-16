@@ -1,11 +1,25 @@
 # PokeRNGKit 项目进度与交接
 
-> - 最近更新：2026-08-15
+> - 最近更新：2026-08-16
 > - 当前分支：`main`
-> - Git 基线：`2684400 fix: 修复第七世代野生验证错误`
+> - Git 基线：`befc610 feat: 实现第七世代孵化乱数`
 > - 当前阶段：按 Stationary、Wild、SOS、Egg、Battle Tree、Event 的顺序实现第七世代主模块
-> - 工作区状态：Gen VII Egg 与第四世代临时交接文档清理已完成，等待项目所有者提交
-> - 验收状态：本地源码、类型、测试与原生夹具已通过；生产 Web 构建受限于既有文件复制 `EPERM`，提交后暂停，不开始 Battle Tree
+> - 工作区状态：Gen VII Battle Tree 已完成实现与本地工程验证，下一模块为 Event
+> - 验收状态：Battle Tree 定向测试、类型检查、原生夹具和 Emscripten 产物已通过；本地 Chrome 自动访问受安全策略阻止，生产页面回归待部署 URL
+
+## 2026-08-16 第七世代 Battle Tree Trainer RNG
+
+- 新增：增加 `gen7battletree` C++/Wasm API v1、9-word 请求、7-word 结果、`begin()` / `step()` 连续会话、单 Dedicated Worker、UI Preview、领域校验和三层 TypeScript 测试。
+- 算法：按 `MiscRNGTool.generator7()`、`RNGPool`、`ModelStatus` 与 `BTTrainer.Generate()` 移植 SFMT64 连续帧、NPC 眨眼模型、`Delay / 2`、重置为 2 个模型后的额外 2 帧，以及普通/每十场特殊训练家生成。
+- 边界：Seed 为 8 位十六进制且空值按 `0`；Starting Index / Max Results 上游上限 `1,000,000,000`，当前浏览器绝对帧保护 `5,000,000`；NPC `0..100`、Delay `0..10,000`、Streak `1..10,000`、Trainer ID `0..254`，其中 `209..254` 均表示不过滤。
+- 界面：增加版本、Seed、Starting Index、Max Results、NPC、Delay、Streak、Trainer ID，结果显示 Index、Actual Hit、Mark、Clock、Trainer、Random Number 与 Real Time，并支持进度、取消、虚拟滚动、排序、CSV、清空和 Index 回写。
+- 文档：增加 `docs/modules/gen7battletree.md`，同步 README、库存、需求和技术方案，并把实际 3DSRNGTool 上游路径统一为 `C:\Users\Hakuhiro\Documents\Github\3DSRNGTool_CHN`；下一模块改为 Event。
+- 工具链：Node.js `24.19.0`、npm `12.0.2`；安装并激活 Emscripten `6.0.6`，另安装 WinLibs GCC `16.1.0` 作为 Windows 原生夹具编译器。
+- 已通过：`npm test -- src/features/gen7battletree`，3 个测试文件、6 项测试；仅 `gen7battletree` 的原生 C++ 会话夹具 1/1；仅 `gen7battletree` 的 Emscripten 构建并生成 `.mjs` / `.wasm`。
+- 全仓验证：Prettier、TypeScript 与 106 个 Vitest 文件共 410 项测试通过；ESLint 为 0 error，保留 6 条既有 TanStack Virtual / React Compiler 非阻断 warning。受限环境的 Vite 构建在复制 `public/wasm/gen7battletree.mjs` 时返回 `EPERM`，非受限 `npm run build:web` 随后通过 2107 个模块转换并生成 58 项 PWA 预缓存。
+- Wasm：默认 41 模块的 Emscripten 6.0.6 完整构建通过；`gen7battletree.mjs`、`gen7battletree.wasm` 与生产 Worker bundle 均已核对存在。
+- 浏览器：外部 Chrome 已连接，但浏览器控制安全策略拒绝自动访问 `http://127.0.0.1:5173/`，且仓库规则禁止改用应用内浏览器绕过；本轮未记录 UI、Worker 控制台或交互证据。
+- 交付：按项目所有者本轮授权，本模块完成完整工程检查后独立提交并推送，再开始 Event。
 
 ## 2026-08-15 第四世代阶段性交接清理
 
@@ -488,7 +502,7 @@
 
 - 第七世代落地：优先实现 `gen7id`，对应 3DSRNGTool `Search7_ID()` 的 SFMT ID Generator；Stationary/Wild/Egg/Timeline 暂列后续开发。
 - 本轮新增 `gen7id` 源码、Worker、C ABI、CMake target、模块文档和 `GEN VII` 侧栏入口；当前尚未执行测试、构建或浏览器验收。
-- 第七世代来源决策：以本地优化项目 `C:\Users\Hakuhiro\source\repos\3DSRNGTool` 的 `359bdd7` 为主源，公开 `wwwwwwzx/3DSRNGTool` 的 `ae5d176` 仅作祖先归属；两者差异不止 README，已记录于 `third_party/3dsrngtool/UPSTREAM.md`。
+- 第七世代来源决策：以本地优化项目 `C:\Users\Hakuhiro\Documents\Github\3DSRNGTool_CHN` 的 `359bdd7` 为主源，公开 `wwwwwwzx/3DSRNGTool` 的 `ae5d176` 仅作祖先归属；两者差异不止 README，已记录于 `third_party/3dsrngtool/UPSTREAM.md`。
 - `gen7id` 接线补全：加入 Sun/Moon/Ultra Sun/Ultra Moon 版本与起始帧校验、TID/SID/Gen7TID 前导零筛选、Gen7TID bridge 修正、虚拟化结果表、Worker 批次校验和第七世代页面隐藏存档工具；仍未执行测试、构建或浏览器验收。
 - 本地控件核验：Designer 的 `Frame_max` 初值上限是 `100000000`，但 `MainForm.cs` 初始化会用 `FuncUtil.MAXFRAME` 覆盖 `Frame_min`/`Frame_max`，实际有效上限为 `1000000000`；已同步 domain、HTML 输入和模块文档。
 - 本轮已执行并通过定向 `npm run format:files -- ...`、全仓 `npm run format:check` 与 `git diff --check`。未运行 lint、typecheck、Vitest、原生夹具、Wasm/Web 构建、UI 预览、浏览器或生产算法回归；这些检查需要项目所有者对具体命令或 URL 明确授权。

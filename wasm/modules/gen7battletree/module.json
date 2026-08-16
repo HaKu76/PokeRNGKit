@@ -1,0 +1,10 @@
+{
+  "id": "gen7battletree",
+  "apiVersion": 1,
+  "contractVersion": 1,
+  "target": "gen7battletree",
+  "artifacts": {
+    "loader": "gen7battletree.mjs",
+    "wasm": "gen7battletree.wasm"
+  }
+}

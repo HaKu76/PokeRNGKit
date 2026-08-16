@@ -25,7 +25,7 @@ PokeFinder 核对入口：
 
 ## 3DSRNGTool
 
-主要行为来源：`C:\Users\Hakuhiro\source\repos\3DSRNGTool` revision `359bdd7a9ff7c145fec12302cf43da932923fa62`。
+主要行为来源：`C:\Users\Hakuhiro\Documents\Github\3DSRNGTool_CHN` revision `359bdd7a9ff7c145fec12302cf43da932923fa62`。
 
 | 编号 | 范围    | 功能                                     | 状态   |
 | ---- | ------- | ---------------------------------------- | ------ |
@@ -47,7 +47,7 @@ PokeFinder 核对入口：
 | 16   | Gen VII | ID RNG                                   | 已实现 |
 | 17   | Gen VII | Main RNG Tool                            | 计划   |
 | 18   | Gen VII | Egg Seed Finder                          | 计划   |
-| 19   | Gen VII | Battle Tree Trainer RNG                  | 计划   |
+| 19   | Gen VII | Battle Tree Trainer RNG                  | 已实现 |
 | 20   | Gen VII | Festival Plaza Facility RNG              | 计划   |
 | 21   | Gen VII | Poke Pelago 特殊遭遇                     | 已包含 |
 | 22   | 公共    | Profile Manager                          | 计划   |
@@ -79,7 +79,7 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 ## 实施顺序
 
-1. 当前第七世代主模块按 `Stationary -> Wild -> SOS -> Egg -> Battle Tree -> Event` 推进；Stationary、Wild、SOS 与 Egg 已实现，下一模块为 Battle Tree。
+1. 当前第七世代主模块按 `Stationary -> Wild -> SOS -> Egg -> Battle Tree -> Event` 推进；Battle Tree 已实现，下一模块为 Event。
 2. 第七世代主模块完成后，继续核对 Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG 与其余模块库存，不提前合并不同上游工作流。
 3. PokeFinder Gen 8 剩余模块、3DSRNGTool Gen VI 与公共工具继续保留在完整产品范围内，`NTR Helper` 除外。
 4. 全部模块完成后执行全仓验证、Actions 部署和生产页面回归。
