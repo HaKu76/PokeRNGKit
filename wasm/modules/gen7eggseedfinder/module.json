@@ -1,0 +1,9 @@
+{
+  "id": "gen7eggseedfinder",
+  "apiVersion": 1,
+  "contractVersion": 1,
+  "target": "gen7eggseedfinder",
+  "artifacts": ["gen7eggseedfinder.mjs", "gen7eggseedfinder.wasm"],
+  "loader": "gen7eggseedfinder.mjs",
+  "wasm": "gen7eggseedfinder.wasm"
+}

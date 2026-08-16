@@ -1,0 +1,87 @@
+.gen7eggseedfinder-panel {
+  min-height: 0;
+}
+.gen7eggseedfinder-workspace {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.9fr) minmax(420px, 1.1fr);
+  gap: 16px;
+  min-height: 0;
+}
+.gen7eggseedfinder-controls,
+.gen7eggseedfinder-results {
+  min-height: 0;
+}
+.gen7eggseedfinder-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+.gen7eggseedfinder-tabs button {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 14px;
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+}
+.gen7eggseedfinder-tabs button.active {
+  background: var(--teal-soft);
+  border-color: var(--teal);
+  color: var(--text);
+}
+.gen7eggseedfinder-form {
+  display: grid;
+  gap: 14px;
+}
+.gen7eggseedfinder-form textarea {
+  min-height: 148px;
+  resize: vertical;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+.gen7eggseedfinder-natures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-height: 390px;
+  overflow: auto;
+  padding-right: 4px;
+}
+.gen7eggseedfinder-output {
+  display: block;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.gen7eggseedfinder-table {
+  min-height: 240px;
+  overflow: auto;
+}
+.gen7eggseedfinder-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+.gen7eggseedfinder-row code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+@media (max-width: 960px) {
+  .gen7eggseedfinder-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 560px) {
+  .gen7eggseedfinder-natures {
+    grid-template-columns: 1fr;
+  }
+  .gen7eggseedfinder-tabs {
+    flex-direction: column;
+  }
+}
