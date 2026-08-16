@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V 已实现；Gen VII Battle Tree 已实现，当前继续 Event
+> - 状态：PokeFinder Gen III、Gen IV、Gen V 已实现；Gen VII Event 已实现，下一模块为 Main RNG Tool
 > - 更新日期：2026-08-16
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V 与全局工具已进入 Git 基线；Gen VIII Profiles、IDs 与 Eggs 已实现。当前会话按项目所有者指定顺序完成第七世代主模块，Stationary、Wild、SOS、Egg 与 Battle Tree 已实现，下一模块为 Event。
+当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V 与全局工具已进入 Git 基线；Gen VIII Profiles、IDs 与 Eggs 已实现。当前会话已完成第七世代 Stationary、Wild、SOS、Egg、Battle Tree 与 Event，下一模块为 Main RNG Tool；3DSRNGTool Profile Manager 继续作为公共模块实现。
 
 3DSRNGTool `NTR Helper` 已明确排除。它依赖桌面程序对 3DS 调试端进行原始 TCP/NTR 通信，普通静态浏览器无法在不增加本地桥接、扩展或后端的情况下复刻。完整模块库存和当前状态见 [`docs/module-inventory.md`](module-inventory.md)。
 
@@ -692,12 +692,23 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、训练家区间、连续状态算法、9/7-word ABI、固定夹具和上游文件见 [Gen 7 Battle Tree](modules/gen7battletree.md)。
 
+## 8.36 当前功能需求：`gen7event`
+
+- **FR-G7EVENT-01** 提供 3DSRNGTool Gen VII `Event RNG` 连续帧工作流，支持 Sun、Moon、Ultra Sun、Ultra Moon，以及本地 `.wc7` / `.wc7full` 配信卡导入。
+- **FR-G7EVENT-02** 输入必须匹配上游 WinForms 与 Core 类型：Seed 为 8 位十六进制；SM 起始帧 `418`，USUM 起始帧 `478`；帧上游上限 `1,000,000,000`、浏览器绝对帧保护 `5,000,000`；TSV `0..4095`、TRV `0..F`、NPC `0..100`、Delay `0..4000`、TID/SID `0..65535`、EC/PID 为 32 位十六进制。
+- **FR-G7EVENT-03** 支持物种、形态、等级、六项固定 IV、保底随机 V 数、Ability/Nature/Gender 锁定、Your ID、Egg、No Dex Entry、Other Information 与 Random / Nonshiny / Shiny / Specified PID Type；固定 IV 数量加非零保底随机 V 数不得超过 5。
+- **FR-G7EVENT-04** SFMT64、NPC 模型、`Event7.Delay()`、丢弃生成、`Event7.Generate()` 和 `Search7_Normal()` 只在独立 `gen7event` Wasm API v1 中执行。模块使用 58-word 请求、9-word 结果、`begin()` / `step()` 连续会话和单 Dedicated Worker。
+- **FR-G7EVENT-05** 结果保留 Frame、Realtime、Random Number、EC、PID、六项 IV、Nature、Ability、Gender、Hidden Power、Shiny、Blink、Delay、PSV 与 PRV；提供完整筛选、进度、取消、100000 行结果上限、虚拟滚动、排序、CSV、清空、错误、空结果与结果上限状态。
+
+完整输入限制、Wonder Card 字段、生成顺序、58/9-word ABI、固定夹具和上游文件见 [Gen 7 Event](modules/gen7event.md)。
+
 ## 9. 后续实施顺序
 
-1. 当前第七世代主模块按 `Stationary -> Wild -> SOS -> Egg -> Battle Tree -> Event` 推进；Battle Tree 已实现，下一模块为 Event。
-2. 第七世代主模块完成后，继续按模块库存完成 Gen VIII、Gen VI 与公共工具；仅 `NTR Helper` 不开发。
-3. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
-4. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
+1. 第七世代 Stationary、Wild、SOS、Egg、Battle Tree 与 Event 已实现；下一模块为 Main RNG Tool，之后继续 Egg Seed Finder 与 Festival Plaza Facility RNG。
+2. 第七世代主工作流完成后实现 3DSRNGTool Profile Manager，使用 IndexedDB 主存储与 localStorage 镜像，并由上游档案字段决定 schema。
+3. 继续按模块库存完成 Gen VIII、Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
+4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
+5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
 
 ## 10. 非目标
 
@@ -814,7 +825,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 14. 阶段划分
 
-当前按完整模块库存推进。Gen III、Gen IV、Gen V 与既有全局工具保持已实现状态；项目所有者已将当前工作切换为第七世代主模块，顺序为 Stationary、Wild、SOS、Egg、Battle Tree、Event。
+当前按完整模块库存推进。Gen III、Gen IV、Gen V 与既有全局工具保持已实现状态；第七世代 Stationary、Wild、SOS、Egg、Battle Tree 与 Event 已实现，下一模块为 Main RNG Tool。
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。
@@ -840,7 +851,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **阶段 8A：`gen8profiles` Profile Manager** - 第八世代 Sword/Shield/BDSP 档案 CRUD、独立 IndexedDB/localStorage、JSON 备份、响应式表格和上游输入文档（当前工作区，待部署回归与最终验收）。
 - **阶段 8B：`gen8id` Gen 8 TID/SID** - 第八世代 Xorshift ID Generator、六种筛选、独立 Wasm/Worker、虚拟结果表和四组上游固定夹具（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 8C-8I：PokeFinder Gen VIII** - Eggs、Event、Raids、Static、Underground、Wild 与 Den Map（按顺序实现）。
-- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg 与 Battle Tree 已实现，下一模块为 Event；Gen VI、公共工具和其余库存继续保留，仅 `NTR Helper` 排除。
+- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree 与 Event 已实现，下一模块为 Main RNG Tool；之后继续 Egg Seed Finder、Festival Plaza Facility RNG、Profile Manager、Gen VI 与其他公共工具，仅 `NTR Helper` 排除。
 - **阶段 10：发布加固** - 完整工程检查、生产页面回归、浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

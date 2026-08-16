@@ -2,10 +2,24 @@
 
 > - 最近更新：2026-08-16
 > - 当前分支：`main`
-> - Git 基线：`befc610 feat: 实现第七世代孵化乱数`
-> - 当前阶段：按 Stationary、Wild、SOS、Egg、Battle Tree、Event 的顺序实现第七世代主模块
-> - 工作区状态：Gen VII Battle Tree 已完成实现与本地工程验证，下一模块为 Event
-> - 验收状态：Battle Tree 定向测试、类型检查、原生夹具和 Emscripten 产物已通过；本地 Chrome 自动访问受安全策略阻止，生产页面回归待部署 URL
+> - Git 基线：`c497591 feat: 实现第七世代对战树乱数`
+> - 当前阶段：Gen VII Event 已实现，下一模块为 Main RNG Tool
+> - 工作区状态：Gen VII Event 功能、导航、文档与工程检查已完成，等待独立提交和推送
+> - 验收状态：Event 定向与全量 TypeScript 测试、类型检查、lint、Web 构建和外部 Chrome UI Preview 已通过；原生夹具与 Emscripten 构建受自动审批服务 502 阻止，生产页面算法回归待部署后授权
+
+## 2026-08-16 第七世代 Event RNG
+
+- 新增：增加 `gen7event` C++/Wasm API v1、58-word 请求、9-word 结果、`begin()` / `step()` 连续会话、单 Dedicated Worker、UI Preview、领域校验和三层 TypeScript 测试。
+- 算法：按 `Search7_Normal()`、`Event7.Delay()` 与 `Event7.Generate()` 移植 SFMT64 连续帧、NPC Blink 模型、SM / USUM Event Delay、No Dex / Your ID 丢弃生成、四种 PID Type、固定 IV、保底随机 V、Ability / Nature / Gender 锁定和完整筛选。
+- 配信卡：支持本地 `.wc7` 与 `.wc7full`，按上游偏移解析 Species、Form、Level、Ability、Nature、Gender、IV、TID/SID、PID Type、PID、EC、Egg 与 Your ID；文件不离开浏览器。
+- 边界：SM 起始帧 `418`、USUM `478`，上游帧上限 `1,000,000,000`、浏览器保护 `5,000,000`；NPC `0..100`、Delay `0..4000`、TSV `0..4095`、TRV `0..F`、TID/SID `0..65535`、结果上限 `100,000`。
+- 界面：增加配信设置、Wonder Card 导入、全部锁定项与其他信息、IV 与状态筛选、进度、取消、虚拟滚动、排序、CSV 和清空；逐字复用上游简体中文词条，并补齐 1280px 展开侧栏双列适配与移动端 44px 触控目标。
+- 文档：增加 `docs/modules/gen7event.md`，同步 README、库存、需求和技术方案；下一模块改为 Main RNG Tool，并记录后续实现 3DSRNGTool Profile Manager。
+- 已通过：Event 3 个 TypeScript 测试文件共 8 项测试；`npm run verify` 的 Prettier、ESLint、TypeScript 与 109 个 Vitest 文件共 418 项测试；ESLint 为 0 error，保留 6 条既有 TanStack Virtual / React Compiler 非阻断 warning。
+- Web 构建：`npm run verify` 最后在受限环境复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`；随后非受限 `npm run build:web` 通过 2113 个模块转换，生成 139 项、约 16.8 MiB 的 PWA 预缓存，仅保留既有大 chunk 警告。
+- 浏览器：外部 Chrome 在 `http://127.0.0.1:5174/` 完成 UI Preview；验证 43 条结果、首帧 478、错误与清空状态、Your ID / Other Information 联动，以及 390 / 768 / 1280 / 1536 / 1920px 布局。页面无横向溢出，虚拟表首行与表头间距为 0，控制台无 warning 或 error。
+- 原生/Wasm：受限原生夹具无法读取 WinLibs GCC，受限 Emscripten 激活无法写入 `C:\Users\Hakuhiro\emsdk\emsdk_set_env.ps1`；两次非受限重跑均被自动审批服务 `502 Bad Gateway` 阻止，命令未启动。该状态不等于原生夹具或真实 Wasm 已通过。
+- 下一步：完成最终格式检查后独立提交并推送 `feat: 实现第七世代配信乱数`，再开始 Main RNG Tool；不得提前把本地 UI Preview 作为生产页面算法验收。
 
 ## 2026-08-16 第七世代 Battle Tree Trainer RNG
 
