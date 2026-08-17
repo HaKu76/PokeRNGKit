@@ -9,7 +9,7 @@
 | Gen III    | IDs、Eggs、GameCube、Static、Wild、Profile Manager、GameCube Seed Finder、IVs to PID、PID to IVs、Jirachi Advancer、PokeSpot、Seed to Time、Spinda Painter | 无         |
 | Gen IV     | Eggs、Event、IDs、Static、Wild、Profile Manager、IVs to PID、Seed to Time、Search Coin Flips、Search Calls、Roamer Map、Chained Shiny to SID               | 无         |
 | Gen V      | Dream Radar、Eggs、Event、Hidden Grotto、IDs、Static、Wild、Profile Manager / Calibrator、Adjacent Seeds、IV Cache Finder、SHA1 Cache Finder               | 无         |
-| Gen VIII   | Profile Manager、IDs、Eggs、Event、Raids、Static、Underground、Wild                                                                                        | Den Map    |
+| Gen VIII   | Profile Manager、IDs、Eggs、Event、Raids、Static、Underground、Wild、Den Map                                                                               | 无         |
 | 全局工具   | Encounter Lookup、IV Calculator、Researcher、Settings                                                                                                      | 无         |
 
 PokeFinder 核对入口：
@@ -79,8 +79,7 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 ## 实施顺序
 
-1. PokeFinder Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground 与 Wild 已实现，下一模块为 Den Map。
-2. 完成 Den Map 后进入 3DSRNGTool Profile Manager。
-3. Gen VIII 完成后进入 3DSRNGTool Profile Manager；字段与存储 schema 以其上游 `Profiles` / `ProfileManager` 为准，不复用 PokeFinder 档案结构。
-4. 继续核对其余模块库存，不提前合并不同上游工作流；`NTR Helper` 除外。
-5. 全部模块完成后执行全仓验证、Actions 部署和生产页面回归。
+1. PokeFinder Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground、Wild 与 Den Map 已实现；Den Map 收口后进入 3DSRNGTool Profile Manager。
+2. 3DSRNGTool Profile Manager 字段与存储 schema 以其上游 `Profiles` / `ProfileManager` 为准，不复用 PokeFinder 档案结构。
+3. 继续核对其余模块库存，不提前合并不同上游工作流；`NTR Helper` 除外。
+4. 全部模块完成后执行全仓验证、Actions 部署和生产页面回归。

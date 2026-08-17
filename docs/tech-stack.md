@@ -1,6 +1,6 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild 与 Gen VII 主工作流已实现，下一模块为 Gen 8 Den Map
+> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map 与 Gen VII 主工作流已实现，下一模块为 3DSRNGTool Profile Manager
 > - 更新日期：2026-08-18
 > - 当前范围：完整 PokeFinder 4.3.2，以及 `docs/module-inventory.md` 中除 `NTR Helper` 外的全部 3DSRNGTool 功能
 > - 包管理器：npm
@@ -502,6 +502,8 @@ packedIvs / metadata / delay / packedEncounter / specialValue
 `gen7festivalplaza` 使用 13 个 32 位请求字和 10 个 32 位固定结果字的连续会话 C ABI。请求包含版本、Seed、闭区间帧范围、NPC、Delay、Rank、四项筛选、NPC Status 开关和结果上限；结果包含 Index、Actual Hit、Real Time Frames、64 位 Random Number、Stars、Facility、NPC Type、Color 与 Mark，NPC Status 开启时每行追加 `NPC + 1` 个状态字。模块只使用一个 Dedicated Worker，默认每批处理 16384 帧；当前浏览器绝对帧限制为 `5,000,000`。完整协议见 [Gen 7 Festival Plaza](modules/gen7festivalplaza.md)。
 
 `gen8id` 使用 64 位 Xorshift Seed 的确定性状态分片和 API v2；`gen8egg` 使用 53 个请求字与 13 个结果字；`gen8event` 使用 45 个请求字与 11 个结果字；`gen8raids` 使用 41 个请求字与 12 个结果字；`gen8static` 使用 41 个请求字与 11 个结果字；`gen8underground` 使用 54 个请求字与 12 个结果字；`gen8wild` 使用 48 个请求字与 12 个结果字。七个模块均由最多 8 个独立 Dedicated Worker/Wasm 实例按 `chunkIndex` 恢复顺序，单次任务最多评估 250,000,000 个状态并返回 100,000 行；完整协议分别见 [Gen 8 ID](modules/gen8id.md)、[Gen 8 Eggs](modules/gen8egg.md)、[Gen 8 Event](modules/gen8event.md)、[Gen 8 Raids](modules/gen8raids.md)、[Gen 8 Static](modules/gen8static.md)、[Gen 8 Underground](modules/gen8underground.md) 与 [Gen 8 Wild](modules/gen8wild.md)。
+
+`gen8denmap` 是静态地图工具，不创建 Wasm/Worker target；区域边界、地图原图尺寸和 276 个巢穴坐标由 `GEN8_DEN_INFO` 与上游 `DenMap` 流程提供。地图资源按原图像素坐标换算为响应式百分比标记，完整来源和 SHA-256 见 [Gen 8 Den Map](modules/gen8denmap.md)。
 
 ID C ABI 为：
 

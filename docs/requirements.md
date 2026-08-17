@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild 与 3DSRNGTool Gen VII 已实现；下一模块为 Gen 8 Den Map
+> - 状态：PokeFinder Gen III、Gen IV、Gen V、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map 与 3DSRNGTool Gen VII 已实现；下一模块为 3DSRNGTool Profile Manager
 > - 更新日期：2026-08-18
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V 与全局工具已进入 Git 基线；Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground 与 Wild 已实现，下一模块为 Den Map。当前会话已完成第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG；完成剩余 Gen VIII 后进入 3DSRNGTool Profile Manager。
+当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V、全局工具与 Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground、Wild、Den Map 已实现。当前会话已完成第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG；下一模块为 3DSRNGTool Profile Manager。
 
 3DSRNGTool `NTR Helper` 已明确排除。它依赖桌面程序对 3DS 调试端进行原始 TCP/NTR 通信，普通静态浏览器无法在不增加本地桥接、扩展或后端的情况下复刻。完整模块库存和当前状态见 [`docs/module-inventory.md`](module-inventory.md)。
 
@@ -784,9 +784,9 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 9. 后续实施顺序
 
-1. PokeFinder Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground 与 Wild 已实现，下一模块为 Den Map。
-2. Den Map 完成后进入 3DSRNGTool Profile Manager。
-3. Gen VIII 完成后实现 3DSRNGTool Profile Manager，再继续 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
+1. PokeFinder Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground、Wild 与 Den Map 已实现，下一模块为 3DSRNGTool Profile Manager。
+2. 完成 3DSRNGTool Profile Manager 后继续核对 Gen VI 与其他公共工具库存。
+3. 继续实现 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
 4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
 5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
 
@@ -905,7 +905,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 14. 阶段划分
 
-当前按完整模块库存推进。Gen III、Gen IV、Gen V 与既有全局工具保持已实现状态；Gen VIII Profiles、IDs、Eggs、Event、Raids、Static 与 Underground 已实现，下一模块为 Wild。第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现；完成剩余 Gen VIII 后进入 3DSRNGTool Profile Manager。
+当前按完整模块库存推进。Gen III、Gen IV、Gen V 与既有全局工具保持已实现状态；Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground、Wild 与 Den Map 已实现，下一模块为 3DSRNGTool Profile Manager。第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现。
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。
@@ -936,8 +936,8 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **阶段 8F：`gen8static` Gen 8 Static** - BDSP 9 类 47 个定点模板、普通/游走分支、独立 Wasm/Worker Pool 和完整状态结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8G：`gen8underground` Underground** - BDSP 18 个房间、剧情/等级标记、队首修正、独立 Wasm/Worker Pool 和完整 20 列结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8H：`gen8wild` Wild** - BDSP 七类野生遭遇、特殊地点、独立 Wasm/Worker Pool 和完整 21 列结果（已实现，待 Actions、部署回归与最终验收）。
-- **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具（下一模块）。
-- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现；完成剩余 Gen VIII 后进入 Profile Manager，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。
+- **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具、三张原图资源、276 个坐标点位和三语地点名称（已实现，待部署回归与最终验收）。
+- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现；下一模块为 Profile Manager，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。
 - **阶段 10：发布加固** - 完整工程检查、生产页面回归、浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

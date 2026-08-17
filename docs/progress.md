@@ -2,10 +2,20 @@
 
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`5727c4f feat: 实现第八世代地下大洞窟乱数`；Gen 8 Wild 当前尚未提交
-> - 当前阶段：完成 Gen 8 Wild 后进入 Gen 8 Den Map
-> - 工作区状态：当前任务包含 Gen 8 Wild 的数据、C++/Wasm bridge、Worker、React 面板、三语文案、文档和原生夹具
-> - 验证状态：全量原生夹具 `51/51`、完整 Emscripten Wasm 构建、全仓格式、`npm run verify` 和外部 Chrome 本地回归已通过；Edge 与生产页算法回归待进行
+> - Git 功能基线：`6977556 feat: 实现第八世代野生乱数` 已推送；当前工作区正在实现 Gen 8 Den Map
+> - 当前阶段：完成 Gen 8 Den Map 后进入 3DSRNGTool Profile Manager
+> - 工作区状态：当前任务包含 Gen 8 Den Map 的区域/巢穴选择、地图资源、坐标标记、三语文案和文档
+> - 验证状态：Gen 8 Den Map 的 4 个域测试、Lint、全仓格式和 `npm run verify` 已通过；外部 Chrome 在接管并刷新本地页面时连续超时，UI 回归证据尚未取得
+
+## 2026-08-18 第八世代巢穴地图
+
+- 新增：实现 PokeFinder 4.3.2 `Den Map` 静态地图工具，覆盖 Wild Area、Isle of Armor、Crown Tundra 三个区域和全部 276 个巢穴索引。
+- 界面：增加区域与巢穴选择、地点名称、全局巢穴索引、原图坐标和红色点位标记；桌面使用控制区/地图区双栏，窄屏改为单栏并保留独立地图滚动。
+- 数据：复用 `gen8raids` 的 `GEN8_DEN_INFO`，保留上游 Special index `16`；原样复制三张地图资源并记录尺寸和 SHA-256。
+- 本地化：区域控件使用 `PokeFinder_zh.ts` 的“巢穴点位分布”“旷野地带”“铠岛”“王冠雪原”，地点名称使用上游 SwSh 地点资源。
+- 已通过：`npm test -- src/features/gen8denmap` 的 4 个域测试、`npm run lint`、`npm run format:check`、`npm run verify` 和 `git diff --check`；完整验证覆盖 130 个测试文件、484 项测试和 Vite/PWA 生产构建。
+- 未完成：外部 Chrome 在接管并刷新 `http://127.0.0.1:5173/` 时连续超时，未取得 DOM、图片加载、区域切换和响应式回归证据；Edge 未运行。
+- 下一步：收口并推送 Gen 8 Den Map，然后进入 3DSRNGTool Profile Manager；不提前进入其他 3DSRNGTool 公共工具。
 
 ## 2026-08-18 第八世代野生乱数
 
