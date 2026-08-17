@@ -2,10 +2,24 @@
 
 > - 最近更新：2026-08-17
 > - 当前分支：`main`
-> - Git 功能基线：`825109d docs: 更新第七世代开发进度`
-> - 当前阶段：Gen VIII Event 已实现，下一模块为 Gen 8 Raids
-> - 工作区状态：`gen8event` 源码、模块文档、导航、三语文案、Wasm 清单与工程验证记录尚未提交
-> - 验证状态：Gen 8 Event / Egg 定向测试、Event 原生夹具与 Emscripten 产物、全仓验证和外部 Chrome 本地真实 Wasm 回归已通过；生产页面算法回归未运行
+> - Git 功能基线：`689da61 feat: 实现第八世代配信乱数`
+> - 当前阶段：Gen 8 Raids 已实现，下一模块为 Gen 8 Static
+> - 工作区状态：`gen8raids` 源码、生成数据、模块文档、导航、三语文案、Wasm 清单与工程验证记录尚未提交
+> - 验证状态：Gen 8 Raids 完整工程验证、原生夹具与 Emscripten 产物已通过；外部 Chrome 页面控制超时，生产页面算法回归未运行
+
+## 2026-08-17 第八世代团体战乱数
+
+- 新增：实现 PokeFinder 4.3.2 `Gen 8 Raids`，覆盖 Sword / Shield 的 Wild Area、Isle of Armor、Crown Tundra 普通与稀有巢穴，以及 69 张 Wild Area Event 表。
+- 数据：生成并内置 197 张普通巢穴表、69 张 Event 表、276 个巢穴哈希/坐标映射和 1192 条 `personal_swsh.bin` 记录；生成脚本、来源 revision 与 SHA-256 已写入模块文档和上游记录。
+- 算法：增加 `gen8raids` C++/Wasm API v1、41-word 请求、12-word 结果、Xoroshiro 团体战生成、保底 IV、异色修正、Ability、Gender、Nature、Height、Weight、Toxtricity 性格分支和完整 StateFilter。
+- 界面：增加 Profile、区域、巢穴、稀有度、Event、模板、等级、推进与筛选工作流；支持最多 8 个独立 Worker、取消、100000 行结果上限、虚拟滚动、16 列排序结果表和 CSV。
+- 修复：默认值按上游恢复为 Max Advances `100`、Offset 空值读取 `0`、Level `1`；Event 等级由模板锁定，Event 模式禁用 Rarity，Seed 全零与推进和溢出均由 HTML 和领域层共同拒绝。
+- 构建：`Gen8RaidsPanel` 改为 React 按需加载，979.02 kB 数据块独立输出，主包由约 8.74 MB 降至 7,762.09 kB，避免 PWA 的 8 MiB 单文件预缓存上限失败；默认 Wasm 清单已加入 `gen8raids`。
+- 已通过：完整 `npm run verify:full` 退出码 `0`；Prettier、TypeScript、122 个 Vitest 文件共 456 项测试、2157 个模块的 Web/PWA 构建、161 项约 17.98 MiB 预缓存、48/48 原生夹具和默认 47 个 Emscripten 模块全部完成。ESLint 为 0 error，仅保留 6 条既有 TanStack Virtual warning。
+- 环境：原生测试弹窗来自当前 Codex 进程未继承用户 PATH 中的 WinLibs 目录，导致测试程序找不到 `libstdc++-6.dll`；刷新用户和系统 PATH 后 `gen8raids_native_test.exe` 单独退出码为 `0`，后续原生检查必须先刷新当前进程 PATH。
+- 浏览器：外部 Chrome 已连接，`http://127.0.0.1:5173/` 可被发现；页面重新加载、DOM 和控制台读取连续超过浏览器连接等待上限，本轮未取得真实 Worker/Wasm 页面证据，也未改用内置浏览器替代。
+- 未验收：本地工程检查、原生/Wasm 构建均不能替代生产算法验收；GitHub Actions 部署后仍需由项目所有者提供准确生产 URL 并授权回归。
+- 下一步：提交并推送 `feat: 实现第八世代团体战乱数`，随后优先实现 Gen 8 Static；暂不进入 Underground、Wild、Den Map 或 3DSRNGTool 范围。
 
 ## 2026-08-17 第八世代配信乱数
 

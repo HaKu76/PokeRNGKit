@@ -1,5 +1,13 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type FormEvent,
+  lazy,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import {
   calculateRsSeed,
@@ -94,6 +102,11 @@ import { ResearcherPanel } from "./features/researcher/ResearcherPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
 
+const Gen8RaidsPanel = lazy(async () => {
+  const module = await import("./features/gen8raids/Gen8RaidsPanel");
+  return { default: module.Gen8RaidsPanel };
+});
+
 type SortKey = keyof Id3State;
 type SupportedLanguage = "zh" | "en" | "ja";
 type ActiveModule =
@@ -142,6 +155,7 @@ type ActiveModule =
   | "gen8id"
   | "gen8egg"
   | "gen8event"
+  | "gen8raids"
   | "researcher"
   | "pokerusfinder"
   | "gen4wild";
@@ -531,7 +545,8 @@ function App() {
     activeModule === "gen8profiles" ||
     activeModule === "gen8id" ||
     activeModule === "gen8egg" ||
-    activeModule === "gen8event";
+    activeModule === "gen8event" ||
+    activeModule === "gen8raids";
   const researcherModule = activeModule === "researcher";
   const pokerusModule = activeModule === "pokerusfinder";
   const profileTools =
@@ -562,6 +577,7 @@ function App() {
     activeModule !== "gen8id" &&
     activeModule !== "gen8egg" &&
     activeModule !== "gen8event" &&
+    activeModule !== "gen8raids" &&
     activeModule !== "researcher";
   const activeFloatingTool = sponsorshipExpanded
     ? "sponsorship"
@@ -1629,6 +1645,24 @@ function App() {
                 <small>{t("gen8EventVersion")}</small>
               </span>
             </button>
+            <button
+              className={
+                activeModule === "gen8raids"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("gen8raids");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">49</span>
+              <span>
+                <strong>{t("gen8RaidsModule")}</strong>
+                <small>{t("gen8RaidsVersion")}</small>
+              </span>
+            </button>
             <div className="rail-section-label">RNG TOOLS</div>
             <button
               className={
@@ -1642,7 +1676,7 @@ function App() {
               }}
               type="button"
             >
-              <span className="module-index">49</span>
+              <span className="module-index">50</span>
               <span>
                 <strong>{t("researcherModule")}</strong>
                 <small>{t("researcherVersion")}</small>
@@ -2511,6 +2545,14 @@ function App() {
               profiles={gen8Profiles}
               uiPreviewMode={uiPreviewMode}
             />
+          ) : activeModule === "gen8raids" ? (
+            <Suspense fallback={null}>
+              <Gen8RaidsPanel
+                onOpenProfileManager={() => setActiveModule("gen8profiles")}
+                profiles={gen8Profiles}
+                uiPreviewMode={uiPreviewMode}
+              />
+            </Suspense>
           ) : activeModule === "gen8profiles" ? (
             <Gen8ProfilesPanel controller={gen8Profiles} />
           ) : activeModule === "pokerusfinder" ? (
