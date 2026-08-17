@@ -37,6 +37,8 @@
 - 请求为 41 个 `uint32_t`，结果为 12 个 `uint32_t`
 - 生产算法仅在 Dedicated Worker 内的 C++/Emscripten Wasm 执行；最多 8 个独立 Worker，不使用 SharedArrayBuffer 或 pthread。
 
+结果表的虚拟滚动容器在 `1280px` 以下保持 `clamp(440px, 56vh, 680px)` 的确定高度。该约束避免 100,000 条结果的虚拟内容反向撑高自动高度面板，并与 Gen 8 Static 的高数据量滚动修复保持一致。
+
 `scripts/generate_gen8_raids_data.mjs` 从 PokeFinder 4.3.2 的 `nests.json`、`event1.json..event69.json`、`Encounters8.cpp` 和 `personal_swsh.bin` 生成 TypeScript 与 C++ 数据。保留 PokeFinder GPL-3.0-or-later 版权、归属、源码提供义务和商标免责声明。
 
 数据固定使用 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9`。`nests.json` 的 SHA-256 为 `36F18FD010F32DF50CDFA48DC76A6976C2E1DE7ACFD1A6CF8E664F49FEE95AB4`；69 个事件 JSON 按 `event1.json` 到 `event69.json` 的“文件 SHA-256 + 两个空格 + 文件名 + LF”清单计算，清单 SHA-256 为 `B6BB4E163E093C35CC2F6A10E403B6D8D824E3E53B76771661B36C006CFE3E62`。完整 PokeFinder 文件哈希见 `third_party/pokefinder/UPSTREAM.md`。
@@ -46,5 +48,7 @@
 - `src/features/gen8raids/domain.test.ts`：输入边界、41-word 编码、分片和解码。
 - `src/features/gen8raids/preview/Gen8RaidsUiPreviewEngine.test.ts`：预览结果。
 - `wasm/modules/gen8raids/tests/gen8raids_native_test.cpp`：API、帧计数、异色分支、零 Seed 和范围错误。
+
+2026-08-18 横查虚拟结果表时发现本模块具有与 Gen 8 Static 相同的响应式自动高度风险，已为 `1280px` 以下结果区补充确定高度。外部 Chrome 在 `1280x900` 下确认结果区约 `504px`、内部滚动表约 `408px` 且 `overflow: auto`；控制台无 warning 或 error。
 
 算法结果仍须在 GitHub Actions 部署后，按项目所有者提供的生产 URL 执行回归；本地测试不能替代生产验收。

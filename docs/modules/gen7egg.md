@@ -94,6 +94,8 @@ One Dedicated Worker owns one continuous Wasm session. `step()` bounds each batc
 
 `Gen7EggPanel` uses Frame Range / Egg Number / Shortest Path segmented modes, compact current-state and parent controls, filter disclosure, virtualized results, sorting, CSV export, cancellation, clear/reset actions and explicit progress, empty, error and result-limit states. Result rows can set either the row's TinyMT state or its post-egg state as the new current status while reducing the target frame with the upstream semantics.
 
+Below `900px`, the virtualized `.gen7egg-table-shell` keeps a fixed `520px` height and does not flex with its contents. This preserves a bounded TanStack Virtual viewport while the surrounding single-column results panel uses automatic page height.
+
 ## Verification Status
 
 The following local checks passed on 2026-08-15:
@@ -106,3 +108,5 @@ The following local checks passed on 2026-08-15:
 - Full Prettier check and `git diff --check`.
 
 The production Web build transformed 2102 modules, then the restricted Windows environment returned `EPERM` while Vite copied the existing `public/wasm/gen3egg.mjs` into `dist/wasm`. A requested non-restricted rerun did not start because the approval service returned `502 Bad Gateway`. This is recorded as an environment limitation, not a successful build. The `gen7egg` Emscripten artifact, external-browser interaction and production-page algorithm regression remain unverified.
+
+On 2026-08-18, the Gen 8 Static freeze audit identified and fixed the same responsive auto-height risk in this module. External Chrome at `900x900` confirmed a `520px`, `flex: 0 0 auto`, `overflow: auto` virtualized table; the console had no warning or error.

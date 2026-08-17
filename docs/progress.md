@@ -1,11 +1,24 @@
 # PokeRNGKit 项目进度与交接
 
-> - 最近更新：2026-08-17
+> - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`26f38db feat: 实现第八世代定点乱数`
-> - 当前阶段：Gen 8 Underground 已实现，下一模块为 Gen 8 Wild
-> - 工作区状态：`gen8underground` 源码、生成数据、模块文档、导航、三语文案、Wasm 清单与工程验证记录尚未提交
-> - 验证状态：Gen 8 Underground 完整应用层、50/50 原生夹具、默认 49 个 Emscripten 模块与外部 Chrome 本地 Worker/Wasm 检查已通过；生产页面算法回归未运行
+> - Git 功能基线：`5727c4f feat: 实现第八世代地下大洞窟乱数`
+> - 当前阶段：优先修复虚拟结果表滚动卡死，完成后继续 Gen 8 Wild
+> - 工作区状态：当前任务仅包含 Gen 8 Static、Gen 8 Raids、Gen 7 Wild、Gen 7 SOS、Gen 7 Egg 的响应式结果区修复与文档
+> - 验证状态：`npm run verify` 与外部 Chrome 高数据量滚动回归已通过；生产页面算法回归未运行
+
+## 2026-08-18 虚拟结果表滚动卡死修复
+
+- 复现：Gen 8 Static 双 Seed 输入 `111`，保留默认 Max Advances `100000` 后生成结果；在 `1380px` 以下单列布局向下滚动时页面失去响应。
+- 根因：响应式断点将模块面板改为 `height: auto`，但没有为虚拟结果容器保留确定高度。约 100,000 条结果形成约 4,000,000px 的虚拟内容并反向撑高滚动区，TanStack Virtual 将大量记录错误判断为可见，最终创建百万级单元格并耗尽 renderer 内存；异常 renderer 曾占用约 4.7 GB。
+- 修复：Gen 8 Static 与 Gen 8 Raids 的响应式结果区增加 `clamp(440px, 56vh, 680px)`；Gen 7 Wild、Gen 7 SOS 与 Gen 7 Egg 的单列虚拟表固定为 `520px` 并取消 flex 拉伸。
+- 横查：检查 `src/features` 中全部 33 个 `useVirtualizer` 模块。Gen 7 Stationary、Event、Battle Tree、Festival Plaza、Main，以及 Gen 8 Egg、Event、Underground 等自动高度布局已经为实际滚动元素设置固定或 clamp 高度；Gen 3、Gen 4、Gen 5 与其余模块未发现相同根因。
+- 已通过：最终重跑 `npm run verify` 的全仓 Prettier、ESLint、TypeScript、127 个 Vitest 文件共 473 项测试、2169 个模块的 Web/PWA 构建与 171 项约 18.27 MiB 预缓存；ESLint 为 0 error，保留 6 条既有 TanStack Virtual / React Compiler warning。Vitest 退出码为 `0`，结束时记录 Gen 4 Egg Preview 与 Gen 5 SHA1 Cache Worker 两条非阻断 fork worker 终止超时提示。最后一次 `git diff --check` 通过。
+- 未运行：本轮只修改 CSS 与文档，未改变 C++、Wasm API、Worker、算法或生成数据，因此未重建原生夹具和 Emscripten 模块。
+- 浏览器：按既有授权重新打开外部 Chrome，在 `http://127.0.0.1:5173/` 的 `1280x900` 视口使用真实 Worker/Wasm 生成 Gen 8 Static Seed `111 / 111`、默认 Max Advances `100000`。表格可视高度 `411px`、虚拟内容高度 `4,000,042px`，顶部只渲染 21 行，滚动到末帧 `99999` 后只渲染 20 行，页面总高度保持约 `1,721px`；状态为“已完成”，生成按钮仍可用，控制台无 warning/error。
+- 内存：原异常 renderer 曾占用约 `4.7 GB`；修复后高数据量结果停留末帧并观察 5 秒，全部 Chrome renderer 的最大工作集约从 `406.5 MB` 变为 `408.7 MB`，未再持续膨胀。
+- 断点：外部 Chrome 确认 Gen 8 Raids 在 `1280x900` 的结果区约 `504px`；Gen 7 Wild 与 SOS 在 `1120x900` 的虚拟表均为 `520px`、`flex: 0 0 auto`；Gen 7 Egg 在 `900x900` 的虚拟表同为 `520px`、`flex: 0 0 auto`。四个模块的实际滚动元素均保持 `overflow: auto`，控制台无 warning/error。
+- 下一步：本修复随 `fix: 修复虚拟结果表滚动卡死` 推送后恢复 Gen 8 Wild。
 
 ## 2026-08-17 第八世代地下大洞窟乱数
 

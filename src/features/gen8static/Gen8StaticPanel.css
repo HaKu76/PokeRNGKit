@@ -469,6 +469,7 @@
   }
 
   .gen8static-results {
+    height: clamp(440px, 56vh, 680px);
     min-height: 440px;
   }
 }

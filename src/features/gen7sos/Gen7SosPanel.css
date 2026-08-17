@@ -451,6 +451,11 @@
   .gen7sos-results {
     min-height: 620px;
   }
+
+  .gen7sos-table {
+    height: 520px;
+    flex: none;
+  }
 }
 
 @media (max-width: 640px) {

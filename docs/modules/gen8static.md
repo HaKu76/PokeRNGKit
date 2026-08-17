@@ -9,6 +9,8 @@
 - 支持 Seed 0 / Seed 1、Initial Advances、Max Advances、Offset、异色/性别/特性/性格/身高/体重/六项 IV 筛选、取消、虚拟滚动、排序、CSV 和 IV/能力值切换。
 - Template 的 Level、Ability、Shiny、IV Count 为只读；上游禁用的 Hidden Power 与 Wild 筛选不显示。
 
+结果表的虚拟滚动容器在 `1380px` 以下保持 `clamp(440px, 56vh, 680px)` 的确定高度。不得在单列响应式布局中让该容器随约 4,000,000px 的虚拟内容自动增高，否则 100,000 条结果会被错误判断为同时可见并耗尽页面内存。
+
 模板分布固定为：Starters 3、Gifts 3、Fossils 7、Stationary 3、Roamers 2、Legends 7、Ramanas Park (Pure Space) 11、Ramanas Park (Strange Space) 6、Mythics 5。
 
 ## 输入限制
@@ -74,5 +76,7 @@ Roamer 仅包含 Mesprit 与 Cresselia。外层 Xorshift 每帧生成 EC，再�
 - `wasm/modules/gen8static/tests/gen8static_native_test.cpp`：Turtwig、Omanyte、Heatran Cute Charm、Articuno Synchronize 与 Hidden Ability、Jirachi Never Shiny、Mesprit、Cresselia、零 Seed、推进溢出、范围保护和结果上限；另以朴素 Xorshift 推进对照 1,000,000 帧跳表结果。
 
 完整应用层验证已通过 124 个测试文件共 462 项测试，49/49 原生夹具与默认 48 个 Emscripten 模块构建均已完成。外部 Chrome 在 `http://127.0.0.1:5173/` 使用真实 Worker/Wasm 生成 Turtwig 固定 10 帧，首帧与第 9 帧逐字段匹配上述夹具；390、768、1280 与 1920px 下无整页横向溢出，结果首行与表头间距为 0，控制台无 warning 或 error。
+
+2026-08-18 修复了双 Seed 输入 `111`、默认 Max Advances `100000` 后滚动结果导致页面卡死的问题。根因是 `1380px` 以下面板改为自动高度时，结果区没有同步保留确定高度。外部 Chrome 在 `1280x900` 下完成真实 Worker/Wasm 回归：表格可视高度 `411px`、虚拟内容高度 `4,000,042px`，顶部只渲染 21 行，滚动到末帧后只渲染 20 行，页面总高度保持约 `1,721px`；5 秒稳定观察期间最大 renderer 工作集约 `406.5..408.7 MB`，控制台无 warning 或 error。
 
 算法结果仍须在 GitHub Actions 部署后，按项目所有者提供的生产 URL 执行回归；本地测试、原生/Wasm 构建与本地浏览器检查不能替代生产验收。

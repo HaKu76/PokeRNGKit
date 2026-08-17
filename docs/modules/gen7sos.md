@@ -79,6 +79,10 @@ The Calls result table supports row selection and `Find Path for index`. The imp
 
 `Gen7SosPanel` uses a segmented Pokemon Generation / Call Prediction workspace, compact encounter and battle controls, filter disclosure, virtualized results, sorting, CSV export, cancellation, selected-call Path Finder output, and explicit empty/error/limit states.
 
+Below `1120px`, the virtualized `.gen7sos-table` keeps a fixed `520px` height and does not flex with its contents. The surrounding results panel may grow in the single-column layout, but the TanStack Virtual scroll element must retain a bounded viewport for result sets up to 100,000 rows.
+
 ## Verification Status
 
 The source and UI files are formatted and `git diff --check` is clean. Native, Wasm, TypeScript, browser and algorithm regression checks remain owner-authorized acceptance work and have not been run in this session.
+
+On 2026-08-18, the Gen 8 Static freeze audit identified and fixed the same responsive auto-height risk in this module. External Chrome at `1120x900` confirmed a `620px` results panel and a `520px`, `flex: 0 0 auto`, `overflow: auto` virtualized table; the console had no warning or error.

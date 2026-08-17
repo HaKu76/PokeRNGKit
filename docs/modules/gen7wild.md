@@ -98,11 +98,15 @@ Gen7WildPanel
 
 桌面使用双列 operational workspace：左侧按 RNG Info、Encounter、Lead 和 Filters 分组，右侧结果表占据主要宽度并独立滚动；窄屏重排为单列。图标按钮使用可访问名称和 tooltip，计算、取消、错误、空结果和结果上限保持稳定布局。
 
+`1120px` 以下单列布局将虚拟表固定为 `520px` 高并取消 flex 拉伸。结果区本身可以随页面内容增高，但承载 TanStack Virtual 的 `.gen7wild-table` 必须保持确定高度，避免 100,000 条结果反向撑开滚动容器。
+
 简体中文逐字复用 `3DSRNGTool/Resources/text/lang_zh.txt` 已存在的 `野生乱数`、`野生草丛遇敌设置`、`游戏版本`、`地点`、`NPC数`、`帧数修正`、`等级范围`、`出现率`、`咬勾延时`、`延迟2 (F)`、`队首`、`触发方式`、`冒泡`、`预览`、`下雨`、`考虑时间延迟`、`标记`、`时间`、`道具`、`仅准确帧` 和 `只显示特殊`。无简中词条的控件保留 English source label。
 
 ## 当前验证状态
 
 本轮未获授权运行测试、类型检查、原生夹具、Wasm 构建、Vite 构建或浏览器检查。源码已加入 Domain、UI Preview、Worker 协议和原生会话夹具，但这些文件尚未执行；不能据此声明算法或界面已通过。
+
+2026-08-18 横查 Gen 8 Static 滚动卡死问题时，本模块被确认具有相同的响应式自动高度风险并已补充虚拟表固定高度。外部 Chrome 在 `1120x900` 下确认结果区为 `620px`，虚拟表计算高度为 `520px`、`flex: 0 0 auto`、`overflow: auto`；控制台无 warning 或 error。
 
 生产算法验收仍须等待项目所有者提交、推送并由 GitHub Actions 部署后，使用项目所有者提供的准确生产 URL 执行。
 

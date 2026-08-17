@@ -388,6 +388,11 @@
   .gen7wild-results {
     min-height: 620px;
   }
+
+  .gen7wild-table {
+    height: 520px;
+    flex: none;
+  }
 }
 
 @media (max-width: 640px) {

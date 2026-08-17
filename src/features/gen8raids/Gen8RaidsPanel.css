@@ -403,6 +403,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .gen8raids-results {
+    height: clamp(440px, 56vh, 680px);
     min-height: 440px;
   }
 }
