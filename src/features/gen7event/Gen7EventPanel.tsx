@@ -11,6 +11,10 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
+import {
+  isThreeDsGen7Profile,
+  type ThreeDsProfile,
+} from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import { GEN7_EVENT_NATURES, GEN7_EVENT_SPECIES } from "./data";
 import {
@@ -138,7 +142,13 @@ function csvCell(value: string | number | bigint) {
   return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
-export function Gen7EventPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
+export function Gen7EventPanel({
+  profile,
+  uiPreviewMode,
+}: {
+  profile?: ThreeDsProfile;
+  uiPreviewMode: boolean;
+}) {
   const { t, i18n } = useTranslation();
   const language: Gen7EventLanguage =
     i18n.resolvedLanguage === "ja"
@@ -310,6 +320,15 @@ export function Gen7EventPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
     setMinFrame(String(gen7EventStartingFrame(next)));
     updateDefaultDelay(next, nextSettings);
   };
+
+  useEffect(() => {
+    if (!isThreeDsGen7Profile(profile)) return;
+    changeVersion(profile.version);
+    setTsv(String(profile.tsv));
+    setTrv(profile.trv.toString(16).toUpperCase());
+    // Only a profile identity/update change may replace manually edited fields.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id, profile?.updatedAt]);
 
   const changeSpecies = (species: number) => {
     const defaults = gen7EventDefaultSettings(version, species);

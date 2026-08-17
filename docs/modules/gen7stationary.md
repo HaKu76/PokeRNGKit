@@ -92,6 +92,8 @@ Gen7StationaryPanel
 
 ## 界面与翻译
 
+页头选择 3DSRNGTool 的 Sun、Moon、Ultra Sun 或 Ultra Moon 档案时，同步 GameVersion、TSV、TRV 与 Shiny Charm，并按现有版本切换流程重置起始帧和可用目标模板。同步只在档案 id 或更新时间改变时执行，之后手动修改不会被普通重渲染覆盖。
+
 桌面使用双列 operational workspace：左侧集中 RNG、目标和筛选，右侧结果表占据主要宽度并独立滚动。自定义目标与筛选使用可折叠区域；`1180px` 以下转为单列，移动端继续保留横向结果表滚动。
 
 PokeFinder 已有的简体中文控件词条沿用 `Form/i18n/PokeFinder_zh.ts`，包括“设置”“分类”“御三家”“化石”“同步”“闪耀护符”“性格”“特性”“性别”和“觉醒力量”。PokeFinder 没有对应翻译的 3DSRNGTool 专用标签保留英文源字符串，例如 `Consider Delay`、`Raining`、`Forced Shiny`、`Blink Frame`、`Safe Frame`、`Perfect IV Value` 与 `Perfect IV Count`。

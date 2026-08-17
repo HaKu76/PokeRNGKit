@@ -96,6 +96,8 @@ Gen7WildPanel
 
 ## 界面与翻译
 
+页头选择 3DSRNGTool 的 Gen VII 档案时，同步 GameVersion、TSV、TRV 与 Shiny Charm；版本变化沿用现有起始帧和遭遇数据联动。同步只在档案对象切换或更新时执行。
+
 桌面使用双列 operational workspace：左侧按 RNG Info、Encounter、Lead 和 Filters 分组，右侧结果表占据主要宽度并独立滚动；窄屏重排为单列。图标按钮使用可访问名称和 tooltip，计算、取消、错误、空结果和结果上限保持稳定布局。
 
 `1120px` 以下单列布局将虚拟表固定为 `520px` 高并取消 flex 拉伸。结果区本身可以随页面内容增高，但承载 TanStack Virtual 的 `.gen7wild-table` 必须保持确定高度，避免 100,000 条结果反向撑开滚动容器。

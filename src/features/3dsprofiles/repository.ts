@@ -1,0 +1,252 @@
+import {
+  EMPTY_THREE_DS_PROFILE_STATE,
+  parseThreeDsProfileState,
+  type ThreeDsProfileState,
+} from "./domain";
+
+const DATABASE_NAME = "pokerngkit-3dsrngtool";
+const DATABASE_VERSION = 1;
+const OBJECT_STORE = "profile-data";
+const PROFILE_KEY = "profiles";
+const MIRROR_KEY = "pokerngkit-3dsrngtool-profiles-v1";
+const MIRROR_DIRTY_KEY = "pokerngkit-3dsrngtool-profiles-v1-primary-pending";
+
+export type ThreeDsProfileStorageMode = "indexeddb" | "localstorage";
+
+export interface ThreeDsProfilePrimaryStore {
+  read(): Promise<unknown | undefined>;
+  write(state: ThreeDsProfileState): Promise<void>;
+  clear(): Promise<void>;
+}
+
+class IndexedDbThreeDsProfileStore implements ThreeDsProfilePrimaryStore {
+  constructor(private readonly factory: IDBFactory) {}
+
+  async read() {
+    const database = await this.open();
+    try {
+      return await new Promise<unknown | undefined>((resolve, reject) => {
+        const request = database
+          .transaction(OBJECT_STORE, "readonly")
+          .objectStore(OBJECT_STORE)
+          .get(PROFILE_KEY);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    } finally {
+      database.close();
+    }
+  }
+
+  async write(state: ThreeDsProfileState) {
+    const database = await this.open();
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const transaction = database.transaction(OBJECT_STORE, "readwrite");
+        transaction.objectStore(OBJECT_STORE).put(state, PROFILE_KEY);
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error);
+      });
+    } finally {
+      database.close();
+    }
+  }
+
+  async clear() {
+    const database = await this.open();
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const transaction = database.transaction(OBJECT_STORE, "readwrite");
+        transaction.objectStore(OBJECT_STORE).delete(PROFILE_KEY);
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error);
+      });
+    } finally {
+      database.close();
+    }
+  }
+
+  private open() {
+    return new Promise<IDBDatabase>((resolve, reject) => {
+      const request = this.factory.open(DATABASE_NAME, DATABASE_VERSION);
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains(OBJECT_STORE)) {
+          request.result.createObjectStore(OBJECT_STORE);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+      request.onblocked = () =>
+        reject(
+          new Error("PokeRNGKit 3DSRNGTool IndexedDB upgrade was blocked."),
+        );
+    });
+  }
+}
+
+export interface ThreeDsProfileLoadResult {
+  state: ThreeDsProfileState;
+  storageMode: ThreeDsProfileStorageMode;
+}
+
+export class ThreeDsProfileRepository {
+  private readonly primary?: ThreeDsProfilePrimaryStore;
+
+  constructor(
+    primary:
+      ThreeDsProfilePrimaryStore | IDBFactory | undefined = typeof indexedDB ===
+    "undefined"
+      ? undefined
+      : indexedDB,
+    private readonly mirror: Storage | undefined = typeof localStorage ===
+    "undefined"
+      ? undefined
+      : localStorage,
+  ) {
+    this.primary =
+      primary && "open" in primary
+        ? new IndexedDbThreeDsProfileStore(primary as IDBFactory)
+        : (primary as ThreeDsProfilePrimaryStore | undefined);
+  }
+
+  async load(): Promise<ThreeDsProfileLoadResult> {
+    const mirrored = this.readMirror();
+    if (mirrored && this.isMirrorDirty()) {
+      if (this.primary) {
+        try {
+          await this.primary.write(mirrored);
+          this.clearMirrorDirty();
+          return { state: mirrored, storageMode: "indexeddb" };
+        } catch {
+          return { state: mirrored, storageMode: "localstorage" };
+        }
+      }
+      return { state: mirrored, storageMode: "localstorage" };
+    }
+
+    if (this.primary) {
+      try {
+        const stored = await this.primary.read();
+        if (stored !== undefined) {
+          const state = parseThreeDsProfileState(stored);
+          try {
+            this.writeMirror(state);
+            this.clearMirrorDirty();
+          } catch {
+            // IndexedDB remains canonical when the mirror is unavailable.
+          }
+          return { state, storageMode: "indexeddb" };
+        }
+      } catch {
+        // The mirror recovers unavailable or corrupt IndexedDB data.
+      }
+    }
+
+    if (mirrored) {
+      if (this.primary) {
+        try {
+          await this.primary.write(mirrored);
+          this.clearMirrorDirty();
+          return { state: mirrored, storageMode: "indexeddb" };
+        } catch {
+          // Continue in localStorage fallback mode.
+        }
+      }
+      return { state: mirrored, storageMode: "localstorage" };
+    }
+
+    return {
+      state: { ...EMPTY_THREE_DS_PROFILE_STATE, profiles: [] },
+      storageMode: this.primary ? "indexeddb" : "localstorage",
+    };
+  }
+
+  async save(state: ThreeDsProfileState): Promise<ThreeDsProfileStorageMode> {
+    const validated = parseThreeDsProfileState(state);
+    let primarySaved = false;
+    if (this.primary) {
+      try {
+        await this.primary.write(validated);
+        primarySaved = true;
+      } catch {
+        primarySaved = false;
+      }
+    }
+
+    let mirrorSaved = false;
+    try {
+      this.writeMirror(validated);
+      if (this.primary && !primarySaved) this.markMirrorDirty();
+      else this.clearMirrorDirty();
+      mirrorSaved = Boolean(this.mirror);
+    } catch {
+      // Keep the initial false value when the mirror rejects the write.
+    }
+    if (!primarySaved && !mirrorSaved) {
+      throw new Error("Unable to save 3DSRNGTool profiles in browser storage.");
+    }
+    return primarySaved ? "indexeddb" : "localstorage";
+  }
+
+  async clear() {
+    let primaryCleared = !this.primary;
+    if (this.primary) {
+      try {
+        await this.primary.clear();
+        primaryCleared = true;
+      } catch {
+        primaryCleared = false;
+      }
+    }
+
+    let mirrorCleared = !this.mirror;
+    try {
+      this.mirror?.removeItem(MIRROR_KEY);
+      this.mirror?.removeItem(MIRROR_DIRTY_KEY);
+      mirrorCleared = true;
+    } catch {
+      // Keep the initial false value when the mirror rejects the removal.
+    }
+    if (!primaryCleared || !mirrorCleared) {
+      throw new Error(
+        "Unable to clear 3DSRNGTool profiles from browser storage.",
+      );
+    }
+  }
+
+  private readMirror() {
+    try {
+      const value = this.mirror?.getItem(MIRROR_KEY);
+      if (!value) return undefined;
+      return parseThreeDsProfileState(JSON.parse(value));
+    } catch {
+      return undefined;
+    }
+  }
+
+  private writeMirror(state: ThreeDsProfileState) {
+    this.mirror?.setItem(MIRROR_KEY, JSON.stringify(state));
+  }
+
+  private isMirrorDirty() {
+    try {
+      return this.mirror?.getItem(MIRROR_DIRTY_KEY) === "1";
+    } catch {
+      return false;
+    }
+  }
+
+  private markMirrorDirty() {
+    this.mirror?.setItem(MIRROR_DIRTY_KEY, "1");
+  }
+
+  private clearMirrorDirty() {
+    try {
+      this.mirror?.removeItem(MIRROR_DIRTY_KEY);
+    } catch {
+      // A stale marker only makes the valid mirror win on the next load.
+    }
+  }
+}

@@ -79,6 +79,10 @@ Seed 搜索使用独立 Worker 实例，不依赖 `SharedArrayBuffer`、Wasm pth
 
 `src/features/gen7main/assets/Clock_00.jpg` 至 `Clock_16.jpg` 原样来自 3DSRNGTool `Resources/pic`，仅用于 Clock 输入按钮展示；文件不上传、不写入用户存档。上游 MIT 许可证与来源见 [`third_party/3dsrngtool/UPSTREAM.md`](../../third_party/3dsrngtool/UPSTREAM.md)。
 
+## 档案联动
+
+页头选择 Gen VII 的 3DSRNGTool 档案时同步 GameVersion。普通、ID 与 Time Calculator 的起始帧继续由现有版本和模式 effect 派生；Seed、Clock、NPC 和其他当前输入不从档案覆盖。
+
 ## 验证记录
 
 - `npm test -- src/features/gen7main`：3 个测试文件、7 项测试通过。

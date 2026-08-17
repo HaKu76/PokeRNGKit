@@ -4,6 +4,10 @@ import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import {
+  isThreeDsGen7Profile,
+  type ThreeDsProfile,
+} from "../3dsprofiles/domain";
+import {
   appendGen7MainNeedle,
   formatGen7MainHex,
   gen7MainNeedleMinimum,
@@ -81,7 +85,13 @@ function csvCell(value: string | number) {
   return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
-export function Gen7MainPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
+export function Gen7MainPanel({
+  profile,
+  uiPreviewMode,
+}: {
+  profile?: ThreeDsProfile;
+  uiPreviewMode: boolean;
+}) {
   const { t } = useTranslation();
   const engine = useMemo<Gen7MainEngine>(
     () =>
@@ -145,6 +155,10 @@ export function Gen7MainPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
     setMinFrame(String(frame));
     setTimeStartingFrame(String(frame));
   }, [mode, version]);
+
+  useEffect(() => {
+    if (isThreeDsGen7Profile(profile)) setVersion(profile.version);
+  }, [profile]);
 
   const minimumNeedles = mode === "qr" ? 2 : gen7MainNeedleMinimum(mode);
   const isCalculating = status === "calculating";

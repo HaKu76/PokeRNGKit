@@ -2,10 +2,21 @@
 
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`6977556 feat: 实现第八世代野生乱数` 已推送；当前工作区正在实现 Gen 8 Den Map
-> - 当前阶段：完成 Gen 8 Den Map 后进入 3DSRNGTool Profile Manager
-> - 工作区状态：当前任务包含 Gen 8 Den Map 的区域/巢穴选择、地图资源、坐标标记、三语文案和文档
-> - 验证状态：Gen 8 Den Map 的 4 个域测试、Lint、全仓格式和 `npm run verify` 已通过；外部 Chrome 在接管并刷新本地页面时连续超时，UI 回归证据尚未取得
+> - Git 功能基线：`f8217f1 feat: 实现第八世代巢穴地图` 已推送；当前工作区正在收口 3DSRNGTool Profile Manager
+> - 当前阶段：完成 Profile Manager 后进入 3DSRNGTool Gen VI Stationary RNG
+> - 工作区状态：当前任务包含 3DSRNGTool 档案领域、IndexedDB/localStorage 存储、响应式管理界面、Gen VII 调用方接入和模块文档
+> - 验证状态：Profile Manager 接线与文档已修改，格式化和完整工程验证待本轮执行；外部 Chrome 本地回归此前连续超时，尚未取得新的 UI 证据
+
+## 2026-08-18 3DSRNGTool 存档信息管理
+
+- 新增：实现独立 `3dsprofiles` Profile Manager，覆盖 X、Y、Omega Ruby、Alpha Sapphire、Transporter、Sun、Moon、Ultra Sun、Ultra Moon 档案的新建、编辑、删除、排序、清空、JSON 备份导入导出与旧 XML 迁移。
+- 存储：使用 IndexedDB `pokerngkit-3dsrngtool/profile-data/profiles`、localStorage 镜像和待同步标记；保持与 PokeFinder 各世代档案数据隔离。
+- 接入：页头选择器向 Gen VII Stationary、Wild、SOS、Egg、Event、Main RNG Tool、ID 工作区同步上游 ProfileView 会写入的版本、TSV、TRV、Shiny Charm 或四字 Egg State；普通重渲染不会覆盖手动输入。
+- 文档：增加 `docs/modules/3dsprofiles.md`，同步 README、需求、技术方案、模块库存和 Gen VII 模块文档。
+- 已通过：`npm test -- src/features/3dsprofiles` 的 2 个测试文件、9 项测试；`npm run typecheck`；`npm run lint`（0 error，6 条既有 TanStack Virtual warning）；`npm run format:check`；`git diff --check`；`npm run verify`（132 个 Vitest 文件、493 项测试，Vite 转换 2186 个模块，PWA 预缓存 183 项约 20.9 MiB）。
+- 未运行：外部 Chrome / Edge UI 回归；此前外部 Chrome 接管本地页面连续超时，未取得可复核的档案编辑、移动端列表或 Gen VII 联动证据。生产算法回归仍需部署后由项目所有者提供 URL 并授权。
+- 当前：代码和工程验证已收口，提交与推送待完成。
+- 下一步：完成定向测试、全仓 `npm run verify`，提交并推送 Profile Manager；随后核对 Gen VI Stationary RNG，不提前进入其他 Gen VI 或公共工具。
 
 ## 2026-08-18 第八世代巢穴地图
 

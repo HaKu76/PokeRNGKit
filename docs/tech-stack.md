@@ -1,6 +1,6 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map 与 Gen VII 主工作流已实现，下一模块为 3DSRNGTool Profile Manager
+> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII、Gen VII 主工作流与 3DSRNGTool Profile Manager 已实现，下一模块为 Gen VI Stationary RNG
 > - 更新日期：2026-08-18
 > - 当前范围：完整 PokeFinder 4.3.2，以及 `docs/module-inventory.md` 中除 `NTR Helper` 外的全部 3DSRNGTool 功能
 > - 包管理器：npm
@@ -163,15 +163,15 @@ PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等�
 ### 6.1 当前模块
 
 - React state：输入、筛选、结果、排序、进度和任务终态。
-- IndexedDB：第三世代与第四世代存档信息的独立主存储记录。
-- `localStorage`：两代独立存档镜像、语言、主题和各悬浮窗折叠状态。
+- IndexedDB：第三世代、第四世代与 3DSRNGTool 存档信息的独立主存储记录。
+- `localStorage`：各世代独立存档镜像、3DSRNGTool Profile Manager 镜像、语言、主题和各悬浮窗折叠状态。
 - Worker/Wasm：任务期间的临时计算状态。
 - 页面刷新：终止任务并重建 Worker，不持久化结果。
 - UI 预览：ID、Initial Seed、GameCube Seed Finder、G3/G4 Static、Wild、IVs to PID、Egg 与 Gen VII Stationary / Wild / SOS / Egg / Battle Tree / Event / Main RNG Tool / Egg Seed Finder 各自使用同一请求边界的确定性样例引擎，不读取或生成 Wasm；预览结果只用于界面交互验收。`gen3spindapainter` 是不涉及 RNG 的确定性 PID/坐标映射，直接由 React domain 计算，不创建 Wasm 或 Worker。
 
 ### 6.2 存档 repository
 
-当前直接使用浏览器 IndexedDB API，并通过 `Gen3ProfileRepository` 与 `Gen4ProfileRepository` 隔离两代数据。两者使用独立 schema 标识、记录键和 localStorage 镜像，不需要为这一级复杂度引入 Dexie。repository 负责验证、事务、IndexedDB 失败回退和镜像恢复。
+当前直接使用浏览器 IndexedDB API，并通过 `Gen3ProfileRepository`、`Gen4ProfileRepository` 与 `ThreeDsProfileRepository` 隔离各世代数据。每个 repository 使用独立 schema 标识、记录键和 localStorage 镜像，不需要为这一级复杂度引入 Dexie。repository 负责验证、事务、IndexedDB 失败回退和镜像恢复。
 
 每次保存同时更新 localStorage 完整镜像；这是明确的数据恢复路径，不是长期全局 store。导入导出使用带格式标识和 schema 版本的 JSON。清除操作同时删除 IndexedDB 记录和镜像，不把 TID/SID 放进 URL。
 

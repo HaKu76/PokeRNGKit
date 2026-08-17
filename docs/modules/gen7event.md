@@ -104,6 +104,8 @@ gen7event_last_error()
 
 ## 界面
 
+页头选择 Gen VII 的 3DSRNGTool 档案时，同步 GameVersion、TSV 与 TRV，并沿用现有版本切换流程更新起始帧、版本限定物种和默认 Delay。Shiny Charm 不属于 Event 请求，不从档案写入。
+
 桌面端使用紧凑参数区与结果区双列工作台，结果表是主要滚动区域；`1181..1380px` 使用较窄双列，`1180px` 以下重排为单列。移动端输入、命令、复选标签和结果表头保持至少 44px 触控目标。界面逐字复用上游简体中文词条：`配信乱数`、`配信设置`、`固定特性`、`固定性格`、`固定性别`、`自ID`、`蛋`、`未登入图鉴`、`其他信息`、`保底随机V数` 与 `考虑时间延迟`。
 
 结果显示 Frame、Realtime、Random Number、EC、PID、六项 IV、Nature、Ability、Gender、Hidden Power、Shiny、Blink、Delay、PSV 与 PRV，并支持列排序、CSV、清空和取消。

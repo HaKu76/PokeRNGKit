@@ -40,6 +40,7 @@ SFMT 常量和推进顺序按本地 `3DSRNGTool/RNG/SFMT.cs` 移植到 `wasm/mod
 - Wasm API：`wasm/modules/gen7id/bridge/gen7id_bridge.h`
 - Packed state：8 个 `uint32`，共 32 字节；低/高随机数、TID/SID、TSV/TRV、帧、Gen7TID、Clock。
 - 导航：独立 `GEN VII` 分组，不改变 Gen III/Gen IV 入口。
+- 档案：页头选择 Gen VII 的 3DSRNGTool 档案时同步 Game Version，并按 Sun/Moon `1012` 或 USUM `1132` 更新 Min Advances；Seed、筛选和 Clock correction 不被覆盖。
 
 ## 筛选语义
 

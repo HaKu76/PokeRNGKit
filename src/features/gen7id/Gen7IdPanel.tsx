@@ -3,6 +3,10 @@ import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import {
+  isThreeDsGen7Profile,
+  type ThreeDsProfile,
+} from "../3dsprofiles/domain";
+import {
   formatHex64,
   GEN7_ID_MAX_ADVANCES,
   gen7IdStartingFrame,
@@ -34,7 +38,13 @@ function filterLabel(mode: Gen7IdFilterMode) {
           : "";
 }
 
-export function Gen7IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
+export function Gen7IdPanel({
+  profile,
+  uiPreviewMode,
+}: {
+  profile?: ThreeDsProfile;
+  uiPreviewMode: boolean;
+}) {
   const { t } = useTranslation();
   const engine = useMemo<Gen7IdSearchEngine>(
     () =>
@@ -74,6 +84,11 @@ export function Gen7IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
     overscan: 12,
   });
   useEffect(() => () => engine.dispose(), [engine]);
+  useEffect(() => {
+    if (!isThreeDsGen7Profile(profile)) return;
+    setVersion(profile.version);
+    setMinAdvances(String(gen7IdStartingFrame(profile.version)));
+  }, [profile]);
   const run = async (event: FormEvent) => {
     event.preventDefault();
     if (status === "calculating") return;

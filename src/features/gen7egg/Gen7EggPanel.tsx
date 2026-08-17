@@ -12,6 +12,11 @@ import {
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
+import {
+  formatThreeDsProfileSeed,
+  isThreeDsGen7Profile,
+  type ThreeDsProfile,
+} from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import { GEN7_WILD_NATURES } from "../gen7wild/data";
 import {
@@ -137,7 +142,13 @@ function csvCell(value: string | number | boolean) {
   return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
-export function Gen7EggPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
+export function Gen7EggPanel({
+  profile,
+  uiPreviewMode,
+}: {
+  profile?: ThreeDsProfile;
+  uiPreviewMode: boolean;
+}) {
   const { t, i18n } = useTranslation();
   const language =
     i18n.resolvedLanguage === "ja"
@@ -225,6 +236,14 @@ export function Gen7EggPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasPidRerolls = shinyCharm || masudaMethod;
   const hasEverstone = male.item === "everstone" || female.item === "everstone";
+
+  useEffect(() => {
+    if (!isThreeDsGen7Profile(profile)) return;
+    setStateText(profile.seeds.map(formatThreeDsProfileSeed) as StateText);
+    setTsv(String(profile.tsv));
+    setTrv(profile.trv.toString(16).toUpperCase());
+    setShinyCharm(profile.shinyCharm);
+  }, [profile]);
 
   useEffect(() => () => engine.dispose(), [engine]);
 

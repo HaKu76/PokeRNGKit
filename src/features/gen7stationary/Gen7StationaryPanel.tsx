@@ -11,6 +11,10 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
+import {
+  isThreeDsGen7Profile,
+  type ThreeDsProfile,
+} from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import {
   GEN7_STATIONARY_NATURES,
@@ -152,8 +156,10 @@ function csvCell(value: string | number | bigint | boolean) {
 }
 
 export function Gen7StationaryPanel({
+  profile,
   uiPreviewMode,
 }: {
+  profile?: ThreeDsProfile;
   uiPreviewMode: boolean;
 }) {
   const { t, i18n } = useTranslation();
@@ -317,6 +323,16 @@ export function Gen7StationaryPanel({
     setCategory(template.category);
     applyTemplate(template);
   };
+
+  useEffect(() => {
+    if (!isThreeDsGen7Profile(profile)) return;
+    changeVersion(profile.version);
+    setTsv(String(profile.tsv));
+    setTrv(profile.trv.toString(16).toUpperCase());
+    setShinyCharm(profile.shinyCharm);
+    // Only a profile identity/update change may replace manually edited fields.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id, profile?.updatedAt]);
 
   const changeCategory = (next: string) => {
     const template = versionTemplates.find((entry) => entry.category === next)!;

@@ -50,7 +50,7 @@ PokeFinder 核对入口：
 | 19   | Gen VII | Battle Tree Trainer RNG                  | 已实现 |
 | 20   | Gen VII | Festival Plaza Facility RNG              | 已实现 |
 | 21   | Gen VII | Poke Pelago 特殊遭遇                     | 已包含 |
-| 22   | 公共    | Profile Manager                          | 计划   |
+| 22   | 公共    | Profile Manager                          | 已实现 |
 | 23   | 公共    | KeyBV                                    | 计划   |
 | 24   | 公共    | Misc. RNG Tool                           | 计划   |
 | 25   | 公共    | TSV List                                 | 计划   |
@@ -79,7 +79,7 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 ## 实施顺序
 
-1. PokeFinder Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground、Wild 与 Den Map 已实现；Den Map 收口后进入 3DSRNGTool Profile Manager。
-2. 3DSRNGTool Profile Manager 字段与存储 schema 以其上游 `Profiles` / `ProfileManager` 为准，不复用 PokeFinder 档案结构。
+1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII 与公共 Profile Manager 已实现。
+2. 下一模块为 3DSRNGTool Gen VI Stationary RNG；字段、控件边界和算法以对应 WinForms/Core 源码为准。
 3. 继续核对其余模块库存，不提前合并不同上游工作流；`NTR Helper` 除外。
 4. 全部模块完成后执行全仓验证、Actions 部署和生产页面回归。

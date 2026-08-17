@@ -3,6 +3,10 @@ import { Download, GitBranch, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
+import {
+  isThreeDsGen7Profile,
+  type ThreeDsProfile,
+} from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import { GEN7_WILD_NATURES, type Gen7WildGameVersion } from "../gen7wild/data";
 import {
@@ -109,7 +113,13 @@ function itemLabel(item: number, common: string, rare: string, none: string) {
   return item === 0 ? common : item === 1 ? rare : item === 2 ? "Hidden" : none;
 }
 
-export function Gen7SosPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
+export function Gen7SosPanel({
+  profile,
+  uiPreviewMode,
+}: {
+  profile?: ThreeDsProfile;
+  uiPreviewMode: boolean;
+}) {
   const { t, i18n } = useTranslation();
   const language: Gen7WildLanguage =
     i18n.resolvedLanguage === "ja"
@@ -266,6 +276,13 @@ export function Gen7SosPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
   useEffect(() => {
     setMinFrame(String(gen7WildStartingFrame(version)));
   }, [version]);
+  useEffect(() => {
+    if (!isThreeDsGen7Profile(profile)) return;
+    setVersion(profile.version);
+    setTsv(String(profile.tsv));
+    setTrv(profile.trv.toString(16).toUpperCase());
+    setShinyCharm(profile.shinyCharm);
+  }, [profile]);
   useEffect(() => () => engine.dispose(), [engine]);
   useEffect(() => {
     setResults([]);

@@ -92,6 +92,8 @@ One Dedicated Worker owns one continuous Wasm session. `step()` bounds each batc
 
 ## UI
 
+Selecting a Gen VII 3DSRNGTool profile synchronizes the four TinyMT Seed words in `[0]..[3]` order, TSV, TRV and Shiny Charm. Synchronization runs only when the selected profile changes or is edited, so subsequent manual state changes remain local to the workspace.
+
 `Gen7EggPanel` uses Frame Range / Egg Number / Shortest Path segmented modes, compact current-state and parent controls, filter disclosure, virtualized results, sorting, CSV export, cancellation, clear/reset actions and explicit progress, empty, error and result-limit states. Result rows can set either the row's TinyMT state or its post-egg state as the new current status while reducing the target frame with the upstream semantics.
 
 Below `900px`, the virtualized `.gen7egg-table-shell` keeps a fixed `520px` height and does not flex with its contents. This preserves a bounded TanStack Virtual viewport while the surrounding single-column results panel uses automatic page height.

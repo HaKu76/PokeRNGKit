@@ -11,6 +11,10 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
+import {
+  isThreeDsGen7Profile,
+  type ThreeDsProfile,
+} from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import {
   GEN7_WILD_NATURES,
@@ -169,7 +173,13 @@ function csvCell(value: string | number | bigint | boolean) {
   return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
-export function Gen7WildPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
+export function Gen7WildPanel({
+  profile,
+  uiPreviewMode,
+}: {
+  profile?: ThreeDsProfile;
+  uiPreviewMode: boolean;
+}) {
   const { t, i18n } = useTranslation();
   const language: Gen7WildLanguage =
     i18n.resolvedLanguage === "ja"
@@ -313,6 +323,14 @@ export function Gen7WildPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
   useEffect(() => {
     setMinFrame(String(gen7WildStartingFrame(version)));
   }, [version]);
+
+  useEffect(() => {
+    if (!isThreeDsGen7Profile(profile)) return;
+    setVersion(profile.version);
+    setTsv(String(profile.tsv));
+    setTrv(profile.trv.toString(16).toUpperCase());
+    setShinyCharm(profile.shinyCharm);
+  }, [profile]);
 
   useEffect(() => {
     if (!baseEncounter) return;
