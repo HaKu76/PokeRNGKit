@@ -1,0 +1,615 @@
+.gen8underground-panel {
+  display: grid;
+  min-height: 0;
+  height: 100%;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: 10px;
+  color: var(--text);
+}
+
+.gen8underground-profile-bar,
+.gen8underground-control-grid > fieldset,
+.gen8underground-results {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--panel-shadow);
+}
+
+.gen8underground-profile-bar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 0.8fr) 40px minmax(
+      170px,
+      0.8fr
+    );
+  gap: 10px;
+  align-items: end;
+  padding: 12px;
+}
+
+.gen8underground-eyebrow {
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.gen8underground-profile-bar h1 {
+  margin: 2px 0 0;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.gen8underground-profile-bar label,
+.gen8underground-panel label {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 0;
+}
+
+.gen8underground-panel input:not([type="checkbox"]),
+.gen8underground-panel select,
+.gen8underground-panel output {
+  min-width: 0;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 38px;
+}
+
+.gen8underground-panel output {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen8underground-icon-button,
+.gen8underground-panel button.icon {
+  display: inline-grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--control-bg);
+  color: var(--text);
+}
+
+.gen8underground-profile-bar dl {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+
+.gen8underground-profile-bar dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen8underground-profile-bar dd {
+  margin: 2px 0 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.gen8underground-control-grid {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: minmax(300px, 0.7fr) minmax(620px, 1.8fr);
+  gap: 10px;
+}
+
+.gen8underground-control-grid fieldset {
+  min-width: 0;
+  padding: 10px;
+  margin: 0;
+}
+
+.gen8underground-control-grid legend {
+  padding: 0 5px;
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.gen8underground-rng-fieldset {
+  display: grid;
+  align-content: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.gen8underground-rng-fieldset .wide,
+.gen8underground-actions {
+  grid-column: 1 / -1;
+}
+
+.gen8underground-actions {
+  display: flex;
+  gap: 7px;
+  margin-top: 2px;
+}
+
+.gen8underground-actions button {
+  flex: 1;
+}
+
+.gen8underground-panel button {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.gen8underground-panel button.primary,
+.gen8underground-panel button.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.gen8underground-panel button.primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.gen8underground-config-fieldset {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: 40px minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.gen8underground-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 5px;
+}
+
+.gen8underground-tabs button {
+  min-height: 34px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+}
+
+.gen8underground-tabs button.active {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.gen8underground-settings-pane,
+.gen8underground-filter-pane {
+  min-height: 0;
+  overflow: auto;
+  padding-top: 7px;
+}
+
+.gen8underground-setting-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.gen8underground-check {
+  display: flex !important;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.gen8underground-disable-filter {
+  margin-bottom: 6px;
+}
+
+.gen8underground-check input,
+.gen8underground-species-list input,
+.gen8underground-check-grid input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--brand);
+}
+
+.gen8underground-species-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen8underground-species-heading button {
+  min-height: 32px;
+  padding: 0 9px;
+  font-size: 13px;
+}
+
+.gen8underground-species-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px 7px;
+  max-height: 140px;
+  overflow: auto;
+  margin-top: 5px;
+  padding: 6px;
+  background: var(--surface-2);
+  border-radius: 7px;
+}
+
+.gen8underground-species-list label,
+.gen8underground-check-grid label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.gen8underground-species-list span,
+.gen8underground-check-grid span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gen8underground-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.gen8underground-filter-lists {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 7px;
+}
+
+.gen8underground-filter-lists strong {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen8underground-check-grid {
+  display: grid;
+  gap: 2px 5px;
+  max-height: 92px;
+  overflow: auto;
+  margin-top: 3px;
+}
+
+.gen8underground-check-grid.nature {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.gen8underground-check-grid.power {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.gen8underground-ranges {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.gen8underground-ranges label,
+.gen8underground-iv-ranges label {
+  display: grid;
+  grid-template-columns: minmax(42px, 0.7fr) repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 4px;
+}
+
+.gen8underground-ranges input,
+.gen8underground-iv-ranges input {
+  width: 100%;
+  padding: 0 4px !important;
+  text-align: center;
+}
+
+.gen8underground-iv-ranges {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.gen8underground-iv-ranges label {
+  grid-template-columns: 1fr;
+  gap: 2px;
+}
+
+.gen8underground-iv-ranges label span {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.gen8underground-alert {
+  border-bottom: 1px solid var(--danger);
+  padding: 8px 10px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.gen8underground-alert.warning {
+  border-color: color-mix(in srgb, var(--amber) 36%, var(--line));
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.gen8underground-results {
+  display: flex;
+  min-height: 0;
+  height: clamp(320px, 38vh, 460px);
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gen8underground-results > header {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 4px 10px;
+}
+
+.gen8underground-results > header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gen8underground-status {
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen8underground-result-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen8underground-result-actions button.active {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.gen8underground-progress-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) repeat(4, auto);
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+}
+
+.gen8underground-progress-row progress {
+  width: 100%;
+  height: 5px;
+  accent-color: var(--brand);
+}
+
+.gen8underground-progress-row span {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen8underground-table {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background: var(--table-bg);
+}
+
+.gen8underground-table-inner {
+  position: relative;
+  min-width: 1900px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen8underground-table-header,
+.gen8underground-table-row {
+  display: grid;
+  grid-template-columns:
+    88px 150px 140px 150px 64px 104px 104px 84px 110px 160px
+    repeat(6, 64px) 80px 210px 72px 72px;
+  width: 100%;
+  min-width: 1900px;
+}
+
+.gen8underground-table-header {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 42px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.gen8underground-table-header button,
+.gen8underground-table-row span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  overflow: hidden;
+  border-right: 1px solid var(--line-soft);
+  padding: 0 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen8underground-table-header button {
+  width: 100%;
+  min-height: 42px;
+  border-width: 0 1px 0 0;
+  border-radius: 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: left;
+}
+
+.gen8underground-table-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 40px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--table-bg);
+}
+
+.gen8underground-table-row:hover {
+  background: var(--teal-soft);
+}
+
+.gen8underground-empty {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  left: 0;
+  display: flex;
+  min-height: 80px;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+.gen8underground-panel button:disabled,
+.gen8underground-panel input:disabled,
+.gen8underground-panel select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.gen8underground-panel button:focus-visible,
+.gen8underground-panel input:focus-visible,
+.gen8underground-panel select:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1380px) {
+  .gen8underground-panel {
+    height: auto;
+  }
+}
+
+@media (max-width: 1100px) {
+  .gen8underground-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .gen8underground-settings-pane,
+  .gen8underground-filter-pane {
+    padding-right: 76px;
+  }
+}
+
+@media (max-width: 760px) {
+  .gen8underground-profile-bar {
+    grid-template-columns: minmax(0, 1fr) 40px;
+  }
+
+  .gen8underground-profile-bar > label,
+  .gen8underground-profile-bar dl {
+    grid-column: 1 / -1;
+  }
+
+  .gen8underground-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen8underground-filter-grid,
+  .gen8underground-ranges,
+  .gen8underground-setting-grid,
+  .gen8underground-filter-lists {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen8underground-species-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen8underground-species-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .gen8underground-species-heading button {
+    width: 100%;
+  }
+
+  .gen8underground-check-grid.nature,
+  .gen8underground-check-grid.power {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gen8underground-iv-ranges {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gen8underground-progress-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .gen8underground-profile-bar h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .gen8underground-panel input:not([type="checkbox"]),
+  .gen8underground-panel select,
+  .gen8underground-panel output,
+  .gen8underground-panel button {
+    min-height: 44px;
+  }
+
+  .gen8underground-species-list label,
+  .gen8underground-check-grid label {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gen8underground-panel *,
+  .gen8underground-panel *::before,
+  .gen8underground-panel *::after {
+    scroll-behavior: auto !important;
+  }
+}

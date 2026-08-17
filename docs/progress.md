@@ -2,10 +2,25 @@
 
 > - 最近更新：2026-08-17
 > - 当前分支：`main`
-> - Git 功能基线：`843230c feat: 实现第八世代团体战乱数`
-> - 当前阶段：Gen 8 Static 已实现，下一模块为 Gen 8 Underground
-> - 工作区状态：`gen8static` 源码、生成数据、模块文档、导航、三语文案、Wasm 清单与工程验证记录尚未提交
-> - 验证状态：Gen 8 Static 完整应用层、49/49 原生夹具、默认 48 个 Emscripten 模块与外部 Chrome 本地 Worker/Wasm 检查已通过；生产页面算法回归未运行
+> - Git 功能基线：`26f38db feat: 实现第八世代定点乱数`
+> - 当前阶段：Gen 8 Underground 已实现，下一模块为 Gen 8 Wild
+> - 工作区状态：`gen8underground` 源码、生成数据、模块文档、导航、三语文案、Wasm 清单与工程验证记录尚未提交
+> - 验证状态：Gen 8 Underground 完整应用层、50/50 原生夹具、默认 49 个 Emscripten 模块与外部 Chrome 本地 Worker/Wasm 检查已通过；生产页面算法回归未运行
+
+## 2026-08-17 第八世代地下大洞窟乱数
+
+- 新增：实现 PokeFinder 4.3.2 `Gen 8 Underground` Generator，仅支持 Brilliant Diamond / Shining Pearl；上游没有 Searcher，Web 端未扩展 Sword / Shield 或反向检索。
+- 数据：从 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9`、PokeFinder `personal_bdsp.bin`、Egg Move 表与本地化资源生成 BD/SP 各 18 个区域、141 条蛋招式和 494 条 Personal 数据；文件大小、SHA-256 与日文招式回退规则已写入模块文档和上游记录。
+- 算法：增加 `gen8underground` C++/Wasm API v1、54-word 请求、12-word 结果、256 项 Xorshift RNGList、普通/特殊物种、Diglett Bonus、完整队首、EC/PID、异色、IV、Ability、Gender、Nature、Height、Weight、Item、Egg Move、Stats 和上游 StateFilter。
+- 界面：增加 BDSP Profile、双 64 位 Seed、推进与 Offset、Story/Level Flag、18 个地点、物种多选、设置/筛选标签、完整筛选、最多 8 个独立 Worker、取消、100000 行结果上限、20 列虚拟表、排序、CSV 和 IV/能力值切换；导航编号为 51，Researcher 顺延为 52。
+- 修复：Worker 初始化期间取消会终止并重建实例，不再误报完成；768px 控制区提前切为单列，结果表固定为独立滚动区域，窄屏物种操作避开悬浮工具并保持 44px 触控目标。
+- 已通过：`npm run verify` 的 Prettier、ESLint、TypeScript、127 个 Vitest 文件共 473 项测试、2169 个模块的 Web/PWA 构建与 171 项约 18.27 MiB 预缓存；ESLint 为 0 error，仅保留 6 条既有 TanStack Virtual warning。
+- 已通过：50/50 原生夹具；Emscripten 6.0.6 构建默认 49 个独立模块。`gen8underground.mjs` 为 7,615 bytes，`gen8underground.wasm` 为 68,926 bytes，对应 SHA-256 已写入模块文档。
+- 重跑：首次 `npm run verify` 因根 `build/` 中手工 Emscripten 临时夹具被 ESLint 扫描而停止；确认该目录为 `.gitignore` 生成物后，将两个文件可恢复地移入 `.tmp/gen8underground-fixture/`，第二次完整验证通过，未扩大 ESLint 忽略范围。
+- 浏览器：外部 Chrome 在 `http://127.0.0.1:5173/` 使用真实 Worker/Wasm 生成固定 10 帧的 60 条结果，首条 `818C829E / C67596B5 / Species 198 / Egg Move 413 / 17 / 28-1-23-10-31-20` 与原生夹具一致；物种全部取消返回 0 条，启用 Disable Filters 后恢复 60 条。
+- 布局：390、768、1280 与 1920px 下无整页横向溢出，结果表保持独立横纵滚动且首行与表头间距为 0；中英日窄屏标签、悬浮工具安全区和控制台无 warning/error 均已检查。
+- 未验收：本地测试、原生/Wasm 构建和 UI 检查只能作为工程证据；GitHub Actions 部署后仍需由项目所有者提供准确生产 URL 并授权算法回归。
+- 下一步：完成最终格式与全仓验证，提交并推送 `feat: 实现第八世代地下大洞窟乱数`；随后进入 Gen 8 Wild，不提前进入 Den Map 或 3DSRNGTool Profile Manager。
 
 ## 2026-08-17 第八世代定点乱数
 

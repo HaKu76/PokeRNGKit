@@ -2,8 +2,10 @@ src/features/wild/gen3Data.ts
 src/features/encounterlookup/data.ts
 src/features/gen8raids/data.ts
 src/features/gen8static/data.ts
+src/features/gen8underground/data.ts
 wasm/modules/gen8egg/bridge/personal_data.inc
 wasm/modules/gen8event/bridge/personal_data.inc
 wasm/modules/gen8raids/bridge/raid_data.inc
 wasm/modules/gen8static/bridge/personal_data.inc
+wasm/modules/gen8underground/bridge/underground_data.inc
 .tools/

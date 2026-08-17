@@ -1,0 +1,13 @@
+{
+  "id": "gen8underground",
+  "generation": 8,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen8underground",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen8underground.mjs",
+    "wasm": "gen8underground.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen VIII UndergroundGenerator"
+}
