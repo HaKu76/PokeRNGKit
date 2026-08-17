@@ -1,0 +1,13 @@
+{
+  "id": "gen7festivalplaza",
+  "generation": 7,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen7festivalplaza",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen7festivalplaza.mjs",
+    "wasm": "gen7festivalplaza.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 Gen VII FPFacility/Search7"
+}

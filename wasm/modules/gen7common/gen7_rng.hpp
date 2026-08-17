@@ -301,7 +301,7 @@ namespace pokerngkit::gen7
         std::vector<std::uint8_t> flags(maxFrame - minFrame + 2);
         SFMT rng(seed);
         int blinkFlag = 0;
-        for (std::uint32_t i = 0; i < minFrame - 2; i++) rng.nextUlong();
+        for (std::uint32_t i = 0; i < minFrame - std::min(minFrame, 2U); i++) rng.nextUlong();
         if (minFrame < 2)
         {
             for (std::uint32_t i = 0; i < minFrame; i++) rng.nextUlong();

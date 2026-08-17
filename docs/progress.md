@@ -2,10 +2,22 @@
 
 > - 最近更新：2026-08-17
 > - 当前分支：`main`
-> - Git 功能基线：`f2e241e feat: 实现第七世代孵化Seed检索`
-> - 当前阶段：Gen VII Main RNG Tool 与 Egg Seed Finder 已实现，下一模块为 Festival Plaza Facility RNG
-> - 工作区状态：SFMT 修复、Main RNG Tool、Egg Seed Finder 和共享接入已分别提交并推送；本条进度记录单独收口
-> - 验收状态：9/9 Gen VII 原生夹具、9 个 Gen VII Wasm、114 个 Vitest 文件共 430 项测试和生产 Web/PWA 构建已通过；外部 Chrome/Edge UI 检查与生产页面算法回归未运行
+> - Git 功能基线：`aa54ac4 docs: 更新第七世代开发进度`
+> - 当前阶段：Gen VII Festival Plaza Facility RNG 已实现，下一模块为 3DSRNGTool Profile Manager
+> - 工作区状态：Festival Plaza 实现、文档和共享接入待本轮提交；此前第七世代模块已分别提交并推送
+> - 验收状态：Festival Plaza 3 个 TypeScript 测试文件共 6 项测试、全仓 117 个 Vitest 文件共 437 项测试、9/9 Gen VII 原生夹具、6 个受影响 Gen VII Wasm、生产 Web/PWA 构建和外部 Chrome 本地 UI 检查已通过；生产页面算法回归未运行
+
+## 2026-08-17 第七世代 Festival Plaza Facility RNG
+
+- 新增：增加 `gen7festivalplaza` C++/Wasm API v1、13-word 请求、10+N-word 结果、`begin()` / `step()` 连续会话、原生会话夹具、单 Dedicated Worker、领域校验和三层 TypeScript 测试。
+- 算法：按 3DSRNGTool `MiscRNGTool.Search7()`、`ModelStatus`、`FPFacility` 和 TinyMT 重播实现 Sun、Moon、Ultra Sun、Ultra Moon 的 NPC 眨眼、Delay、19 个 Rank、星级、设施、NPC 类型和颜色筛选。
+- 修复：Moon / Ultra Moon 使用独立设施池；Sun / Moon 一至三星移除 Switcheroo；Rank `21-30` 的 ★4 概率恢复为 `9%`；修复共享 Gen VII 起始帧 `0..1` 的无符号下溢。
+- 界面：增加设施池联动、NPC Status、Mark 映射、进度、取消、100000 行结果上限、虚拟滚动、排序、CSV、清空和 Index 回写；移动端 390px 无横向溢出，相关控件保持 44px 高度。
+- 文档：增加 `docs/modules/gen7festivalplaza.md`，同步 README、库存、需求、技术方案、三语文案和 Wasm 清单。
+- 已通过：Node.js `24.19.0`、npm `12.0.2`；Festival Plaza 3 个测试文件共 6 项测试；全仓 `npm run verify` 的 Prettier、ESLint、TypeScript、117 个 Vitest 文件共 437 项测试和生产 Web/PWA 构建，ESLint 保留 6 条既有非阻断 warning。
+- 已通过：WinLibs GCC `16.1.0` 的 9/9 Gen VII 原生夹具；Emscripten `6.0.6` 重建 `gen7wild`、`gen7sos`、`gen7egg`、`gen7event`、`gen7main` 和 `gen7festivalplaza`；外部 Chrome 在 `http://127.0.0.1:5173/` 使用真实 Wasm 核对固定五帧、NPC Status、Moon ★4 设施联动和控制台无错误。
+- 未运行：GitHub Pages 生产页面算法回归；仍需部署完成后由项目所有者提供准确 URL 并单独授权，不能用本地 UI 或 Wasm 夹具替代。
+- 下一步：收口本模块提交后实现 3DSRNGTool Profile Manager；继续保留 `NTR Helper` 为明确排除项。
 
 ## 2026-08-17 第七世代 Main RNG Tool 与 Egg Seed Finder
 
