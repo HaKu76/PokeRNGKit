@@ -15,7 +15,7 @@
 
 ## 上游依据
 
-本模块以本地只读 PokeFinder 4.3.2 归档 `C:\Users\Hakuhiro\Desktop\PokeFinder-master` 为行为依据，核对文件如下：
+本模块以本地只读 PokeFinder 4.3.2 归档 `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master` 为行为依据，核对文件如下：
 
 ```text
 Form/Gen4/Event4.cpp

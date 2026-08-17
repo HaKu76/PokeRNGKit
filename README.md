@@ -5,15 +5,15 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：完成第七世代 Festival Plaza Facility RNG。** PokeFinder 4.3.2 的第三、第四、第五世代模块已经进入仓库；第八世代 Profiles、IDs 与 Eggs 已实现。第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现，下一模块为 3DSRNGTool Profile Manager。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
+**当前里程碑：实现第八世代配信乱数。** PokeFinder 4.3.2 的第三、第四、第五世代模块已经进入仓库；第八世代 Profiles、IDs、Eggs 与 Event 已实现，下一模块为 Gen 8 Raids。第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现。完成剩余 Gen VIII 后进入 3DSRNGTool Profile Manager；3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
 
 - 当前范围：完整 PokeFinder 4.3.2，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能
-- 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs，以及 3DSRNGTool Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG
-- 当前工作：实现 3DSRNGTool Profile Manager
+- 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event，以及 3DSRNGTool Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG
+- 当前工作：实现 Gen 8 Raids
 - 明确排除：仅 3DSRNGTool `NTR Helper`
 - 上游核验基线：PokeFinder 4.3.2
 - 完整库存与状态：[docs/module-inventory.md](docs/module-inventory.md)
-- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [GameCube Seed Finder](docs/modules/gen3ngcseed.md) / [Gen 3 GameCube RNG](docs/modules/gen3gamecube.md) / [Gen 3 PID to IVs](docs/modules/gen3pidtoiv.md) / [Gen 3 PokeSpot](docs/modules/gen3pokespot.md) / [Gen 3 Jirachi Advancer](docs/modules/gen3jirachiadvancer.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 ID](docs/modules/gen4id.md) / [Gen 4 Seed to Time](docs/modules/gen4seedtotime.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Wild](docs/modules/gen4wild.md) / [Gen 4 Egg](docs/modules/gen4egg.md) / [Gen 4 Advance Finder](docs/modules/gen4advance.md) / [Gen 4 Wondercard IVs](docs/modules/gen4event.md) / [Gen 4 Chained Shiny to SID](docs/modules/gen4chainedsid.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Gen 5 Profiles](docs/modules/gen5profiles.md) / [Gen 5 TID/SID](docs/modules/gen5id.md) / [Gen 5 Adjacent Seeds](docs/modules/gen5adjacentseeds.md) / [Gen 5 IV Cache Finder](docs/modules/gen5ivcache.md) / [Gen 5 SHA1 Cache Finder](docs/modules/gen5sha1cache.md) / [Gen 5 Dream Radar](docs/modules/gen5dreamradar.md) / [Gen 5 Static](docs/modules/gen5static.md) / [Gen 5 Wild](docs/modules/gen5wild.md) / [Gen 5 Hidden Grotto](docs/modules/gen5hiddengrotto.md) / [Gen 5 Eggs](docs/modules/gen5egg.md) / [Gen 5 Event](docs/modules/gen5event.md) / [Gen 7 Stationary](docs/modules/gen7stationary.md) / [Gen 7 Wild](docs/modules/gen7wild.md) / [Gen 7 SOS](docs/modules/gen7sos.md) / [Gen 7 Egg](docs/modules/gen7egg.md) / [Gen 7 Battle Tree](docs/modules/gen7battletree.md) / [Gen 7 Event](docs/modules/gen7event.md) / [Gen 7 ID](docs/modules/gen7id.md) / [Gen 7 Main RNG Tool](docs/modules/gen7main.md) / [Gen 7 Egg Seed Finder](docs/modules/gen7eggseedfinder.md) / [Gen 7 Festival Plaza](docs/modules/gen7festivalplaza.md) / [Gen 8 Profiles](docs/modules/gen8profiles.md) / [Gen 8 ID](docs/modules/gen8id.md) / [Gen 8 Eggs](docs/modules/gen8egg.md) / [Researcher](docs/modules/researcher.md) / [宝可病毒查询](docs/modules/pokerusfinder.md) / [Encounter Lookup](docs/modules/encounterlookup.md)
+- 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [GameCube Seed Finder](docs/modules/gen3ngcseed.md) / [Gen 3 GameCube RNG](docs/modules/gen3gamecube.md) / [Gen 3 PID to IVs](docs/modules/gen3pidtoiv.md) / [Gen 3 PokeSpot](docs/modules/gen3pokespot.md) / [Gen 3 Jirachi Advancer](docs/modules/gen3jirachiadvancer.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 ID](docs/modules/gen4id.md) / [Gen 4 Seed to Time](docs/modules/gen4seedtotime.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Wild](docs/modules/gen4wild.md) / [Gen 4 Egg](docs/modules/gen4egg.md) / [Gen 4 Advance Finder](docs/modules/gen4advance.md) / [Gen 4 Wondercard IVs](docs/modules/gen4event.md) / [Gen 4 Chained Shiny to SID](docs/modules/gen4chainedsid.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Gen 5 Profiles](docs/modules/gen5profiles.md) / [Gen 5 TID/SID](docs/modules/gen5id.md) / [Gen 5 Adjacent Seeds](docs/modules/gen5adjacentseeds.md) / [Gen 5 IV Cache Finder](docs/modules/gen5ivcache.md) / [Gen 5 SHA1 Cache Finder](docs/modules/gen5sha1cache.md) / [Gen 5 Dream Radar](docs/modules/gen5dreamradar.md) / [Gen 5 Static](docs/modules/gen5static.md) / [Gen 5 Wild](docs/modules/gen5wild.md) / [Gen 5 Hidden Grotto](docs/modules/gen5hiddengrotto.md) / [Gen 5 Eggs](docs/modules/gen5egg.md) / [Gen 5 Event](docs/modules/gen5event.md) / [Gen 7 Stationary](docs/modules/gen7stationary.md) / [Gen 7 Wild](docs/modules/gen7wild.md) / [Gen 7 SOS](docs/modules/gen7sos.md) / [Gen 7 Egg](docs/modules/gen7egg.md) / [Gen 7 Battle Tree](docs/modules/gen7battletree.md) / [Gen 7 Event](docs/modules/gen7event.md) / [Gen 7 ID](docs/modules/gen7id.md) / [Gen 7 Main RNG Tool](docs/modules/gen7main.md) / [Gen 7 Egg Seed Finder](docs/modules/gen7eggseedfinder.md) / [Gen 7 Festival Plaza](docs/modules/gen7festivalplaza.md) / [Gen 8 Profiles](docs/modules/gen8profiles.md) / [Gen 8 ID](docs/modules/gen8id.md) / [Gen 8 Eggs](docs/modules/gen8egg.md) / [Gen 8 Event](docs/modules/gen8event.md) / [Researcher](docs/modules/researcher.md) / [宝可病毒查询](docs/modules/pokerusfinder.md) / [Encounter Lookup](docs/modules/encounterlookup.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
 - 第七世代来源记录：[3DSRNGTool](third_party/3dsrngtool/UPSTREAM.md) / [needle-searcher](third_party/needle-searcher/UPSTREAM.md) / [Gen 7 Stationary](docs/modules/gen7stationary.md) / [Gen 7 Wild](docs/modules/gen7wild.md) / [Gen 7 SOS](docs/modules/gen7sos.md) / [Gen 7 Egg](docs/modules/gen7egg.md) / [Gen 7 Battle Tree](docs/modules/gen7battletree.md) / [Gen 7 Event](docs/modules/gen7event.md) / [Gen 7 ID](docs/modules/gen7id.md) / [Gen 7 Main](docs/modules/gen7main.md) / [Gen 7 Egg Seed Finder](docs/modules/gen7eggseedfinder.md) / [Gen 7 Festival Plaza](docs/modules/gen7festivalplaza.md)
 - 宝可病毒来源记录：[Pokerus Finder](third_party/pokerusfinder/UPSTREAM.md)
@@ -180,6 +180,13 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - 双亲 IV / 特性 / 性别 / 道具 / 性格、红线、异国孵化、闪耀护符、圆形护符和特殊蛋种分支
 - 独立 `gen8egg` Wasm API v1、Dedicated Worker Pool、250,000,000 次任务上限、100,000 行结果上限、进度、取消、虚拟结果表与 CSV
 - 输入边界、53/13-word 契约和上游夹具见 [Gen 8 Eggs](docs/modules/gen8egg.md)
+
+当前 Gen VIII Event 工作区包含：
+
+- Brilliant Diamond / Shining Pearl 档案、两段 64 位 Seed、初始帧、最大帧数、Offset 与本地 `.wb8` 导入
+- 配信物种、等级、PID Type、特性、性别、性格锁定、TID、SID、EC、PID、保底 IV、蛋标记和完整状态筛选
+- 独立 `gen8event` Wasm API v1、Dedicated Worker Pool、250,000,000 次任务上限、100,000 行结果上限、进度、取消、虚拟结果表、排序与 CSV
+- 输入边界、45/11-word 契约、上游缺陷修正和固定夹具见 [Gen 8 Event](docs/modules/gen8event.md)
 
 当前 Gen IV Wild 工作区包含：
 
@@ -543,13 +550,13 @@ npm run build:web
 - **阶段 8A：`gen8profiles` Profile Manager** - 第八世代 Sword/Shield/BDSP 档案 CRUD、拖动排序、独立 IndexedDB/localStorage、JSON 备份、响应式表格和上游输入文档（当前工作区，待工程检查、部署回归与最终验收）。
 - **阶段 8B：`gen8id` Gen 8 TID/SID** - 第八世代 Xorshift ID Generator、六种筛选、独立 Wasm/Worker、虚拟结果表和上游固定夹具（当前工作区，待工程检查、Actions、部署回归与最终验收）。
 - **阶段 8C：`gen8egg` Gen 8 Eggs** - BDSP 双亲、遗传、异国孵化、护符、独立 Wasm/Worker 与上游夹具（已实现，待工程检查、Actions、部署回归与最终验收）。
-- **阶段 8D：`gen8event` Gen 8 Event** - 第八世代配信 Generator/Searcher。
+- **阶段 8D：`gen8event` Gen 8 Event** - 第八世代 BDSP 配信 Generator、`.wb8` 导入、完整筛选、独立 Wasm/Worker 与上游夹具（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8E：`gen8raids` Gen 8 Raids** - Sword/Shield 巢穴与事件团体战。
 - **阶段 8F：`gen8static` Gen 8 Static** - Sword/Shield 与 BDSP 定点 Generator/Searcher。
 - **阶段 8G：`gen8underground` Underground** - BDSP 地下大洞窟遇敌。
 - **阶段 8H：`gen8wild` Gen 8 Wild** - Sword/Shield 与 BDSP 野生 Generator/Searcher。
 - **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具。
-- **阶段 9：3DSRNGTool** - Gen VII 主工作流已实现；下一模块为 Profile Manager，之后继续 Gen VI、其他公共工具与其余库存，仅 `NTR Helper` 不开发。
+- **阶段 9：3DSRNGTool** - Gen VII 主工作流已实现；完成剩余 Gen VIII 后进入 Profile Manager，之后继续 Gen VI、其他公共工具与其余库存，仅 `NTR Helper` 不开发。
 - **阶段 10：发布加固与验收** - 完整工程检查、Actions 部署、PWA 离线、可访问性、浏览器矩阵、性能预算、许可证和生产页面回归。
 
 ## 许可证、署名与源码分发

@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V 与 3DSRNGTool Gen VII 已实现；下一模块为 3DSRNGTool Profile Manager
+> - 状态：PokeFinder Gen III、Gen IV、Gen V、Gen VIII Profiles / IDs / Eggs / Event 与 3DSRNGTool Gen VII 已实现；下一模块为 Gen 8 Raids
 > - 更新日期：2026-08-17
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V 与全局工具已进入 Git 基线；Gen VIII Profiles、IDs 与 Eggs 已实现。当前会话已完成第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG，下一模块为 3DSRNGTool Profile Manager。
+当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V 与全局工具已进入 Git 基线；Gen VIII Profiles、IDs、Eggs 与 Event 已实现，下一模块为 Raids。当前会话已完成第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG；完成剩余 Gen VIII 后进入 3DSRNGTool Profile Manager。
 
 3DSRNGTool `NTR Helper` 已明确排除。它依赖桌面程序对 3DS 调试端进行原始 TCP/NTR 通信，普通静态浏览器无法在不增加本地桥接、扩展或后端的情况下复刻。完整模块库存和当前状态见 [`docs/module-inventory.md`](module-inventory.md)。
 
@@ -731,11 +731,21 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、设施池、缺陷修正、13/10+N-word ABI、固定夹具和上游文件见 [Gen 7 Festival Plaza](modules/gen7festivalplaza.md)。
 
+## 8.40 当前功能需求：`gen8event`
+
+- **FR-G8EVENT-01** 提供 PokeFinder `Gen 8 Event` Generator，仅接受 Brilliant Diamond / Shining Pearl Profile。Seed 0/1 使用最多 16 位的 64 位十六进制且空值读取为 `0`；两项同时为 `0` 时拒绝。Initial Advances、Max Advances、Offset 使用十进制 `uint32_t`，默认分别为 `0`、`100000`、`0`，三项之和不得溢出。
+- **FR-G8EVENT-02** 支持物种 `1..493`、等级 `1..100`、五种 PID Type、五种配信特性、三种固定性别、性格锁定、TID/SID、EC、PID、`0..3` 个保底 31 IV 和蛋标记；严格解析 732 字节 `.wb8`，并以八位十六进制回填 EC/PID 和回填 Level。
+- **FR-G8EVENT-03** 支持 Any / Star / Square / Star/Square 异色筛选、Any / Male / Female 性别筛选、Any / `0` / `1` / `H` 特性筛选，以及性格、觉醒属性、身高、体重和六项 IV 闭区间筛选。PokeFinder `EventGenerator8` 的 PID Type 分支缺陷按界面语义修正，不复制未初始化 PID 行为。
+- **FR-G8EVENT-04** 外层 Xorshift、EC/PID、保底 IV、特性、性别、性格、身高、体重、能力值和筛选只在独立 `gen8event` Wasm API v1 中执行。请求固定为 45 个 `uint32_t`，结果固定为 11 个 `uint32_t`；单次任务最多评估 250,000,000 个状态并返回 100,000 行，Worker Pool 最多使用 8 个独立单线程实例。
+- **FR-G8EVENT-05** 结果保留 PokeFinder `StaticModel8` 的 Advances、EC、PID、Shiny、Nature、Ability、HP、Atk、Def、SpA、SpD、Spe、Gender、Height、Weight、Characteristic 16 列；六项能力列可切换 IV 或能力值，支持虚拟滚动、排序、CSV、进度、取消、清空、错误、空结果和结果上限状态。桌面优先将档案、RNG 信息、设置/筛选和结果表收纳在首屏，`1280px` 以下重排为单栏。
+
+完整输入限制、`.wb8` 字段、PID Type 缺陷修正、45/11-word ABI、固定夹具和上游文件见 [Gen 8 Event](modules/gen8event.md)。
+
 ## 9. 后续实施顺序
 
-1. 第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现。
-2. 下一模块实现 3DSRNGTool Profile Manager，使用 IndexedDB 主存储与 localStorage 镜像，并由上游档案字段决定 schema。
-3. 继续按模块库存完成 Gen VIII、Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
+1. PokeFinder Gen VIII Profiles、IDs、Eggs 与 Event 已实现，下一模块实现 Raids。
+2. 按 Raids、Static、Underground、Wild、Den Map 顺序完成其余 Gen VIII 模块。
+3. Gen VIII 完成后实现 3DSRNGTool Profile Manager，再继续 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
 4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
 5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
 
@@ -854,7 +864,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 14. 阶段划分
 
-当前按完整模块库存推进。Gen III、Gen IV、Gen V 与既有全局工具保持已实现状态；第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现，下一模块为 3DSRNGTool Profile Manager。
+当前按完整模块库存推进。Gen III、Gen IV、Gen V 与既有全局工具保持已实现状态；Gen VIII Profiles、IDs、Eggs 与 Event 已实现，下一模块为 Raids。第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现；完成剩余 Gen VIII 后进入 3DSRNGTool Profile Manager。
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。
@@ -879,8 +889,10 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **阶段 7E：`gen4advance` Advance Finder** - Calls/Chatot/Needles 连续观测匹配、独立 Wasm/Worker、Jump to Advance 和算法文档（当前工作区，待生产 Wasm、Actions、部署回归与最终验收）。
 - **阶段 8A：`gen8profiles` Profile Manager** - 第八世代 Sword/Shield/BDSP 档案 CRUD、独立 IndexedDB/localStorage、JSON 备份、响应式表格和上游输入文档（当前工作区，待部署回归与最终验收）。
 - **阶段 8B：`gen8id` Gen 8 TID/SID** - 第八世代 Xorshift ID Generator、六种筛选、独立 Wasm/Worker、虚拟结果表和四组上游固定夹具（当前工作区，待工程检查、Actions、部署回归与最终验收）。
-- **阶段 8C-8I：PokeFinder Gen VIII** - Eggs、Event、Raids、Static、Underground、Wild 与 Den Map（按顺序实现）。
-- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现；下一模块为 Profile Manager，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。
+- **阶段 8C：`gen8egg` Gen 8 Eggs** - BDSP 双亲、遗传、异国孵化、护符、独立 Wasm/Worker 与上游夹具（已实现，待 Actions、部署回归与最终验收）。
+- **阶段 8D：`gen8event` Gen 8 Event** - BDSP 配信 Generator、`.wb8` 导入、完整筛选、独立 Wasm/Worker 与上游夹具（已实现，待 Actions、部署回归与最终验收）。
+- **阶段 8E-8I：PokeFinder Gen VIII** - Raids、Static、Underground、Wild 与 Den Map（按顺序实现）。
+- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现；完成剩余 Gen VIII 后进入 Profile Manager，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。
 - **阶段 10：发布加固** - 完整工程检查、生产页面回归、浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

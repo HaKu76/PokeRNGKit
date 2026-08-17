@@ -11,7 +11,6 @@ import {
 import type { Gen8EggWorkerRequest, Gen8EggWorkerResponse } from "./messages";
 
 interface Gen8EggEmscriptenModule {
-  HEAPU8: Uint8Array;
   HEAPU32: Uint32Array;
   _malloc(bytes: number): number;
   _free(pointer: number): void;
@@ -86,7 +85,7 @@ function generate(message: Extract<Gen8EggWorkerRequest, { type: "task" }>) {
   try {
     if ((requestPointer & 3) !== 0)
       throw new Error("Gen 8 Egg Wasm request pointer is not aligned.");
-    if (requestPointer + request.byteLength > wasm.HEAPU8.byteLength)
+    if (requestPointer + request.byteLength > wasm.HEAPU32.byteLength)
       throw new RangeError("Gen 8 Egg Wasm request exceeds memory.");
     wasm.HEAPU32.set(request, requestPointer >>> 2);
     const resultCount = wasm._gen8egg_generate(requestPointer);
@@ -107,7 +106,7 @@ function generate(message: Extract<Gen8EggWorkerRequest, { type: "task" }>) {
       (resultCount !== 0 && resultPointer === 0) ||
       (resultPointer & 3) !== 0 ||
       resultPointer < 0 ||
-      resultPointer + byteLength > wasm.HEAPU8.byteLength
+      resultPointer + byteLength > wasm.HEAPU32.byteLength
     ) {
       throw new RangeError("Gen 8 Egg Wasm result pointer is invalid.");
     }

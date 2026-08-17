@@ -4,22 +4,22 @@
 
 ## PokeFinder 4.3.2
 
-| 世代或范围 | 已实现模块                                                                                                                                                 | 待实现模块                                       |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| Gen III    | IDs、Eggs、GameCube、Static、Wild、Profile Manager、GameCube Seed Finder、IVs to PID、PID to IVs、Jirachi Advancer、PokeSpot、Seed to Time、Spinda Painter | 无                                               |
-| Gen IV     | Eggs、Event、IDs、Static、Wild、Profile Manager、IVs to PID、Seed to Time、Search Coin Flips、Search Calls、Roamer Map、Chained Shiny to SID               | 无                                               |
-| Gen V      | Dream Radar、Eggs、Event、Hidden Grotto、IDs、Static、Wild、Profile Manager / Calibrator、Adjacent Seeds、IV Cache Finder、SHA1 Cache Finder               | 无                                               |
-| Gen VIII   | Profile Manager、IDs、Eggs                                                                                                                                 | Event、Raids、Static、Underground、Wild、Den Map |
-| 全局工具   | Encounter Lookup、IV Calculator、Researcher、Settings                                                                                                      | 无                                               |
+| 世代或范围 | 已实现模块                                                                                                                                                 | 待实现模块                                |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Gen III    | IDs、Eggs、GameCube、Static、Wild、Profile Manager、GameCube Seed Finder、IVs to PID、PID to IVs、Jirachi Advancer、PokeSpot、Seed to Time、Spinda Painter | 无                                        |
+| Gen IV     | Eggs、Event、IDs、Static、Wild、Profile Manager、IVs to PID、Seed to Time、Search Coin Flips、Search Calls、Roamer Map、Chained Shiny to SID               | 无                                        |
+| Gen V      | Dream Radar、Eggs、Event、Hidden Grotto、IDs、Static、Wild、Profile Manager / Calibrator、Adjacent Seeds、IV Cache Finder、SHA1 Cache Finder               | 无                                        |
+| Gen VIII   | Profile Manager、IDs、Eggs、Event                                                                                                                          | Raids、Static、Underground、Wild、Den Map |
+| 全局工具   | Encounter Lookup、IV Calculator、Researcher、Settings                                                                                                      | 无                                        |
 
 PokeFinder 核对入口：
 
-- `C:\Users\Hakuhiro\Desktop\PokeFinder-master\Form\MainWindow.cpp`
-- `C:\Users\Hakuhiro\Desktop\PokeFinder-master\Form\MainWindow.ui`
-- `C:\Users\Hakuhiro\Desktop\PokeFinder-master\Form\Gen3`
-- `C:\Users\Hakuhiro\Desktop\PokeFinder-master\Form\Gen4`
-- `C:\Users\Hakuhiro\Desktop\PokeFinder-master\Form\Gen5`
-- `C:\Users\Hakuhiro\Desktop\PokeFinder-master\Form\Gen8`
+- `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master\Form\MainWindow.cpp`
+- `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master\Form\MainWindow.ui`
+- `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master\Form\Gen3`
+- `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master\Form\Gen4`
+- `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master\Form\Gen5`
+- `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master\Form\Gen8`
 
 仓库另有 PokeFinder 主菜单之外的 `Initial Seed Finder`、Advance Finder 与宝可病毒查询；它们保留为已实现扩展，不替代上表中的上游模块。
 
@@ -79,8 +79,8 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 ## 实施顺序
 
-1. 第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现。
-2. 下一模块为 3DSRNGTool Profile Manager，字段与存储 schema 以其上游 `Profiles` / `ProfileManager` 为准，不复用 PokeFinder 档案结构。
-3. 继续核对其余模块库存，不提前合并不同上游工作流。
-4. PokeFinder Gen 8 剩余模块、3DSRNGTool Gen VI 与其他公共工具继续保留在完整产品范围内，`NTR Helper` 除外。
+1. PokeFinder Gen VIII Profiles、IDs、Eggs 与 Event 已实现，下一模块为 Raids。
+2. 按 Raids、Static、Underground、Wild、Den Map 顺序完成其余 PokeFinder Gen VIII 模块。
+3. Gen VIII 完成后进入 3DSRNGTool Profile Manager；字段与存储 schema 以其上游 `Profiles` / `ProfileManager` 为准，不复用 PokeFinder 档案结构。
+4. 继续核对其余模块库存，不提前合并不同上游工作流；`NTR Helper` 除外。
 5. 全部模块完成后执行全仓验证、Actions 部署和生产页面回归。

@@ -1,4 +1,5 @@
 src/features/wild/gen3Data.ts
 src/features/encounterlookup/data.ts
 wasm/modules/gen8egg/bridge/personal_data.inc
+wasm/modules/gen8event/bridge/personal_data.inc
 .tools/

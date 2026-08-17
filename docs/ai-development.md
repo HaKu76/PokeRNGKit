@@ -22,17 +22,17 @@
 
 ## 2. 事实来源
 
-| 问题                 | 权威来源                                                    |
-| -------------------- | ----------------------------------------------------------- |
-| 产品范围和验收       | `docs/requirements.md`                                      |
-| 当前进度和下一步     | `docs/progress.md`                                          |
-| Web 架构、版本和协议 | `docs/tech-stack.md`、`package.json`、lockfile              |
-| RNG 算法             | `C:\Users\Hakuhiro\Desktop\PokeFinder-master\Core` 只读源码 |
-| Qt 业务流程          | 上游对应世代的 `Form` 实现与 `.ui` 文件                     |
-| 输入进制、位宽和空值 | 上游 `Form/Controls/TextBox.cpp` 与模块 Form 代码           |
-| 简体中文控件名       | 上游 `Form/i18n/PokeFinder_zh.ts`                           |
-| 英文、日文控件名     | 上游对应源字符串与 `PokeFinder_ja.ts`                       |
-| vendored 文件完整性  | `third_party/pokefinder/UPSTREAM.md`                        |
+| 问题                 | 权威来源                                                            |
+| -------------------- | ------------------------------------------------------------------- |
+| 产品范围和验收       | `docs/requirements.md`                                              |
+| 当前进度和下一步     | `docs/progress.md`                                                  |
+| Web 架构、版本和协议 | `docs/tech-stack.md`、`package.json`、lockfile                      |
+| RNG 算法             | `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master\Core` 只读源码 |
+| Qt 业务流程          | 上游对应世代的 `Form` 实现与 `.ui` 文件                             |
+| 输入进制、位宽和空值 | 上游 `Form/Controls/TextBox.cpp` 与模块 Form 代码                   |
+| 简体中文控件名       | 上游 `Form/i18n/PokeFinder_zh.ts`                                   |
+| 英文、日文控件名     | 上游对应源字符串与 `PokeFinder_ja.ts`                               |
+| vendored 文件完整性  | `third_party/pokefinder/UPSTREAM.md`                                |
 
 控件有上游简体中文翻译时必须逐字复用；没有翻译时保留英文源字符串。不要根据语义自行翻译、润色或统一术语。
 

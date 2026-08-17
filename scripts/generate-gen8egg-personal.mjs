@@ -6,7 +6,7 @@ import process from "node:process";
 const projectRoot = process.cwd();
 const source =
   process.env.POKEFINDER_ROOT ??
-  "C:\\Users\\Hakuhiro\\Desktop\\PokeFinder-master";
+  "C:\\Users\\Hakuhiro\\Desktop\\project\\PokeFinder-master";
 const input = path.join(
   source,
   "Core",

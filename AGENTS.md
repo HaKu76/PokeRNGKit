@@ -10,7 +10,7 @@
 
 ## Upstream And Naming
 
-- Treat `C:\Users\Hakuhiro\Desktop\PokeFinder-master` as a read-only PokeFinder 4.3.2 reference.
+- Treat `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master` as a read-only PokeFinder 4.3.2 reference.
 - Treat `C:\Users\Hakuhiro\Documents\Github\3DSRNGTool_CHN` revision `359bdd7a9ff7c145fec12302cf43da932923fa62` as the read-only 3DSRNGTool reference.
 - Name product modules after their corresponding PokeFinder modules.
 - For every control label, use the exact Simplified Chinese translation from `Form/i18n/PokeFinder_zh.ts` when it exists.

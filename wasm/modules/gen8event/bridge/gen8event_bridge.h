@@ -1,0 +1,84 @@
+/*
+ * PokeRNGKit Gen VIII Event WebAssembly bridge
+ * Copyright (C) 2026 Hakuhiro
+ *
+ * Algorithm adapted from PokeFinder 4.3.2 EventGenerator8, WB8,
+ * StateFilter, State, Xorshift and RNGList by Admiral_Fish, bumba,
+ * and EzPzStreamz (GPL-3.0-or-later).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+#ifndef POKERNGKIT_GEN8EVENT_BRIDGE_H
+#define POKERNGKIT_GEN8EVENT_BRIDGE_H
+
+#include <cstdint>
+
+struct Gen8EventPackedRequest
+{
+    std::uint32_t seed0Low;
+    std::uint32_t seed0High;
+    std::uint32_t seed1Low;
+    std::uint32_t seed1High;
+    std::uint32_t initialAdvances;
+    std::uint32_t offset;
+    std::uint32_t chunkStart;
+    std::uint32_t chunkCount;
+    std::uint32_t profileTid;
+    std::uint32_t profileSid;
+    std::uint32_t eventTid;
+    std::uint32_t eventSid;
+    std::uint32_t ec;
+    std::uint32_t pid;
+    std::uint32_t species;
+    std::uint32_t gender;
+    std::uint32_t egg;
+    std::uint32_t nature;
+    std::uint32_t ability;
+    std::uint32_t pidType;
+    std::uint32_t ivCount;
+    std::uint32_t level;
+    std::uint32_t filtersDisabled;
+    std::uint32_t shinyFilter;
+    std::uint32_t genderFilter;
+    std::uint32_t abilityFilter;
+    std::uint32_t natureMask;
+    std::uint32_t hiddenPowerMask;
+    std::uint32_t heightMin;
+    std::uint32_t heightMax;
+    std::uint32_t weightMin;
+    std::uint32_t weightMax;
+    std::uint32_t ivMin[6];
+    std::uint32_t ivMax[6];
+    std::uint32_t resultLimit;
+};
+
+struct Gen8EventPackedResult
+{
+    std::uint32_t advances;
+    std::uint32_t ec;
+    std::uint32_t pid;
+    std::uint32_t metadata;
+    std::uint32_t measures;
+    std::uint32_t ivs0;
+    std::uint32_t ivs1;
+    std::uint32_t abilityIndex;
+    std::uint32_t stats01;
+    std::uint32_t stats23;
+    std::uint32_t stats45;
+};
+
+extern "C"
+{
+    std::uint32_t gen8event_api_version();
+    std::uint32_t gen8event_generate(const Gen8EventPackedRequest *request);
+    std::uintptr_t gen8event_result_ptr();
+    std::uint32_t gen8event_result_count();
+    std::uint32_t gen8event_processed_count();
+    std::uint32_t gen8event_limit_reached();
+    std::uint32_t gen8event_last_error();
+}
+
+#endif

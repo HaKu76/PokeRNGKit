@@ -5,7 +5,15 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: ["dist", "coverage", "node_modules", ".tools", "public/wasm"],
+    ignores: [
+      "dist",
+      "coverage",
+      "node_modules",
+      ".tools",
+      ".tmp",
+      "tmp",
+      "public/wasm",
+    ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,

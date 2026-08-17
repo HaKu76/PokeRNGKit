@@ -2,10 +2,25 @@
 
 > - 最近更新：2026-08-17
 > - 当前分支：`main`
-> - Git 功能基线：`3089f9d feat: 实现第七世代圆庆广场乱数`
-> - 当前阶段：Gen VII Festival Plaza Facility RNG 已实现，下一模块为 3DSRNGTool Profile Manager
-> - 工作区状态：Festival Plaza 实现、模块文档、共享接入和本条进度记录已提交并推送
-> - 验收状态：Festival Plaza 3 个 TypeScript 测试文件共 6 项测试、全仓 117 个 Vitest 文件共 437 项测试、9/9 Gen VII 原生夹具、6 个受影响 Gen VII Wasm、生产 Web/PWA 构建和外部 Chrome 本地 UI 检查已通过；生产页面算法回归未运行
+> - Git 功能基线：`825109d docs: 更新第七世代开发进度`
+> - 当前阶段：Gen VIII Event 已实现，下一模块为 Gen 8 Raids
+> - 工作区状态：`gen8event` 源码、模块文档、导航、三语文案、Wasm 清单与工程验证记录尚未提交
+> - 验证状态：Gen 8 Event / Egg 定向测试、Event 原生夹具与 Emscripten 产物、全仓验证和外部 Chrome 本地真实 Wasm 回归已通过；生产页面算法回归未运行
+
+## 2026-08-17 第八世代配信乱数
+
+- 新增：增加 `gen8event` C++/Wasm API v1、45-word 请求、11-word 结果、BDSP 个人数据、Dedicated Worker Pool、领域校验、UI Preview 与三层 TypeScript 测试。
+- 算法：按 PokeFinder 4.3.2 的 Xorshift、`RNGList`、Event Generator、StateFilter 与 StaticModel8 实现 EC、PID、保底 IV、特性、固定性别、性格、身高、体重、能力值和筛选；蛋配信使用当前 BDSP Profile TSV。
+- 修复：按 Event8 界面语义补全 Nonshiny、Random、Star、Square、Static 五种 PID Type，拒绝 `.wb8` 越界 PID Type，并以八位十六进制回填 EC/PID 和回填 Level；异色筛选只保留上游实际存在的 Any、Star、Square、Star/Square。
+- 修复：Gen 8 Event 与 Gen 8 Egg Worker 的堆边界检查改用实际导出的 `HEAPU32.byteLength`，不再访问未导出的 `HEAPU8`；Wasm 导出面和算法不变。
+- 界面：增加 BDSP Profile 与 Manager 入口、`.wb8` 本地导入、物种自动完成、设置/筛选标签、16 列虚拟结果表、IV/能力值切换、排序、CSV、清空、进度和取消；`1280px` 以下重排为单栏。
+- 文档：增加 `docs/modules/gen8event.md`，同步 README、库存、需求、技术方案与 PokeFinder 来源记录；上游路径统一为 `C:\Users\Hakuhiro\Desktop\project\PokeFinder-master`，下一模块改为 Gen 8 Raids。
+- 已通过：Node.js `24.19.0`、npm `12.0.2`；`npm test -- src/features/gen8event src/features/gen8egg` 的 6 个测试文件共 25 项测试；`gen8event_native_parity` 原生夹具 1/1；Emscripten `6.0.6` 重建 `gen8event.mjs/.wasm`。
+- 已通过：完整 `npm run verify` 的全仓 Prettier、ESLint、TypeScript、120 个 Vitest 文件共 449 项测试、2150 个模块生产 Web/PWA 构建与 156 项预缓存；ESLint 为 0 error，保留 6 条既有 TanStack Virtual warning，Vitest 保留一次不影响退出码的 fork 终止超时提示；最后一次 `git diff --check` 通过。
+- 重跑：首次 `npm run wasm:build` 因当前 PowerShell 未激活 Emscripten 而停止；加载 `C:\\Users\\Hakuhiro\\emsdk\\emsdk_env.ps1` 后定向构建通过，未重新安装工具链。
+- 浏览器：外部 Chrome 在 `http://127.0.0.1:5173/` 使用真实 Worker/Wasm 生成 Manaphy 固定 10 帧；首行 `220345D0 / 8FD266FA / 15-30-31-19-31-31`，末行 `E8D55A32 / 6541C199 / 31-30-0-21-31-31`，控制台无 warning 或 error。
+- 未验收：本地测试、原生/Wasm 构建和 UI 检查只能作为工程证据；GitHub Actions 部署后仍需由项目所有者提供准确生产 URL 并授权算法回归。
+- 下一步：提交并推送 `feat: 实现第八世代配信乱数`，再开始 Gen 8 Raids；不提前进入 3DSRNGTool Profile Manager。
 
 ## 2026-08-17 第七世代 Festival Plaza Facility RNG
 

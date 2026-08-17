@@ -49,7 +49,7 @@
 ```powershell
 python scripts\generate_encounter_lookup_data.py `
   --generated .tmp-encounter-tables `
-  --i18n C:\Users\Hakuhiro\Desktop\PokeFinder-master\Core\Resources\i18n `
+  --i18n C:\Users\Hakuhiro\Desktop\project\PokeFinder-master\Core\Resources\i18n `
   --output src\features\encounterlookup\data.ts
 ```
 

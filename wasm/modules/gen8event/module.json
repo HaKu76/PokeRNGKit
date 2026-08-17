@@ -1,0 +1,13 @@
+{
+  "id": "gen8event",
+  "generation": 8,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen8event",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen8event.mjs",
+    "wasm": "gen8event.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen VIII Event8/EventGenerator8"
+}
