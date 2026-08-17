@@ -1,0 +1,13 @@
+{
+  "id": "gen8static",
+  "generation": 8,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen8static",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen8static.mjs",
+    "wasm": "gen8static.wasm"
+  },
+  "source": "PokeFinder 4.3.2 Gen VIII StaticGenerator8"
+}

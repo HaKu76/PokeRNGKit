@@ -1,0 +1,529 @@
+.gen8static-panel {
+  display: grid;
+  min-height: 0;
+  height: 100%;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: 10px;
+  color: var(--text);
+}
+
+.gen8static-profile-bar,
+.gen8static-control-grid > fieldset,
+.gen8static-results {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--panel-shadow);
+}
+
+.gen8static-profile-bar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 0.8fr) 40px minmax(
+      170px,
+      0.8fr
+    );
+  gap: 10px;
+  align-items: end;
+  padding: 12px;
+}
+
+.gen8static-eyebrow {
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.gen8static-profile-bar h1 {
+  margin: 2px 0 0;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.gen8static-profile-bar label,
+.gen8static-panel label {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 0;
+}
+
+.gen8static-panel input:not([type="checkbox"]),
+.gen8static-panel select,
+.gen8static-panel output {
+  min-width: 0;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 38px;
+}
+
+.gen8static-panel output {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen8static-icon-button,
+.gen8static-panel button.icon {
+  display: inline-grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--control-bg);
+  color: var(--text);
+}
+
+.gen8static-profile-bar dl {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+
+.gen8static-profile-bar dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen8static-profile-bar dd {
+  margin: 2px 0 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.gen8static-control-grid {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(300px, 0.95fr) minmax(
+      560px,
+      1.8fr
+    );
+  gap: 10px;
+}
+
+.gen8static-control-grid fieldset {
+  min-width: 0;
+  padding: 10px;
+  margin: 0;
+}
+
+.gen8static-control-grid legend {
+  padding: 0 5px;
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.gen8static-rng-fieldset {
+  display: grid;
+  align-content: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.gen8static-rng-fieldset .wide,
+.gen8static-actions {
+  grid-column: 1 / -1;
+}
+
+.gen8static-actions {
+  display: flex;
+  gap: 7px;
+  margin-top: 2px;
+}
+
+.gen8static-actions button {
+  flex: 1;
+}
+
+.gen8static-panel button {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.gen8static-panel button.primary,
+.gen8static-panel button.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.gen8static-panel button.primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.gen8static-settings-fieldset {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+}
+
+.gen8static-template-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.gen8static-filter-fieldset {
+  overflow: hidden;
+}
+
+.gen8static-check {
+  display: flex !important;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 6px;
+}
+
+.gen8static-disable-filter {
+  margin-bottom: 6px;
+}
+
+.gen8static-check input,
+.gen8static-natures input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--brand);
+}
+
+.gen8static-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.gen8static-nature-heading {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.gen8static-natures {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 3px 5px;
+  max-height: 70px;
+  overflow: auto;
+  padding: 5px 0;
+}
+
+.gen8static-natures label {
+  display: flex;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen8static-ranges {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.gen8static-ranges label,
+.gen8static-iv-ranges label {
+  display: grid;
+  grid-template-columns: minmax(42px, 0.7fr) repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 4px;
+}
+
+.gen8static-ranges input,
+.gen8static-iv-ranges input {
+  width: 100%;
+  padding: 0 4px !important;
+  text-align: center;
+}
+
+.gen8static-iv-ranges {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.gen8static-iv-ranges label {
+  grid-template-columns: 1fr;
+  gap: 2px;
+}
+
+.gen8static-iv-ranges label span {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.gen8static-alert {
+  border-bottom: 1px solid var(--danger);
+  padding: 8px 10px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.gen8static-alert.warning {
+  border-color: color-mix(in srgb, var(--amber) 36%, var(--line));
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.gen8static-results {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gen8static-results > header {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 4px 10px;
+}
+
+.gen8static-results > header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gen8static-status {
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen8static-result-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen8static-result-actions button.active {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.gen8static-progress-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) repeat(4, auto);
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+}
+
+.gen8static-progress-row progress {
+  width: 100%;
+  height: 5px;
+  accent-color: var(--brand);
+}
+
+.gen8static-progress-row span {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen8static-table {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background: var(--table-bg);
+}
+
+.gen8static-table-inner {
+  position: relative;
+  min-width: 1500px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen8static-table-header,
+.gen8static-table-row {
+  display: grid;
+  grid-template-columns:
+    88px 104px 104px 92px 112px 168px repeat(6, 64px) 92px 76px 76px
+    minmax(210px, 1fr);
+  width: 100%;
+  min-width: 1500px;
+}
+
+.gen8static-table-header {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 42px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.gen8static-table-header button,
+.gen8static-table-row span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  overflow: hidden;
+  border-right: 1px solid var(--line-soft);
+  padding: 0 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen8static-table-header button {
+  width: 100%;
+  min-height: 42px;
+  border-width: 0 1px 0 0;
+  border-radius: 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: left;
+}
+
+.gen8static-table-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 40px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--table-bg);
+}
+
+.gen8static-table-row:hover {
+  background: var(--teal-soft);
+}
+
+.gen8static-empty {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  left: 0;
+  display: flex;
+  min-height: 80px;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+}
+
+.gen8static-panel button:disabled,
+.gen8static-panel input:disabled,
+.gen8static-panel select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.gen8static-panel button:focus-visible,
+.gen8static-panel input:focus-visible,
+.gen8static-panel select:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1380px) {
+  .gen8static-panel {
+    height: auto;
+  }
+
+  .gen8static-control-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen8static-filter-fieldset {
+    grid-column: 1 / -1;
+  }
+
+  .gen8static-results {
+    min-height: 440px;
+  }
+}
+
+@media (max-width: 760px) {
+  .gen8static-profile-bar {
+    grid-template-columns: minmax(0, 1fr) 40px;
+  }
+
+  .gen8static-profile-bar > label,
+  .gen8static-profile-bar dl {
+    grid-column: 1 / -1;
+  }
+
+  .gen8static-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen8static-filter-fieldset {
+    grid-column: auto;
+  }
+
+  .gen8static-filter-grid,
+  .gen8static-ranges {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen8static-natures {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gen8static-iv-ranges {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gen8static-progress-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .gen8static-profile-bar h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .gen8static-panel input:not([type="checkbox"]),
+  .gen8static-panel select,
+  .gen8static-panel output,
+  .gen8static-panel button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gen8static-panel *,
+  .gen8static-panel *::before,
+  .gen8static-panel *::after {
+    scroll-behavior: auto !important;
+  }
+}

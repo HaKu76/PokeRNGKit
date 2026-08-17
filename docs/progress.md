@@ -2,10 +2,24 @@
 
 > - 最近更新：2026-08-17
 > - 当前分支：`main`
-> - Git 功能基线：`689da61 feat: 实现第八世代配信乱数`
-> - 当前阶段：Gen 8 Raids 已实现，下一模块为 Gen 8 Static
-> - 工作区状态：`gen8raids` 源码、生成数据、模块文档、导航、三语文案、Wasm 清单与工程验证记录尚未提交
-> - 验证状态：Gen 8 Raids 完整工程验证、原生夹具与 Emscripten 产物已通过；外部 Chrome 页面控制超时，生产页面算法回归未运行
+> - Git 功能基线：`843230c feat: 实现第八世代团体战乱数`
+> - 当前阶段：Gen 8 Static 已实现，下一模块为 Gen 8 Underground
+> - 工作区状态：`gen8static` 源码、生成数据、模块文档、导航、三语文案、Wasm 清单与工程验证记录尚未提交
+> - 验证状态：Gen 8 Static 完整应用层、49/49 原生夹具、默认 48 个 Emscripten 模块与外部 Chrome 本地 Worker/Wasm 检查已通过；生产页面算法回归未运行
+
+## 2026-08-17 第八世代定点乱数
+
+- 新增：实现 PokeFinder 4.3.2 `Gen 8 Static` Generator，仅支持 Brilliant Diamond / Shining Pearl；上游没有 Searcher，也没有 Sword / Shield Static，Web 端未自行扩展。
+- 数据：从 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 的 `Gen8/encounters.json` 与 PokeFinder `personal_bdsp.bin` 生成 9 类 47 个模板和 494 条紧凑 Personal 数据；生成脚本、文件大小与 SHA-256 已写入模块文档和上游记录。
+- 算法：增加 `gen8static` C++/Wasm API v1、41-word 请求、11-word 结果、Xorshift + 32 项 RNGList 普通定点、Xorshift EC + XoroshiroBDSP 游走、Fateful Square、Synchronize、Cute Charm、保底 IV、Ability、Gender、Nature、Height、Weight、Characteristic、Stats 和完整 StateFilter。
+- 界面：增加 BDSP Profile、9 类模板、None/Cute Charm/Synchronize 队首、双 64 位 Seed、推进、只读 Level/Ability/Shiny/IV Count、完整筛选、最多 8 个独立 Worker、取消、100000 行结果上限、16 列虚拟表、排序、CSV 和 IV/能力值切换；导航编号为 50，Researcher 顺延为 51。
+- 修复：将 `gen8static` 的 TypeScript/C++ 生成产物加入 `.prettierignore`，避免 Prettier 把 `personal_data.inc` 说明行合并为非法 C++；重新运行生成脚本后原生编译恢复。
+- 已通过：完整应用层验证的 Prettier、ESLint、TypeScript、124 个 Vitest 文件共 462 项测试、2163 个模块的 Web/PWA 构建与 164 项预缓存；ESLint 为 0 error，仅保留 6 条既有 TanStack Virtual warning。
+- 已通过：49/49 原生夹具；默认 48 个 Emscripten 模块构建完成，`gen8static.mjs` 为 7,490 bytes、`gen8static.wasm` 为 19,282 bytes。首次 `npm run verify:full` 在应用层与原生阶段通过后，因当前 PowerShell 未激活 Emscripten 而停止；加载 `C:\\Users\\Hakuhiro\\emsdk\\emsdk_env.ps1` 后补跑 `npm run wasm:build` 成功，无需安装或更换工具链。
+- 固定夹具：Seed `1234567887654321 / 8765432112345678`、TID `12345`、SID `54321` 的 Turtwig 首帧与第 9 帧、Omanyte、Heatran Cute Charm、Articuno Synchronize 与 Hidden Ability、Jirachi Never Shiny、Mesprit、Cresselia 逐字段匹配；1,000,000 帧跳表与朴素 Xorshift 推进一致，零 Seed、推进溢出、浏览器范围保护和结果上限错误分支通过。
+- 浏览器：外部 Chrome 在 `http://127.0.0.1:5173/` 使用真实 Worker/Wasm 生成 Turtwig 固定 10 帧，首帧 `220345D0 / 2203506A / 4-23-15-30-19-26`，第 9 帧 `E8D55A32 / 0FEB047B / 16-12-0-15-29-20`；390、768、1280 与 1920px 下无整页横向溢出，窄屏结果表保留独立横向滚动，首行与表头间距为 0，控制台无 warning 或 error。
+- 未验收：本地测试、原生/Wasm 构建和 UI 检查只能作为工程证据；GitHub Actions 部署后仍需由项目所有者提供准确生产 URL 并授权算法回归。
+- 下一步：完成最终格式检查，提交并推送 `feat: 实现第八世代定点乱数`；随后进入 Gen 8 Underground，不提前进入 Wild、Den Map 或 3DSRNGTool Profile Manager。
 
 ## 2026-08-17 第八世代团体战乱数
 
