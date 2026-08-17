@@ -9,6 +9,7 @@ export default tseslint.config(
       "dist",
       "coverage",
       "node_modules",
+      "wasm/build",
       ".tools",
       ".tmp",
       "tmp",

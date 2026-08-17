@@ -1,0 +1,11 @@
+{
+  "id": "gen8wild",
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "operations": ["generator"],
+  "target": "gen8wild",
+  "artifacts": {
+    "loader": "gen8wild.mjs",
+    "wasm": "gen8wild.wasm"
+  }
+}

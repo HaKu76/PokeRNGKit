@@ -1,7 +1,7 @@
 # PokeRNGKit 产品需求
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground 与 3DSRNGTool Gen VII 已实现；下一模块为 Gen 8 Wild
-> - 更新日期：2026-08-17
+> - 状态：PokeFinder Gen III、Gen IV、Gen V、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild 与 3DSRNGTool Gen VII 已实现；下一模块为 Gen 8 Den Map
+> - 更新日期：2026-08-18
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
 
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V 与全局工具已进入 Git 基线；Gen VIII Profiles、IDs、Eggs、Event、Raids、Static 与 Underground 已实现，下一模块为 Wild。当前会话已完成第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG；完成剩余 Gen VIII 后进入 3DSRNGTool Profile Manager。
+当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V 与全局工具已进入 Git 基线；Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground 与 Wild 已实现，下一模块为 Den Map。当前会话已完成第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG；完成剩余 Gen VIII 后进入 3DSRNGTool Profile Manager。
 
 3DSRNGTool `NTR Helper` 已明确排除。它依赖桌面程序对 3DS 调试端进行原始 TCP/NTR 通信，普通静态浏览器无法在不增加本地桥接、扩展或后端的情况下复刻。完整模块库存和当前状态见 [`docs/module-inventory.md`](module-inventory.md)。
 
@@ -772,10 +772,20 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、数据生成、54/12-word ABI、固定夹具和上游文件见 [Gen 8 Underground](modules/gen8underground.md)。
 
+## 8.44 当前功能需求：`gen8wild`
+
+- **FR-G8WILD-01** 提供 PokeFinder `Gen 8 Wild` Generator，仅接受 Brilliant Diamond / Shining Pearl Profile；不增加 Sword / Shield 或 Searcher。Seed 0/1 使用最多 16 位的 64 位十六进制且空值读取为 `0`，两项同时为 `0` 时拒绝；Initial Advances、Max Advances、Offset 使用十进制 `uint32_t`，默认分别为 `0`、`100000`、空，三项之和不得溢出。
+- **FR-G8WILD-02** 支持 Grass、Honey Tree、Rock Smash、Surfing、Old Rod、Good Rod、Super Rod；按 Profile 和地点联动 Time、Radar、Swarm、Feebas Tile、Great Marsh / Trophy Garden Replacement。Honey Tree 必须选择唯一槽位；Rock Smash 保留上游控件，但当前 BDSP encounter 数据无可用地点。
+- **FR-G8WILD-03** 支持 None、25 种 Synchronize Nature、Cute Charm、Harvest、Flash Fire、Magnet Pull、Static、Storm Drain、Compound Eyes、Super Luck、Hustle、Pressure、Vital Spirit 队首；Honey Tree 隐藏不适用队首。支持 Any / Star / Square / Star/Square、Any / Male / Female、Any / `0` / `1`、性格、Hidden Power、槽位、等级、身高、体重和六项 IV 闭区间筛选；Disable Filters 不得解除 Honey Tree 的唯一槽位约束。
+- **FR-G8WILD-04** Xorshift、128 项 RNGList、物种槽位、Feebas、队首修正、Unown、EC/PID、异色修正、IV、Ability、Gender、Nature、Height、Weight、Item、能力值和筛选只在独立 `gen8wild` Wasm API v1 中执行。请求固定为 48 个 `uint32_t`，结果固定为 12 个 `uint32_t`；单次任务最多评估 250,000,000 个状态并返回 100,000 行，Worker Pool 最多使用 8 个独立单线程实例。
+- **FR-G8WILD-05** 结果保留 Advances、Item、Slot、Pokemon、Level、EC、PID、Shiny、Nature、Ability、六项 IV/能力值、Hidden Power、Gender、Height、Weight、Characteristic 21 列；支持虚拟滚动、排序、CSV、进度、取消、清空、错误、空结果和结果上限状态。结果表在响应式单列布局下保持独立固定高度滚动区。
+
+完整输入限制、数据生成、48/12-word ABI、固定夹具和上游文件见 [Gen 8 Wild](modules/gen8wild.md)。
+
 ## 9. 后续实施顺序
 
-1. PokeFinder Gen VIII Profiles、IDs、Eggs、Event、Raids、Static 与 Underground 已实现，下一模块为 Wild。
-2. 按 Wild、Den Map 顺序完成其余 Gen VIII 模块。
+1. PokeFinder Gen VIII Profiles、IDs、Eggs、Event、Raids、Static、Underground 与 Wild 已实现，下一模块为 Den Map。
+2. Den Map 完成后进入 3DSRNGTool Profile Manager。
 3. Gen VIII 完成后实现 3DSRNGTool Profile Manager，再继续 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
 4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
 5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
@@ -849,7 +859,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 1. `npm ci --engine-strict` 使用已提交 lockfile 成功安装。
 2. `npm run verify` 通过格式、lint、类型、TypeScript 单元测试和 Web 构建。
 3. `npm run wasm:test:native` 通过 ID Generator 三种模式、RS ID Searcher SID/PID/无解、Initial Seed RS ID 固定候选、Seed to Time 的 2000 年时间表与 32 位回推、NGC Seed C ABI 输入边界、G3 Static Method 1/4、Searcher 反向恢复、游走缺陷、Wild Route 111 Generator/Searcher、IVs to PID Channel/Method 2、PID to IVs、GameCube Channel、PokeSpot、Jirachi、Egg Emerald/RSFRLG、G4 Static Method 1/J/K、Synchronize、Cute Charm、Searcher、G4 Wild Route 222 Generator/Searcher、G4 Egg DPPt/HGSS/Masuda/Searcher、Advance Finder Calls/Chatot/Needles 与错误边界、G4 Chained SID `54320`、Gen V Profiles BW/BW2 Seed/IV/Needle/Memory Link、Gen V ID Search By/Seed Finder、Gen V Adjacent Seeds、Gen V IV Cache、Gen V SHA1 Cache、Gen V Dream Radar、Gen V Static、Gen V Wild、Gen V Hidden Grotto、Gen V Egg、Gen V Event、Gen7 Stationary、Wild、SOS 与 Egg 连续会话、Gen7 ID、Gen8 ID 四组 `id8.json`、Gen8 Egg BDSP 三种物种分支、Gen8 Event、Gen8 Raids、Gen8 Static 和 Gen8 Underground 固定分支、宝可病毒与错误边界夹具。
-4. `npm run wasm:build` 生成 `wasm/CMakeLists.txt` 登记的默认 49 个模块 MJS/Wasm 产物，包括 `gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground` 与 `researcher`。
+4. `npm run wasm:build` 生成 `wasm/CMakeLists.txt` 登记的默认 50 个模块 MJS/Wasm 产物，包括 `gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground`、`gen8wild` 与 `researcher`。
 5. `npm run build` 生成包含 Worker、Wasm、PWA 与法律文件的 `dist/`。
 6. GitHub Pages 地址能加载首页、Worker 和 Wasm，控制台无资源 404。
 7. `npm run build:ui` 和 `npm run preview:ui` 不依赖 Wasm 产物，可以完成本地 UI 验收。
@@ -925,7 +935,8 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **阶段 8E：`gen8raids` Gen 8 Raids** - Sword/Shield 巢穴与事件团体战、197 张巢穴表、69 张 Event 表、独立 Wasm/Worker Pool 和完整状态结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8F：`gen8static` Gen 8 Static** - BDSP 9 类 47 个定点模板、普通/游走分支、独立 Wasm/Worker Pool 和完整状态结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8G：`gen8underground` Underground** - BDSP 18 个房间、剧情/等级标记、队首修正、独立 Wasm/Worker Pool 和完整 20 列结果（已实现，待 Actions、部署回归与最终验收）。
-- **阶段 8H-8I：PokeFinder Gen VIII** - Wild 与 Den Map（按顺序实现）。
+- **阶段 8H：`gen8wild` Wild** - BDSP 七类野生遭遇、特殊地点、独立 Wasm/Worker Pool 和完整 21 列结果（已实现，待 Actions、部署回归与最终验收）。
+- **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具（下一模块）。
 - **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder 与 Festival Plaza Facility RNG 已实现；完成剩余 Gen VIII 后进入 Profile Manager，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。
 - **阶段 10：发布加固** - 完整工程检查、生产页面回归、浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 

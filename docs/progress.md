@@ -2,10 +2,24 @@
 
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`5727c4f feat: 实现第八世代地下大洞窟乱数`
-> - 当前阶段：优先修复虚拟结果表滚动卡死，完成后继续 Gen 8 Wild
-> - 工作区状态：当前任务仅包含 Gen 8 Static、Gen 8 Raids、Gen 7 Wild、Gen 7 SOS、Gen 7 Egg 的响应式结果区修复与文档
-> - 验证状态：`npm run verify` 与外部 Chrome 高数据量滚动回归已通过；生产页面算法回归未运行
+> - Git 功能基线：`5727c4f feat: 实现第八世代地下大洞窟乱数`；Gen 8 Wild 当前尚未提交
+> - 当前阶段：完成 Gen 8 Wild 后进入 Gen 8 Den Map
+> - 工作区状态：当前任务包含 Gen 8 Wild 的数据、C++/Wasm bridge、Worker、React 面板、三语文案、文档和原生夹具
+> - 验证状态：全量原生夹具 `51/51`、完整 Emscripten Wasm 构建、全仓格式、`npm run verify` 和外部 Chrome 本地回归已通过；Edge 与生产页算法回归待进行
+
+## 2026-08-18 第八世代野生乱数
+
+- 新增：实现 PokeFinder 4.3.2 `Gen 8 Wild` BDSP Generator，覆盖 Grass、Honey Tree、Rock Smash、Surfing、Old Rod、Good Rod、Super Rod 入口，以及昼夜、宝可追踪、大量出现、丑丑鱼、Great Marsh / Trophy Garden Replacement 和甜甜蜜树槽位。
+- 算法：增加 `gen8wild` C++/Wasm API v1、48-word 请求、12-word 结果、128 项 Xorshift RNGList、完整队首修正、Unown 形态、EC/PID、异色、IV、Ability、Gender、Nature、Height、Weight、Item、Characteristic、Stats 和筛选。
+- 界面：增加 BDSP Profile、双 Seed、推进与 Offset、设置/筛选标签、21 列虚拟结果表、IV/能力值切换、排序、CSV、结果上限、进度、取消和清空；导航编号为 52，Researcher 顺延为 53。
+- 修复：取消筛选不再覆盖 Honey Tree 的单槽约束；补齐上游 Wild8 的 Super Luck、Hustle、Vital Spirit 队首入口；响应式结果表保持固定独立滚动区。
+- 数据：从 EncounterTableGenerator revision `7769c1df80be93761fe6479d51cbf2fe7a7dc4f9` 与 PokeFinder `personal_bdsp.bin` 生成 BD/SP 各 124 个区域、21 个甜甜蜜树地点和 494 条 Personal 数据；来源哈希见 `docs/modules/gen8wild.md`。
+- 已通过：`npm run typecheck`；全量 `npm run wasm:test:native` 的 51/51 原生夹具（含 `gen8wild_native_parity`）；完整 `npm run wasm:build`。Wasm 产物 `public/wasm/gen8wild.mjs` 7394 bytes，SHA-256 `44E1DB693A67EC6B15B8547DBDA16562EC668004429881D0561405AC233BD35F`；`public/wasm/gen8wild.wasm` 62151 bytes，SHA-256 `2741E0C560FEF2476DE111D09A2DB4C3CDEAF4CD02475F4E9377A306AA8FBA2E`。
+- 已通过：`npm run format:check`、`git diff --check`、`npm run verify`（Lint 0 error、6 条既有 warning；129 个 Vitest 文件、480 项测试；Vite 转换 2176 个模块，PWA 预缓存 177 项约 19.1 MiB）。
+- 已通过：外部 Chrome `http://127.0.0.1:5173/` 的 Gen 8 Wild 回归；BDSP Grass、双 Seed `111`、100000 结果上限、4 Workers 和结果区滚动正常，模块控制台无错误。一次大幅滚轮手势触发浏览器连接超时，但页面随后完成滚动，未复现应用冻结。
+- 说明：最终收口时重新配置 native-debug 后，`gen3id_native_test` 与单独的 `gen8wild_native_parity` 进程均出现无 CPU 进展的环境停滞并已终止；此前相同源码的全量 51/51 结果仍有效，本轮 Wasm CMake 变更仅增加 `HEAPU32` 运行时导出。
+- 待验证：Edge 实机回归；生产页面算法回归仍需 GitHub Actions 部署后由项目所有者提供准确 URL 并授权。
+- 下一步：提交推送 Gen 8 Wild 后进入 Gen 8 Den Map；不提前进入 3DSRNGTool Profile Manager。
 
 ## 2026-08-18 虚拟结果表滚动卡死修复
 

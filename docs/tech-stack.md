@@ -1,7 +1,7 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground 与 Gen VII 主工作流已实现，下一模块为 Gen 8 Wild
-> - 更新日期：2026-08-17
+> - 状态：PokeFinder Gen III、Gen IV、Gen V 已接入独立 Wasm/Worker；Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild 与 Gen VII 主工作流已实现，下一模块为 Gen 8 Den Map
+> - 更新日期：2026-08-18
 > - 当前范围：完整 PokeFinder 4.3.2，以及 `docs/module-inventory.md` 中除 `NTR Helper` 外的全部 3DSRNGTool 功能
 > - 包管理器：npm
 
@@ -71,7 +71,8 @@ React UI
         |-- Gen8EventWorkerPool -------------> gen8event.mjs + gen8event.wasm
         |-- Gen8RaidWorkerPool --------------> gen8raids.mjs + gen8raids.wasm
         |-- Gen8StaticWorkerPool ------------> gen8static.mjs + gen8static.wasm
-        `-- Gen8UndergroundWorkerPool -------> gen8underground.mjs + gen8underground.wasm
+        |-- Gen8UndergroundWorkerPool -------> gen8underground.mjs + gen8underground.wasm
+        `-- Gen8WildWorkerPool --------------> gen8wild.mjs + gen8wild.wasm
                                             |
                                             `-- narrow C ABI bridges
                                              `-- PokeFinder 4.3.2 / 3DSRNGTool rules
@@ -214,6 +215,7 @@ gen8event
 gen8raids
 gen8static
 gen8underground
+gen8wild
 ```
 
 每个模块必须拥有独立目录、manifest、构建 target、C ABI 前缀、Worker client 和测试，避免一个 Wasm 文件吸收所有世代和功能。当前 `gen3ivtopid` 每次输入只恢复有限候选，不创建多 Worker 分片；`gen3egg` 只提供 Generator，Searcher 保留为后续独立工作流。
@@ -446,6 +448,8 @@ public/wasm/                        # 生成物，忽略
 |-- gen8static.wasm
 |-- gen8underground.mjs
 |-- gen8underground.wasm
+|-- gen8wild.mjs
+|-- gen8wild.wasm
 |-- pokerusfinder.mjs
 `-- pokerusfinder.wasm
 ```
@@ -454,7 +458,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` 与 `gen8id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7egg`、`gen7battletree`、`gen7event`、`gen7main`、`gen7eggseedfinder`、`gen7festivalplaza`、`gen7id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。
+当前 `gen3id` 与 `gen8id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7egg`、`gen7battletree`、`gen7event`、`gen7main`、`gen7eggseedfinder`、`gen7festivalplaza`、`gen7id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground`、`gen8wild` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。
 
 `gen7stationary` 使用连续会话 C ABI，57 个 32 位请求字在 `begin()` 时初始化 SFMT、NPC 模型状态和长帧快照，`step()` 每批推进有限状态并返回 9 个 `uint32_t` 的结果记录：
 
@@ -497,7 +501,7 @@ packedIvs / metadata / delay / packedEncounter / specialValue
 
 `gen7festivalplaza` 使用 13 个 32 位请求字和 10 个 32 位固定结果字的连续会话 C ABI。请求包含版本、Seed、闭区间帧范围、NPC、Delay、Rank、四项筛选、NPC Status 开关和结果上限；结果包含 Index、Actual Hit、Real Time Frames、64 位 Random Number、Stars、Facility、NPC Type、Color 与 Mark，NPC Status 开启时每行追加 `NPC + 1` 个状态字。模块只使用一个 Dedicated Worker，默认每批处理 16384 帧；当前浏览器绝对帧限制为 `5,000,000`。完整协议见 [Gen 7 Festival Plaza](modules/gen7festivalplaza.md)。
 
-`gen8id` 使用 64 位 Xorshift Seed 的确定性状态分片和 API v2；`gen8egg` 使用 53 个请求字与 13 个结果字；`gen8event` 使用 45 个请求字与 11 个结果字；`gen8raids` 使用 41 个请求字与 12 个结果字；`gen8static` 使用 41 个请求字与 11 个结果字；`gen8underground` 使用 54 个请求字与 12 个结果字。六个模块均由最多 8 个独立 Dedicated Worker/Wasm 实例按 `chunkIndex` 恢复顺序，单次任务最多评估 250,000,000 个状态并返回 100,000 行；完整协议分别见 [Gen 8 ID](modules/gen8id.md)、[Gen 8 Eggs](modules/gen8egg.md)、[Gen 8 Event](modules/gen8event.md)、[Gen 8 Raids](modules/gen8raids.md)、[Gen 8 Static](modules/gen8static.md) 与 [Gen 8 Underground](modules/gen8underground.md)。
+`gen8id` 使用 64 位 Xorshift Seed 的确定性状态分片和 API v2；`gen8egg` 使用 53 个请求字与 13 个结果字；`gen8event` 使用 45 个请求字与 11 个结果字；`gen8raids` 使用 41 个请求字与 12 个结果字；`gen8static` 使用 41 个请求字与 11 个结果字；`gen8underground` 使用 54 个请求字与 12 个结果字；`gen8wild` 使用 48 个请求字与 12 个结果字。七个模块均由最多 8 个独立 Dedicated Worker/Wasm 实例按 `chunkIndex` 恢复顺序，单次任务最多评估 250,000,000 个状态并返回 100,000 行；完整协议分别见 [Gen 8 ID](modules/gen8id.md)、[Gen 8 Eggs](modules/gen8egg.md)、[Gen 8 Event](modules/gen8event.md)、[Gen 8 Raids](modules/gen8raids.md)、[Gen 8 Static](modules/gen8static.md)、[Gen 8 Underground](modules/gen8underground.md) 与 [Gen 8 Wild](modules/gen8wild.md)。
 
 ID C ABI 为：
 
@@ -770,7 +774,7 @@ type ModuleWorkerResponse =
 - 未知任务、重复批次、Wasm 错误或缓冲区长度异常都进入失败终态。
 - ID、Initial Seed、Seed to Time、GameCube Seed Finder、GameCube RNG、PID to IVs、PokeSpot、Jirachi Advancer、Static、Wild、IVs to PID、Egg、Gen VII Stationary / Wild / SOS / Egg / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza 与 Gen VIII ID / Eggs / Event / Raids 使用相同的消息信封原则，但保留独立 TypeScript 类型、Worker 文件和 API 版本，不使用未加区分的通用 payload。Initial Seed 以 `rs-ids` 与 `target` 区分操作，只有目标 Seed 反推携带 `chunkIndex`；Seed to Time、PID to IVs、Jirachi 与 IVs to PID 每次输入都是有限任务；GameCube Seed Finder、GameCube RNG 和 PokeSpot 使用模块自己的分片协议；Egg 以 Held Advances 分片，保留 Pickup 范围和 Redraws 作为每个分片的完整请求输入；Gen VII 连续会话以 `batchIndex` 提交 `step()` 批次，不使用多 Worker 乱序归并；Main RNG Tool、Egg Seed Finder 与 Gen VIII 模块按 `chunkIndex` 恢复多 Worker 乱序结果。
 
-`gen4id`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7egg`、`gen7battletree`、`gen7event`、`gen7main`、`gen7festivalplaza`、`gen8id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static` 与 `gen8underground` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`；第四世代任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`，Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、Festival Plaza 与 Gen VIII ID/Eggs/Event/Raids/Static/Underground 固定声明 `operation: "generator"`，Main RNG Tool 声明 `seed-search`、`qr-search` 与 `time-calculator`。`gen7eggseedfinder` 保留模块独立的 `search` / `magikarp` 消息类型和 API v1 握手。这些契约不改写三代消息类型。
+`gen4id`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7egg`、`gen7battletree`、`gen7event`、`gen7main`、`gen7festivalplaza`、`gen8id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground` 与 `gen8wild` 使用 `rngModuleContract.ts` 的版本 1 信封，初始化时同时声明 `moduleId`、`contractVersion` 与 `apiVersion`；第四世代任务统一使用 `type: "task"` 加 `operation: "generator" | "searcher"`，Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、Festival Plaza 与 Gen VIII ID/Eggs/Event/Raids/Static/Underground/Wild 固定声明 `operation: "generator"`，Main RNG Tool 声明 `seed-search`、`qr-search` 与 `time-calculator`。`gen7eggseedfinder` 保留模块独立的 `search` / `magikarp` 消息类型和 API v1 握手。这些契约不改写三代消息类型。
 
 ## 9. 源码与许可证边界
 
@@ -778,7 +782,7 @@ type ModuleWorkerResponse =
 
 - `UPSTREAM.md` 记录上游项目、版本、导入日期、文件 SHA-256 和修改边界。
 - 上游文件保留原版权与 GPL 头。
-- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4id_*`、`gen4static_*`、`gen4wild_*`、`gen4chainedsid_*`、`gen7stationary_*`、`gen7wild_*`、`gen7sos_*`、`gen7egg_*`、`gen7battletree_*`、`gen7event_*`、`gen7main_*`、`gen7eggseedfinder_*`、`gen7festivalplaza_*`、`gen7id_*`、`gen8id_*`、`gen8egg_*`、`gen8event_*`、`gen8raids_*`、`gen8static_*`、`gen8underground_*`、`pokerusfinder_*` 前缀。
+- PokeRNGKit bridge 使用独立文件和 `gen3id_*`、`gen3initialseed_*`、`gen3seedtotime_*`、`gen3ngcseed_*`、`gen3static_*`、`gen3wild_*`、`gen3ivtopid_*`、`gen3pidtoiv_*`、`gen3egg_*`、`gen3gamecube_*`、`gen3pokespot_*`、`gen3jirachi_*`、`gen4id_*`、`gen4static_*`、`gen4wild_*`、`gen4chainedsid_*`、`gen7stationary_*`、`gen7wild_*`、`gen7sos_*`、`gen7egg_*`、`gen7battletree_*`、`gen7event_*`、`gen7main_*`、`gen7eggseedfinder_*`、`gen7festivalplaza_*`、`gen7id_*`、`gen8id_*`、`gen8egg_*`、`gen8event_*`、`gen8raids_*`、`gen8static_*`、`gen8underground_*`、`gen8wild_*`、`pokerusfinder_*` 前缀。
 - `vite.config.ts` 在构建结束时将根 `LICENSE` 和上游记录复制到 `dist/legal/`。
 - 页面页脚链接 PokeRNGKit 源代码、GPL 文本和上游记录。
 
