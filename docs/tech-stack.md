@@ -202,6 +202,7 @@ gen4chainedsid
 gen6stationary
 gen6bank
 gen6event
+gen6wild
 gen7stationary
 gen7wild
 gen7sos

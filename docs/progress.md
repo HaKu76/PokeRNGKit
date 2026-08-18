@@ -2,10 +2,22 @@
 
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`c442735`；当前工作区正在收口 3DSRNGTool Gen VI Event / Mystery Gift RNG，改动待提交
-> - 当前阶段：Gen VI Event / Mystery Gift 已实现，下一模块为 Gen VI Wild RNG
-> - 工作区状态：当前任务包含独立 MT Wasm/Worker、54-word 请求、Wonder Card 导入、XY/ORAS 生成、固定高度虚拟结果表、三语界面和模块文档
-> - 验证状态：Gen VI Event 定向 Vitest、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+> - Git 功能基线：`95913ad`；当前工作区正在收口 3DSRNGTool Gen VI Wild RNG，改动待提交
+> - 当前阶段：Gen VI Wild 已实现，下一模块为 Gen VI DexNav RNG
+> - 工作区状态：当前任务包含普通野生、Horde、Rock Smash、Fishing、TinyMT/MT 双 RNG、Dedicated Worker/Wasm、183 个区域数据、固定高度虚拟结果表、三语界面和模块文档
+> - 验证状态：Gen VI Wild 定向 Vitest、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+
+## 2026-08-18 3DSRNGTool Gen VI Wild RNG
+
+- 新增：实现独立 `gen6wild` 工作区，覆盖 X、Y、Omega Ruby、Alpha Sapphire 的普通野生、Horde、Rock Smash 和 Fishing；支持队首能力、笛子、钓竿、Horde 选槽、闪耀护符、异色/方块异色、IV、性格、觉醒力量、性别、特性、道具与槽位筛选。
+- 算法：复用上游 `Wild6`、`WildRNG`、`RNGPool` 的 TinyMT/MT19937 消耗顺序；普通、碎岩、钓鱼和群聚分别保留动态延迟、队伍消耗和五只连续生成规则；算法只在独立 Dedicated Worker 和 Wasm 中执行。
+- 数据：从 `LocationTable6.cs`、`HordeArea6.cs`、`FishingArea.cs` 和三语地点资源生成 183 个区域记录；上游 revision 缺少完整 XY 普通野生槽位时使用可编辑自定义槽位，并在模块文档记录限制。
+- 界面：增加版本、遭遇类型、地点、Seed、Tiny Seed、帧范围、Delay、队伍数量、钓竿、队首能力、笛子、槽位与完整结果筛选，支持进度、取消、100000 行结果上限、CSV、排序和固定高度虚拟结果表。
+- 契约：新增 `wasm/modules/gen6wild`，96-word 请求、16-word 结果、Wasm API version 1、Contract version 1、独立 Worker 和 `public/wasm/gen6wild.mjs/.wasm`。
+- 已通过：`npm test -- src/features/gen6wild`（2 个文件、5 项测试）、`npm run verify`（139 个测试文件、514 项测试、Vite/PWA 生产构建）、`npm run format:check`、`git diff --check`、`POKERNGKIT_WASM_MODULES=gen6wild npm run wasm:test:native`（1/1）和激活 Emscripten 6.0.6 后的 `POKERNGKIT_WASM_MODULES=gen6wild npm run wasm:build`。
+- 产物：`public/wasm/gen6wild.mjs` 7440 bytes，SHA-256 `5490544C909FADF410F0A2F3D292354C520269DC1A5041FE1598DDA7B907419C`；`public/wasm/gen6wild.wasm` 14225 bytes，SHA-256 `C5082B38815D6434008656477A574E61980EF675DC0BA2258A974D885152F9DD`。
+- 未运行：外部 Chrome / Edge UI 回归，原因是当前无外部调试端点；生产页面算法验收仍需部署后由项目所有者提供准确 URL 并授权。
+- 下一步：提交并推送 `feat: 实现第六世代野生乱数`；随后核对并实现 Gen VI DexNav RNG。
 
 ## 2026-08-18 3DSRNGTool Gen VI Event / Mystery Gift RNG
 

@@ -822,10 +822,20 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、Wonder Card 字段、XY/ORAS 生成顺序、54/16-word ABI、固定夹具和上游文件见 [Gen 6 Event](modules/gen6event.md)。
 
+## 8.49 当前功能需求：`gen6wild`
+
+- **FR-G6WILD-01** 提供独立的 3DSRNGTool Gen VI `Wild RNG` 工作区，支持 X、Y、Omega Ruby、Alpha Sapphire 的普通野生、Horde、Rock Smash 与 Fishing；XY 普通野生表缺失时提供可编辑自定义槽位，不伪造上游数据。
+- **FR-G6WILD-02** 支持 Seed、Initial Frame、Max Frame、Delay、Tiny Seed、Tiny Frame、TSV/TRV、Shiny Charm、Consider Delay、Synchronize、Cute Charm、Static、Magnet Pull、Compound Eyes、Pressure/Hustle/Vital Spirit、Flute、Horde Slot、Fishing Rod、Party Pokemon 和 Encounter Rate。
+- **FR-G6WILD-03** 支持上游 Normal 12 槽、Horde/Rock Smash 5 槽、Fishing 3 槽机率；Horde 采用一次 TinyMT 准备、一次主 RNG `Advance(60)` 和五只连续生成，Fishing 保留动态咬勾延时与 Party Pokemon 消耗。
+- **FR-G6WILD-04** MT19937、TinyMT、EC/PID、IV、Ability、Nature、Gender、Hidden Power、PSV/PRV、异色和结果筛选只在独立 `gen6wild` Wasm API v1 中执行；模块使用 96-word 请求、16-word 结果和单 Dedicated Worker。
+- **FR-G6WILD-05** 支持六项 IV 闭区间、完美 IV 数量、性格、觉醒力量、性别、特性、异色、方块异色、道具和槽位筛选；提供进度、取消、100000 行结果上限、固定高度虚拟结果表、排序、CSV、清空、错误和空结果状态。
+
+完整输入限制、183 个区域数据、Horde 版本替换、96/16-word ABI、固定夹具和上游文件见 [Gen 6 Wild](modules/gen6wild.md)。
+
 ## 9. 后续实施顺序
 
-1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event 与 Profile Manager 已实现。
-2. 下一模块为 3DSRNGTool Gen VI Wild RNG，完成后继续 Gen VI 与其他公共工具库存。
+1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild 与 Profile Manager 已实现。
+2. 下一模块为 3DSRNGTool Gen VI DexNav RNG，完成后继续 Gen VI 与其他公共工具库存。
 3. 继续实现 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
 4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
 5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
