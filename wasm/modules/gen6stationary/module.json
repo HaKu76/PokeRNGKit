@@ -1,0 +1,13 @@
+{
+  "id": "gen6stationary",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 2,
+  "target": "gen6stationary",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6stationary.mjs",
+    "wasm": "gen6stationary.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 Gen6/Stationary6.cs, Core/StationaryRNG.cs and RNG/MersenneTwister.cs"
+}

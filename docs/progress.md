@@ -2,10 +2,21 @@
 
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`f8217f1 feat: 实现第八世代巢穴地图` 已推送；当前工作区正在收口 3DSRNGTool Profile Manager
-> - 当前阶段：完成 Profile Manager 后进入 3DSRNGTool Gen VI Stationary RNG
-> - 工作区状态：当前任务包含 3DSRNGTool 档案领域、IndexedDB/localStorage 存储、响应式管理界面、Gen VII 调用方接入和模块文档
-> - 验证状态：Profile Manager 接线与文档已修改，格式化和完整工程验证待本轮执行；外部 Chrome 本地回归此前连续超时，尚未取得新的 UI 证据
+> - Git 功能基线：`7af5008 feat: 实现3DSRNGTool存档信息管理` 已推送；当前工作区正在收口 3DSRNGTool Gen VI Stationary RNG
+> - 当前阶段：Gen VI Stationary 已实现，进入 Gen VI Pokemon Link / Transporter RNG
+> - 工作区状态：当前任务包含 Gen VI Stationary 的 MT Wasm、Dedicated Worker、Profile 联动、响应式结果表和模块文档
+> - 验证状态：Gen VI Stationary 定向测试、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+
+## 2026-08-18 3DSRNGTool Gen VI Stationary RNG
+
+- 新增：实现 `gen6stationary`，覆盖 XY、ORAS、Transporter 的普通定点、礼物、御三家、化石、游戏内交换和 Pokemon Link / Transporter 目标前置消耗；从 `Gen6/PKM6.cs` 生成全部 141 个目标模板。
+- 算法：增加运行时滚动 Mersenne Twister、Delay/60 次非同步消耗、Shiny Charm PID rolls、固定/随机 IV、3V/5V、Ability、Nature、Gender、PSV/PRV、异色/方块异色、OT TSV 覆盖和 Pokemon Bank 前置消耗；算法只在独立 Worker 的 Wasm 中执行。
+- 界面：增加 3DS Profile 联动、三语分类/模板、Seed、帧范围、Delay、同步性格、Bank 目标、Transporter GenderList、自定义目标、TSV/TRV、闪耀护符、完整筛选、结果上限、取消、CSV 和固定高度虚拟结果表。
+- 契约：新增 `wasm/modules/gen6stationary`，49-word 请求、16-word 结果、Wasm API version 2、Contract version 1、原生固定夹具和 `public/wasm/gen6stationary.mjs/.wasm`。
+- 已通过：`npm test -- src/features/gen6stationary`（2 个文件、6 项测试）、`npm run verify`（134 个 Vitest 文件、499 项测试、Vite/PWA 预缓存 186 项约 20.6 MiB）、`npm run format:check`、`git diff --check`、`POKERNGKIT_WASM_MODULES=gen6stationary npm run wasm:test:native`（1/1）和激活 Emscripten 6.0.6 后的 `POKERNGKIT_WASM_MODULES=gen6stationary npm run wasm:build`。
+- Lint：0 error、7 条既有 TanStack Virtual `react-hooks/incompatible-library` warning；本模块的模板依赖 warning 已修复。
+- 未运行：外部 Chrome / Edge UI 回归，原因是当前无 9222/9223/9515 调试端点；生产页面算法验收仍需部署后由项目所有者提供准确 URL 并授权。
+- 下一步：进入 Gen VI Pokemon Link / Transporter RNG；开始前先读取对应 WinForms/Core 输入设置、目标数据和前置消耗规则。
 
 ## 2026-08-18 3DSRNGTool 存档信息管理
 
