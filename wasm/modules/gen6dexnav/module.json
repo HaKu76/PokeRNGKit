@@ -1,0 +1,13 @@
+{
+  "id": "gen6dexnav",
+  "generation": 6,
+  "apiVersion": 1,
+  "contractVersion": 1,
+  "target": "gen6dexnav",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6dexnav.mjs",
+    "wasm": "gen6dexnav.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 Gen6/DexNav.cs and RNG/TinyMT.cs"
+}

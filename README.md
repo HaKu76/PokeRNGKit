@@ -5,12 +5,12 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：实现 3DSRNGTool Gen VI DexNav RNG。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
+**当前里程碑：实现 3DSRNGTool Gen VI Poke Radar RNG。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
 
 - 当前范围：完整 PokeFinder 4.3.2，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能
 - 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary / Pokemon Link / Transporter / Event、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
-- 当前工作：实现 3DSRNGTool Gen VI DexNav RNG
-- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md)
+- 当前工作：实现 3DSRNGTool Gen VI Poke Radar RNG
+- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md) / [Gen 6 DexNav](docs/modules/gen6dexnav.md)
 - 明确排除：仅 3DSRNGTool `NTR Helper`
 - 上游核验基线：PokeFinder 4.3.2
 - 完整库存与状态：[docs/module-inventory.md](docs/module-inventory.md)
@@ -110,6 +110,12 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - 183 个上游地点记录、Horde 版本替换、Fishing 三种钓竿、TinyMT、队首修正和基础筛选
 - 独立 `gen6wild` Wasm API v1、96/16-word 契约、Dedicated Worker、虚拟结果表、CSV、进度与取消
 - 输入边界、Horde 生成顺序和当前限制见 [Gen 6 Wild](docs/modules/gen6wild.md)
+
+当前 Gen VI DexNav 工作区包含：
+
+- Grass、Tall Grass、Surf 的主动搜索/普通触发、摇晃坐标、槽位类型、连锁 Boost、搜索等级、Potential、Flute、隐藏特性、蛋招式、持有物与闪光检查
+- 独立 `gen6dexnav` Wasm API v1、45/16-word 契约、Dedicated Worker、可编辑槽位、虚拟结果表、CSV、进度与取消
+- 输入边界、Grade/Boost/闪光检查顺序、上游占位行为和验证状态见 [Gen 6 DexNav](docs/modules/gen6dexnav.md)
 
 当前 Gen VII ID 工作区包含：
 

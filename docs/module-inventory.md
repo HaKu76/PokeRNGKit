@@ -33,7 +33,7 @@ PokeFinder 核对入口：
 | 2    | Gen VI  | Pokemon Link / Transporter RNG           | 已实现 |
 | 3    | Gen VI  | Event / Mystery Gift RNG                 | 已实现 |
 | 4    | Gen VI  | Wild RNG，包括普通野生、群聚、钓鱼与碎岩 | 已实现 |
-| 5    | Gen VI  | DexNav RNG                               | 计划   |
+| 5    | Gen VI  | DexNav RNG                               | 已实现 |
 | 6    | Gen VI  | Poke Radar RNG                           | 计划   |
 | 7    | Gen VI  | Egg RNG                                  | 计划   |
 | 8    | Gen VI  | ID RNG                                   | 计划   |
@@ -79,7 +79,7 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 ## 实施顺序
 
-1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary / Pokemon Link / Event / Wild 与公共 Profile Manager 已实现。
-2. 下一模块为 3DSRNGTool Gen VI DexNav RNG；字段、控件边界和算法以对应 WinForms/Core 源码为准。
+1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary / Pokemon Link / Event / Wild / DexNav 与公共 Profile Manager 已实现。
+2. 下一模块为 3DSRNGTool Gen VI Poke Radar RNG；字段、控件边界和算法以对应 WinForms/Core 源码为准。
 3. 继续核对其余模块库存，不提前合并不同上游工作流；`NTR Helper` 除外。
 4. 全部模块完成后执行全仓验证、Actions 部署和生产页面回归。

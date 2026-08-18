@@ -1,6 +1,6 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter 与 Profile Manager 已实现，下一模块为 Gen VI Event / Mystery Gift RNG
+> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav 与 Profile Manager 已实现，下一模块为 Gen VI Poke Radar RNG
 > - 更新日期：2026-08-18
 > - 当前范围：完整 PokeFinder 4.3.2，以及 `docs/module-inventory.md` 中除 `NTR Helper` 外的全部 3DSRNGTool 功能
 > - 包管理器：npm
@@ -167,7 +167,7 @@ PWA 离线能力必须在真实 GitHub Pages 环境验收，构建成功不等�
 - `localStorage`：各世代独立存档镜像、3DSRNGTool Profile Manager 镜像、语言、主题和各悬浮窗折叠状态。
 - Worker/Wasm：任务期间的临时计算状态。
 - 页面刷新：终止任务并重建 Worker，不持久化结果。
-- UI 预览：ID、Initial Seed、GameCube Seed Finder、G3/G4 Static、Wild、IVs to PID、Egg、Gen VI Stationary / Pokemon Link / Event 与 Gen VII Stationary / Wild / SOS / Egg / Battle Tree / Event / Main RNG Tool / Egg Seed Finder 各自使用同一请求边界的确定性样例引擎，不读取或生成 Wasm；预览结果只用于界面交互验收。`gen3spindapainter` 是不涉及 RNG 的确定性 PID/坐标映射，直接由 React domain 计算，不创建 Wasm 或 Worker。
+- UI 预览：ID、Initial Seed、GameCube Seed Finder、G3/G4 Static、Wild、IVs to PID、Egg、Gen VI Stationary / Pokemon Link / Event / Wild / DexNav 与 Gen VII Stationary / Wild / SOS / Egg / Battle Tree / Event / Main RNG Tool / Egg Seed Finder 各自使用同一请求边界的确定性样例引擎，不读取或生成 Wasm；预览结果只用于界面交互验收。`gen3spindapainter` 是不涉及 RNG 的确定性 PID/坐标映射，直接由 React domain 计算，不创建 Wasm 或 Worker。
 
 ### 6.2 存档 repository
 
@@ -203,6 +203,7 @@ gen6stationary
 gen6bank
 gen6event
 gen6wild
+gen6dexnav
 gen7stationary
 gen7wild
 gen7sos
@@ -959,9 +960,9 @@ npm run verify:full      # verify + 原生测试 + Wasm 构建
 ### 12.1 当前已实现
 
 - **C++ 原生夹具**：ID 三种模式，Initial Seed 的 RS TID/SID 固定候选，Seed to Time 的时间表与 32 位回推，NGC Seed C ABI 输入边界，G3 Static Method 1/4、Searcher 反向恢复与游走缺陷，Wild Route 111 Generator/Searcher，IVs to PID Channel/Method 2，Egg Emerald/RSFRLG，G4 Static Method 1/J/K、Synchronize、Cute Charm 与 Searcher，Gen VII Stationary / Wild / SOS / Egg / Battle Tree / Event 连续会话，以及 Main RNG Tool 与 Egg Seed Finder 固定结果。
-- **TypeScript 单元测试**：ID、G3/G4 Static、Wild、IVs to PID、Egg、Spinda Painter 与 Gen VII Stationary / Wild / SOS / Egg / Battle Tree / Event / Main RNG Tool / Egg Seed Finder 输入边界，Generator/Searcher 分片、乱序批次、取消、固定宽度结果解码、Wonder Card 解析、PID/斑点双向映射、觉醒力量、输入规范化、主题和红蓝宝石 Seed 推导。
+- **TypeScript 单元测试**：ID、G3/G4 Static、Wild、IVs to PID、Egg、Spinda Painter、Gen VI DexNav 与 Gen VII Stationary / Wild / SOS / Egg / Battle Tree / Event / Main RNG Tool / Egg Seed Finder 输入边界，Generator/Searcher 分片、乱序批次、取消、固定宽度结果解码、Wonder Card 解析、PID/斑点双向映射、觉醒力量、输入规范化、主题和红蓝宝石 Seed 推导。
 - **持久化单元测试**：G3/G4 存档 JSON schema、合并边界、IndexedDB 主存储抽象与 localStorage 兜底。
-- **UI 预览引擎测试**：ID、Initial Seed、GameCube Seed Finder、G3/G4 Static、Wild Generator/Searcher、IVs to PID、Egg Generator、Gen VI Stationary / Pokemon Link / Event 与 Gen VII Stationary / Wild / SOS / Egg / Battle Tree / Event / Main RNG Tool 的确定性样例、进度和取消。
+- **UI 预览引擎测试**：ID、Initial Seed、GameCube Seed Finder、G3/G4 Static、Wild Generator/Searcher、IVs to PID、Egg Generator、Gen VI Stationary / Pokemon Link / Event / DexNav 与 Gen VII Stationary / Wild / SOS / Egg / Battle Tree / Event / Main RNG Tool 的确定性样例、进度和取消。
 - **静态检查**：Prettier、ESLint、TypeScript project build。
 - **生产 Web 构建**：Vite Worker、PWA、相对 base 和法律文件。
 
