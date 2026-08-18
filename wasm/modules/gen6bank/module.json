@@ -1,0 +1,13 @@
+{
+  "id": "gen6bank",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 2,
+  "target": "gen6bank",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6bank.mjs",
+    "wasm": "gen6bank.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 Gen6/Stationary6.cs, Core/StationaryRNG.cs and RNG/MersenneTwister.cs"
+}

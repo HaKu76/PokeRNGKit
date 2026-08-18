@@ -6676,11 +6676,13 @@ export function gen6StationaryVersion(
 
 export function gen6StationaryCategoriesForVersion(
   version: Gen6StationaryVersion,
+  bankOnly = false,
 ) {
   return Array.from(
     new Set(
-      GEN6_STATIONARY_TEMPLATES.filter((template) =>
-        supportsVersion(template, version),
+      GEN6_STATIONARY_TEMPLATES.filter(
+        (template) =>
+          supportsVersion(template, version) && (!bankOnly || template.bank),
       ).map((template) => template.category),
     ),
   );
@@ -6689,10 +6691,13 @@ export function gen6StationaryCategoriesForVersion(
 export function gen6StationaryTemplatesForVersion(
   version: Gen6StationaryVersion,
   category: string,
+  bankOnly = false,
 ) {
   return GEN6_STATIONARY_TEMPLATES.filter(
     (template) =>
-      template.category === category && supportsVersion(template, version),
+      template.category === category &&
+      supportsVersion(template, version) &&
+      (!bankOnly || template.bank),
   );
 }
 

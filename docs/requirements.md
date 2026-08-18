@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary 与 Profile Manager 已实现；下一模块为 Gen VI Pokemon Link / Transporter RNG
+> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter 与 Profile Manager 已实现；下一模块为 Gen VI Event / Mystery Gift RNG
 > - 更新日期：2026-08-18
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V、全局工具与 Gen VIII 已实现。3DSRNGTool 第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary 与独立 Profile Manager 已实现；下一模块为 Gen VI Pokemon Link / Transporter RNG。
+当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V、全局工具与 Gen VIII 已实现。3DSRNGTool 第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary、Pokemon Link / Transporter 与独立 Profile Manager 已实现；下一模块为 Gen VI Event / Mystery Gift RNG。
 
 3DSRNGTool `NTR Helper` 已明确排除。它依赖桌面程序对 3DS 调试端进行原始 TCP/NTR 通信，普通静态浏览器无法在不增加本地桥接、扩展或后端的情况下复刻。完整模块库存和当前状态见 [`docs/module-inventory.md`](module-inventory.md)。
 
@@ -802,10 +802,20 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、141 个模板、生成顺序、49/16-word ABI、固定夹具和上游文件见 [Gen 6 Stationary](modules/gen6stationary.md)。
 
+## 8.47 当前功能需求：`gen6bank`
+
+- **FR-G6BANK-01** 提供独立的 3DSRNGTool Gen VI `Pokemon Link / Transporter RNG` 工作区，支持 X、Y、Omega Ruby、Alpha Sapphire 的 Pokemon Link 与 Transporter 的 8 个 Bank 目标模板；普通 Stationary 模板不得出现在该工作区。
+- **FR-G6BANK-02** 支持 Seed、Initial Frame、Max Frame、Delay、Consider Delay、TSV/TRV、Shiny Charm、Target Pokemon 和 Transporter GenderList。Seed 为空按 `0`，Seed 为 8 位十六进制；Delay 为 `0..4000`；Target Pokemon 为 `1..3`（Pokemon Link）或 `1..20`（Transporter）；GenderList 最多 20 位且每位为 `0/1/2`。
+- **FR-G6BANK-03** Bank 前置目标按上游 `Stationary6.Generate_Once` 生成：Johto Starters 每个前置目标推进 10；Legendary Titans、Mew、Celebi 与其他 Transporter 目标推进 2 后按 `3/3/5` 个随机保底 IV 位置和 `4/5/2` 表推进。Transporter Mew/Celebi 保留 5V 规则，Bank 目标固定为 Always Sync。
+- **FR-G6BANK-04** MT19937、Bank 前置消耗、EC/PID、IV、Ability、Nature、Gender、Hidden Power、PSV/PRV、筛选和结果打包只在独立 `gen6bank` Wasm API v2 中执行；模块使用 49-word 请求、16-word 结果和独立 Dedicated Worker，产物为 `gen6bank.mjs/.wasm`。
+- **FR-G6BANK-05** 提供进度、取消、100000 行结果上限、虚拟滚动、排序、CSV、清空、错误与空结果状态；结果保留 Frame、Random、EC、PID、六项 IV、Nature、Ability、Gender、Hidden Power、Shiny、Frame Used、PSV 与 PRV。
+
+完整输入限制、8 个 Bank 模板、前置消耗、49/16-word ABI、固定夹具和上游文件见 [Gen 6 Pokemon Link / Transporter](modules/gen6bank.md)。
+
 ## 9. 后续实施顺序
 
-1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary 与 Profile Manager 已实现。
-2. 下一模块为 3DSRNGTool Gen VI Pokemon Link / Transporter RNG，完成后继续 Gen VI 与其他公共工具库存。
+1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter 与 Profile Manager 已实现。
+2. 下一模块为 3DSRNGTool Gen VI Event / Mystery Gift RNG，完成后继续 Gen VI 与其他公共工具库存。
 3. 继续实现 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
 4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
 5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
@@ -925,7 +935,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 14. 阶段划分
 
-当前按完整模块库存推进。PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary 与独立 Profile Manager 已实现；下一模块为 Gen VI Pokemon Link / Transporter RNG。
+当前按完整模块库存推进。PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter 与独立 Profile Manager 已实现；下一模块为 Gen VI Event / Mystery Gift RNG。
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。
@@ -957,7 +967,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **阶段 8G：`gen8underground` Underground** - BDSP 18 个房间、剧情/等级标记、队首修正、独立 Wasm/Worker Pool 和完整 20 列结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8H：`gen8wild` Wild** - BDSP 七类野生遭遇、特殊地点、独立 Wasm/Worker Pool 和完整 21 列结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具、三张原图资源、276 个坐标点位和三语地点名称（已实现，待部署回归与最终验收）。
-- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary 与 Profile Manager 已实现；下一模块为 Gen VI Pokemon Link / Transporter RNG，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。
+- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary、Pokemon Link / Transporter 与 Profile Manager 已实现；下一模块为 Gen VI Event / Mystery Gift RNG，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。
 - **阶段 10：发布加固** - 完整工程检查、生产页面回归、浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

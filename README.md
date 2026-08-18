@@ -5,12 +5,12 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：实现 3DSRNGTool Gen VI Pokemon Link / Transporter RNG。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
+**当前里程碑：实现 3DSRNGTool Gen VI Event / Mystery Gift RNG。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
 
 - 当前范围：完整 PokeFinder 4.3.2，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能
-- 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
-- 当前工作：实现 3DSRNGTool Gen VI Pokemon Link / Transporter RNG
-- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md)
+- 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary / Pokemon Link / Transporter、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
+- 当前工作：实现 3DSRNGTool Gen VI Event / Mystery Gift RNG
+- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md)
 - 明确排除：仅 3DSRNGTool `NTR Helper`
 - 上游核验基线：PokeFinder 4.3.2
 - 完整库存与状态：[docs/module-inventory.md](docs/module-inventory.md)
@@ -585,7 +585,7 @@ npm run build:web
 - **阶段 8G：`gen8underground` Underground** - BDSP 地下大洞窟遇敌（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8H：`gen8wild` Gen 8 Wild** - BDSP 野生 Generator、独立 Wasm/Worker Pool 和完整状态结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具、三张原图资源、276 个坐标点位和三语地点名称（已实现，待部署回归与最终验收）。
-- **阶段 9：3DSRNGTool** - Gen VII 主工作流已实现；下一模块为 Profile Manager，之后继续 Gen VI、其他公共工具与其余库存，仅 `NTR Helper` 不开发。
+- **阶段 9：3DSRNGTool** - Gen VII 主工作流、Gen VI Stationary、Gen VI Pokemon Link / Transporter 与 Profile Manager 已实现；下一模块继续 Gen VI Event / Mystery Gift，之后继续其他公共工具与其余库存，仅 `NTR Helper` 不开发。
 - **阶段 10：发布加固与验收** - 完整工程检查、Actions 部署、PWA 离线、可访问性、浏览器矩阵、性能预算、许可证和生产页面回归。
 
 ## 许可证、署名与源码分发

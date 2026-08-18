@@ -163,23 +163,28 @@ function customTemplate(
 export function Gen6StationaryPanel({
   profile,
   uiPreviewMode,
+  bankOnly = false,
+  engineOverride,
 }: {
   profile: ThreeDsProfile | undefined;
   uiPreviewMode: boolean;
+  bankOnly?: boolean;
+  engineOverride?: Gen6StationaryEngine;
 }) {
   const { t, i18n } = useTranslation();
   const language = languageFor(i18n.resolvedLanguage);
   const engine = useMemo<Gen6StationaryEngine>(
     () =>
-      uiPreviewMode
+      engineOverride ??
+      (uiPreviewMode
         ? new Gen6StationaryUiPreviewEngine()
-        : new Gen6StationaryWorker(),
-    [uiPreviewMode],
+        : new Gen6StationaryWorker()),
+    [engineOverride, uiPreviewMode],
   );
   const profileInfo = gen6StationaryProfile(profile);
   const categories: readonly string[] = useMemo(
-    () => gen6StationaryCategoriesForVersion(profileInfo.version),
-    [profileInfo.version],
+    () => gen6StationaryCategoriesForVersion(profileInfo.version, bankOnly),
+    [bankOnly, profileInfo.version],
   );
   const [category, setCategory] = useState("-");
   const activeCategory = categories.includes(category)
@@ -187,8 +192,12 @@ export function Gen6StationaryPanel({
     : (categories[0] ?? "-");
   const templates = useMemo(
     () =>
-      gen6StationaryTemplatesForVersion(profileInfo.version, activeCategory),
-    [activeCategory, profileInfo.version],
+      gen6StationaryTemplatesForVersion(
+        profileInfo.version,
+        activeCategory,
+        bankOnly,
+      ),
+    [activeCategory, bankOnly, profileInfo.version],
   );
   const [templateId, setTemplateId] = useState("");
   const selectedTemplate =
@@ -397,7 +406,7 @@ export function Gen6StationaryPanel({
           <div className="gen6stationary-heading">
             <div>
               <span className="panel-index">01</span>
-              <h2>{t("gen6StationaryModule")}</h2>
+              <h2>{t(bankOnly ? "gen6BankModule" : "gen6StationaryModule")}</h2>
             </div>
             <span className={`run-status ${status}`}>{t(status)}</span>
           </div>

@@ -1,7 +1,7 @@
 import type { Gen6StationaryRequest } from "../domain";
 
 interface Gen6StationaryWorkerBase {
-  moduleId: "gen6stationary";
+  moduleId: "gen6stationary" | "gen6bank";
   apiVersion: number;
 }
 export interface Gen6StationaryWorkerInit extends Gen6StationaryWorkerBase {

@@ -33,9 +33,23 @@ interface ActiveSearch {
   processed: number;
   abort?: () => void;
 }
+export interface Gen6WorkerConfig {
+  moduleId: "gen6stationary" | "gen6bank";
+  moduleFile: "gen6stationary" | "gen6bank";
+  workerName: string;
+}
+const DEFAULT_CONFIG: Gen6WorkerConfig = {
+  moduleId: "gen6stationary",
+  moduleFile: "gen6stationary",
+  workerName: "pokerngkit-gen6stationary-1",
+};
 export class Gen6StationaryWorker implements Gen6StationaryEngine {
+  private readonly config: Gen6WorkerConfig;
   private slot?: Slot;
   private active?: ActiveSearch;
+  constructor(config: Gen6WorkerConfig = DEFAULT_CONFIG) {
+    this.config = config;
+  }
   async search(
     request: Gen6StationaryRequest,
     options: Gen6StationarySearchOptions = {},
@@ -81,7 +95,7 @@ export class Gen6StationaryWorker implements Gen6StationaryEngine {
       if (!this.active) return completion;
       const message: Gen6StationaryWorkerRequest = {
         type: "task",
-        moduleId: "gen6stationary",
+        moduleId: this.config.moduleId,
         apiVersion: GEN6_STATIONARY_API_VERSION,
         taskId,
         request,
@@ -127,7 +141,7 @@ export class Gen6StationaryWorker implements Gen6StationaryEngine {
     });
     const worker = new Worker(
       new URL("./gen6stationary.worker.ts", import.meta.url),
-      { type: "module", name: "pokerngkit-gen6stationary-1" },
+      { type: "module", name: this.config.workerName },
     );
     const slot = { worker, ready, resolveReady, rejectReady };
     worker.onmessage = ({ data }: MessageEvent<Gen6StationaryWorkerResponse>) =>
@@ -138,9 +152,9 @@ export class Gen6StationaryWorker implements Gen6StationaryEngine {
       );
     worker.postMessage({
       type: "init",
-      moduleId: "gen6stationary",
+      moduleId: this.config.moduleId,
       moduleUrl: new URL(
-        `${import.meta.env.BASE_URL}wasm/gen6stationary.mjs`,
+        `${import.meta.env.BASE_URL}wasm/${this.config.moduleFile}.mjs`,
         globalThis.location.href,
       ).href,
       contractVersion: RNG_MODULE_CONTRACT_VERSION,
@@ -150,7 +164,7 @@ export class Gen6StationaryWorker implements Gen6StationaryEngine {
   }
   private handle(slot: Slot, message: Gen6StationaryWorkerResponse) {
     if (
-      message.moduleId !== "gen6stationary" ||
+      message.moduleId !== this.config.moduleId ||
       message.apiVersion !== GEN6_STATIONARY_API_VERSION
     )
       return this.fail(

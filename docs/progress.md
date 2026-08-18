@@ -3,9 +3,21 @@
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
 > - Git 功能基线：`7af5008 feat: 实现3DSRNGTool存档信息管理` 已推送；当前工作区正在收口 3DSRNGTool Gen VI Stationary RNG
-> - 当前阶段：Gen VI Stationary 已实现，进入 Gen VI Pokemon Link / Transporter RNG
-> - 工作区状态：当前任务包含 Gen VI Stationary 的 MT Wasm、Dedicated Worker、Profile 联动、响应式结果表和模块文档
-> - 验证状态：Gen VI Stationary 定向测试、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+> - 当前阶段：Gen VI Pokemon Link / Transporter 已实现，进入 Gen VI Event / Mystery Gift RNG
+> - 工作区状态：当前任务包含 Gen VI Bank-only 模板过滤、独立 MT Wasm/Worker、Transporter GenderList、Profile 联动、响应式结果表和模块文档
+> - 验证状态：Gen VI Bank 定向测试、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+
+## 2026-08-18 3DSRNGTool Gen VI Pokemon Link / Transporter RNG
+
+- 新增：实现独立 `gen6bank` 工作区，只显示 XY、ORAS、Transporter 的 8 个 Bank 模板；普通 Stationary 模板不会混入 Bank 搜索。
+- 算法：复用已验证的 Stationary6 MT19937 ABI 和结果结构，在独立 Wasm 入口执行目标前置消耗、GenderList base-3 解码、3/5 个保底 IV 位置、4/5/2 表、Mew/Celebi 5V、PSV/PRV 和筛选。
+- 界面：增加 Gen VI Bank 导航、Bank-only 模板选择、Target Pokemon、Transporter GenderList 和 Gen VI Profile 联动；每次搜索创建独立 Worker，取消后重建。
+- 契约：新增 `wasm/modules/gen6bank`，49-word 请求、16-word 结果、Wasm API version 2、Contract version 1 和 `public/wasm/gen6bank.mjs/.wasm`。
+- 文档：增加 `docs/modules/gen6bank.md`，同步 README、需求、技术方案和模块库存；记录 8 个模板、输入边界、前置消耗和上游来源。
+- 已通过：`npm test -- src/features/gen6stationary src/features/gen6bank`（3 个文件、9 项测试）、`npm run verify`（135 个 Vitest 文件、502 项测试、Vite 转换 2196 个模块、PWA 预缓存 188 项约 20.6 MiB）、`npm run format:check`、`git diff --check`、`POKERNGKIT_WASM_MODULES=gen6bank npm run wasm:test:native`（1/1）和激活 Emscripten 6.0.6 后的 `POKERNGKIT_WASM_MODULES=gen6bank npm run wasm:build`。
+- Lint：0 error、7 条既有 TanStack Virtual `react-hooks/incompatible-library` warning，无本模块新增 warning。
+- 未运行：外部 Chrome / Edge UI 回归，原因是当前无 9222/9223/9515 调试端点；生产页面算法验收仍需部署后由项目所有者提供准确 URL 并授权。
+- 下一步：提交并推送 `feat: 实现第六世代宝可梦连接与虚拟传送乱数`；随后进入 Gen VI Event / Mystery Gift RNG。
 
 ## 2026-08-18 3DSRNGTool Gen VI Stationary RNG
 
