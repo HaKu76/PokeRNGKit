@@ -15,6 +15,9 @@
 7. [`third_party/pokefinder/UPSTREAM.md`](../third_party/pokefinder/UPSTREAM.md)：vendored 源码来源、修改边界和 SHA-256。
 8. [Hakuhiro 项目风格 Skill](../.agents/skills/hakuhiro-project-style/SKILL.md)：README、进度、提交、构建与发布说明格式。
 9. [HakuStyle Web 前端 Skill](../.agents/skills/web-frontend-style/SKILL.md)：页面布局、视觉层级、响应式、交互样式、可访问性与动效规则。
+10. [固定 UI 设计契约](ui-design.md)：PokeRNGKit 的 Ant Neutral、标准密度、侧栏、
+    面板、候选控件与浮动工具基线。对应 HakuStyle 的
+    `references/pokerngkit-ui-contract.md` 为唯一完整规范。
 
 修改第四世代模块时，还必须读取对应的 `docs/modules/gen4<module>.md` 和 `src/features/shared/rngModuleContract.ts`。开始未实现模块前先核对[模块库存](module-inventory.md)，每次只完成一个独立模块并收口对应导航、文档、测试与构建清单。
 

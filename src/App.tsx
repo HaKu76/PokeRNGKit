@@ -10,6 +10,20 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Calculator,
+  ChevronDown,
+  Menu,
+  Monitor,
+  Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Search,
+  SlidersHorizontal,
+  Sun,
+  UserRound,
+  X,
+} from "lucide-react";
+import {
   calculateRsSeed,
   formatHex,
   parseDecimal,
@@ -195,6 +209,259 @@ type ActiveModule =
   | "pokerusfinder"
   | "gen4wild";
 
+type ModuleNavigationItem = {
+  id: ActiveModule;
+  label: string;
+  pokerusMode?: "gen3" | "pthgss";
+};
+
+type ModuleNavigationGroup = {
+  id: string;
+  label: string;
+  marker: string;
+  items: readonly ModuleNavigationItem[];
+};
+
+const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
+  {
+    id: "gen3",
+    label: "GEN III",
+    marker: "3",
+    items: [
+      { id: "id", label: "idModule" },
+      { id: "initialseed", label: "initialSeedModule" },
+      { id: "ngcseed", label: "ngcSeedModule" },
+      { id: "seedtotime", label: "seedToTimeModule" },
+      { id: "static", label: "staticModule" },
+      { id: "wild", label: "wildModule" },
+      { id: "ivtopid", label: "ivToPidModule" },
+      { id: "egg", label: "eggModule" },
+      { id: "spindapainter", label: "spindaPainterModule" },
+      {
+        id: "pokerusfinder",
+        label: "pokerusFinderModule",
+        pokerusMode: "gen3",
+      },
+      { id: "gamecube", label: "gameCubeModule" },
+      { id: "pidtoiv", label: "pidToIvModule" },
+      { id: "pokespot", label: "pokeSpotModule" },
+      { id: "jirachiadvancer", label: "jirachiAdvancerModule" },
+    ],
+  },
+  {
+    id: "gen4",
+    label: "GEN IV",
+    marker: "4",
+    items: [
+      { id: "gen4id", label: "gen4IdModule" },
+      { id: "gen4seedtotime", label: "gen4SeedToTimeModule" },
+      { id: "gen4static", label: "gen4StaticModule" },
+      { id: "gen4wild", label: "gen4WildModule" },
+      { id: "gen4egg", label: "gen4EggModule" },
+      { id: "gen4event", label: "gen4EventModule" },
+      { id: "gen4chainedsid", label: "gen4ChainedSidModule" },
+      { id: "gen4advance", label: "gen4AdvanceModule" },
+      {
+        id: "pokerusfinder",
+        label: "pokerusFinderModule",
+        pokerusMode: "pthgss",
+      },
+    ],
+  },
+  {
+    id: "gen5",
+    label: "GEN V",
+    marker: "5",
+    items: [
+      { id: "gen5profiles", label: "gen5ProfilesModule" },
+      { id: "gen5id", label: "gen5IdModule" },
+      { id: "gen5adjacentseeds", label: "gen5AdjacentSeedsModule" },
+      { id: "gen5ivcache", label: "gen5IvCacheModule" },
+      { id: "gen5sha1cache", label: "gen5Sha1CacheModule" },
+      { id: "gen5dreamradar", label: "gen5DreamRadarModule" },
+      { id: "gen5static", label: "gen5StaticModule" },
+      { id: "gen5wild", label: "gen5WildModule" },
+      { id: "gen5hiddengrotto", label: "gen5HiddenGrottoModule" },
+      { id: "gen5egg", label: "gen5EggModule" },
+      { id: "gen5event", label: "gen5EventModule" },
+    ],
+  },
+  {
+    id: "gen6",
+    label: "GEN VI",
+    marker: "6",
+    items: [
+      { id: "gen6stationary", label: "gen6StationaryModule" },
+      { id: "gen6bank", label: "gen6BankModule" },
+      { id: "gen6event", label: "gen6EventModule" },
+    ],
+  },
+  {
+    id: "gen7",
+    label: "GEN VII",
+    marker: "7",
+    items: [
+      { id: "gen7stationary", label: "gen7StationaryModule" },
+      { id: "gen7wild", label: "gen7WildModule" },
+      { id: "gen7sos", label: "gen7SosModule" },
+      { id: "gen7egg", label: "gen7EggModule" },
+      { id: "gen7id", label: "gen7IdModule" },
+      { id: "gen7battletree", label: "gen7BattleTreeModule" },
+      { id: "gen7event", label: "gen7EventModule" },
+      { id: "gen7main", label: "gen7MainModule" },
+      { id: "gen7eggseedfinder", label: "gen7EggSeedFinderModule" },
+      { id: "gen7festivalplaza", label: "gen7FestivalPlazaModule" },
+    ],
+  },
+  {
+    id: "3ds",
+    label: "3DSRNGTOOL",
+    marker: "3D",
+    items: [{ id: "threedsprofiles", label: "threeDsProfilesModule" }],
+  },
+  {
+    id: "gen8",
+    label: "GEN VIII",
+    marker: "8",
+    items: [
+      { id: "gen8profiles", label: "gen8ProfilesModule" },
+      { id: "gen8id", label: "gen8IdModule" },
+      { id: "gen8egg", label: "gen8EggModule" },
+      { id: "gen8event", label: "gen8EventModule" },
+      { id: "gen8raids", label: "gen8RaidsModule" },
+      { id: "gen8static", label: "gen8StaticModule" },
+      { id: "gen8underground", label: "gen8UndergroundModule" },
+      { id: "gen8wild", label: "gen8WildModule" },
+      { id: "gen8denmap", label: "gen8DenMapModule" },
+    ],
+  },
+  {
+    id: "tools",
+    label: "RNG TOOLS",
+    marker: "R",
+    items: [{ id: "researcher", label: "researcherModule" }],
+  },
+];
+
+function readModuleRailCollapsed() {
+  if (typeof localStorage === "undefined") return false;
+  return localStorage.getItem("pokerngkit-module-rail-collapsed") === "true";
+}
+
+function ModuleNavigation({
+  activeModule,
+  collapsed,
+  onGroupToggle,
+  onSearchChange,
+  onSelect,
+  openGroups,
+  pokerusInitialMode,
+  searchQuery,
+}: {
+  activeModule: ActiveModule;
+  collapsed: boolean;
+  onGroupToggle: (group: string) => void;
+  onSearchChange: (query: string) => void;
+  onSelect: (group: string, item: ModuleNavigationItem) => void;
+  openGroups: ReadonlySet<string>;
+  pokerusInitialMode: "gen3" | "pthgss";
+  searchQuery: string;
+}) {
+  const { t } = useTranslation();
+  const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
+  const visibleGroups = moduleNavigationGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) =>
+        t(item.label).toLocaleLowerCase().includes(normalizedQuery),
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
+  const searching = normalizedQuery.length > 0;
+
+  return (
+    <>
+      <div
+        aria-label={t("modules")}
+        className="module-rail-search"
+        inert={collapsed ? true : undefined}
+        role="search"
+      >
+        <Search aria-hidden="true" size={16} />
+        <input
+          aria-label={t("modules")}
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder={t("modules")}
+          type="search"
+          value={searchQuery}
+        />
+        {searchQuery && (
+          <button
+            aria-label={t("clear")}
+            onClick={() => onSearchChange("")}
+            title={t("clear")}
+            type="button"
+          >
+            <X aria-hidden="true" size={15} />
+          </button>
+        )}
+      </div>
+      <nav aria-label={t("modules")} className="module-navigation">
+        {visibleGroups.map((group) => {
+          const expanded = searching || openGroups.has(group.id);
+          return (
+            <section className="module-nav-group" key={group.id}>
+              <button
+                aria-expanded={expanded}
+                aria-label={group.label}
+                className="module-nav-group-toggle"
+                onClick={() => onGroupToggle(group.id)}
+                title={group.label}
+                type="button"
+              >
+                <span aria-hidden="true" className="module-generation-icon">
+                  {group.marker}
+                </span>
+                <span className="module-nav-group-label">{group.label}</span>
+                <ChevronDown
+                  aria-hidden="true"
+                  className={expanded ? "rotated" : undefined}
+                  size={16}
+                />
+              </button>
+              {expanded && (
+                <div className="module-nav-group-items">
+                  {group.items.map((item) => {
+                    const selected =
+                      item.id === activeModule &&
+                      (!item.pokerusMode ||
+                        item.pokerusMode === pokerusInitialMode);
+                    return (
+                      <button
+                        aria-current={selected ? "page" : undefined}
+                        className={`module-entry${selected ? " active" : ""}`}
+                        key={`${group.id}-${item.id}-${item.pokerusMode ?? ""}`}
+                        onClick={() => onSelect(group.id, item)}
+                        title={t(item.label)}
+                        type="button"
+                      >
+                        <strong>{t(item.label)}</strong>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          );
+        })}
+        {visibleGroups.length === 0 && (
+          <div className="module-navigation-empty">{t("empty")}</div>
+        )}
+      </nav>
+    </>
+  );
+}
+
 const modes: { id: Id3Mode; label: "xdColo" | "frlg" | "rs" }[] = [
   { id: "xd-colo", label: "xdColo" },
   { id: "fr-lg", label: "frlg" },
@@ -217,7 +484,7 @@ function initialDateTime() {
 
 function App() {
   const { t, i18n } = useTranslation();
-  const { theme, changeTheme } = useTheme();
+  const { preference, changeTheme } = useTheme();
   const profiles = useGen3Profiles();
   const gen4Profiles = useGen4Profiles();
   const threeDsProfiles = useThreeDsProfiles();
@@ -227,11 +494,18 @@ function App() {
     "gen3" | "pthgss"
   >("gen3");
   const [moduleRailOpen, setModuleRailOpen] = useState(false);
-  const [moduleRailCollapsed, setModuleRailCollapsed] = useState(false);
+  const [moduleRailCollapsed, setModuleRailCollapsed] = useState(
+    readModuleRailCollapsed,
+  );
+  const [moduleSearchQuery, setModuleSearchQuery] = useState("");
+  const [openModuleGroups, setOpenModuleGroups] = useState(
+    () => new Set<string>(),
+  );
   const [ivCalculatorExpanded, setIvCalculatorExpanded] = useState(false);
   const [encounterLookupExpanded, setEncounterLookupExpanded] = useState(false);
   const [contributionsExpanded, setContributionsExpanded] = useState(false);
   const [sponsorshipExpanded, setSponsorshipExpanded] = useState(false);
+  const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
     useState<Gen5AdjacentSeedsInitialContext>();
   const gen5AdjacentSeedsRequestId = useRef(0);
@@ -370,6 +644,12 @@ function App() {
       }
     };
   }, [moduleRailOpen, wideViewport]);
+  useEffect(() => {
+    localStorage.setItem(
+      "pokerngkit-module-rail-collapsed",
+      String(moduleRailCollapsed),
+    );
+  }, [moduleRailCollapsed]);
 
   const calculatedRsSeed = useMemo(() => {
     if (deadBattery) return 0x05a0;
@@ -660,6 +940,31 @@ function App() {
     }
   };
 
+  const toolRailUsesHover = () =>
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  const toggleModuleGroup = (group: string) => {
+    if (moduleRailCollapsed) {
+      setModuleRailCollapsed(false);
+      setOpenModuleGroups(new Set([group]));
+      return;
+    }
+    setOpenModuleGroups((current) => {
+      const next = new Set(current);
+      if (next.has(group)) next.delete(group);
+      else next.add(group);
+      return next;
+    });
+  };
+
+  const selectModule = (group: string, item: ModuleNavigationItem) => {
+    if (item.pokerusMode) setPokerusInitialMode(item.pokerusMode);
+    setActiveModule(item.id);
+    setModuleRailOpen(false);
+    setModuleSearchQuery("");
+    setOpenModuleGroups(new Set([group]));
+  };
+
   const toggleFloatingTool = (
     tool: "contributions" | "encounter" | "iv" | "profile" | "sponsorship",
   ) => {
@@ -712,7 +1017,13 @@ function App() {
             ref={moduleMenuButtonRef}
             type="button"
           >
-            <span aria-hidden="true">☰</span>
+            {wideViewport && moduleRailCollapsed ? (
+              <PanelLeftOpen aria-hidden="true" size={19} />
+            ) : wideViewport ? (
+              <PanelLeftClose aria-hidden="true" size={19} />
+            ) : (
+              <Menu aria-hidden="true" size={19} />
+            )}
           </button>
           <div className="brand-lockup">
             <div className="brand-mark" aria-hidden="true">
@@ -744,26 +1055,37 @@ function App() {
           </div>
         </div>
         <div className="topbar-meta">
-          <span className={`status-chip ${uiPreviewMode ? "amber" : "teal"}`}>
-            {t(uiPreviewMode ? "uiPreview" : "wasmCore")}
+          <span className="app-status">
+            <span aria-hidden="true" />
+            {t(uiPreviewMode ? "uiPreview" : "ready")}
           </span>
-          <span className="status-chip red">{t("workerPool")}</span>
-          <button
-            aria-label={t(theme === "dark" ? "themeLight" : "themeDark")}
-            className="theme-toggle"
-            onClick={(event) =>
-              changeTheme(theme === "dark" ? "light" : "dark", {
-                x: event.clientX,
-                y: event.clientY,
-              })
-            }
-            title={t(theme === "dark" ? "themeLight" : "themeDark")}
-            type="button"
-          >
-            <span aria-hidden="true" className="theme-toggle-icon">
-              {theme === "dark" ? "☀" : "☾"}
-            </span>
-          </button>
+          <div aria-label={t("themeMode")} className="theme-switch">
+            {[
+              { value: "light" as const, label: "themeLight", Icon: Sun },
+              { value: "dark" as const, label: "themeDark", Icon: Moon },
+              {
+                value: "system" as const,
+                label: "themeSystem",
+                Icon: Monitor,
+              },
+            ].map(({ value, label, Icon }) => (
+              <button
+                aria-pressed={preference === value}
+                className={preference === value ? "selected" : undefined}
+                key={value}
+                onClick={(event) =>
+                  changeTheme(value, {
+                    x: event.clientX,
+                    y: event.clientY,
+                  })
+                }
+                title={t(label)}
+                type="button"
+              >
+                <Icon aria-hidden="true" size={16} />
+              </button>
+            ))}
+          </div>
           <div className="language-switch" aria-label={t("language")}>
             <button
               className={language === "zh" ? "selected" : ""}
@@ -802,20 +1124,12 @@ function App() {
         <aside
           aria-label={!wideViewport ? t("modules") : undefined}
           aria-modal={!wideViewport ? true : undefined}
-          aria-hidden={
-            (!wideViewport && !moduleRailOpen) ||
-            (wideViewport && moduleRailCollapsed)
-          }
+          aria-hidden={!wideViewport && !moduleRailOpen}
           className={`module-rail${moduleRailOpen ? " open" : ""}${
             moduleRailCollapsed ? " collapsed" : ""
           }`}
           id="module-rail"
-          inert={
-            (!wideViewport && !moduleRailOpen) ||
-            (wideViewport && moduleRailCollapsed)
-              ? true
-              : undefined
-          }
+          inert={!wideViewport && !moduleRailOpen ? true : undefined}
           ref={moduleRailRef}
           role={!wideViewport ? "dialog" : undefined}
         >
@@ -828,11 +1142,21 @@ function App() {
                 title={t("closeModules")}
                 type="button"
               >
-                <span aria-hidden="true">&larr;</span>
+                <X aria-hidden="true" size={19} />
               </button>
             </div>
           )}
-          <nav aria-label={t("modules")} className="module-navigation">
+          <ModuleNavigation
+            activeModule={activeModule}
+            collapsed={wideViewport && moduleRailCollapsed}
+            onGroupToggle={toggleModuleGroup}
+            onSearchChange={setModuleSearchQuery}
+            onSelect={selectModule}
+            openGroups={openModuleGroups}
+            pokerusInitialMode={pokerusInitialMode}
+            searchQuery={moduleSearchQuery}
+          />
+          <nav aria-label={t("modules")} className="module-navigation" hidden>
             <div className="rail-section-label">GEN III</div>
             <button
               className={
@@ -1884,7 +2208,7 @@ function App() {
               </span>
             </button>
           </nav>
-          <div className="rail-footer">
+          <div className="rail-footer" hidden>
             <span className="rail-dot" />
             {t("localOnly")}
           </div>
@@ -2989,67 +3313,97 @@ function App() {
             onExpandedChange={changeProfileExpanded}
           />
         ) : null}
-        <nav aria-label={t("tools")} className="floating-tool-rail">
-          <button
-            aria-controls="iv-calculator-panel"
-            aria-expanded={activeFloatingTool === "iv"}
-            aria-haspopup="dialog"
-            aria-label={t("ivCalculator")}
-            className={activeFloatingTool === "iv" ? "active" : undefined}
-            data-tone="teal"
-            id="iv-calculator-trigger"
-            onClick={() => toggleFloatingTool("iv")}
-            title={t("ivCalculator")}
-            type="button"
+        <div
+          aria-label={t("tools")}
+          className={`floating-tool-rail${floatingToolsExpanded ? " expanded" : ""}`}
+          onMouseEnter={() => {
+            if (toolRailUsesHover()) setFloatingToolsExpanded(true);
+          }}
+          onMouseLeave={() => {
+            if (toolRailUsesHover()) setFloatingToolsExpanded(false);
+          }}
+        >
+          <nav
+            aria-label={t("tools")}
+            className="floating-tool-actions"
+            id="floating-tool-actions"
           >
-            <span aria-hidden="true" className="floating-tool-rail-icon">
-              IV
-            </span>
-            <span>{t("ivCalculator")}</span>
-          </button>
-          <button
-            aria-controls="encounter-lookup-panel"
-            aria-expanded={activeFloatingTool === "encounter"}
-            aria-haspopup="dialog"
-            aria-label={t("encounterLookupModule")}
-            className={
-              activeFloatingTool === "encounter" ? "active" : undefined
-            }
-            data-tone="amber"
-            id="encounter-lookup-trigger"
-            onClick={() => toggleFloatingTool("encounter")}
-            title={t("encounterLookupModule")}
-            type="button"
-          >
-            <span aria-hidden="true" className="floating-tool-rail-icon">
-              ◉
-            </span>
-            <span>{t("encounterLookupModule")}</span>
-          </button>
-          {profileTools && (
             <button
-              aria-controls={
-                gen4Tools ? "gen4-profile-panel" : "gen3-profile-panel"
-              }
-              aria-expanded={activeFloatingTool === "profile"}
+              aria-controls="iv-calculator-panel"
+              aria-expanded={activeFloatingTool === "iv"}
               aria-haspopup="dialog"
-              aria-label={t("profile")}
-              className={
-                activeFloatingTool === "profile" ? "active" : undefined
-              }
-              data-tone="brand"
-              id={gen4Tools ? "gen4-profile-trigger" : "gen3-profile-trigger"}
-              onClick={() => toggleFloatingTool("profile")}
-              title={t("profile")}
+              aria-label={t("ivCalculator")}
+              className={activeFloatingTool === "iv" ? "active" : undefined}
+              data-tone="teal"
+              id="iv-calculator-trigger"
+              onClick={() => {
+                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                toggleFloatingTool("iv");
+              }}
+              title={t("ivCalculator")}
               type="button"
             >
-              <span aria-hidden="true" className="floating-tool-rail-icon">
-                ID
-              </span>
-              <span>{t("profile")}</span>
+              <Calculator aria-hidden="true" size={19} />
             </button>
-          )}
-        </nav>
+            <button
+              aria-controls="encounter-lookup-panel"
+              aria-expanded={activeFloatingTool === "encounter"}
+              aria-haspopup="dialog"
+              aria-label={t("encounterLookupModule")}
+              className={
+                activeFloatingTool === "encounter" ? "active" : undefined
+              }
+              data-tone="amber"
+              id="encounter-lookup-trigger"
+              onClick={() => {
+                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                toggleFloatingTool("encounter");
+              }}
+              title={t("encounterLookupModule")}
+              type="button"
+            >
+              <Search aria-hidden="true" size={19} />
+            </button>
+            {profileTools && (
+              <button
+                aria-controls={
+                  gen4Tools ? "gen4-profile-panel" : "gen3-profile-panel"
+                }
+                aria-expanded={activeFloatingTool === "profile"}
+                aria-haspopup="dialog"
+                aria-label={t("profile")}
+                className={
+                  activeFloatingTool === "profile" ? "active" : undefined
+                }
+                data-tone="brand"
+                id={gen4Tools ? "gen4-profile-trigger" : "gen3-profile-trigger"}
+                onClick={() => {
+                  if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                  toggleFloatingTool("profile");
+                }}
+                title={t("profile")}
+                type="button"
+              >
+                <UserRound aria-hidden="true" size={19} />
+              </button>
+            )}
+          </nav>
+          <button
+            aria-controls="floating-tool-actions"
+            aria-expanded={floatingToolsExpanded}
+            aria-label={t("tools")}
+            className="floating-tool-toggle"
+            onClick={(event) => {
+              if (toolRailUsesHover() && event.detail > 0) return;
+              if (floatingToolsExpanded) event.currentTarget.blur();
+              setFloatingToolsExpanded((current) => !current);
+            }}
+            title={t("tools")}
+            type="button"
+          >
+            <SlidersHorizontal aria-hidden="true" size={19} />
+          </button>
+        </div>
       </div>
       <footer className="legal-footer">
         <button

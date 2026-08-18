@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { readTheme } from "./theme";
+import { readTheme, readThemePreference } from "./theme";
 
 describe("theme preference", () => {
   afterEach(() => {
@@ -19,6 +19,15 @@ describe("theme preference", () => {
       getItem: () => null,
     });
     vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    expect(readTheme()).toBe("dark");
+  });
+
+  it("preserves the system preference and resolves it at read time", () => {
+    vi.stubGlobal("localStorage", {
+      getItem: () => "system",
+    });
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    expect(readThemePreference()).toBe("system");
     expect(readTheme()).toBe("dark");
   });
 });

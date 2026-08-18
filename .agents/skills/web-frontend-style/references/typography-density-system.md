@@ -114,6 +114,12 @@ form.
 - Keep a sidebar navigation row at `44-48px`; never compress labels until adjacent
   rows become difficult to hit.
 - Reserve label width during loading and selection changes so controls do not jump.
+- Treat density as a geometry contract, not a font-size switch. A density profile
+  must coordinate control height, touch target, row height, panel padding, field
+  gaps, grid tracks, table rows, and responsive spacing; changing only text size
+  is invalid. Standard density keeps `44px` controls and touch targets, while a
+  compact profile may use `40px` desktop controls only when the task benefits and
+  must restore at least `44px` targets on touch surfaces.
 
 ## 5. Spacing
 
@@ -160,13 +166,19 @@ pixel, terminal, or desktop-window recipe.
 ## 7. Borders, fills, and elevation
 
 The default layer order is: solid/high-opacity fill, quiet neutral border when
-needed, then restrained shadow. A component does not need all three.
+needed, and usually no shadow. A component does not need all three. Do not use an
+opaque, broad, high-contrast `box-shadow` as a decorative outline. Reserve
+directional shadow for drawers, popovers, floating panels, or a named material
+recipe where it communicates a real layer boundary.
 
 - Keep default borders near the surface family, not the text color. A border and
   label must not share the same saturated blue, purple, pink, or red unless the
   component is selected, invalid, warning, or focused.
 - Use `1px` borders for structure. Use `2px` only for focus, game frames, or an
   explicit themed shell.
+- Keep ordinary navigation and control state markers at `1px` maximum. Do not use
+  `border-left`, `border-right`, or accent bars of `3px` or more for selected rows;
+  use a filled selected surface and stable text hierarchy instead.
 - Prefer a filled hover/selected surface over recoloring both border and text to
   the same accent.
 - Avoid outlining every card. Use whitespace or a subtle elevation when the card

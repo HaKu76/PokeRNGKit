@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 export type Theme = "light" | "dark";
+export type ThemePreference = Theme | "system";
 
 type ThemeTransitionOrigin = {
   x: number;
@@ -22,10 +23,20 @@ function systemTheme(): Theme {
     : "light";
 }
 
-export function readTheme(): Theme {
-  if (typeof localStorage === "undefined") return systemTheme();
+export function readThemePreference(): ThemePreference {
+  if (typeof localStorage === "undefined") return "system";
   const stored = localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === "light" || stored === "dark" ? stored : systemTheme();
+  return stored === "light" || stored === "dark" || stored === "system"
+    ? stored
+    : "system";
+}
+
+function resolveTheme(preference: ThemePreference): Theme {
+  return preference === "system" ? systemTheme() : preference;
+}
+
+export function readTheme(): Theme {
+  return resolveTheme(readThemePreference());
 }
 
 export function applyTheme(theme: Theme) {
@@ -34,21 +45,42 @@ export function applyTheme(theme: Theme) {
 }
 
 export function initializeTheme() {
-  applyTheme(readTheme());
+  applyTheme(resolveTheme(readThemePreference()));
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(readTheme);
+  const [preference, setPreference] =
+    useState<ThemePreference>(readThemePreference);
+  const [theme, setTheme] = useState<Theme>(() => resolveTheme(preference));
 
-  useEffect(() => applyTheme(theme), [theme]);
+  useEffect(() => {
+    const applyPreference = () => {
+      const resolved = resolveTheme(preference);
+      applyTheme(resolved);
+      setTheme(resolved);
+    };
+    applyPreference();
+    if (preference !== "system" || typeof matchMedia === "undefined") {
+      return;
+    }
+    const mediaQuery = matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => applyPreference();
+    mediaQuery.addEventListener?.("change", handleChange);
+    return () => mediaQuery.removeEventListener?.("change", handleChange);
+  }, [preference]);
 
-  const changeTheme = (nextTheme: Theme, origin?: ThemeTransitionOrigin) => {
+  const changeTheme = (
+    nextPreference: ThemePreference,
+    origin?: ThemeTransitionOrigin,
+  ) => {
     const commitTheme = () => {
-      applyTheme(nextTheme);
-      setTheme(nextTheme);
+      const resolved = resolveTheme(nextPreference);
+      applyTheme(resolved);
+      setPreference(nextPreference);
+      setTheme(resolved);
     };
 
-    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    localStorage.setItem(THEME_STORAGE_KEY, nextPreference);
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const viewTransitionDocument = document as ViewTransitionDocument;
 
@@ -69,7 +101,7 @@ export function useTheme() {
     root.style.setProperty("--theme-transition-x", `${origin.x}px`);
     root.style.setProperty("--theme-transition-y", `${origin.y}px`);
     root.style.setProperty("--theme-transition-radius", `${radius}px`);
-    root.dataset.themeTransition = nextTheme;
+    root.dataset.themeTransition = resolveTheme(nextPreference);
 
     const transition = viewTransitionDocument.startViewTransition(commitTheme);
     void transition.finished.finally(() => {
@@ -77,5 +109,5 @@ export function useTheme() {
     });
   };
 
-  return { theme, changeTheme };
+  return { preference, theme, changeTheme };
 }

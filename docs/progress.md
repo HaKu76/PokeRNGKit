@@ -7,6 +7,27 @@
 > - 工作区状态：当前任务包含独立 MT Wasm/Worker、54-word 请求、Wonder Card 导入、XY/ORAS 生成、固定高度虚拟结果表、三语界面和模块文档
 > - 验证状态：Gen VI Event 定向 Vitest、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
 
+## 2026-08-18 HakuStyle UI Demo 与正式工作台基线
+
+- 新增：增加独立 `?demo=hakustyle` 预览入口，使用 Ant Neutral 单一主题展示工作台侧栏、配置表单、筛选、结果表、进度、浮动工具、三类面板和下拉选框。
+- 优化：标准密度固定为 16px 正文 / 44px 控件，并同步调整面板内边距、字段间距、导航行高和结果行几何；浅色、深色、系统跟随主题偏好写入 localStorage，系统模式监听操作系统变化。
+- 优化：侧栏展开宽度进一步收窄为 224px（1120px 以下为 216px），收起 Rail 为 64px；搜索框到首个世代、各世代之间的垂直间距进一步压缩为 4px，世代数字提升为 17px 且与 `GEN III` 同一中线；数字与 `Open Modules` 共用 44px 外框，分组按钮内间距收紧；模块项移除重复图标和小字描述，底部 `hs-demo-rail-footer` 已删除；收起时不展示下拉项，点击世代数字会展开侧栏并打开对应层级；折叠状态写入 localStorage，图标按钮提供 tooltip。
+- 修复：移除侧栏顶部 `hs-demo-rail-header` 模块；世代数字图标与 `Open Modules` 使用同一 `44px` 方形外框尺寸，并同步分组按钮轨道，展开与收起状态保持居中。
+- 修复：桌面菜单按钮只切换侧栏折叠，移动端按钮只切换抽屉；移除选中导航项的 `3px border-left`，改用填充选中背景；同步将 HakuStyle 的普通状态标记限制为 `1px`，避免高描边重新出现。
+- 优化：浮动面板统一居中显示，并按档案、个体值计算器、遇敌查询功能使用不同宽度；标题栏支持 Pointer Events 拖动与键盘方向键位移，位置受视口边界限制；加入缓冲式抽屉/面板进入动效和 reduced-motion 回退；深浅切换改为图标按钮，文字只通过 tooltip 与 `aria-label` 提示。
+- 新增：浮动工具改为单一折叠触发器，桌面端鼠标进入后向上展开、离开后收起，移动端以点击触发器切换；工具按钮彼此独立等距。键盘焦点可展开工具且鼠标点击焦点不会钉住展开态；工具面板支持 scrim、显式关闭、`Escape` 关闭、焦点圈定和触发器焦点恢复。Demo 内所有下拉均统一为输入 + 按钮的候选控件，支持打开、键盘方向键、Enter、Escape 与鼠标选择；下拉预览保留实体候选层，采用默认宽度、键盘与移动端贴边策略。
+- 清理：所有待确认项已经由项目所有者确认，移除临时 `UI review` 区块；移除 `PANEL STATES`、`PANEL PREVIEW` 等说明性 eyebrow 文案，保留实际面板标题和操作。
+- 设计契约：Ant Neutral、响应式工作台、标准密度、圆润控件、实体内容面、solid-backed glass 导航、Apple/博客式缓冲动效；普通面板不使用不透明大范围 `box-shadow` 描边，仅保留状态焦点环和必要的层级边界。
+- 新增：正式 `App` 接入相同的 Ant Neutral 令牌、三态主题、224px / 64px Rail、搜索和按世代默认收纳导航；保留 `?demo=hakustyle` 作为独立审查入口，真实模块面板和 RNG/Worker 业务不替换。
+- 优化：正式工作台的右下角工具 Rail 复用 Demo 行为，桌面端悬停展开、离开收起，移动端点击切换；浮动按钮使用 Lucide 图标，保留面板居中、拖动、scrim、Escape 与焦点恢复。
+- 固化：新增 `.agents/skills/web-frontend-style/references/pokerngkit-ui-contract.md` 与 `docs/ui-design.md`，并在 `AGENTS.md`、`docs/ai-development.md` 中将契约设为后续 UI 的强制基线。
+- 文件：`src/App.tsx`、`src/styles.css`、`src/HakuStyleDemo.tsx`、`src/hakuStyleDemo.css`、`src/theme.ts`、`src/i18n.ts`、`src/main.tsx`、`docs/ui-design.md`、`.agents/skills/web-frontend-style/SKILL.md`、`.agents/skills/web-frontend-style/references/pokerngkit-ui-contract.md`。
+- 已通过：本轮编辑后重新运行定向 `npm run format:files -- ...`、`npm run format:check`、`git diff --check`，以及 HakuStyle Skill 校验。
+- 已启动：`npm run dev:ui`，本地预览地址为 `http://127.0.0.1:5173/?demo=hakustyle`；服务器当前保持运行。
+- 已通过：`powershell -ExecutionPolicy Bypass -File .agents/skills/web-frontend-style/scripts/validate.ps1`（Skill is valid）。
+- 待人工确认：当前 Demo 视觉决策已收口；外部 Chrome / Edge 未连接，未执行自动浏览器回归。
+- 下一步：完成格式与 Skill 校验后提交并推送本次正式 UI 基线；未获具体授权前不运行测试、构建或浏览器回归。
+
 ## 2026-08-18 3DSRNGTool Gen VI Event / Mystery Gift RNG
 
 - 新增：实现独立 `gen6event` 工作区，支持 X、Y、Omega Ruby、Alpha Sapphire、物种/形态/等级、固定 IV、保底随机 V、Ability / Nature / Gender 锁定、四种 PID Type、Your ID、Egg、Other Information 与 TID/SID/EC/PID。

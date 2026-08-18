@@ -34,6 +34,9 @@ visible UI change:
 8. Read only the relevant section of
    `references/frontend-style-distillation-sources.md` when a task names a source,
    requires evidence/attribution, or may reuse a licensed implementation.
+9. Read `references/pokerngkit-ui-contract.md` for every PokeRNGKit product UI
+   change. It is the owner's fixed project profile and supersedes open-ended
+   HakuStyle selection for this repository until the owner changes it.
 
 ## Non-negotiable baseline
 
@@ -59,6 +62,21 @@ default border: quiet neutral 1px, only when needed
 - Do not make border and text the same saturated color in a normal state.
 - Do not use glass as a global default. Important text and controls need a stable,
   readable surface.
+- Do not use an opaque, broad, high-contrast `box-shadow` as a decorative outline
+  around ordinary cards, panels, fields, or page sections. Prefer an opaque surface,
+  whitespace, and a quiet neutral `1px` border; use no shadow by default. Reserve
+  directional shadow for drawers, popovers, floating panels, or a named material
+  recipe where it communicates a real layer boundary, and keep it restrained.
+- Keep ordinary navigation and control state markers at `1px` maximum. Do not use
+  `border-left`, `border-right`, or accent bars of `3px` or more for selected rows;
+  use a filled selected surface and stable text hierarchy instead. Reserve `2px`
+  for focus indicators, game frames, or an explicitly named theme frame.
+- Treat density as a geometry contract, not a font-size switch. A density profile
+  must coordinate control height, touch target, row height, panel padding, field
+  gaps, grid tracks, table rows, and responsive spacing; changing only text size
+  is invalid. Standard density keeps `44px` controls and touch targets, while a
+  compact profile may use `40px` desktop controls only when the task benefits and
+  must restore at least `44px` targets on touch surfaces.
 - For low-cost tool chrome, prefer PokeRNGKit's solid-backed glass recipe: an opaque
   tinted shell, `.06-.08` inner control fills, quiet light borders, graded scrims,
   and opaque content panels. Do not claim or require blur when none is used.

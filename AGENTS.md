@@ -30,6 +30,10 @@
 
 ## Frontend Composition
 
+- PokeRNGKit 的固定视觉基线是 Ant Neutral HakuStyle。修改产品 UI 前必须读取
+  `.agents/skills/web-frontend-style/references/pokerngkit-ui-contract.md` 与
+  `docs/ui-design.md`；不得自行回退到 Royal Blueprint、编号面板、高描边、全局
+  阴影或临时主题选择器。
 - On desktop, keep the primary form and actions within the available viewport whenever practical. The page shell should avoid vertical scrolling; prefer the results table as the main scroll region. Only allow page scrolling when the module's real control set cannot be reduced without hiding required behavior.
 - Use tabs, segmented modes, compact field grids, and collapsible advanced settings to fit dense modules. Do not shrink text or touch targets below the established HakuStyle baseline to force a fit.
 - Keep core Generator/Searcher workflows as independent module workspaces. Consolidate lightweight global tools, profile managers, lookup helpers, templates, and module-support utilities into the floating tool menu when this shortens navigation without obscuring ownership.
