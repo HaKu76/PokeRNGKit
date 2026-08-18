@@ -1,6 +1,6 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav 与 Profile Manager 已实现，下一模块为 Gen VI Poke Radar RNG
+> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar 与 Profile Manager 已实现，下一模块为 Gen VI Egg RNG
 > - 更新日期：2026-08-18
 > - 当前范围：完整 PokeFinder 4.3.2，以及 `docs/module-inventory.md` 中除 `NTR Helper` 外的全部 3DSRNGTool 功能
 > - 包管理器：npm
@@ -204,6 +204,7 @@ gen6bank
 gen6event
 gen6wild
 gen6dexnav
+gen6pokeradar
 gen7stationary
 gen7wild
 gen7sos

@@ -2,10 +2,23 @@
 
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`00a11ae`；当前工作区正在收口 3DSRNGTool Gen VI DexNav RNG，改动待提交
-> - 当前阶段：Gen VI DexNav 已实现，下一模块为 Gen VI Poke Radar RNG
-> - 工作区状态：当前任务包含 TinyMT 触发/搜索、摇晃坐标、槽位与 Boost、Potential、隐藏特性、蛋招式、持有物、闪光检查、Dedicated Worker/Wasm、可编辑槽位、固定高度虚拟结果表、三语界面和模块文档
-> - 验证状态：Gen VI DexNav 定向 Vitest、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+> - Git 功能基线：`038f1aa`；本地 `main` 比 `origin/main` 超前 1 个提交，当前工作区正在收口 3DSRNGTool Gen VI Poke Radar RNG
+> - 当前阶段：Gen VI Poke Radar 已实现，下一模块为 Gen VI Egg RNG
+> - 工作区状态：当前任务包含 TinyMT 音乐状态、四个宝可梦摇草块、一个空块、连锁/Boost 闪光块判定、9×9 概览、Dedicated Worker/Wasm、固定高度虚拟结果表、三语界面和模块文档
+> - 验证状态：Gen VI Poke Radar 定向 Vitest、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+
+## 2026-08-18 3DSRNGTool Gen VI Poke Radar RNG
+
+- 新增：实现独立 `gen6pokeradar` 工作区，覆盖 TinyMT Seed/Frame、帧范围、Party Size、Chain Length、Boost、音乐状态、四个宝可梦摇草块、一个不可踩空块和 9×9 概览。
+- 算法：复用上游 `Gen6/PokeRadar.cs` 与 `RNG/TinyMT.cs` 的消耗顺序；保留 `23/43/63/83` GoodRate、音乐触发、连锁/Boost 闪光阈值和 `Patch.X/Y` 坐标映射。
+- 界面：增加帧范围与生成参数、进度、取消、100000 行结果上限、CSV、固定高度虚拟结果表，以及 `B/G/S/X/C` 草块概览。
+- 契约：新增 `wasm/modules/gen6pokeradar`，8-word 请求、16-word 结果、Wasm API version 1、Contract version 1、独立 Worker 和 `public/wasm/gen6pokeradar.mjs/.wasm`。
+- 文档：增加 `docs/modules/gen6pokeradar.md`，同步 README、需求、技术方案和模块库存；记录 TinyMT、帧范围、队伍数量、连锁长度、GoodRate、闪光阈值、坐标映射和浏览器任务上限。
+- 已通过：`npm test -- src/features/gen6pokeradar`（2 个文件、4 项测试）、`npm run verify`（143 个测试文件、522 项测试、Vite 转换 2218 个模块、PWA 预缓存 200 项）、`npm run format:check`、`git diff --check`、`$env:POKERNGKIT_WASM_MODULES='gen6pokeradar'; node scripts/wasm.mjs test-native`（1/1）和激活 Emscripten 6.0.6 后的 `node scripts/wasm.mjs build`。
+- Lint：0 error、11 条 TanStack Virtual `react-hooks/incompatible-library` warning，其中 1 条来自本模块虚拟结果表。
+- 产物：`public/wasm/gen6pokeradar.mjs` 7565 bytes，SHA-256 `5285F825A7E98462E079928F310C7F3722A56C0772268FB2713263AA2DC794DC`；`public/wasm/gen6pokeradar.wasm` 6743 bytes，SHA-256 `2173E008765E425837148DDBFD30297C32519A696F094C876195579955F07F7B`。
+- 未运行：外部 Chrome / Edge UI 回归，原因是当前无外部调试端点；生产页面算法验收仍需部署后由项目所有者提供准确 URL 并授权。
+- 下一步：提交并推送 `feat: 实现第六世代宝可雷达乱数`；随后核对并实现 Gen VI Egg RNG。
 
 ## 2026-08-18 3DSRNGTool Gen VI DexNav RNG
 

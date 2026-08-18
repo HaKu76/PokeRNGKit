@@ -1,0 +1,13 @@
+{
+  "id": "gen6pokeradar",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6pokeradar",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6pokeradar.mjs",
+    "wasm": "gen6pokeradar.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 Gen6/PokeRadar.cs and RNG/TinyMT.cs"
+}
