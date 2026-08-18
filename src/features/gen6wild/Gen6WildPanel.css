@@ -1,0 +1,270 @@
+.gen6wild-panel {
+  min-height: 0;
+}
+
+.gen6wild-workspace {
+  display: grid;
+  grid-template-columns: minmax(420px, 0.9fr) minmax(560px, 1.4fr);
+  gap: 16px;
+  min-height: 0;
+}
+
+.gen6wild-controls,
+.gen6wild-results-panel {
+  min-width: 0;
+  min-height: 0;
+}
+
+.gen6wild-controls {
+  max-height: calc(100vh - 180px);
+  overflow: auto;
+}
+
+.gen6wild-heading {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.gen6wild-heading > div {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gen6wild-heading h2,
+.gen6wild-heading h3 {
+  margin: 0;
+}
+
+.gen6wild-heading small {
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen6wild-section {
+  border-top: 1px solid var(--border-subtle);
+  padding: 14px 0;
+}
+
+.gen6wild-section:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.gen6wild-section h3 {
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+.gen6wild-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gen6wild-grid .field,
+.gen6wild-iv-grid .field {
+  min-width: 0;
+}
+
+.gen6wild-grid input,
+.gen6wild-grid select,
+.gen6wild-iv-grid input,
+.gen6wild-slot-editor input,
+.gen6wild-checks select {
+  min-width: 0;
+  width: 100%;
+}
+
+.gen6wild-checks {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 10px;
+}
+
+.gen6wild-checks label,
+.gen6wild-ignore {
+  align-items: center;
+  display: inline-flex;
+  gap: 7px;
+}
+
+.gen6wild-custom-slots {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.gen6wild-custom-slots > strong {
+  grid-column: 1 / -1;
+}
+
+.gen6wild-slot-editor {
+  align-items: center;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: 22px 1fr 1fr;
+}
+
+.gen6wild-slot-editor span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.gen6wild-iv-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.gen6wild-iv-grid .field > div {
+  align-items: center;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.gen6wild-ignore {
+  margin-top: 12px;
+}
+
+.gen6wild-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 14px;
+}
+
+.gen6wild-actions button {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.gen6wild-actions progress {
+  flex: 1 0 100%;
+  height: 8px;
+}
+
+.gen6wild-error,
+.gen6wild-summary {
+  margin: 10px 0 0;
+}
+
+.gen6wild-error {
+  color: var(--danger);
+}
+
+.gen6wild-summary {
+  color: var(--text-muted);
+}
+
+.gen6wild-results-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.gen6wild-results {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  flex: 0 0 clamp(440px, 58vh, 680px);
+  min-height: 440px;
+  overflow: auto;
+  position: relative;
+}
+
+.gen6wild-table {
+  min-width: 1100px;
+  position: relative;
+}
+
+.gen6wild-table-head,
+.gen6wild-table-row {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 72px 92px 92px 92px 66px 54px 48px 92px 54px 54px 58px 58px 54px;
+  left: 0;
+  padding: 0 12px;
+  position: absolute;
+  right: 0;
+}
+
+.gen6wild-table-head {
+  background: var(--surface-strong);
+  border-bottom: 1px solid var(--border-subtle);
+  height: 42px;
+  top: 0;
+  z-index: 1;
+}
+
+.gen6wild-table-head button {
+  background: none;
+  border: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  min-height: 30px;
+  overflow: hidden;
+  padding: 0;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen6wild-table-row {
+  border-bottom: 1px solid var(--border-subtle);
+  height: 38px;
+}
+
+.gen6wild-table-row span {
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen6wild-empty {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  inset: 42px 0 0;
+  justify-content: center;
+  position: absolute;
+}
+
+@media (max-width: 1120px) {
+  .gen6wild-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .gen6wild-controls {
+    max-height: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .gen6wild-grid,
+  .gen6wild-iv-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gen6wild-custom-slots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen6wild-results {
+    flex-basis: 520px;
+    min-height: 520px;
+  }
+}

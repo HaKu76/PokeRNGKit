@@ -1,0 +1,13 @@
+{
+  "id": "gen6wild",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6wild",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6wild.mjs",
+    "wasm": "gen6wild.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 Gen6/Wild6.cs, Core/WildRNG.cs, Core/RNGPool.cs and RNG/MT.cs"
+}

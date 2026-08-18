@@ -2,10 +2,48 @@
 
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`c442735`；当前工作区正在收口 3DSRNGTool Gen VI Event / Mystery Gift RNG，改动待提交
-> - 当前阶段：Gen VI Event / Mystery Gift 已实现，下一模块为 Gen VI Wild RNG
-> - 工作区状态：当前任务包含独立 MT Wasm/Worker、54-word 请求、Wonder Card 导入、XY/ORAS 生成、固定高度虚拟结果表、三语界面和模块文档
-> - 验证状态：Gen VI Event 定向 Vitest、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+> - Git 功能基线：本地 HakuStyle 工作台提交已与 origin/main 的 Gen VI Wild / DexNav / Poke Radar 提交合并，待提交合并结果
+> - 当前阶段：Gen VI Wild、DexNav、Poke Radar 已实现，下一模块为 Gen VI Egg RNG
+> - 工作区状态：正式 App 与 `?demo=hakustyle` 共用固定 Ant Neutral HakuStyle 契约；Gen VI 新模块保留独立 Worker/Wasm、固定高度虚拟结果表、三语界面和模块文档
+> - 验证状态：远程 Gen VI 提交已带有各自定向 Vitest、完整 verify、原生夹具和 Emscripten Wasm 构建记录；本次合并仅执行格式与差异检查，外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+
+## 2026-08-18 3DSRNGTool Gen VI Poke Radar RNG
+
+- 新增：实现独立 `gen6pokeradar` 工作区，覆盖 TinyMT Seed/Frame、帧范围、Party Size、Chain Length、Boost、音乐状态、四个宝可梦摇草块、一个不可踩空块和 9×9 概览。
+- 算法：复用上游 `Gen6/PokeRadar.cs` 与 `RNG/TinyMT.cs` 的消耗顺序；保留 `23/43/63/83` GoodRate、音乐触发、连锁/Boost 闪光阈值和 `Patch.X/Y` 坐标映射。
+- 界面：增加帧范围与生成参数、进度、取消、100000 行结果上限、CSV、固定高度虚拟结果表，以及 `B/G/S/X/C` 草块概览。
+- 契约：新增 `wasm/modules/gen6pokeradar`，8-word 请求、16-word 结果、Wasm API version 1、Contract version 1、独立 Worker 和 `public/wasm/gen6pokeradar.mjs/.wasm`。
+- 文档：增加 `docs/modules/gen6pokeradar.md`，同步 README、需求、技术方案和模块库存；记录 TinyMT、帧范围、队伍数量、连锁长度、GoodRate、闪光阈值、坐标映射和浏览器任务上限。
+- 已通过：`npm test -- src/features/gen6pokeradar`（2 个文件、4 项测试）、`npm run verify`（143 个测试文件、522 项测试、Vite 转换 2218 个模块、PWA 预缓存 200 项）、`npm run format:check`、`git diff --check`、`$env:POKERNGKIT_WASM_MODULES='gen6pokeradar'; node scripts/wasm.mjs test-native`（1/1）和激活 Emscripten 6.0.6 后的 `node scripts/wasm.mjs build`。
+- Lint：0 error、11 条 TanStack Virtual `react-hooks/incompatible-library` warning，其中 1 条来自本模块虚拟结果表。
+- 产物：`public/wasm/gen6pokeradar.mjs` 7565 bytes，SHA-256 `5285F825A7E98462E079928F310C7F3722A56C0772268FB2713263AA2DC794DC`；`public/wasm/gen6pokeradar.wasm` 6743 bytes，SHA-256 `2173E008765E425837148DDBFD30297C32519A696F094C876195579955F07F7B`。
+- 未运行：外部 Chrome / Edge UI 回归，原因是当前无外部调试端点；生产页面算法验收仍需部署后由项目所有者提供准确 URL 并授权。
+- 下一步：提交并推送 `feat: 实现第六世代宝可雷达乱数`；随后核对并实现 Gen VI Egg RNG。
+
+## 2026-08-18 3DSRNGTool Gen VI DexNav RNG
+
+- 新增：实现独立 `gen6dexnav` 工作区，覆盖 Grass、Tall Grass、Surf 的主动搜索与普通触发、摇晃坐标、槽位类型、连锁 Boost、搜索等级、Potential、Flute、隐藏特性、蛋招式、持有物和闪光检查。
+- 算法：复用上游 `Gen6/DexNav.cs` 与 `RNG/TinyMT.cs` 的消耗顺序；保留 `FindPatch()` / `PostCheck()` 成功占位行为，Nav HA、Unown 和强制闪光与上游 MainForm 设置联动。
+- 界面：增加 Tiny Seed/Frame、遇敌类型、主动搜索、图鉴导航遇敌、搜索等级、连锁长度、潜力星级、笛子、档案 TSV/TRV、13 槽可编辑物种/等级、进度、取消、100000 行结果上限、CSV 和固定高度虚拟结果表。
+- 契约：新增 `wasm/modules/gen6dexnav`，45-word 请求、16-word 结果、Wasm API version 1、Contract version 1、独立 Worker 和 `public/wasm/gen6dexnav.mjs/.wasm`。
+- 文档：增加 `docs/modules/gen6dexnav.md`，同步 README、需求、技术方案和模块库存；记录 `DexNav.cs` 的输入边界、Grade/Boost/闪光检查和上游占位限制。
+- 已通过：`npm test -- src/features/gen6dexnav`（2 个文件、4 项测试）、`npm run verify`（141 个测试文件、518 项测试、Vite 转换 2213 个模块、PWA 预缓存 197 项）、`npm run format:check`、`git diff --check`、`$env:POKERNGKIT_WASM_MODULES='gen6dexnav'; node scripts/wasm.mjs test-native`（1/1）和激活 Emscripten 6.0.6 后的 `node scripts/wasm.mjs build`。
+- Lint：0 error、10 条 TanStack Virtual `react-hooks/incompatible-library` warning，其中 1 条来自本模块虚拟结果表。
+- 产物：`public/wasm/gen6dexnav.mjs` 7490 bytes，SHA-256 `C81F8167D1276F9D0B187421267449127214BAEB922D046D8477830E568E04FB`；`public/wasm/gen6dexnav.wasm` 8980 bytes，SHA-256 `B14937434D5869759467374734AEB36580713445A466E474275A1769D5588313`。
+- 未运行：外部 Chrome / Edge UI 回归，原因是当前无外部调试端点；生产页面算法验收仍需部署后由项目所有者提供准确 URL 并授权。
+- 下一步：提交并推送 `feat: 实现第六世代图鉴导航乱数`；随后核对并实现 Gen VI Poke Radar RNG。
+
+## 2026-08-18 3DSRNGTool Gen VI Wild RNG
+
+- 新增：实现独立 `gen6wild` 工作区，覆盖 X、Y、Omega Ruby、Alpha Sapphire 的普通野生、Horde、Rock Smash 和 Fishing；支持队首能力、笛子、钓竿、Horde 选槽、闪耀护符、异色/方块异色、IV、性格、觉醒力量、性别、特性、道具与槽位筛选。
+- 算法：复用上游 `Wild6`、`WildRNG`、`RNGPool` 的 TinyMT/MT19937 消耗顺序；普通、碎岩、钓鱼和群聚分别保留动态延迟、队伍消耗和五只连续生成规则；算法只在独立 Dedicated Worker 和 Wasm 中执行。
+- 数据：从 `LocationTable6.cs`、`HordeArea6.cs`、`FishingArea.cs` 和三语地点资源生成 183 个区域记录；上游 revision 缺少完整 XY 普通野生槽位时使用可编辑自定义槽位，并在模块文档记录限制。
+- 界面：增加版本、遭遇类型、地点、Seed、Tiny Seed、帧范围、Delay、队伍数量、钓竿、队首能力、笛子、槽位与完整结果筛选，支持进度、取消、100000 行结果上限、CSV、排序和固定高度虚拟结果表。
+- 契约：新增 `wasm/modules/gen6wild`，96-word 请求、16-word 结果、Wasm API version 1、Contract version 1、独立 Worker 和 `public/wasm/gen6wild.mjs/.wasm`。
+- 已通过：`npm test -- src/features/gen6wild`（2 个文件、5 项测试）、`npm run verify`（139 个测试文件、514 项测试、Vite/PWA 生产构建）、`npm run format:check`、`git diff --check`、`POKERNGKIT_WASM_MODULES=gen6wild npm run wasm:test:native`（1/1）和激活 Emscripten 6.0.6 后的 `POKERNGKIT_WASM_MODULES=gen6wild npm run wasm:build`。
+- 产物：`public/wasm/gen6wild.mjs` 7440 bytes，SHA-256 `5490544C909FADF410F0A2F3D292354C520269DC1A5041FE1598DDA7B907419C`；`public/wasm/gen6wild.wasm` 14225 bytes，SHA-256 `C5082B38815D6434008656477A574E61980EF675DC0BA2258A974D885152F9DD`。
+- 未运行：外部 Chrome / Edge UI 回归，原因是当前无外部调试端点；生产页面算法验收仍需部署后由项目所有者提供准确 URL 并授权。
+- 下一步：提交并推送 `feat: 实现第六世代野生乱数`；随后核对并实现 Gen VI DexNav RNG。
 
 ## 2026-08-18 HakuStyle UI Demo 与正式工作台基线
 

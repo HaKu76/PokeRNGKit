@@ -5,17 +5,18 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：实现 3DSRNGTool Gen VI Wild RNG。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
+**当前里程碑：实现 3DSRNGTool Gen VI Egg RNG。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
 
 - 当前范围：完整 PokeFinder 4.3.2，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能
 - 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary / Pokemon Link / Transporter / Event、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
-- 当前工作：实现 3DSRNGTool Gen VI Wild RNG
-- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md)
+- 当前工作：实现 3DSRNGTool Gen VI Egg RNG
+- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md) / [Gen 6 DexNav](docs/modules/gen6dexnav.md) / [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md)
 - 明确排除：仅 3DSRNGTool `NTR Helper`
 - 上游核验基线：PokeFinder 4.3.2
 - 完整库存与状态：[docs/module-inventory.md](docs/module-inventory.md)
 - 模块说明：[Gen 3 ID](docs/modules/gen3id.md) / [Gen 3 Initial Seed Finder](docs/modules/gen3initialseed.md) / [Gen 3 Seed to Time](docs/modules/gen3seedtotime.md) / [GameCube Seed Finder](docs/modules/gen3ngcseed.md) / [Gen 3 GameCube RNG](docs/modules/gen3gamecube.md) / [Gen 3 PID to IVs](docs/modules/gen3pidtoiv.md) / [Gen 3 PokeSpot](docs/modules/gen3pokespot.md) / [Gen 3 Jirachi Advancer](docs/modules/gen3jirachiadvancer.md) / [Gen 3 Static](docs/modules/gen3static.md) / [Gen 3 Wild](docs/modules/gen3wild.md) / [Gen 3 IVs to PID](docs/modules/gen3ivtopid.md) / [Gen 3 Egg](docs/modules/gen3egg.md) / [Gen 3 Spinda Painter](docs/modules/gen3spindapainter.md) / [Gen 3 Profiles](docs/modules/gen3profiles.md) / [IV Calculator](docs/modules/gen3ivcalculator.md) / [Gen 4 ID](docs/modules/gen4id.md) / [Gen 4 Seed to Time](docs/modules/gen4seedtotime.md) / [Gen 4 Static](docs/modules/gen4static.md) / [Gen 4 Wild](docs/modules/gen4wild.md) / [Gen 4 Egg](docs/modules/gen4egg.md) / [Gen 4 Advance Finder](docs/modules/gen4advance.md) / [Gen 4 Wondercard IVs](docs/modules/gen4event.md) / [Gen 4 Chained Shiny to SID](docs/modules/gen4chainedsid.md) / [Gen 4 Profiles](docs/modules/gen4profiles.md) / [Gen 5 Profiles](docs/modules/gen5profiles.md) / [Gen 5 TID/SID](docs/modules/gen5id.md) / [Gen 5 Adjacent Seeds](docs/modules/gen5adjacentseeds.md) / [Gen 5 IV Cache Finder](docs/modules/gen5ivcache.md) / [Gen 5 SHA1 Cache Finder](docs/modules/gen5sha1cache.md) / [Gen 5 Dream Radar](docs/modules/gen5dreamradar.md) / [Gen 5 Static](docs/modules/gen5static.md) / [Gen 5 Wild](docs/modules/gen5wild.md) / [Gen 5 Hidden Grotto](docs/modules/gen5hiddengrotto.md) / [Gen 5 Eggs](docs/modules/gen5egg.md) / [Gen 5 Event](docs/modules/gen5event.md) / [Gen 6 Stationary](docs/modules/gen6stationary.md) / [3DSRNGTool Profiles](docs/modules/3dsprofiles.md) / [Gen 7 Stationary](docs/modules/gen7stationary.md) / [Gen 7 Wild](docs/modules/gen7wild.md) / [Gen 7 SOS](docs/modules/gen7sos.md) / [Gen 7 Egg](docs/modules/gen7egg.md) / [Gen 7 Battle Tree](docs/modules/gen7battletree.md) / [Gen 7 Event](docs/modules/gen7event.md) / [Gen 7 ID](docs/modules/gen7id.md) / [Gen 7 Main RNG Tool](docs/modules/gen7main.md) / [Gen 7 Egg Seed Finder](docs/modules/gen7eggseedfinder.md) / [Gen 7 Festival Plaza](docs/modules/gen7festivalplaza.md) / [Gen 8 Profiles](docs/modules/gen8profiles.md) / [Gen 8 ID](docs/modules/gen8id.md) / [Gen 8 Eggs](docs/modules/gen8egg.md) / [Gen 8 Event](docs/modules/gen8event.md) / [Gen 8 Raids](docs/modules/gen8raids.md) / [Gen 8 Static](docs/modules/gen8static.md) / [Gen 8 Underground](docs/modules/gen8underground.md) / [Gen 8 Wild](docs/modules/gen8wild.md) / [Gen 8 Den Map](docs/modules/gen8denmap.md) / [Researcher](docs/modules/researcher.md) / [宝可病毒查询](docs/modules/pokerusfinder.md) / [Encounter Lookup](docs/modules/encounterlookup.md)
 - 进度与跨环境交接：[docs/progress.md](docs/progress.md)
+- Gen VI Wild 模块说明：[docs/modules/gen6wild.md](docs/modules/gen6wild.md)
 - 第七世代来源记录：[3DSRNGTool](third_party/3dsrngtool/UPSTREAM.md) / [needle-searcher](third_party/needle-searcher/UPSTREAM.md) / [Gen 7 Stationary](docs/modules/gen7stationary.md) / [Gen 7 Wild](docs/modules/gen7wild.md) / [Gen 7 SOS](docs/modules/gen7sos.md) / [Gen 7 Egg](docs/modules/gen7egg.md) / [Gen 7 Battle Tree](docs/modules/gen7battletree.md) / [Gen 7 Event](docs/modules/gen7event.md) / [Gen 7 ID](docs/modules/gen7id.md) / [Gen 7 Main](docs/modules/gen7main.md) / [Gen 7 Egg Seed Finder](docs/modules/gen7eggseedfinder.md) / [Gen 7 Festival Plaza](docs/modules/gen7festivalplaza.md)
 - 宝可病毒来源记录：[Pokerus Finder](third_party/pokerusfinder/UPSTREAM.md)
 - 需求基线：[docs/requirements.md](docs/requirements.md)
@@ -102,6 +103,25 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - 物种、形态、等级、固定 IV、保底随机 V 数、Ability / Nature / Gender 锁定、PID Type、自 ID、蛋和其他信息
 - 独立 `gen6event` Wasm API v1、54/16-word 契约、单 Dedicated Worker、完整筛选、取消、固定高度虚拟结果表和 CSV
 - 输入边界、Wonder Card 字段、XY/ORAS 生成顺序和验证状态见 [Gen 6 Event](docs/modules/gen6event.md)
+
+当前 Gen VI Wild 工作区包含：
+
+- X/Y/OR/AS 的普通野生、Horde、Rock Smash 与 Fishing 入口；XY 普通表缺失时可编辑自定义槽位
+- 183 个上游地点记录、Horde 版本替换、Fishing 三种钓竿、TinyMT、队首修正和基础筛选
+- 独立 `gen6wild` Wasm API v1、96/16-word 契约、Dedicated Worker、虚拟结果表、CSV、进度与取消
+- 输入边界、Horde 生成顺序和当前限制见 [Gen 6 Wild](docs/modules/gen6wild.md)
+
+当前 Gen VI DexNav 工作区包含：
+
+- Grass、Tall Grass、Surf 的主动搜索/普通触发、摇晃坐标、槽位类型、连锁 Boost、搜索等级、Potential、Flute、隐藏特性、蛋招式、持有物与闪光检查
+- 独立 `gen6dexnav` Wasm API v1、45/16-word 契约、Dedicated Worker、可编辑槽位、虚拟结果表、CSV、进度与取消
+- 输入边界、Grade/Boost/闪光检查顺序、上游占位行为和验证状态见 [Gen 6 DexNav](docs/modules/gen6dexnav.md)
+
+当前 Gen VI Poke Radar 工作区包含：
+
+- TinyMT 音乐状态、四个宝可梦摇草块、一个空块、连锁/Boost 闪光块判定和 9×9 概览
+- 独立 `gen6pokeradar` Wasm API v1、8/16-word 契约、Dedicated Worker、虚拟结果表、CSV、进度与取消
+- 输入边界、GoodRate、坐标映射、闪光阈值和验证状态见 [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md)
 
 当前 Gen VII ID 工作区包含：
 

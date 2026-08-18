@@ -1,0 +1,146 @@
+.gen6pokeradar-workspace {
+  display: grid;
+  grid-template-columns: minmax(380px, 0.72fr) minmax(660px, 1.5fr);
+  gap: 16px;
+  min-height: 0;
+}
+.gen6pokeradar-controls,
+.gen6pokeradar-results {
+  min-height: 0;
+  min-width: 0;
+}
+.gen6pokeradar-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gen6pokeradar-grid input {
+  min-width: 0;
+  width: 100%;
+}
+.gen6pokeradar-check {
+  align-items: center;
+  display: flex;
+  gap: 7px;
+  margin-top: 12px;
+}
+.gen6pokeradar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.gen6pokeradar-actions button {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+.gen6pokeradar-actions progress {
+  flex: 1 0 100%;
+  height: 8px;
+}
+.gen6pokeradar-overview {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  font-family: Consolas, monospace;
+  font-size: 16px;
+  line-height: 1.15;
+  margin: 16px 0 0;
+  overflow: auto;
+  padding: 12px;
+  text-align: center;
+  white-space: pre;
+}
+.gen6pokeradar-error {
+  color: var(--danger);
+}
+.gen6pokeradar-summary {
+  color: var(--text-muted);
+}
+.gen6pokeradar-results {
+  display: flex;
+  flex-direction: column;
+}
+.gen6pokeradar-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.gen6pokeradar-heading h2 {
+  margin: 0;
+}
+.gen6pokeradar-scroll {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  flex: 0 0 clamp(440px, 58vh, 680px);
+  min-height: 440px;
+  overflow: auto;
+  position: relative;
+}
+.gen6pokeradar-table {
+  min-width: 1080px;
+  position: relative;
+}
+.gen6pokeradar-head,
+.gen6pokeradar-row {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 72px 54px 54px 72px repeat(5, 150px);
+  left: 0;
+  padding: 0 12px;
+  position: absolute;
+  right: 0;
+}
+.gen6pokeradar-head {
+  background: var(--surface-strong);
+  border-bottom: 1px solid var(--border-subtle);
+  height: 42px;
+  top: 0;
+  z-index: 1;
+}
+.gen6pokeradar-head span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.gen6pokeradar-row {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  border-radius: 0;
+  color: inherit;
+  height: 38px;
+  text-align: left;
+  width: 100%;
+}
+.gen6pokeradar-row:hover,
+.gen6pokeradar-row.selected {
+  background: var(--surface-hover);
+}
+.gen6pokeradar-row span {
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gen6pokeradar-empty {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  inset: 42px 0 0;
+  justify-content: center;
+  position: absolute;
+}
+@media (max-width: 1120px) {
+  .gen6pokeradar-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 620px) {
+  .gen6pokeradar-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
