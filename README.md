@@ -5,12 +5,12 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：实现 3DSRNGTool Gen VI Egg RNG。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
+**当前里程碑：实现 3DSRNGTool Gen VI ID RNG。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
 
 - 当前范围：完整 PokeFinder 4.3.2，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能
-- 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary / Pokemon Link / Transporter / Event、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
-- 当前工作：实现 3DSRNGTool Gen VI Egg RNG
-- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md) / [Gen 6 DexNav](docs/modules/gen6dexnav.md) / [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md)
+- 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary / Pokemon Link / Transporter / Event / Wild / DexNav / Poke Radar / Egg、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
+- 当前工作：实现 3DSRNGTool Gen VI ID RNG
+- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md) / [Gen 6 DexNav](docs/modules/gen6dexnav.md) / [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md) / [Gen 6 Egg](docs/modules/gen6egg.md)
 - 明确排除：仅 3DSRNGTool `NTR Helper`
 - 上游核验基线：PokeFinder 4.3.2
 - 完整库存与状态：[docs/module-inventory.md](docs/module-inventory.md)

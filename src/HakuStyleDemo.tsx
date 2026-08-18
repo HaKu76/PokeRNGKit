@@ -441,6 +441,16 @@ export default function HakuStyleDemo() {
     }
   }, [activeTool]);
 
+  const toggleToolPanel = (tool: DemoTool) => {
+    const nextTool = activeTool === tool ? null : tool;
+    if (nextTool !== activeTool) {
+      floatingDragRef.current = null;
+      setFloatingDragging(false);
+      setFloatingOffset({ x: 0, y: 0 });
+    }
+    setActiveTool(nextTool);
+  };
+
   const handleFloatingPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
     if (
       event.button !== 0 ||
@@ -571,12 +581,6 @@ export default function HakuStyleDemo() {
       String(railCollapsed),
     );
   }, [railCollapsed]);
-
-  useEffect(() => {
-    floatingDragRef.current = null;
-    setFloatingDragging(false);
-    setFloatingOffset({ x: 0, y: 0 });
-  }, [activeTool]);
 
   const toolPanelCopy: Record<DemoTool, { detail: string; label: string }> = {
     encounter: {
@@ -1150,11 +1154,7 @@ export default function HakuStyleDemo() {
                       activeTool === tool ? " active" : ""
                     }`}
                     key={tool}
-                    onClick={() =>
-                      setActiveTool((current) =>
-                        current === tool ? null : tool,
-                      )
-                    }
+                    onClick={() => toggleToolPanel(tool)}
                     type="button"
                   >
                     <span className="hs-demo-panel-preview-icon">
@@ -1197,7 +1197,7 @@ export default function HakuStyleDemo() {
               data-tone="brand"
               onClick={() => {
                 if (!toolRailUsesHover()) setToolsExpanded(true);
-                setActiveTool((current) => (current === "iv" ? null : "iv"));
+                toggleToolPanel("iv");
               }}
               ref={(node) => {
                 toolTriggerRefs.current.iv = node;
@@ -1215,9 +1215,7 @@ export default function HakuStyleDemo() {
               data-tone="teal"
               onClick={() => {
                 if (!toolRailUsesHover()) setToolsExpanded(true);
-                setActiveTool((current) =>
-                  current === "encounter" ? null : "encounter",
-                );
+                toggleToolPanel("encounter");
               }}
               ref={(node) => {
                 toolTriggerRefs.current.encounter = node;
@@ -1235,9 +1233,7 @@ export default function HakuStyleDemo() {
               data-tone="amber"
               onClick={() => {
                 if (!toolRailUsesHover()) setToolsExpanded(true);
-                setActiveTool((current) =>
-                  current === "profile" ? null : "profile",
-                );
+                toggleToolPanel("profile");
               }}
               ref={(node) => {
                 toolTriggerRefs.current.profile = node;

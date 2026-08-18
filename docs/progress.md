@@ -2,10 +2,23 @@
 
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：本地 HakuStyle 工作台提交已与 origin/main 的 Gen VI Wild / DexNav / Poke Radar 提交合并，待提交合并结果
-> - 当前阶段：Gen VI Wild、DexNav、Poke Radar 已实现，下一模块为 Gen VI Egg RNG
-> - 工作区状态：正式 App 与 `?demo=hakustyle` 共用固定 Ant Neutral HakuStyle 契约；Gen VI 新模块保留独立 Worker/Wasm、固定高度虚拟结果表、三语界面和模块文档
-> - 验证状态：远程 Gen VI 提交已带有各自定向 Vitest、完整 verify、原生夹具和 Emscripten Wasm 构建记录；本次合并仅执行格式与差异检查，外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+> - Git 功能基线：`1f844f9`；远端 HakuStyle 工作台与 Gen VI Wild / DexNav / Poke Radar 提交已快进合并，当前工作区正在收口 Gen VI Egg RNG
+> - 当前阶段：Gen VI Egg 已实现，下一模块为 Gen VI ID RNG
+> - 工作区状态：正式 App 与 `?demo=hakustyle` 共用固定 Ant Neutral HakuStyle 契约；本轮包含 Gen VI Egg 的 Current 行、接受/拒绝延迟、双 Power Item、Dedicated Worker/Wasm、固定高度虚拟结果表、三语界面和模块文档
+> - 验证状态：Gen VI Egg 定向 Vitest、TypeScript、格式检查、原生夹具和 Emscripten 6.0.6 定向 Wasm 构建已通过；远端合并后的完整 `npm run verify` 已通过，外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+
+## 2026-08-18 3DSRNGTool Gen VI Egg RNG
+
+- 新增：实现独立 `gen6egg` 工作区，覆盖 Current 蛋、Frame Range、Accept/Reject 延迟、Main RNG PID、双亲 IV/Ability/性别/Ditto/道具、Nido Type、Shiny Charm、Masuda Method、Other TSV 与完整结果筛选。
+- 算法：复用上游 `MainForm_Core.cs::Search6_Egg`、`MainForm.cs::getEggRNG`、`Core/EggRNG.cs`、`Gen6/Egg6.cs`、`Core/RNGPool.cs` 与 `RNG/MT.cs`；保留 20 项 MT 滚动缓冲、接受蛋 16 延迟、拒绝蛋 0 延迟、双 Power Item 随机父方、Current 行和 Female IV inheritance mask。
+- 契约：新增 `wasm/modules/gen6egg`，154-word 请求、20-word 结果、Wasm API version 2、Contract version 1、独立 Worker 和 `public/wasm/gen6egg.mjs/.wasm`。
+- 文档：增加 `docs/modules/gen6egg.md`，同步 README、需求、技术方案和模块库存；记录上游 WinForms 输入边界、Current 行、接受/拒绝延迟、请求布局和验证限制。
+- 已通过：`npm test -- --run src/features/gen6egg`（2 个文件、4 项测试）、`npm run typecheck`、`npm run format:check`、`git diff --check`、`$env:POKERNGKIT_WASM_MODULES='gen6egg'; npm run wasm:test:native`（1/1）和激活 Emscripten 6.0.6 后 `$env:POKERNGKIT_WASM_MODULES='gen6egg'; npm run wasm:build`。
+- 产物：`public/wasm/gen6egg.mjs` 7547 bytes，SHA-256 `7BB1E3CC00E5C98208EB14A82403C3220CAB9CE5C637D835F73EABCC3CF399F6`；`public/wasm/gen6egg.wasm` 10475 bytes，SHA-256 `D1980DE45AFD7376BC998E4BE8B9712F492F79039996347D538EFCDA4FFAC868`。
+- 修复：远端 HakuStyle Demo 的工具面板状态重置从 effect 移入工具切换事件处理器，消除 React `set-state-in-effect` lint error；保留 Demo 作为后续 UI 风格基线，不参与 RNG 算法。
+- 已通过：合并 `origin/main` 后完整 `npm run verify`（145 个测试文件、527 项测试、Vite 转换 2225 个模块、PWA 预缓存 203 项）；Lint 0 error，保留 12 条既有 TanStack Virtual `react-hooks/incompatible-library` warning。
+- 未运行：外部 Chrome / Edge UI 回归，原因是当前无外部调试端点；生产页面算法验收仍需部署后由项目所有者提供准确 URL 并授权。网络 `git pull` 曾重试两次因连接重置失败，随后使用已获取的 `origin/main` 对象完成本地快进合并。
+- 下一步：提交并推送 `feat: 实现第六世代孵化乱数`；随后核对并实现 Gen VI ID RNG。
 
 ## 2026-08-18 3DSRNGTool Gen VI Poke Radar RNG
 

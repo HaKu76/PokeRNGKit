@@ -1,0 +1,13 @@
+{
+  "id": "gen6egg",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 2,
+  "target": "gen6egg",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6egg.mjs",
+    "wasm": "gen6egg.wasm"
+  },
+  "source": "3DSRNGTool Gen6/Egg6.cs and Core/EggRNG.cs"
+}

@@ -1,0 +1,264 @@
+.gen6egg-workspace {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(440px, 0.42fr) minmax(0, 0.58fr);
+  gap: 12px;
+}
+
+.gen6egg-controls,
+.gen6egg-results {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.gen6egg-controls {
+  overflow: auto;
+}
+
+.gen6egg-heading {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding: 0 14px;
+}
+
+.gen6egg-heading h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.gen6egg-heading span {
+  color: var(--brand-strong);
+  font:
+    700 13px/20px ui-monospace,
+    monospace;
+}
+
+.gen6egg-section,
+.gen6egg-disclosure > :not(summary) {
+  padding: 12px 14px;
+}
+
+.gen6egg-main-grid,
+.gen6egg-setting-grid,
+.gen6egg-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 11px;
+}
+
+.gen6egg-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 0 14px 12px;
+}
+
+.gen6egg-mode button {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--control-bg);
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.gen6egg-mode button.active {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.gen6egg-disclosure {
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.gen6egg-disclosure summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gen6egg-parent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gen6egg-parent-grid fieldset {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.gen6egg-parent-grid legend {
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.gen6egg-iv-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.gen6egg-setting-grid,
+.gen6egg-filter-grid {
+  margin-top: 10px;
+}
+
+.gen6egg-iv-filter {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.gen6egg-iv-filter > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.gen6egg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+.gen6egg-actions .field {
+  width: 130px;
+}
+
+.gen6egg-actions button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gen6egg-summary,
+.gen6egg-error {
+  margin: 0 14px 12px;
+  font-size: 13px;
+}
+
+.gen6egg-summary {
+  color: var(--brand-strong);
+}
+
+.gen6egg-error {
+  color: var(--danger);
+}
+
+.gen6egg-results {
+  display: flex;
+  flex-direction: column;
+}
+
+.gen6egg-table-shell {
+  position: relative;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.gen6egg-table {
+  position: relative;
+  min-width: 1650px;
+}
+
+.gen6egg-head,
+.gen6egg-row {
+  display: grid;
+  grid-template-columns: 70px 155px 100px 100px 100px 150px 100px 72px 86px 130px 92px 60px 50px;
+  align-items: center;
+}
+
+.gen6egg-head {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 42px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.gen6egg-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 38px;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text);
+  font-size: 12px;
+}
+
+.gen6egg-head span,
+.gen6egg-row span {
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen6egg-row span:nth-child(-n + 6),
+.gen6egg-row span:nth-last-child(-n + 2) {
+  font-family: ui-monospace, monospace;
+}
+
+.gen6egg-empty {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+@media (max-width: 1380px) {
+  .gen6egg-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .gen6egg-controls,
+  .gen6egg-results {
+    height: auto;
+  }
+
+  .gen6egg-table-shell {
+    height: 520px;
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .gen6egg-main-grid,
+  .gen6egg-parent-grid,
+  .gen6egg-setting-grid,
+  .gen6egg-filter-grid,
+  .gen6egg-iv-filter {
+    grid-template-columns: 1fr;
+  }
+}
