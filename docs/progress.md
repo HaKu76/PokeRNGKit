@@ -2,10 +2,23 @@
 
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`7af5008 feat: 实现3DSRNGTool存档信息管理` 已推送；当前工作区正在收口 3DSRNGTool Gen VI Stationary RNG
-> - 当前阶段：Gen VI Pokemon Link / Transporter 已实现，进入 Gen VI Event / Mystery Gift RNG
-> - 工作区状态：当前任务包含 Gen VI Bank-only 模板过滤、独立 MT Wasm/Worker、Transporter GenderList、Profile 联动、响应式结果表和模块文档
-> - 验证状态：Gen VI Bank 定向测试、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+> - Git 功能基线：`c442735`；当前工作区正在收口 3DSRNGTool Gen VI Event / Mystery Gift RNG，改动待提交
+> - 当前阶段：Gen VI Event / Mystery Gift 已实现，下一模块为 Gen VI Wild RNG
+> - 工作区状态：当前任务包含独立 MT Wasm/Worker、54-word 请求、Wonder Card 导入、XY/ORAS 生成、固定高度虚拟结果表、三语界面和模块文档
+> - 验证状态：Gen VI Event 定向 Vitest、完整 verify、原生夹具和 Emscripten Wasm 构建已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+
+## 2026-08-18 3DSRNGTool Gen VI Event / Mystery Gift RNG
+
+- 新增：实现独立 `gen6event` 工作区，支持 X、Y、Omega Ruby、Alpha Sapphire、物种/形态/等级、固定 IV、保底随机 V、Ability / Nature / Gender 锁定、四种 PID Type、Your ID、Egg、Other Information 与 TID/SID/EC/PID。
+- 算法：复用上游 Event6 的 MT19937 生成顺序；XY 每帧生成一次，ORAS 每帧生成两次并返回第二次；Wonder Card 读取 `.wc6` / `.wc6full`，Personal 性别比由 `personal_ao` 生成脚本维护。
+- 界面：增加 Gen VI Event 导航、三语标签、配信卡导入、完整 IV/性格/觉醒力量/性别/特性/异色筛选、进度、取消、结果上限、CSV 和固定高度虚拟结果表。
+- 契约：新增 `wasm/modules/gen6event`，54-word 请求、16-word 结果、Wasm API version 1、Contract version 1、独立 Dedicated Worker 与 `public/wasm/gen6event.mjs/.wasm`。
+- 文档：增加 `docs/modules/gen6event.md`，同步 README、需求、技术方案、模块库存和生成数据来源；记录 Wonder Card 偏移、输入边界、XY/ORAS 差异和许可证。
+- 已通过：`npm test -- src/features/gen6event`（2 个文件、7 项测试）、`npm run verify`（137 个 Vitest 文件、509 项测试、Vite 转换 2202 个模块、PWA 预缓存 191 项约 20.7 MiB）、`npm run format:check`、`git diff --check`、`npm run typecheck`、`POKERNGKIT_WASM_MODULES=gen6event npm run wasm:test:native`（1/1）和激活 Emscripten 6.0.6 后的 `POKERNGKIT_WASM_MODULES=gen6event npm run wasm:build`。
+- 产物：`public/wasm/gen6event.mjs` 7465 bytes，SHA-256 `BC5BB0996D616E0A829F9DDE56775B8901755F48DD7547E6D049C78C30C8D7A5`；`public/wasm/gen6event.wasm` 10929 bytes，SHA-256 `1806DD932DCF259435E02C7B459DE3481FA7CBF0C9F7066B7B6925034A27027F`。
+- Lint：0 error、8 条 TanStack Virtual `react-hooks/incompatible-library` warning，其中 1 条来自本模块结果表，属于现有 React Compiler 兼容性提示。
+- 未运行：外部 Chrome / Edge UI 回归，原因是当前无 9222/9223/9515 调试端点；生产页面算法验收仍需部署后由项目所有者提供准确 URL 并授权。
+- 下一步：提交并推送 `feat: 实现第六世代配信乱数`；随后进入 Gen VI Wild RNG。
 
 ## 2026-08-18 3DSRNGTool Gen VI Pokemon Link / Transporter RNG
 

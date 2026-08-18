@@ -1,6 +1,6 @@
 # PokeRNGKit 产品需求
 
-> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter 与 Profile Manager 已实现；下一模块为 Gen VI Event / Mystery Gift RNG
+> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event 与 Profile Manager 已实现；下一模块为 Gen VI Wild RNG
 > - 更新日期：2026-08-18
 > - 当前部署目标：GitHub Pages 测试环境
 > - 产品名称：PokeRNGKit；当前不设置中文名
@@ -11,7 +11,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 应用必须保持纯静态、无后端。用户输入、计算结果、档案和设置留在浏览器本地；站点可部署到 GitHub Pages、Cloudflare Pages 或等价静态托管，并在资源缓存完成后离线使用。
 
-当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V、全局工具与 Gen VIII 已实现。3DSRNGTool 第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary、Pokemon Link / Transporter 与独立 Profile Manager 已实现；下一模块为 Gen VI Event / Mystery Gift RNG。
+当前开发范围覆盖 PokeFinder 4.3.2 的全部产品模块，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能。PokeFinder Gen III、Gen IV、Gen V、全局工具与 Gen VIII 已实现。3DSRNGTool 第七世代 Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary、Pokemon Link / Transporter、Event 与独立 Profile Manager 已实现；下一模块为 Gen VI Wild RNG。
 
 3DSRNGTool `NTR Helper` 已明确排除。它依赖桌面程序对 3DS 调试端进行原始 TCP/NTR 通信，普通静态浏览器无法在不增加本地桥接、扩展或后端的情况下复刻。完整模块库存和当前状态见 [`docs/module-inventory.md`](module-inventory.md)。
 
@@ -812,10 +812,20 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、8 个 Bank 模板、前置消耗、49/16-word ABI、固定夹具和上游文件见 [Gen 6 Pokemon Link / Transporter](modules/gen6bank.md)。
 
+## 8.48 当前功能需求：`gen6event`
+
+- **FR-G6EVENT-01** 提供独立的 3DSRNGTool Gen VI `Event RNG` 连续帧工作区，支持 X、Y、Omega Ruby、Alpha Sapphire 与本地 `.wc6` / `.wc6full` 导入。Seed 为 8 位十六进制且空值按 `0`；帧上游上限为 `1000000000`，当前浏览器绝对帧保护上限为 `5000000`。
+- **FR-G6EVENT-02** 支持物种、形态、等级、固定 IV、`0..5` 个保底随机 V、Ability / Nature / Gender 锁定、Random / Nonshiny / Shiny / Specified PID Type、Your ID、Egg、Other Information、TID/SID/EC/PID、Delay 与 Consider Delay。
+- **FR-G6EVENT-03** `.wc6` 读取 `0x108` 字节，`.wc6full` 跳过 `0x208` 字节后读取同一结构；非宝可梦卡、截断文件、超出 Gen VI 物种/形态或字段范围的卡必须拒绝。Personal 性别比由上游 `personal_ao` 生成，不在界面代码中手工维护。
+- **FR-G6EVENT-04** MT19937、XY 单次生成、ORAS 双次生成、EC/PID、IV、Ability、Nature、Gender、Hidden Power、PSV/PRV、筛选和结果打包只在独立 `gen6event` Wasm API v1 中执行；模块使用 54-word 请求、16-word 结果和单 Dedicated Worker。
+- **FR-G6EVENT-05** 提供六项 IV、完美 IV 数量、性格、觉醒力量、性别、特性、异色和方块异色筛选，以及进度、取消、100000 行结果上限、固定高度虚拟结果表、CSV、清空、错误与空结果状态。
+
+完整输入限制、Wonder Card 字段、XY/ORAS 生成顺序、54/16-word ABI、固定夹具和上游文件见 [Gen 6 Event](modules/gen6event.md)。
+
 ## 9. 后续实施顺序
 
-1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter 与 Profile Manager 已实现。
-2. 下一模块为 3DSRNGTool Gen VI Event / Mystery Gift RNG，完成后继续 Gen VI 与其他公共工具库存。
+1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event 与 Profile Manager 已实现。
+2. 下一模块为 3DSRNGTool Gen VI Wild RNG，完成后继续 Gen VI 与其他公共工具库存。
 3. 继续实现 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
 4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
 5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
