@@ -36,7 +36,7 @@ PokeFinder 核对入口：
 | 5    | Gen VI  | DexNav RNG                               | 已实现 |
 | 6    | Gen VI  | Poke Radar RNG                           | 已实现 |
 | 7    | Gen VI  | Egg RNG                                  | 已实现 |
-| 8    | Gen VI  | ID RNG                                   | 计划   |
+| 8    | Gen VI  | ID RNG                                   | 已实现 |
 | 9    | Gen VI  | Main Seed Finder                         | 计划   |
 | 10   | Gen VI  | TinyMT Timeline Tool                     | 计划   |
 | 11   | Gen VII | Stationary RNG                           | 已实现 |
@@ -56,6 +56,44 @@ PokeFinder 核对入口：
 | 25   | 公共    | TSV List                                 | 计划   |
 | 26   | 公共    | IV Range / IV Template                   | 计划   |
 | 27   | 公共    | NTR Helper                               | 不开发 |
+
+## TinyFinder（Gen VI 扩展）
+
+主要行为来源：本地 C:\Users\Hakuhiro\Desktop\project\TinyFinder-main，公开来源为 Bambo-Rambo/TinyFinder。来源、许可证和代码入口见 third_party/tinyfinder/UPSTREAM.md。
+
+| 编号 | 功能                                                   | 状态                                |
+| ---- | ------------------------------------------------------ | ----------------------------------- |
+| T1   | TinyMT 日期 / Index Searcher                           | 计划                                |
+| T2   | Index 筛选与状态查看                                   | 计划                                |
+| T3   | ID RNG                                                 | 已实现（与 gen6id 合并核对）        |
+| T4   | Normal Wild / Friend Safari                            | 已实现（与 gen6wild 合并核对）      |
+| T5   | Fishing RNG                                            | 已实现（与 gen6wild 合并核对）      |
+| T6   | Rock Smash RNG                                         | 计划                                |
+| T7   | Horde RNG                                              | 已实现（与 gen6wild 分支核对）      |
+| T8   | Honey Wild RNG                                         | 计划                                |
+| T9   | Poke Radar RNG                                         | 已实现（与 gen6pokeradar 合并核对） |
+| T10  | Ambush Encounter                                       | 计划                                |
+| T11  | DexNav Moving / Searching                              | 已实现（与 gen6dexnav 合并核对）    |
+| T12  | Victory Road Swooping                                  | 计划                                |
+| T13  | MT Seed Searcher（IV、PID、PID reroll、EC/PID、Horde） | 计划                                |
+| T14  | MT 初始 Seed / Time Finder                             | 计划                                |
+
+TinyFinder 已实现模块仍需逐字段检查其特有分支、日期/Index 语义和固定夹具，不能仅凭同名 3DSRNGTool 模块视为完成。
+
+## 3DSTimeFinder 日期/时间反查
+
+主要行为来源：本地 C:\Users\Hakuhiro\Desktop\project\3DSTimeFinder-master，公开来源为 Admiral-Fish/3DSTimeFinder。来源、GPL-3.0 和入口见 third_party/3dstimefinder/UPSTREAM.md。
+
+| 编号 | 世代    | 功能                                  | 状态             |
+| ---- | ------- | ------------------------------------- | ---------------- |
+| TF1  | Gen VI  | Stationary 时间/初始 Seed Searcher    | 计划             |
+| TF2  | Gen VI  | Event 时间/初始 Seed Searcher         | 计划             |
+| TF3  | Gen VII | Stationary 时间/初始 Seed Searcher    | 计划             |
+| TF4  | Gen VII | Event 时间/初始 Seed Searcher         | 计划             |
+| TF5  | Gen VII | Wild 时间/初始 Seed Searcher          | 计划             |
+| TF6  | Gen VII | ID 时间/初始 Seed Searcher            | 计划             |
+| TF7  | Gen VI  | Profile Manager / Editor 时间字段     | 已实现（需核对） |
+| TF8  | Gen VII | Profile Manager / Editor / Calibrator | 已实现（需核对） |
 
 Options、Language 和结果表通用操作属于应用外壳或模块支撑，不单独作为 RNG 模块提交。
 
@@ -79,7 +117,7 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 ## 实施顺序
 
-1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary / Pokemon Link / Event / Wild / DexNav / Poke Radar / Egg 与公共 Profile Manager 已实现。
-2. 下一模块为 3DSRNGTool Gen VI ID RNG；字段、控件边界和算法以对应 WinForms/Core 源码为准。
+1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary / Pokemon Link / Event / Wild / DexNav / Poke Radar / Egg / ID 与公共 Profile Manager 已实现。
+2. 下一模块为 3DSRNGTool Gen VI Main Seed Finder；字段、控件边界和算法以对应 WinForms/Core 源码为准。
 3. 继续核对其余模块库存，不提前合并不同上游工作流；`NTR Helper` 除外。
 4. 全部模块完成后执行全仓验证、Actions 部署和生产页面回归。

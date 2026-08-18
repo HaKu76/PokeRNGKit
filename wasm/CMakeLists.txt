@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(POKERNGKIT_WASM_MODULES "gen3id;gen3initialseed;gen3seedtotime;gen3ngcseed;gen3static;gen3wild;gen3ivtopid;gen3pidtoiv;gen3egg;gen3gamecube;gen3pokespot;gen3jirachi;gen4id;gen4seedtotime;gen4static;gen4wild;gen4egg;gen4event;gen4chainedsid;gen4advance;gen5profiles;gen5id;gen5adjacentseeds;gen5ivcache;gen5sha1cache;gen5dreamradar;gen5static;gen5wild;gen5hiddengrotto;gen5egg;gen5event;gen6stationary;gen6bank;gen6event;gen6wild;gen6dexnav;gen6pokeradar;gen6egg;gen7stationary;gen7wild;gen7sos;gen7egg;gen7battletree;gen7event;gen7main;gen7eggseedfinder;gen7festivalplaza;gen7id;gen8id;gen8egg;gen8event;gen8raids;gen8static;gen8underground;gen8wild;pokerusfinder;researcher" CACHE STRING "Semicolon-separated Wasm modules to build, or all")
+set(POKERNGKIT_WASM_MODULES "gen3id;gen3initialseed;gen3seedtotime;gen3ngcseed;gen3static;gen3wild;gen3ivtopid;gen3pidtoiv;gen3egg;gen3gamecube;gen3pokespot;gen3jirachi;gen4id;gen4seedtotime;gen4static;gen4wild;gen4egg;gen4event;gen4chainedsid;gen4advance;gen5profiles;gen5id;gen5adjacentseeds;gen5ivcache;gen5sha1cache;gen5dreamradar;gen5static;gen5wild;gen5hiddengrotto;gen5egg;gen5event;gen6stationary;gen6bank;gen6event;gen6wild;gen6dexnav;gen6pokeradar;gen6egg;gen6id;gen7stationary;gen7wild;gen7sos;gen7egg;gen7battletree;gen7event;gen7main;gen7eggseedfinder;gen7festivalplaza;gen7id;gen8id;gen8egg;gen8event;gen8raids;gen8static;gen8underground;gen8wild;pokerusfinder;researcher" CACHE STRING "Semicolon-separated Wasm modules to build, or all")
 set(
     POKERNGKIT_WASM_OUTPUT_DIR
     "${CMAKE_CURRENT_SOURCE_DIR}/../public/wasm"
@@ -31,6 +31,7 @@ pokerngkit_add_module(gen6wild)
 pokerngkit_add_module(gen6dexnav)
 pokerngkit_add_module(gen6pokeradar)
 pokerngkit_add_module(gen6egg)
+pokerngkit_add_module(gen6id)
 
 pokerngkit_add_module(gen3id)
 pokerngkit_add_module(gen3initialseed)

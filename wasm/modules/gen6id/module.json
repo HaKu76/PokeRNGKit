@@ -1,0 +1,13 @@
+{
+  "id": "gen6id",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6id",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6id.mjs",
+    "wasm": "gen6id.wasm"
+  },
+  "source": "3DSRNGTool Gen6/ID6.cs and RNG/TinyMT.cs"
+}

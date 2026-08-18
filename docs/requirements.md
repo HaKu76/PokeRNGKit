@@ -856,10 +856,37 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、Current 行、接受/拒绝延迟、154/20-word ABI、固定夹具和上游文件见 [Gen 6 Egg](modules/gen6egg.md)。
 
+## 8.53 当前功能需求：gen6id
+
+- **FR-G6ID-01** 提供 3DSRNGTool Gen VI ID RNG 连续 TinyMT 帧工作区，支持四字状态、帧范围、TID、SID、完整 TID/SID、TSV、TRV、Random Number 与 TinyMT 状态筛选。
+- **FR-G6ID-02** 输入必须匹配上游 ID6 与 IDFilters：四个状态字为 32 位十六进制且空值按 0；帧为 0..1,000,000,000，当前浏览器绝对帧保护上限为 5,000,000；结果上限为 1..100,000。
+- **FR-G6ID-03** TinyMT 状态推进、Random、TID/SID/TSV/TRV 和筛选只在独立 gen6id Wasm API v1 中执行；模块使用 6-word 请求、8-word 结果、单 Dedicated Worker 与每批 2,048 帧。
+- **FR-G6ID-04** 提供进度、取消、100000 行结果上限、虚拟滚动、排序、CSV、清空、错误和空结果状态；状态输入与结果列按上游 [3]..[0] 顺序显示。
+
+完整输入限制、TinyMT 顺序、6/8-word ABI、固定夹具和上游文件见 [Gen 6 ID](modules/gen6id.md)。
+
+## 8.54 TinyFinder Gen VI 扩展需求
+
+- **FR-TINY-01** 纳入 TinyFinder 的 TinyMT 日期/Index Searcher、Index 筛选、Normal Wild、Friend Safari、Fishing、Rock Smash、Horde、Honey Wild、Poke Radar、Ambush、DexNav Moving/Searching 与 Victory Road Swooping。
+- **FR-TINY-02** 纳入 TinyFinder 独立 MT Seed Searcher 的 IV、PID、PID reroll、EC/PID、群聚闪光和 MT 初始 Seed/Time Finder；MT/TinyMT 算法仍只能在对应 Wasm Worker 内执行。
+- **FR-TINY-03** 已有 Gen VI ID、Wild、DexNav 和 Poke Radar 必须按 TinyFinder Methods、RNG/TinyMT.cs、数据表和 BlinkSystem.cs 逐字段核对；独有 Honey、Ambush、Swooping、Rock Smash、日期/Index 与 MT Searcher 分支不得遗漏。
+- **FR-TINY-04** TinyFinder 未实现 TinyMT Timeline calibration；该功能仍按 3DSRNGTool 库存独立开发，不以 TinyFinder README 的缺失作为完成依据。
+
+完整来源、许可和后续模块映射见 [TinyFinder 来源记录](../third_party/tinyfinder/UPSTREAM.md)。
+
+## 8.55 3DSTimeFinder 日期/时间反查需求
+
+- **FR-TIME-01** 提供 3DSTimeFinder 的 Gen VI Stationary/Event、Gen VII Stationary/Event/Wild/ID 日期与初始 Seed 反查；支持 Citra RTC 区间、Profile Save Variable/Time Variable、帧范围和上游实际筛选字段。
+- **FR-TIME-02** 日期换算、初始 Seed 生成、SFMT/MT 推进、结果过滤和时间列只在独立时间搜索 Worker/Wasm operation 中执行，不在 React 主线程重写生产 RNG。
+- **FR-TIME-03** Gen VI/Gen VII Profile Manager、Editor 与 Gen VII Profile Calibrator 的时间字段必须与 3DSTimeFinder ProfileLoader、Profile6、Profile7 和校准流程逐字段兼容；已有 3DSRNGTool Profile Manager 只作为持久化层，不覆盖上游计算语义。
+- **FR-TIME-04** 结果保留上游实际 Date/Time、Initial Seed、Frame 与生成字段，提供进度、取消、结果上限、排序、CSV、错误和空结果状态。
+
+完整模块、上游文件、提交和许可证见 [3DSTimeFinder 来源记录](../third_party/3dstimefinder/UPSTREAM.md)。
+
 ## 9. 后续实施顺序
 
-1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg 与 Profile Manager 已实现。
-2. 下一模块为 3DSRNGTool Gen VI ID RNG，完成后继续 Gen VI 与其他公共工具库存。
+1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID 与 Profile Manager 已实现。
+2. 下一模块为 3DSRNGTool Gen VI Main Seed Finder，完成后继续 Gen VI 与其他公共工具库存。
 3. 继续实现 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
 4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
 5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
@@ -979,7 +1006,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 14. 阶段划分
 
-当前按完整模块库存推进。PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg 与独立 Profile Manager 已实现；下一模块为 Gen VI ID RNG。
+当前按完整模块库存推进。PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID 与独立 Profile Manager 已实现；下一模块为 Gen VI Main Seed Finder。
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。

@@ -5,12 +5,12 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：实现 3DSRNGTool Gen VI ID RNG。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
+**当前里程碑：实现 3DSRNGTool Gen VI Main Seed Finder。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
 
 - 当前范围：完整 PokeFinder 4.3.2，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能
-- 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary / Pokemon Link / Transporter / Event / Wild / DexNav / Poke Radar / Egg、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
-- 当前工作：实现 3DSRNGTool Gen VI ID RNG
-- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md) / [Gen 6 DexNav](docs/modules/gen6dexnav.md) / [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md) / [Gen 6 Egg](docs/modules/gen6egg.md)
+- 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary / Pokemon Link / Transporter / Event / Wild / DexNav / Poke Radar / Egg / ID、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
+- 当前工作：实现 3DSRNGTool Gen VI Main Seed Finder
+- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md) / [Gen 6 DexNav](docs/modules/gen6dexnav.md) / [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md) / [Gen 6 Egg](docs/modules/gen6egg.md) / [Gen 6 ID](docs/modules/gen6id.md)
 - 明确排除：仅 3DSRNGTool `NTR Helper`
 - 上游核验基线：PokeFinder 4.3.2
 - 完整库存与状态：[docs/module-inventory.md](docs/module-inventory.md)
@@ -122,6 +122,12 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - TinyMT 音乐状态、四个宝可梦摇草块、一个空块、连锁/Boost 闪光块判定和 9×9 概览
 - 独立 `gen6pokeradar` Wasm API v1、8/16-word 契约、Dedicated Worker、虚拟结果表、CSV、进度与取消
 - 输入边界、GoodRate、坐标映射、闪光阈值和验证状态见 [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md)
+
+当前 Gen VI ID 工作区包含：
+
+- TinyMT 四字状态、连续 ID 帧、TID、SID、完整 TID/SID、TSV、TRV、Random Number 与 TinyMT 状态筛选
+- 独立 `gen6id` Wasm API v1、6/8-word 契约、单 Dedicated Worker、虚拟结果表、CSV、进度与取消
+- 输入边界、TinyMT 推进顺序、固定夹具和验证状态见 [Gen 6 ID](docs/modules/gen6id.md)
 
 当前 Gen VII ID 工作区包含：
 
@@ -612,7 +618,7 @@ npm run build:web
 - **阶段 8G：`gen8underground` Underground** - BDSP 地下大洞窟遇敌（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8H：`gen8wild` Gen 8 Wild** - BDSP 野生 Generator、独立 Wasm/Worker Pool 和完整状态结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具、三张原图资源、276 个坐标点位和三语地点名称（已实现，待部署回归与最终验收）。
-- **阶段 9：3DSRNGTool** - Gen VII 主工作流、Gen VI Stationary、Gen VI Pokemon Link / Transporter、Gen VI Event 与 Profile Manager 已实现；下一模块继续 Gen VI Wild，之后继续其他公共工具与其余库存，仅 `NTR Helper` 不开发。
+- **阶段 9：3DSRNGTool** - Gen VII 主工作流、Gen VI Stationary、Gen VI Pokemon Link / Transporter、Gen VI Event、Gen VI Wild、Gen VI DexNav、Gen VI Poke Radar、Gen VI Egg、Gen VI ID 与 Profile Manager 已实现；下一模块继续 Gen VI Main Seed Finder，之后继续其他公共工具与其余库存，仅 `NTR Helper` 不开发。
 - **阶段 10：发布加固与验收** - 完整工程检查、Actions 部署、PWA 离线、可访问性、浏览器矩阵、性能预算、许可证和生产页面回归。
 
 ## 许可证、署名与源码分发

@@ -1,11 +1,24 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-18 3DSRNGTool Gen VI ID RNG
+
+- 新增：实现独立 gen6id 工作区，覆盖 TinyMT 四字状态、连续 ID 帧、TID/SID/完整 TID-SID、TSV、TRV、Random Number 与状态筛选。
+- 算法：复用上游 Gen6/ID6.cs、Controls/Frame_ID.cs、Core/IDFilters.cs 与 RNG/TinyMT.cs；每帧先保存状态再取 Nextuint()，按上游计算 TID、SID、TSV 和 TRV。
+- 契约：新增 wasm/modules/gen6id，6-word 请求、8-word 结果、Wasm API version 1、Contract version 1、单 Dedicated Worker 和 public/wasm/gen6id.mjs/.wasm。
+- 界面：增加 Gen VI 导航、0..5,000,000 浏览器帧保护、100000 行结果上限、三态 ID 筛选、正则/禁用筛选、进度、取消、虚拟结果表和 CSV。
+- 文档：增加 docs/modules/gen6id.md，更新需求和模块库存；TinyFinder 与 Bambo-Rambo 研究资料记录在 third_party/tinyfinder/UPSTREAM.md、third_party/bambo-rambo/UPSTREAM.md。
+- 已通过：`npm test -- --run src/features/gen6id`（2 个文件、4 项测试）和 `npm run typecheck`。
+- 已通过：格式收尾、git diff --check、gen6id 原生夹具 1/1、激活 Emscripten 6.0.6 后的定向 Wasm 构建；gen6id.mjs 7516 bytes，SHA-256 0C24067B6A6EC0A798E83AA9BBB2DBE3C7323D4D52AC06C09EC41DCBE1E4AB8D；gen6id.wasm 4644 bytes，SHA-256 3EF9A2FC8FBA2C1E6597F101AA06A3A0063A038A620823EA38F58973D6AEF5FB。
+- 已通过：完整 `npm run verify`；Prettier、TypeScript、Vitest（147 个测试文件、531 项测试）和 Vite/PWA 生产构建（2230 个模块、206 项预缓存资源）均完成；ESLint 0 error，保留 12 条既有 TanStack Virtual `react-hooks/incompatible-library` warning。
+- 未运行：外部 Chrome / Edge UI 回归和生产页面算法验收；外部浏览器尚未连接，生产验收仍需部署后由项目所有者提供准确 URL 并授权。
+- 下一步：提交并推送 `feat: 实现第六世代 ID 乱数`，随后进入 Gen VI Main Seed Finder；TinyFinder/3DSTimeFinder 扩展按库存排期，PokemonRNGGuides 侧栏流程重排与可借鉴模块最后处理。
+
 > - 最近更新：2026-08-18
 > - 当前分支：`main`
-> - Git 功能基线：`1f844f9`；远端 HakuStyle 工作台与 Gen VI Wild / DexNav / Poke Radar 提交已快进合并，当前工作区正在收口 Gen VI Egg RNG
-> - 当前阶段：Gen VI Egg 已实现，下一模块为 Gen VI ID RNG
-> - 工作区状态：正式 App 与 `?demo=hakustyle` 共用固定 Ant Neutral HakuStyle 契约；本轮包含 Gen VI Egg 的 Current 行、接受/拒绝延迟、双 Power Item、Dedicated Worker/Wasm、固定高度虚拟结果表、三语界面和模块文档
-> - 验证状态：Gen VI Egg 定向 Vitest、TypeScript、格式检查、原生夹具和 Emscripten 6.0.6 定向 Wasm 构建已通过；远端合并后的完整 `npm run verify` 已通过，外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+> - Git 功能基线：`8754548`（`feat: 实现第六世代孵化乱数`）；当前工作区正在收口 Gen VI ID RNG
+> - 当前阶段：Gen VI ID RNG 已实现，待提交推送；下一模块为 Gen VI Main Seed Finder
+> - 工作区状态：正式 App 与 `?demo=hakustyle` 共用固定 Ant Neutral HakuStyle 契约；本轮包含 Gen VI ID 的 TinyMT 四字状态、ID/TSV/TRV/Random/状态筛选、Dedicated Worker/Wasm、固定高度虚拟结果表、三语界面和模块文档
+> - 验证状态：Gen VI ID 定向 Vitest、TypeScript、格式检查、原生夹具、Emscripten 6.0.6 定向 Wasm 构建和完整 `npm run verify` 已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
 
 ## 2026-08-18 3DSRNGTool Gen VI Egg RNG
 
