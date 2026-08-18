@@ -10,13 +10,13 @@
 .gen8raids-control-grid > fieldset,
 .gen8raids-results {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 16px;
   background: var(--surface);
-  box-shadow: var(--panel-shadow);
+  box-shadow: none;
 }
 .gen8raids-profile-bar {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(220px, 0.8fr) 40px minmax(
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 0.8fr) 44px minmax(
       170px,
       0.8fr
     );
@@ -25,11 +25,7 @@
   padding: 12px;
 }
 .gen8raids-eyebrow {
-  color: var(--brand-strong);
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  display: none;
 }
 .gen8raids-profile-bar h1 {
   margin: 2px 0 0;
@@ -42,23 +38,23 @@
   min-width: 0;
   gap: 4px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  line-height: 18px;
+  line-height: 22px;
   letter-spacing: 0;
 }
 .gen8raids-panel input:not([type="checkbox"]),
 .gen8raids-panel select,
 .gen8raids-panel output {
   min-width: 0;
-  min-height: 40px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0 10px;
-  background: var(--control-bg);
+  min-height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 9px 13px;
+  background: var(--surface);
   color: var(--text);
-  font-size: 14px;
-  line-height: 38px;
+  font-size: 15px;
+  line-height: 22px;
 }
 .gen8raids-panel output {
   display: block;
@@ -69,12 +65,12 @@
 .gen8raids-icon-button,
 .gen8raids-panel button.icon {
   display: inline-grid;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border: 1px solid var(--line);
-  border-radius: 7px;
-  background: var(--control-bg);
+  border-radius: 10px;
+  background: var(--surface-2);
   color: var(--text);
 }
 .gen8raids-profile-bar dl {
@@ -136,12 +132,12 @@
   flex: 1;
 }
 .gen8raids-panel button {
-  min-height: 40px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--control-bg);
+  min-height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface-2);
   color: var(--text);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 650;
 }
 .gen8raids-panel button.primary {
@@ -163,17 +159,23 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 4px;
   margin-bottom: 8px;
 }
 .gen8raids-location-tabs button {
   min-height: 40px;
+  border-color: transparent;
+  border-radius: 9px;
   padding: 0 5px;
   color: var(--muted);
   font-size: 13px;
 }
 .gen8raids-location-tabs button.active {
-  border-color: var(--brand);
-  background: var(--brand-soft);
+  border-color: transparent;
+  background: var(--surface);
   color: var(--brand-strong);
 }
 .gen8raids-two-col {
@@ -409,7 +411,7 @@
 }
 @media (max-width: 760px) {
   .gen8raids-profile-bar {
-    grid-template-columns: minmax(0, 1fr) 40px;
+    grid-template-columns: minmax(0, 1fr) 44px;
   }
   .gen8raids-profile-bar > label {
     grid-column: 1 / -1;

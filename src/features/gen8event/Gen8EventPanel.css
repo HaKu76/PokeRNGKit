@@ -14,9 +14,9 @@
 .gen8event-results {
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 16px;
   background: var(--surface);
-  box-shadow: var(--panel-shadow);
+  box-shadow: none;
 }
 
 .gen8event-profile-bar {
@@ -119,8 +119,8 @@
 
 .gen8event-profile-values dt {
   color: var(--muted);
-  font-size: 12px;
-  line-height: 17px;
+  font-size: 13px;
+  line-height: 20px;
 }
 
 .gen8event-profile-values dd {
@@ -150,7 +150,7 @@
 
 .gen8event-section-heading {
   display: flex;
-  min-height: 40px;
+  min-height: 48px;
   align-items: center;
   border-bottom: 1px solid var(--line-soft);
   margin-bottom: 10px;
@@ -158,8 +158,8 @@
 
 .gen8event-section-heading h2 {
   margin: 0;
-  font-size: 17px;
-  line-height: 24px;
+  font-size: 20px;
+  line-height: 28px;
 }
 
 .gen8event-rng-grid {
@@ -187,13 +187,13 @@
 .gen8event-primary,
 .gen8event-secondary {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 7px 13px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 650;
 }
 
@@ -205,8 +205,8 @@
 }
 
 .gen8event-secondary {
-  border: 1px solid var(--line);
-  background: var(--control-bg);
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
   color: var(--text);
 }
 
@@ -221,15 +221,15 @@
   grid-template-columns: repeat(2, minmax(116px, 1fr));
   gap: 4px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 3px;
+  border-radius: 12px;
+  padding: 4px;
   background: var(--surface-2);
 }
 
 .gen8event-config-tabs button {
-  min-height: 38px;
+  min-height: 40px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 9px;
   background: transparent;
   color: var(--muted);
   font-size: 14px;
@@ -239,7 +239,7 @@
 .gen8event-config-tabs button.active {
   background: var(--surface);
   color: var(--brand-strong);
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 12%, transparent);
+  box-shadow: none;
 }
 
 .gen8event-config-panel {
@@ -319,7 +319,7 @@
   width: 100%;
   min-height: 44px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 9px 12px;
   background: transparent;
   color: var(--text);
@@ -333,11 +333,11 @@
 
 .gen8event-toggle {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
   gap: 8px;
   color: var(--text);
-  font-size: 14px;
+  font-size: 15px;
   white-space: nowrap;
 }
 
@@ -468,14 +468,14 @@
 }
 
 .gen8event-iv-range button {
-  min-height: 40px;
+  min-height: 44px;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
   padding: 0 4px;
   background: var(--surface-2);
   color: var(--brand-strong);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -534,7 +534,7 @@
   padding: 3px 8px;
   background: var(--surface-2);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .gen8event-run-status.calculating {
@@ -576,7 +576,7 @@
 
 .gen8event-progress-row span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 

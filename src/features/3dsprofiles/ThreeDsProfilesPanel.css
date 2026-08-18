@@ -273,8 +273,9 @@
 }
 
 .threedsprofiles-table tbody tr:focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid transparent;
   outline-offset: -2px;
+  box-shadow: inset 0 0 0 2px var(--focus-ring);
 }
 
 .threedsprofiles-table tbody tr[draggable="true"] {

@@ -1,5 +1,23 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-19 HakuStyle Demo 对齐第二轮
+
+- 优化：正式工作台的浅色与深色中性令牌重新对齐 `?demo=hakustyle`，统一页面底色、实体表面、弱表面、边界、正文和次要文字；主内容宽度、页标题分隔、侧栏间距和折叠 Rail 搜索入口同步采用 Demo 几何，页头 `Ready` 状态改用与 Demo 相同的 Lucide 勾选图标。
+- 优化：通用输入、原生下拉、自动完成、多选候选、分段切换、主次操作、运行状态、进度条、结果头部、表格与浮动工具面板统一为 44px 控件、10px 控制圆角、12px 菜单圆角、16px 普通面板和 18px 浮动面板；原生下拉增加与 Demo 一致的 Chevron 图标和深浅色适配，旧有不透明焦点描边改用半透明 focus ring。
+- 优化：直接对齐 Gen VIII Raids、Static、Underground、Wild、Profiles、Egg、Event 与 Den Map 的模块样式，避免懒加载或高优先级模块 CSS 恢复 40px 控件、8px 面板、透明次按钮和旧下拉表面；保留虚拟表既有行高，未改动滚动定位计算。
+- 影响：仅调整 CSS 令牌、布局和组件状态，不改变 React 数据流、模块字段、输入范围、RNG 算法、Worker、Wasm 或持久化。
+- 已通过：本轮代码文件定向 `npm run format:files -- ...`、全仓 `npm run format:check`、`git diff --check` 和触及 CSS 的粗描边静态复扫；未发现非透明 2/3px focus outline、3px inset 状态环或 2/3px 方向边框。
+- 未运行：ESLint、TypeScript、Vitest、Web/Wasm 构建和本地 UI 预览；项目所有者本轮未授权具体检查命令或 URL。
+- 未运行：外部 Chrome / Edge 的 390px、1280px、桌面与深浅色 UI 回归；当前没有已连接的外部浏览器，不能使用应用内浏览器替代。
+- 下一步：项目所有者连接外部 Chrome / Edge 并明确授权实际 URL 后，对正式工作台与 `?demo=hakustyle` 进行同屏回归；浏览器回归收口后继续 Gen VI Main Seed Finder，不提前进入后续 3DSRNGTool 模块。
+
+> - 最近更新：2026-08-19
+> - 当前分支：`main`
+> - 当前 HEAD：`c879129`（`style: 清理工作台粗描边并统一 Demo 样式`）
+> - 当前阶段：HakuStyle Demo 对齐第二轮已完成代码与静态格式收尾，等待外部浏览器回归
+> - 工作区状态：`src/App.tsx`、`src/styles.css`、8 个 Gen VIII 模块 CSS 与 5 个旧模块焦点态 CSS 存在未提交 UI 修改，未暂存、未提交、未推送
+> - 验证状态：定向格式化、全仓 Prettier、空白检查和粗描边静态复扫已通过；测试、构建和外部浏览器回归未运行
+
 ## 2026-08-19 HakuStyle UI 组件收敛
 
 - 优化：严格对齐 `?demo=hakustyle` 的实体表面与安静边界，普通工作面板移除粗顶边和普通阴影，改为实体背景加 1px 中性边界。

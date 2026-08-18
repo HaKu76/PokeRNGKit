@@ -58,8 +58,9 @@
 
 .gen4advance-token-grid button:focus-visible,
 .gen4advance-table tr:focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid transparent;
   outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 .gen4advance-call-reference {

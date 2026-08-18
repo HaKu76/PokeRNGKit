@@ -11,6 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Calculator,
+  Check,
   ChevronDown,
   Menu,
   Monitor,
@@ -1081,7 +1082,7 @@ function App() {
         </div>
         <div className="topbar-meta">
           <span className="app-status">
-            <span aria-hidden="true" />
+            <Check aria-hidden="true" size={14} />
             {t(uiPreviewMode ? "uiPreview" : "ready")}
           </span>
           <div aria-label={t("themeMode")} className="theme-switch">

@@ -11,14 +11,14 @@
 .gen8wild-control-grid > fieldset,
 .gen8wild-results {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 16px;
   background: var(--surface);
-  box-shadow: var(--panel-shadow);
+  box-shadow: none;
 }
 
 .gen8wild-profile-bar {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(220px, 0.8fr) 40px minmax(
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 0.8fr) 44px minmax(
       170px,
       0.8fr
     );
@@ -28,11 +28,7 @@
 }
 
 .gen8wild-eyebrow {
-  color: var(--brand-strong);
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: 0;
-  text-transform: uppercase;
+  display: none;
 }
 
 .gen8wild-profile-bar h1 {
@@ -47,9 +43,9 @@
   min-width: 0;
   gap: 4px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  line-height: 18px;
+  line-height: 22px;
   letter-spacing: 0;
 }
 
@@ -57,14 +53,14 @@
 .gen8wild-panel select,
 .gen8wild-panel output {
   min-width: 0;
-  min-height: 40px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0 10px;
-  background: var(--control-bg);
+  min-height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 9px 13px;
+  background: var(--surface);
   color: var(--text);
-  font-size: 14px;
-  line-height: 38px;
+  font-size: 15px;
+  line-height: 22px;
 }
 
 .gen8wild-panel output {
@@ -77,12 +73,12 @@
 .gen8wild-icon-button,
 .gen8wild-panel button.icon {
   display: inline-grid;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border: 1px solid var(--line);
-  border-radius: 7px;
-  background: var(--control-bg);
+  border-radius: 10px;
+  background: var(--surface-2);
   color: var(--text);
 }
 
@@ -147,12 +143,12 @@
 }
 
 .gen8wild-panel button {
-  min-height: 40px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--control-bg);
+  min-height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface-2);
   color: var(--text);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 650;
 }
 
@@ -173,7 +169,7 @@
 .gen8wild-config-fieldset {
   display: grid;
   min-height: 0;
-  grid-template-rows: 40px minmax(0, 1fr);
+  grid-template-rows: 50px minmax(0, 1fr);
   overflow: hidden;
 }
 
@@ -181,19 +177,22 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px;
-  border-bottom: 1px solid var(--line-soft);
-  padding-bottom: 5px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 4px;
 }
 
 .gen8wild-tabs button {
-  min-height: 34px;
+  min-height: 40px;
   border-color: transparent;
+  border-radius: 9px;
   background: transparent;
   color: var(--muted);
 }
 
 .gen8wild-tabs button.active {
-  background: var(--brand-soft);
+  background: var(--surface);
   color: var(--brand-strong);
 }
 
@@ -241,9 +240,9 @@
 }
 
 .gen8wild-species-heading button {
-  min-height: 32px;
-  padding: 0 9px;
-  font-size: 13px;
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 14px;
 }
 
 .gen8wild-species-list {
@@ -287,9 +286,9 @@
 }
 
 .gen8wild-slot-heading button {
-  min-height: 30px;
-  padding: 0 8px;
-  font-size: 12px;
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 14px;
 }
 
 .gen8wild-slot-list {
@@ -305,14 +304,14 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  min-height: 32px;
+  min-height: 44px;
   gap: 5px;
   padding: 3px 5px;
   border: 1px solid var(--line-soft);
-  border-radius: 6px;
+  border-radius: 10px;
   background: var(--control-bg);
   color: var(--text);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .gen8wild-slot-list small {
@@ -572,8 +571,9 @@
 .gen8wild-panel button:focus-visible,
 .gen8wild-panel input:focus-visible,
 .gen8wild-panel select:focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid transparent;
   outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 @media (max-width: 1380px) {
@@ -601,7 +601,7 @@
 
 @media (max-width: 760px) {
   .gen8wild-profile-bar {
-    grid-template-columns: minmax(0, 1fr) 40px;
+    grid-template-columns: minmax(0, 1fr) 44px;
   }
 
   .gen8wild-profile-bar > label,
