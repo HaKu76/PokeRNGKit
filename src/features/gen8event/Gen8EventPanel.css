@@ -36,9 +36,9 @@
 .gen8event-field > span,
 .gen8event-panel .multi-check-field > span {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  line-height: 18px;
+  line-height: 22px;
   letter-spacing: 0;
 }
 
@@ -48,12 +48,12 @@
 .gen8event-panel .autocomplete-combobox input,
 .gen8event-panel .autocomplete-combobox-trigger {
   min-width: 0;
-  height: 40px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
   background: var(--control-bg);
   color: var(--text);
-  font-size: 14px;
+  font-size: 15px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -76,7 +76,7 @@
 .gen8event-panel button:focus-visible {
   outline: 0;
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 .gen8event-panel :disabled {
@@ -87,18 +87,18 @@
 .gen8event-profile-control {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(0, 1fr) 40px;
+  grid-template-columns: minmax(0, 1fr) 44px;
   gap: 7px;
 }
 
 .gen8event-icon-button {
   display: inline-grid;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   place-items: center;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--control-bg);
   color: var(--text);
 }
@@ -283,41 +283,44 @@
 .gen8event-species-field .autocomplete-combobox {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 40px;
+  grid-template-columns: minmax(0, 1fr) 44px;
 }
 
 .gen8event-species-field .autocomplete-combobox input {
-  border-radius: 8px 0 0 8px;
-  padding: 0 10px;
+  border-radius: 10px 0 0 10px;
+  padding: 0 12px;
 }
 
 .gen8event-species-field .autocomplete-combobox-trigger {
   border-left: 0;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 10px 10px 0;
 }
 
 .gen8event-species-field .autocomplete-combobox-menu {
   position: absolute;
   z-index: 20;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   right: 0;
   left: 0;
   max-height: 260px;
   overflow: auto;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 4px;
   background: var(--surface);
-  box-shadow: var(--panel-shadow);
+  box-shadow: 0 12px 28px rgb(9 16 35 / 0.14);
 }
 
 .gen8event-species-field .autocomplete-combobox-menu button {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
-  min-height: 36px;
+  min-height: 44px;
   border: 0;
-  border-radius: 5px;
-  padding: 7px 9px;
+  border-radius: 8px;
+  padding: 9px 12px;
   background: transparent;
   color: var(--text);
   text-align: left;
@@ -325,7 +328,7 @@
 
 .gen8event-species-field .autocomplete-combobox-menu button.active,
 .gen8event-species-field .autocomplete-combobox-menu button:hover {
-  background: var(--brand-soft);
+  background: var(--teal-soft);
 }
 
 .gen8event-toggle {
@@ -392,7 +395,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 0 10px;
+  padding: 0 12px;
 }
 
 .gen8event-panel .multi-check-trigger > span:first-child {
@@ -404,24 +407,24 @@
 .gen8event-panel .multi-check-menu {
   position: absolute;
   z-index: 20;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   right: 0;
   left: 0;
   max-height: 250px;
   overflow: auto;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 6px;
+  border-radius: 12px;
+  padding: 4px;
   background: var(--surface);
-  box-shadow: var(--panel-shadow);
+  box-shadow: 0 12px 28px rgb(9 16 35 / 0.14);
 }
 
 .gen8event-panel .multi-check-menu label {
   display: flex;
-  min-height: 34px;
+  min-height: 44px;
   align-items: center;
   gap: 8px;
-  padding: 4px 6px;
+  padding: 9px 10px;
 }
 
 .gen8event-measure-filters {

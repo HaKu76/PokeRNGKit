@@ -15,7 +15,7 @@
 .gen7sos-mode-tabs button {
   min-height: 40px;
   border: 0;
-  border-bottom: 2px solid transparent;
+  border-bottom: 1px solid transparent;
   padding: 0 16px;
   background: transparent;
   color: var(--muted);

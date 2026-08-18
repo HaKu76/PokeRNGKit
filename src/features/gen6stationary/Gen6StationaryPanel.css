@@ -86,8 +86,8 @@
 .gen6stationary-panel .field select,
 .gen6stationary-panel .multi-check-trigger,
 .gen6stationary-iv-row input {
-  min-height: 40px;
-  border-radius: 8px;
+  min-height: 44px;
+  border-radius: 10px;
 }
 
 .gen6stationary-panel input:disabled,
@@ -383,7 +383,7 @@
 
 .gen6stationary-table-row:hover {
   background: var(--teal-soft);
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 
 @media (max-width: 1180px) {

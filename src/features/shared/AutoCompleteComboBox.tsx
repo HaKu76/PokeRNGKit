@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { Check, ChevronDown } from "lucide-react";
 
 export interface AutoCompleteOption<T extends string | number> {
   readonly label: string;
@@ -162,6 +163,9 @@ export function AutoCompleteComboBox<T extends string | number>({
         value={inputValue}
       />
       <button
+        aria-controls={listboxId}
+        aria-expanded={open && !disabled}
+        aria-haspopup="listbox"
         aria-label={label}
         className="autocomplete-combobox-trigger"
         disabled={disabled}
@@ -175,9 +179,14 @@ export function AutoCompleteComboBox<T extends string | number>({
           }
         }}
         tabIndex={-1}
+        title={label}
         type="button"
       >
-        <span aria-hidden="true">v</span>
+        <ChevronDown
+          aria-hidden="true"
+          className={open ? "rotated" : undefined}
+          size={17}
+        />
       </button>
       {open && !disabled && filteredOptions.length > 0 && (
         <div
@@ -196,7 +205,8 @@ export function AutoCompleteComboBox<T extends string | number>({
               role="option"
               type="button"
             >
-              {option.label}
+              <span>{option.label}</span>
+              {option.value === value && <Check aria-hidden="true" size={15} />}
             </button>
           ))}
         </div>

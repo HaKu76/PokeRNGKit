@@ -86,7 +86,7 @@
 .gen4advance-responses {
   max-height: 160px;
   overflow: auto;
-  border-left: 2px solid var(--line);
+  border-left: 1px solid var(--line);
   padding-left: 12px;
 }
 

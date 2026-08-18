@@ -79,7 +79,7 @@
 .gen5id-panel input:not([type="checkbox"]):focus-visible,
 .gen5id-panel select:focus-visible {
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 .gen5id-panel input:disabled,

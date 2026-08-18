@@ -100,8 +100,8 @@
 .gen7wild-panel .field select,
 .gen7wild-panel .multi-check-trigger,
 .gen7wild-iv-row input {
-  min-height: 40px;
-  border-radius: 8px;
+  min-height: 44px;
+  border-radius: 10px;
 }
 
 .gen7wild-panel input:disabled,

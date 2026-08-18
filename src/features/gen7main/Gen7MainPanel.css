@@ -299,7 +299,7 @@
 .gen7main-time-result {
   display: block;
   margin-top: 9px;
-  border-left: 3px solid var(--teal);
+  border-left: 1px solid var(--teal);
   padding: 7px 10px;
   background: var(--teal-soft);
   color: var(--text);
@@ -381,7 +381,7 @@
 }
 .gen7main-table-row:hover {
   background: var(--teal-soft);
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 .gen7main-table-row > span {
   overflow: hidden;

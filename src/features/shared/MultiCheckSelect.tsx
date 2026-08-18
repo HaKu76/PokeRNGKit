@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 interface MultiCheckSelectProps {
   anyLabel: string;
@@ -19,6 +20,7 @@ export function MultiCheckSelect({
   options,
   resetHint,
 }: MultiCheckSelectProps) {
+  const menuId = useId();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const fullMask = options.reduce(
@@ -47,7 +49,9 @@ export function MultiCheckSelect({
     <div className="field multi-check-field" ref={rootRef}>
       <span>{label}</span>
       <button
+        aria-controls={menuId}
         aria-expanded={open}
+        aria-haspopup="true"
         className="multi-check-trigger"
         disabled={disabled}
         onClick={(event) => {
@@ -62,10 +66,14 @@ export function MultiCheckSelect({
         type="button"
       >
         <span>{summary}</span>
-        <span aria-hidden="true">v</span>
+        <ChevronDown
+          aria-hidden="true"
+          className={open ? "rotated" : undefined}
+          size={17}
+        />
       </button>
       {open && (
-        <div className="multi-check-menu">
+        <div aria-label={label} className="multi-check-menu" id={menuId}>
           {options.map((option) => (
             <label key={option.value}>
               <input

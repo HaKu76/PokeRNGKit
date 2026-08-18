@@ -106,8 +106,8 @@
 .gen7event-iv-row input,
 .gen7event-fixed-iv-grid input,
 .gen7event-lock-field select {
-  min-height: 40px;
-  border-radius: 8px;
+  min-height: 44px;
+  border-radius: 10px;
 }
 
 .gen7event-panel .prefixed-input input {
@@ -459,7 +459,7 @@
 
 .gen7event-table-row:hover {
   background: var(--teal-soft);
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 
 .gen7event-table-row span {

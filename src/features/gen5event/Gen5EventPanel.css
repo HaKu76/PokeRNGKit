@@ -164,13 +164,13 @@
 .gen5event-panel .multi-check-trigger {
   width: 100%;
   min-width: 0;
-  height: 40px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  padding: 0 10px;
+  height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 0 12px;
   background: var(--control-bg);
   color: var(--text);
-  font-size: 14px;
+  font-size: 15px;
   font-variant-numeric: tabular-nums;
   transition:
     border-color var(--motion-fast) var(--ease-out),
@@ -178,8 +178,8 @@
 }
 
 .gen5event-panel .autocomplete-combobox-trigger {
-  width: 40px;
-  min-height: 40px;
+  width: 44px;
+  min-height: 44px;
 }
 
 .gen5event-panel input:not([type="checkbox"]):hover:not(:disabled),

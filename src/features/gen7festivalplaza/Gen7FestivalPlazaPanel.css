@@ -259,7 +259,7 @@
 
 .gen7festivalplaza-table-row:hover {
   background: var(--teal-soft);
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 
 .gen7festivalplaza-table-row > button {

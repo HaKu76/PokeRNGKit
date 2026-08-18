@@ -36,8 +36,7 @@
   --rail-line: rgba(177, 199, 224, 0.2);
   --rail-active: rgba(123, 167, 241, 0.16);
   --panel-accent: #7396d8;
-  --panel-shadow:
-    0 1px 2px rgba(22, 34, 42, 0.08), 0 10px 28px rgba(41, 61, 72, 0.07);
+  --panel-shadow: none;
   --floating-shadow: 0 18px 42px rgba(19, 30, 37, 0.2);
   --focus-ring: rgba(49, 95, 159, 0.24);
   --content-max-width: 1560px;
@@ -81,7 +80,7 @@
   --rail-line: rgba(163, 190, 222, 0.2);
   --rail-active: rgba(123, 167, 241, 0.2);
   --panel-accent: #7ba7f1;
-  --panel-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 34px rgba(0, 0, 0, 0.16);
+  --panel-shadow: none;
   --floating-shadow: 0 20px 48px rgba(0, 0, 0, 0.38);
   --focus-ring: rgba(255, 209, 102, 0.2);
 }
@@ -376,7 +375,7 @@ select:focus-visible {
 .module-entry.active {
   border-color: var(--rail-line);
   background: var(--rail-active);
-  box-shadow: inset 3px 0 0 var(--brand);
+  box-shadow: none;
 }
 .module-entry.disabled {
   opacity: 0.45;
@@ -417,7 +416,7 @@ select:focus-visible {
   height: 6px;
   border-radius: 50%;
   background: var(--teal);
-  box-shadow: 0 0 0 3px var(--teal-soft);
+  box-shadow: 0 0 0 1px var(--teal-soft);
 }
 
 .main-content {
@@ -440,8 +439,8 @@ select:focus-visible {
   top: 0;
   bottom: 16px;
   left: 0;
-  width: 4px;
-  border-radius: 4px;
+  width: 1px;
+  border-radius: 1px;
   background: var(--brand);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
   content: "";
@@ -451,7 +450,7 @@ select:focus-visible {
   right: 0;
   bottom: 0;
   left: 0;
-  height: 2px;
+  height: 1px;
   background: var(--line);
   content: "";
 }
@@ -494,17 +493,17 @@ h1 {
 .panel {
   position: relative;
   border: 1px solid var(--line);
-  border-top: 2px solid var(--panel-accent);
+  border-top: 1px solid var(--line);
   border-radius: 16px;
   background: var(--surface);
-  box-shadow: var(--panel-shadow);
+  box-shadow: none;
   transition:
     border-color var(--motion-base) ease,
     box-shadow var(--motion-base) ease;
 }
 .panel:hover {
   border-color: var(--line-strong);
-  box-shadow: 0 14px 30px rgba(20, 39, 61, 0.1);
+  box-shadow: none;
 }
 .panel::after {
   display: none;
@@ -593,7 +592,7 @@ h1 {
 .field input:focus,
 .field select:focus {
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }
 .field small {
   font-size: 13px;
@@ -632,14 +631,14 @@ h1 {
   background: var(--brand);
   color: #ffffff;
   font-weight: 700;
-  box-shadow: 0 3px 0 var(--brand-strong);
+  box-shadow: none;
 }
 .primary-action:hover:not(:disabled) {
   background: var(--brand-strong);
   transform: translateY(-1px);
 }
 .primary-action:active:not(:disabled) {
-  box-shadow: 0 1px 0 var(--brand-strong);
+  box-shadow: none;
   transform: translateY(1px);
 }
 .primary-action:disabled {
@@ -771,13 +770,13 @@ h1 {
   color: var(--text);
 }
 .floating-tool-rail button.active {
-  box-shadow: inset 3px 0 0 var(--brand);
+  box-shadow: none;
 }
 .floating-tool-rail button.active[data-tone="teal"] {
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 .floating-tool-rail button.active[data-tone="amber"] {
-  box-shadow: inset 3px 0 0 var(--amber);
+  box-shadow: none;
 }
 .floating-tool-rail button:hover > span:last-child,
 .floating-tool-rail button:focus-visible > span:last-child {
@@ -809,7 +808,7 @@ h1 {
   transform: translate(-50%, -50%);
   overflow: hidden;
   border: 1px solid var(--line);
-  border-top: 2px solid var(--brand);
+  border-top: 1px solid var(--brand);
   border-radius: 18px;
   background: var(--surface);
   box-shadow: var(--floating-shadow);
@@ -1188,7 +1187,7 @@ h1 {
   max-height: calc(100vh - 40px);
   overflow: auto;
   border: 1px solid var(--line);
-  border-top: 2px solid var(--brand);
+  border-top: 1px solid var(--brand);
   border-radius: 18px;
   padding: 20px;
   background: var(--surface);
@@ -1276,7 +1275,7 @@ h1 {
 .profile-notice,
 .error-message {
   margin-top: 12px;
-  border-left: 2px solid var(--teal);
+  border-left: 1px solid var(--teal);
   padding: 8px 10px;
   background: var(--teal-soft);
   color: var(--text);
@@ -2334,7 +2333,7 @@ h1 {
   font-weight: 500;
 }
 .inline-notice {
-  border-left: 2px solid var(--amber);
+  border-left: 1px solid var(--amber);
   padding: 7px 8px;
   background: var(--amber-soft);
   color: var(--amber);
@@ -2364,49 +2363,74 @@ h1 {
   position: relative;
 }
 .multi-check-trigger {
-  min-height: 40px;
+  min-height: var(--control-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
   background: var(--control-bg);
   color: var(--text);
-  padding: 6px 8px;
-  font-size: 14px;
+  padding: 9px 12px;
+  font-size: 15px;
   text-align: left;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 .multi-check-trigger > span:first-child {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.multi-check-trigger > svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+  transition: transform 180ms ease;
+}
+.multi-check-trigger > svg.rotated {
+  transform: rotate(180deg);
+}
+.multi-check-trigger:hover:not(:disabled) {
+  border-color: var(--brand);
+}
+.multi-check-trigger:focus-visible {
+  border-color: var(--brand);
+  outline: 0;
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
 .multi-check-menu {
   position: absolute;
   z-index: 8;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   right: 0;
   left: 0;
   max-height: 250px;
   overflow: auto;
   border: 1px solid var(--line);
+  border-radius: 12px;
   background: var(--surface);
-  box-shadow: 0 10px 24px rgba(9, 10, 24, 0.2);
-  padding: 5px;
+  box-shadow: 0 12px 28px rgb(9 16 35 / 0.14);
+  padding: 4px;
 }
 .multi-check-menu label {
+  min-height: var(--control-height);
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px;
+  border-radius: 8px;
+  padding: 9px 10px;
   color: var(--text);
-  font-size: 14px;
+  font-size: 15px;
 }
 .multi-check-menu label:hover {
   background: var(--surface-2);
 }
 .multi-check-menu input {
-  width: auto;
+  width: 16px;
+  height: 16px;
   margin: 0;
 }
 .filter-controls {
@@ -3006,7 +3030,7 @@ h1 {
 }
 .table-row:hover {
   background: var(--teal-soft);
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 .table-row span {
   padding: 0 20px;
@@ -3226,7 +3250,7 @@ h1 {
 }
 .gen8id-virtual-table .table-row.selected {
   background: var(--teal-soft);
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 .gen8id-virtual-table .table-row:focus-visible {
   z-index: 1;
@@ -3255,27 +3279,38 @@ h1 {
   position: relative;
 }
 .autocomplete-combobox input {
-  padding-right: 42px;
+  padding-right: calc(var(--control-height) + 8px);
 }
 .autocomplete-combobox-trigger {
   position: absolute;
   top: 1px;
   right: 1px;
-  width: 38px;
+  width: calc(var(--control-height) - 2px);
   height: calc(100% - 2px);
   border: 0;
   border-left: 1px solid var(--line);
-  background: var(--control-bg);
+  border-radius: 0 9px 9px 0;
+  background: var(--surface-2);
   color: var(--muted);
   cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
 }
 .autocomplete-combobox-trigger:hover {
-  color: var(--text);
+  background: var(--teal-soft);
+  color: var(--brand-strong);
+}
+.autocomplete-combobox-trigger svg {
+  transition: transform 180ms ease;
+}
+.autocomplete-combobox-trigger svg.rotated {
+  transform: rotate(180deg);
 }
 .autocomplete-combobox-menu {
   position: absolute;
   z-index: 4;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
   width: 100%;
   max-height: min(320px, calc(100vh - 230px));
@@ -3286,16 +3321,23 @@ h1 {
   box-shadow: 0 12px 28px rgba(9, 10, 24, 0.22);
 }
 .autocomplete-combobox-menu button {
-  display: block;
+  min-height: var(--control-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
-  min-height: 40px;
   border: 0;
   border-bottom: 1px solid var(--line-soft);
   background: transparent;
   color: var(--text);
-  padding: 8px 11px;
+  padding: 9px 12px;
+  font-size: 15px;
   text-align: left;
   cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
 }
 .autocomplete-combobox-menu button:last-child {
   border-bottom: 0;
@@ -3305,7 +3347,15 @@ h1 {
   background: var(--teal-soft);
 }
 .autocomplete-combobox-menu button[aria-selected="true"] {
-  box-shadow: inset 3px 0 0 var(--amber);
+  box-shadow: none;
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+.autocomplete-combobox-menu button > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .encounter-lookup-submit {
   min-width: 88px;
@@ -3863,7 +3913,7 @@ h1 {
   --rail-line: #e3e8ef;
   --rail-active: #eaf2ff;
   --panel-accent: #d9e0ea;
-  --panel-shadow: 0 8px 18px rgb(24 34 48 / 0.1);
+  --panel-shadow: none;
   --floating-shadow: 0 16px 32px rgb(24 34 48 / 0.18);
   --focus-ring: rgb(22 119 255 / 0.26);
   --rail-width: 224px;
@@ -3903,7 +3953,7 @@ h1 {
   --rail-line: #27344b;
   --rail-active: #1c355a;
   --panel-accent: #465367;
-  --panel-shadow: 0 12px 26px rgb(0 0 0 / 0.24);
+  --panel-shadow: none;
   --floating-shadow: 0 18px 36px rgb(0 0 0 / 0.36);
   --focus-ring: rgb(145 190 255 / 0.28);
 }
@@ -4060,7 +4110,7 @@ body {
 
 .module-rail-search:focus-within {
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 .module-rail-search input {

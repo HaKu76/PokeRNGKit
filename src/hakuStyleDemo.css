@@ -82,7 +82,7 @@
 
 .hs-demo-shell button:focus-visible,
 .hs-demo-shell input:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--hs-brand) 30%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--hs-brand) 30%, transparent);
   outline-offset: 2px;
 }
 
@@ -702,7 +702,7 @@
 
 .hs-demo-field > input:focus {
   border-color: var(--hs-brand);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hs-brand) 16%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--hs-brand) 16%, transparent);
   outline: 0;
 }
 
@@ -1119,7 +1119,7 @@
 
 .hs-demo-select-combo-control:focus-within {
   border-color: var(--hs-brand);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hs-brand) 16%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--hs-brand) 16%, transparent);
 }
 
 .hs-demo-select-combo-control input {
@@ -1512,7 +1512,7 @@
 
 .hs-demo-floating-field > input:focus {
   border-color: var(--hs-brand);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hs-brand) 16%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--hs-brand) 16%, transparent);
   outline: 0;
 }
 

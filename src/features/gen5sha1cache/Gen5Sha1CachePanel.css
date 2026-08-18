@@ -72,7 +72,7 @@
 .gen5sha1cache-panel input:not([type="file"]):focus-visible,
 .gen5sha1cache-panel select:focus-visible {
   border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
 .gen5sha1cache-manager {

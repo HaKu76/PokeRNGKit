@@ -95,8 +95,8 @@
 .gen7stationary-panel .field select,
 .gen7stationary-panel .multi-check-trigger,
 .gen7stationary-iv-row input {
-  min-height: 40px;
-  border-radius: 8px;
+  min-height: 44px;
+  border-radius: 10px;
 }
 
 .gen7stationary-panel .prefixed-input input {
@@ -408,7 +408,7 @@
 
 .gen7stationary-table-row:hover {
   background: var(--teal-soft);
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 
 .gen7stationary-table-row span {

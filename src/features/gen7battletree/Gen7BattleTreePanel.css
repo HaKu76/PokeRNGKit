@@ -254,7 +254,7 @@
 
 .gen7battletree-table-row:hover {
   background: var(--teal-soft);
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 
 .gen7battletree-table-row > button {

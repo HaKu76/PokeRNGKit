@@ -84,8 +84,8 @@
 .gen6event-iv-row input,
 .gen6event-fixed-grid input,
 .gen6event-lock-field select {
-  min-height: 40px;
-  border-radius: 8px;
+  min-height: 44px;
+  border-radius: 10px;
 }
 .gen6event-panel input:disabled,
 .gen6event-panel select:disabled,
@@ -352,7 +352,7 @@
 }
 .gen6event-table-row:hover {
   background: var(--teal-soft);
-  box-shadow: inset 3px 0 0 var(--teal);
+  box-shadow: none;
 }
 @media (max-width: 1180px) {
   .gen6event-workspace {

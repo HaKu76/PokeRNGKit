@@ -1,5 +1,24 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-19 HakuStyle UI 组件收敛
+
+- 优化：严格对齐 `?demo=hakustyle` 的实体表面与安静边界，普通工作面板移除粗顶边和普通阴影，改为实体背景加 1px 中性边界。
+- 清理：移除正式工作台、Demo、Gen V-VIII、研究工具和 Gen VIII Den Map 中的 3px 焦点光环、内嵌选中条和白色粗标记；焦点统一为 2px 透明混合色环，选中与悬停统一使用填充背景。
+- 优化：共享自动完成与多选候选控件改用 Lucide 箭头和勾选图标，统一 44px 控件、10px 控制圆角、12px 实体候选层、填充高亮和克制浮层阴影；同步收敛 Gen V-VIII 的重复局部样式。
+- 保留：浮动工具面板、弹窗和候选下拉仍保留克制的层级阴影；错误、警告、在线状态和地图位置继续使用语义色，但不再依赖粗描边。
+- 影响：仅调整 CSS 材质、边界和状态表达，不改变 React 结构、交互、输入范围、RNG 算法、Worker、Wasm 或持久化。
+- 已通过：定向 `npm run format:files -- ...`、全仓 `npm run format:check`、`git diff --check`，以及粗描边模式静态复扫；`src` 中不再存在 3px outline、3px 状态环、`inset 3px` 或 2/3px 方向边框。
+- 未运行：ESLint、TypeScript、Vitest、Web/Wasm 构建和本地预览；本轮不包含算法或运行时改动，仓库规则要求这些检查取得具体授权后再执行。
+- 未运行：外部 Chrome / Edge UI 回归和生产页面验收；当前没有外部浏览器连接，待部署后由项目所有者提供准确 URL 并授权。
+- 下一步：继续按 PokeFinder/3DSRNGTool 库存推进 Gen VI Main Seed Finder；PokemonRNGGuides 流程排序与借鉴模块、EXE 适配保持最后阶段。
+
+> - 最近更新：2026-08-19
+> - 当前分支：`main`
+> - Git 功能基线：`d3405e8`（`feat: 实现第六世代 ID 乱数`）
+> - 当前阶段：HakuStyle UI 描边、实体表面和候选控件收敛已完成，下一模块为 Gen VI Main Seed Finder
+> - 工作区状态：正式 App 与 `?demo=hakustyle` 共用固定 Ant Neutral HakuStyle 契约；普通面板无粗描边和 broad shadow，浮动层保留必要层级阴影
+> - 验证状态：定向格式化、全仓 Prettier、空白检查和粗描边静态复扫已通过；外部 Chrome / Edge 未连接，浏览器回归待后续连接后执行
+
 ## 2026-08-18 3DSRNGTool Gen VI ID RNG
 
 - 新增：实现独立 gen6id 工作区，覆盖 TinyMT 四字状态、连续 ID 帧、TID/SID/完整 TID-SID、TSV、TRV、Random Number 与状态筛选。
