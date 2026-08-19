@@ -15,6 +15,14 @@
 - 未运行：`npm run wasm:build`，当前环境缺少已激活的 Emscripten / `emcmake`；外部 Chrome/Edge UI 与生产页面算法验收按全部 3DS 模块完成后的统一门槛执行。
 - 下一步：实现 Gen VI TF2 Event 时间反查，复用 `EventSearcher6` 的结果和筛选语义。
 
+## 2026-08-20 3DSTimeFinder TF2 Gen VI Event 时间反查（已完成工程验证）
+
+- 新增：Gen VI Event TF2 时间/初始 Seed Searcher，按 `EventSearcher6` 逐秒枚举 Citra epoch，复用既有 Event 54-word Wasm 请求和 16-word 结果。
+- 接入：Gen VI Event 面板新增 TF2 时间模式、日期范围、Date/Time 与 Initial Seed 结果列；保留 Wondercard 导入、PID 类型、锁定字段和筛选逻辑。
+- 已通过：TF2/Gen VI Event 定向 Vitest（3 个文件、9 项）、定向 ESLint、`npm run typecheck`、`$env:POKERNGKIT_WASM_MODULES='gen6timefinder,gen6event'; npm run wasm:test:native`（2/2）、任务文件格式化、`npm run format:check` 和 `git diff --check`。
+- 未运行：`npm run wasm:build`，当前环境缺少已激活的 Emscripten / `emcmake`；外部 Chrome/Edge UI 与生产页面算法验收按全部 3DS 模块完成后的统一门槛执行。
+- 下一步：核对 TinyFinder 六代真实缺口，随后统一整理剩余 3DS 模块库存并准备验收。
+
 ## 2026-08-20 公共 IV Range / IV Template（已完成工程验证）
 
 - 新增：实现 3DSRNGTool `IVRange` 与 `IVTemplate` 的全局本地浮动工具，复用 `AutoCompleteComboBox`，支持六项档位、严格六项模板、默认模板、新增/删除/保存和双亲应用。

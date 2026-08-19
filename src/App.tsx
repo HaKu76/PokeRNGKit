@@ -207,6 +207,7 @@ type ActiveModule =
   | "gen6timefinder"
   | "gen6bank"
   | "gen6event"
+  | "gen6eventtimefinder"
   | "gen6wild"
   | "gen6dexnav"
   | "gen6pokeradar"
@@ -328,6 +329,7 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
       { id: "gen6timefinder", label: "gen6StationaryTimeModule" },
       { id: "gen6bank", label: "gen6BankModule" },
       { id: "gen6event", label: "gen6EventModule" },
+      { id: "gen6eventtimefinder", label: "gen6EventTimeModule" },
       { id: "gen6wild", label: "gen6WildModule" },
       { id: "gen6dexnav", label: "gen6DexNavModule" },
       { id: "gen6pokeradar", label: "gen6PokeRadarModule" },
@@ -902,6 +904,7 @@ function App() {
     activeModule === "gen6timefinder" ||
     activeModule === "gen6bank" ||
     activeModule === "gen6event" ||
+    activeModule === "gen6eventtimefinder" ||
     activeModule === "gen6wild" ||
     activeModule === "gen6dexnav" ||
     activeModule === "gen6pokeradar" ||
@@ -955,6 +958,7 @@ function App() {
     activeModule !== "gen6timefinder" &&
     activeModule !== "gen6bank" &&
     activeModule !== "gen6event" &&
+    activeModule !== "gen6eventtimefinder" &&
     activeModule !== "gen6wild" &&
     activeModule !== "gen6dexnav" &&
     activeModule !== "gen6pokeradar" &&
@@ -1951,6 +1955,24 @@ function App() {
               <span>
                 <strong>{t("gen6EventModule")}</strong>
                 <small>{t("gen6EventVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "gen6eventtimefinder"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("gen6eventtimefinder");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">TF2</span>
+              <span>
+                <strong>{t("gen6EventTimeModule")}</strong>
+                <small>{t("gen6EventTimeVersion")}</small>
               </span>
             </button>
             <button
@@ -3464,6 +3486,12 @@ function App() {
           ) : activeModule === "gen6event" ? (
             <Gen6EventPanel
               profile={threeDsProfiles.selectedProfile}
+              uiPreviewMode={uiPreviewMode}
+            />
+          ) : activeModule === "gen6eventtimefinder" ? (
+            <Gen6EventPanel
+              profile={threeDsProfiles.selectedProfile}
+              timeFinderMode
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen6wild" ? (

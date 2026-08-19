@@ -29,6 +29,16 @@ import {
 import type { Gen6EventEngine } from "./search";
 import { Gen6EventUiPreviewEngine } from "./preview/Gen6EventUiPreviewEngine";
 import { Gen6EventWorker } from "./worker/Gen6EventWorker";
+import { Gen6EventTimeWorker } from "./worker/Gen6EventTimeWorker";
+import { Gen6EventTimePreviewEngine } from "./preview/Gen6EventTimePreviewEngine";
+import {
+  formatGen6EventTimeEpoch,
+  gen6EventTimeEpochFromInput,
+  validateGen6EventTimeRequest,
+  type Gen6EventTimeRequest,
+  type Gen6EventTimeResult,
+} from "./timeDomain";
+import type { Gen6EventTimeEngine } from "./timeSearch";
 import "./Gen6EventPanel.css";
 
 type Status = "ready" | "calculating" | "completed" | "cancelled" | "failed";
@@ -138,15 +148,19 @@ function genderLabel(value: number, t: (key: string) => string) {
 export function Gen6EventPanel({
   profile,
   uiPreviewMode = false,
+  timeFinderMode = false,
 }: {
   profile?: ThreeDsProfile;
   uiPreviewMode?: boolean;
+  timeFinderMode?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const language = languageFor(i18n.language);
   const profileInfo = gen6EventProfile(profile);
   const [version, setVersion] = useState<Gen6EventVersion>(profileInfo.version);
   const [seed, setSeed] = useState("00000000");
+  const [startDate, setStartDate] = useState("2000-01-01T00:00:00");
+  const [endDate, setEndDate] = useState("2000-01-01T00:01:00");
   const [minFrame, setMinFrame] = useState("0");
   const [maxFrame, setMaxFrame] = useState("1000");
   const [tsv, setTsv] = useState(String(profileInfo.tsv));
@@ -158,7 +172,9 @@ export function Gen6EventPanel({
   );
   const [filters, setFilters] = useState<Gen6EventFilters>(baseFilters);
   const [resultLimit, setResultLimit] = useState("100000");
-  const [results, setResults] = useState<Gen6EventResult[]>([]);
+  const [results, setResults] = useState<
+    (Gen6EventResult | Gen6EventTimeResult)[]
+  >([]);
   const [status, setStatus] = useState<Status>("ready");
   const [error, setError] = useState("");
   const [progress, setProgress] = useState({
@@ -173,6 +189,13 @@ export function Gen6EventPanel({
   const engine = useMemo<Gen6EventEngine>(
     () =>
       uiPreviewMode ? new Gen6EventUiPreviewEngine() : new Gen6EventWorker(),
+    [uiPreviewMode],
+  );
+  const timeEngine = useMemo<Gen6EventTimeEngine>(
+    () =>
+      uiPreviewMode
+        ? new Gen6EventTimePreviewEngine()
+        : new Gen6EventTimeWorker(),
     [uiPreviewMode],
   );
   const species = GEN6_EVENT_SPECIES[language];
@@ -207,7 +230,13 @@ export function Gen6EventPanel({
     if (settings.form >= formCount)
       setSettings((current) => ({ ...current, form: 0 }));
   }, [formCount, settings.form]);
-  useEffect(() => () => engine.dispose(), [engine]);
+  useEffect(
+    () => () => {
+      engine.dispose();
+      timeEngine.dispose();
+    },
+    [engine, timeEngine],
+  );
 
   const request = (): Gen6EventRequest => ({
     version,
@@ -222,6 +251,19 @@ export function Gen6EventPanel({
     filters,
     resultLimit: parseGen6EventDecimal(resultLimit),
   });
+  const timeRequest = (): Gen6EventTimeRequest => {
+    const startEpoch = gen6EventTimeEpochFromInput(startDate);
+    const endEpoch = gen6EventTimeEpochFromInput(endDate);
+    if (typeof startEpoch !== "bigint" || typeof endEpoch !== "bigint")
+      throw new TypeError("Invalid Gen VI Event Time Finder date range.");
+    return validateGen6EventTimeRequest({
+      ...request(),
+      startEpoch,
+      endEpoch,
+      saveVariable: profile?.saveVariable ?? 0,
+      timeVariable: profile?.timeVariable ?? 0,
+    });
+  };
 
   const run = async (event: FormEvent) => {
     event.preventDefault();
@@ -230,12 +272,20 @@ export function Gen6EventPanel({
     setSummary(undefined);
     setStatus("calculating");
     try {
-      const nextRequest = request();
+      const nextRequest = timeFinderMode ? timeRequest() : request();
       validateGen6EventRequest(nextRequest);
-      const next = await engine.search(nextRequest, {
-        onBatch: (batch) => setResults(batch),
-        onProgress: setProgress,
-      });
+      const next = timeFinderMode
+        ? await timeEngine.search(nextRequest as Gen6EventTimeRequest, {
+            onBatch: (batch) =>
+              setResults((current) =>
+                current.concat(batch as Gen6EventResult[]),
+              ),
+            onProgress: setProgress,
+          })
+        : await engine.search(nextRequest as Gen6EventRequest, {
+            onBatch: (batch) => setResults(batch),
+            onProgress: setProgress,
+          });
       setSummary(next);
       setStatus(next.cancelled ? "cancelled" : "completed");
     } catch (cause) {
@@ -266,6 +316,7 @@ export function Gen6EventPanel({
   const exportCsv = () => {
     if (!results.length) return;
     const headers = [
+      ...(timeFinderMode ? [t("gen7TimeDate"), t("gen7TimeInitialSeed")] : []),
       "Frame",
       "Random",
       "EC",
@@ -282,6 +333,12 @@ export function Gen6EventPanel({
       "PRV",
     ];
     const rows = results.map((result) => [
+      ...(timeFinderMode && "epoch" in result
+        ? [
+            formatGen6EventTimeEpoch(result.epoch),
+            formatGen6EventHex(result.initialSeed),
+          ]
+        : []),
       result.frame,
       formatGen6EventHex(result.random),
       formatGen6EventHex(result.ec),
@@ -345,7 +402,9 @@ export function Gen6EventPanel({
           <div className="gen6event-heading">
             <div>
               <span className="panel-index">01</span>
-              <h2>{t("gen6EventSetup")}</h2>
+              <h2>
+                {t(timeFinderMode ? "gen6EventTimeModule" : "gen6EventSetup")}
+              </h2>
             </div>
             <span className="panel-note">MT / Event6</span>
           </div>
@@ -353,36 +412,64 @@ export function Gen6EventPanel({
           <section className="gen6event-section">
             <h3>{t("rngInfo")}</h3>
             <div className="gen6event-grid">
-              <label className="field">
-                <span>{t("version")}</span>
-                <select
-                  disabled={status === "calculating"}
-                  value={version}
-                  onChange={(event) =>
-                    setVersion(event.target.value as Gen6EventVersion)
-                  }
-                >
-                  <option value="x">X</option>
-                  <option value="y">Y</option>
-                  <option value="omega-ruby">Omega Ruby</option>
-                  <option value="alpha-sapphire">Alpha Sapphire</option>
-                </select>
-              </label>
-              <label className="field">
-                <span>{t("seed")}</span>
-                <div className="prefixed-input">
-                  <span>0x</span>
-                  <input
+              {timeFinderMode && (
+                <>
+                  <label className="field">
+                    <span>{t("gen7TimeStart")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      type="datetime-local"
+                      step="1"
+                      value={startDate}
+                      onChange={(event) => setStartDate(event.target.value)}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("gen7TimeEnd")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      type="datetime-local"
+                      step="1"
+                      value={endDate}
+                      onChange={(event) => setEndDate(event.target.value)}
+                    />
+                  </label>
+                </>
+              )}
+              {!timeFinderMode && (
+                <label className="field">
+                  <span>{t("version")}</span>
+                  <select
                     disabled={status === "calculating"}
-                    inputMode="text"
-                    maxLength={8}
-                    value={seed}
+                    value={version}
                     onChange={(event) =>
-                      setSeed(normalizeHexInput(event.target.value, 8))
+                      setVersion(event.target.value as Gen6EventVersion)
                     }
-                  />
-                </div>
-              </label>
+                  >
+                    <option value="x">X</option>
+                    <option value="y">Y</option>
+                    <option value="omega-ruby">Omega Ruby</option>
+                    <option value="alpha-sapphire">Alpha Sapphire</option>
+                  </select>
+                </label>
+              )}
+              {!timeFinderMode && (
+                <label className="field">
+                  <span>{t("seed")}</span>
+                  <div className="prefixed-input">
+                    <span>0x</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="text"
+                      maxLength={8}
+                      value={seed}
+                      onChange={(event) =>
+                        setSeed(normalizeHexInput(event.target.value, 8))
+                      }
+                    />
+                  </div>
+                </label>
+              )}
               <label className="field">
                 <span>{t("gen6StationaryFrameRange")}</span>
                 <input
@@ -978,7 +1065,7 @@ export function Gen6EventPanel({
               type="submit"
             >
               <Play aria-hidden="true" size={17} />
-              {t("generate")}
+              {t(timeFinderMode ? "search" : "generate")}
             </button>
             <button
               aria-label={t("cancel")}
@@ -986,7 +1073,7 @@ export function Gen6EventPanel({
               disabled={status !== "calculating"}
               title={t("cancel")}
               type="button"
-              onClick={() => engine.cancel()}
+              onClick={() => (timeFinderMode ? timeEngine : engine).cancel()}
             >
               <Square aria-hidden="true" size={16} />
             </button>
@@ -1061,6 +1148,9 @@ export function Gen6EventPanel({
               >
                 <div className="gen6event-table-header">
                   {[
+                    ...(timeFinderMode
+                      ? [t("gen7TimeDate"), t("gen7TimeInitialSeed")]
+                      : []),
                     "Frame",
                     "Random",
                     "EC",
@@ -1089,6 +1179,12 @@ export function Gen6EventPanel({
                         transform: `translateY(${virtualRow.start + TABLE_HEADER_HEIGHT}px)`,
                       }}
                     >
+                      {timeFinderMode && "epoch" in result && (
+                        <>
+                          <span>{formatGen6EventTimeEpoch(result.epoch)}</span>
+                          <span>{formatGen6EventHex(result.initialSeed)}</span>
+                        </>
+                      )}
                       <span>{result.frame}</span>
                       <span>{formatGen6EventHex(result.random)}</span>
                       <span>{formatGen6EventHex(result.ec)}</span>

@@ -935,6 +935,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 - **FR-TIME-01** 提供 3DSTimeFinder 的 Gen VI Stationary/Event、Gen VII Stationary/Event/Wild/ID 日期与初始 Seed 反查；支持 Citra RTC 区间、Profile Save Variable/Time Variable、帧范围和上游实际筛选字段。
 - **FR-TIME-02** Gen VI TF1 Stationary 时间反查按 `StationarySearcher6` 逐秒枚举 Citra epoch，使用 `uint32(save + epoch + time)` 初始 Seed，并复用 Gen VI Stationary 的 MT 生成、筛选和结果字段。
+- **FR-TIME-04** Gen VI TF2 Event 时间反查按 `EventSearcher6` 逐秒枚举 Citra epoch，使用同一 Profile6 初始 Seed 公式，并复用 Gen VI Event 的 54-word 请求、Wondercard 字段、PID/锁定设置、IV 和 Event Filter。
 - **FR-TIME-02** 日期换算、初始 Seed 生成、SFMT/MT 推进、结果过滤和时间列只在独立时间搜索 Worker/Wasm operation 中执行，不在 React 主线程重写生产 RNG。
 - **FR-TIME-03** Gen VI/Gen VII Profile Manager、Editor 与 Gen VII Profile Calibrator 的时间字段必须与 3DSTimeFinder ProfileLoader、Profile6、Profile7 和校准流程逐字段兼容；已有 3DSRNGTool Profile Manager 只作为持久化层，不覆盖上游计算语义。
 - **FR-TIME-04** 结果保留上游实际 Date/Time、Initial Seed、Frame 与生成字段，提供进度、取消、结果上限、排序、CSV、错误和空结果状态。
