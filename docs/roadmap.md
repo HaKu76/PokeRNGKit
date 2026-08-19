@@ -16,7 +16,7 @@
 | ------ | ------------------------------------------------- | ------ | --------------------------------------------------------------------------------- | ------------------------------------------- |
 | P0     | Gen VII TF3 Stationary Initial Seed / Time Finder | 已完成 | `PokemonRNGGuides` 的 Gen VII 初始 Seed 教程；`3DSTimeFinder` StationarySearcher7 | 已提交推送；生产算法仍待部署 URL 与人工验收 |
 | P0     | Gen VII TF4 Event Initial Seed / Time Finder      | 已完成 | 与 TF3 同一时间枚举流程，复用 `gen7event`                                         | 已完成工程验证，待提交推送                  |
-| P0     | Gen VII TF5 Wild / TF6 ID                         | 计划   | 教程时间反查闭环；只补真实缺口                                                    | TF4 提交推送后评估共用时间 Worker           |
+| P0     | Gen VII TF5 Wild / TF6 ID                         | 进行中 | TF5 已完成工程验证；TF6 复用 `gen7timefinder` / `gen7id` Wasm 实现时间反查        | TF6 外部页面回归后进入 Gen VI TF1/TF2       |
 | P1     | Gen VI TF1/TF2 Stationary/Event                   | 计划   | `3DSTimeFinder` Gen VI 时间入口                                                   | Gen VII TF3-TF6 完成后                      |
 | P2     | 公共 TSV List                                     | 计划   | Gen VII Egg 教程要求编辑 TSV List                                                 | TF1/TF2 后实现全局悬浮工具                  |
 | P2     | IV Range / IV Template                            | 计划   | 3DSRNGTool `IVRange.cs`、`IVTemplate.cs`                                          | TSV List 后实现                             |

@@ -1,5 +1,35 @@
 # PokeRNGKit 项目进度与交接
 
+# 当前目标：完成 3DSRNGTool 全范围后统一 UI 验收
+
+- 当前主线：TF5 Gen VII Wild 时间/初始 Seed 反查 -> TF6 Gen VII ID 时间/初始 Seed 反查 -> TSV List / IV Range / Template -> Gen VI 时间反查 -> TinyFinder 真实缺口。
+- 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
+- 当前状态：TF5 与 TF6 功能和工程验证已完成，变更仍待按功能提交推送；外部页面回归保留到全部 3DS 模块完成后统一执行。
+
+## 工程验证耗时优化决策
+
+- 现状：`tsc -b` 已使用项目引用增量缓存；Vite/PWA 全量构建仍必须生成所有 Worker、Wasm 资源和预缓存，不能用局部构建替代发布门槛。
+- 基准：本机默认 `npm test` 的 159 个测试文件、568 项测试约 57 秒通过；强制 Vitest `threads` 池并发 4 在 Windows 上耗时约 148 秒并出现 3 个 worker 启动超时，因此不切换默认测试池。
+- 决策：开发循环使用 `npx vitest run <module-test-files>`、`npx eslint <changed-files>`、定向 `POKERNGKIT_WASM_MODULES=<module>` 原生/Wasm 检查；提交前继续使用完整 `npm run verify` 与 `npm run verify:full`。
+- 适用范围：增量 TypeScript、按修改文件 lint、按模块测试和按目标构建是多数 TS/Vite/Vitest 仓库都可复用的优化方向；测试池、Worker 数量、缓存策略和全量构建拆分不能直接照搬，必须在目标仓库和操作系统上以实际耗时、稳定性和资源占用重新基准测试。
+
+## 2026-08-19 3DSTimeFinder TF5 Gen VII Wild 时间反查（已完成）
+
+- 新增：加入独立 `gen7wildtimefinder` Wasm、Dedicated Worker、时间枚举、领域校验、原生夹具和三栏参数工作台，支持 Grass/Fish、同步、性别比、闪耀护符与 WildFilter 筛选。
+- 算法：按 `3DSTimeFinder` `WildSearcher7` 的 SFMT 128 项 RNGList 和帧消耗顺序实现同步、槽位、等级/笛子消耗、60 帧推进、EC、PID 重掷、六项 IV、Ability、Nature、Gender；Initial Seed 复用 `gen7timefinder` SHA-256 Worker。
+- 接线：Gen VII 侧栏新增 TF5 入口，新增固定宽度 C ABI、请求/结果校验、取消、结果上限和 PWA Worker 产物。
+- 已通过：`npx vitest run src/features/gen7wildtimefinder/timeDomain.test.ts`（3 项）；`$env:POKERNGKIT_WASM_MODULES='gen7wildtimefinder'; npm run wasm:test:native`（1/1）；激活 Emscripten 6.0.6 后定向 `npm run wasm:build`；`npm run verify`（159 个测试文件、568 项测试、Vite/PWA 219 项预缓存）；`npm run format:check`、`git diff --check`。
+- 未运行：外部 Chrome/Edge UI 与生产页面算法验收；按当前目标，待全部 3DS 模块完成后统一执行八项 UI 门槛。
+
+## 2026-08-20 3DSTimeFinder TF6 Gen VII ID 时间反查（已完成工程验证）
+
+- 新增：加入独立 `gen7idtimefinder` 时间领域、Dedicated Worker、预览引擎和三栏工作台；按 `IDSearcher7` 逐秒枚举 Citra 时间并输出 Initial Seed、帧、TID、SID、TSV、TRV、Gen7TID 和 Clock。
+- 复用：不新增重复 C++ RNG；Worker 复用 `gen7timefinder` Initial Seed SHA-256 Wasm 与 `gen7id` SFMT Wasm，再应用既有 ID 多行、TSV、Random Number、正则和 Disable Filters 语义。
+- 接线：Gen VII 侧栏新增 TF6 入口，结果表使用虚拟滚动，补充固定十字结果协议、取消、时间/Seed 元数据和模块文档。
+- 已通过：TF6 定向 Vitest（1 个文件、3 项测试）与既有 Gen VII ID 测试合计 2 个文件、15 项测试；`$env:POKERNGKIT_WASM_MODULES='gen7id'; npm run wasm:test:native`（1/1）；`npm run typecheck`、定向 ESLint、全仓 `npm run verify`（160 个测试文件、571 项测试、Vite/PWA 预缓存 220 项）、`npm run format:check`、`git diff --check`。
+- 已通过：激活 Emscripten 6.0.6 后定向 `npm run wasm:build`，复用 `gen7id` 与 `gen7timefinder` 浏览器 Wasm 产物可用；CMake 仍提示 4.3.1 对 Emscripten shared library 的非阻断警告，当前 target 为 executable。
+- 待完成：外部 Chrome/Edge 和生产页面回归；按当前目标，待全部 3DS 模块完成后统一执行八项 UI 门槛，未完成前不宣称 TF6 最终验收。
+
 ## 2026-08-19 3DSTimeFinder TF4 Gen VII Event 时间反查（已完成）
 
 - 新增：加入独立 `gen7eventtimefinder` Wasm、Dedicated Worker、领域校验、预览引擎、三栏参数工作台、虚拟结果表、CSV、取消和空结果状态。
@@ -10,11 +40,11 @@
 - 已验证产物：`gen7eventtimefinder.mjs` 8183 bytes，SHA-256 `8759C23CABF0DAC5489854E47C98CF1092CE055FA2B813739C6C80F9A430D728`；`gen7eventtimefinder.wasm` 7246 bytes，SHA-256 `00110E99534F56C8DB6BD5382FE6397242F558EC94C83078F7D244EBA880E1E2`。
 - 未运行：外部 Chrome/Edge UI 回归和生产算法验收；全部 3DSRNGTool 模块完成后，按项目所有者列出的 8 项 UI 清单统一验收，须使用已连接外部浏览器。
 
-> - 最近更新：2026-08-19
+> - 最近更新：2026-08-20
 > - 当前分支：`main`
-> - 当前阶段：TF4 Event 时间反查工程闭环完成，待提交推送
-> - 工作区状态：TF4 功能、导航、契约、测试和文档存在未提交修改
-> - 下一步：提交 `feat: 实现第七世代配信时间反查` 并推送；随后开始 TF5 Wild / TF6 ID
+> - 当前阶段：TF6 Gen VII ID 时间反查开发中
+> - 工作区状态：TF5/TF6 功能、导航、契约、测试和文档存在未提交修改，待按功能提交推送
+> - 下一步：补齐 TF6 定向测试与复用 Wasm 验证，再执行全仓工程检查；随后进入 TSV List / IV Range / Template
 
 ## 2026-08-19 3DSTimeFinder TF3 Gen VII Stationary 时间反查（已完成）
 

@@ -1,0 +1,13 @@
+{
+  "id": "gen7wildtimefinder",
+  "generation": 7,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen7wildtimefinder",
+  "operations": ["wild-time-search"],
+  "artifacts": {
+    "loader": "gen7wildtimefinder.mjs",
+    "wasm": "gen7wildtimefinder.wasm"
+  },
+  "source": "3DSTimeFinder Source/Core/Gen7/WildSearcher7.cpp and Source/Core/Parents/WildFilter.cpp"
+}

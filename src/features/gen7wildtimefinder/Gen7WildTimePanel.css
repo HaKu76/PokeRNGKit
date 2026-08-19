@@ -1,0 +1,127 @@
+.gen7-wild-time-panel {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+.gen7-wild-time-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.gen7-wild-time-panel fieldset {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+}
+.gen7-wild-time-panel fieldset legend {
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.wild-time-iv-grid {
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.wild-time-iv-grid > div {
+  display: grid;
+  grid-template-columns: minmax(64px, 1fr) 64px 64px;
+  align-items: center;
+  min-height: 39px;
+  gap: 6px;
+  padding: 3px 7px;
+}
+.wild-time-iv-grid > div + div {
+  border-top: 1px solid var(--line-soft);
+}
+.wild-time-iv-grid > div:first-child {
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 13px;
+}
+.wild-time-iv-grid input {
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+}
+.gen7-wild-time-panel .form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.gen7-wild-time-panel .field,
+.gen7-wild-time-panel .checkbox-field {
+  min-width: 0;
+}
+.gen7-wild-time-panel .field > span {
+  display: block;
+  margin-bottom: 6px;
+}
+.gen7-wild-time-panel input,
+.gen7-wild-time-panel select {
+  width: 100%;
+  min-height: 44px;
+}
+.gen7-wild-time-panel .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gen7-wild-time-panel .results-table-wrap {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+.gen7-wild-time-panel table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+}
+.gen7-wild-time-panel thead tr {
+  display: grid;
+  grid-template-columns: 1.7fr 1.1fr 0.7fr 0.5fr 1.1fr 1.1fr 1.4fr 0.7fr;
+}
+.gen7-wild-time-panel th,
+.gen7-wild-time-panel td {
+  height: 42px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: left;
+}
+.gen7-wild-time-panel tbody {
+  display: block;
+  position: relative;
+}
+.gen7-wild-time-panel tbody tr {
+  grid-template-columns: 1.7fr 1.1fr 0.7fr 0.5fr 1.1fr 1.1fr 1.4fr 0.7fr;
+}
+.gen7-wild-time-panel tbody td {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gen7-wild-time-panel th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-3);
+  color: var(--muted);
+  font-size: 13px;
+}
+@media (max-width: 960px) {
+  .gen7-wild-time-panel .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .gen7-wild-time-panel .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

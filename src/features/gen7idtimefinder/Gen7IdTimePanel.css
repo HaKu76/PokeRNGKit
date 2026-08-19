@@ -1,0 +1,48 @@
+.gen7-id-time-panel {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.gen7-id-time-panel form {
+  flex: 0 0 auto;
+}
+
+.gen7-id-time-panel textarea {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+}
+
+.gen7-id-time-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 12px 0;
+}
+
+.gen7-id-time-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gen7-id-time-results {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.gen7-id-time-results table {
+  min-width: 980px;
+}
+
+.gen7-id-time-results thead tr,
+.gen7-id-time-results tbody tr {
+  grid-template-columns: 1.6fr 1.15fr 0.7fr 0.9fr 0.7fr 0.7fr 0.6fr 0.5fr;
+}
+
+@media (max-width: 720px) {
+  .gen7-id-time-panel .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
