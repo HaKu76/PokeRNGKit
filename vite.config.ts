@@ -64,7 +64,7 @@ export default defineConfig(({ mode }) => ({
             workbox: {
               navigateFallback: "index.html",
               globPatterns: ["**/*.{js,css,html,ico,mjs,wasm,txt,md,png,jpg}"],
-              maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
+              maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
             },
           }),
         ]),

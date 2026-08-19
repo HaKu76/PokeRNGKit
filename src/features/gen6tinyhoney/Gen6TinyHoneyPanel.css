@@ -1,0 +1,98 @@
+.gen6tinyhoney-workspace {
+  display: grid;
+  gap: 16px;
+}
+.gen6tinyhoney-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.gen6tinyhoney-panel {
+  min-width: 0;
+  padding: 24px;
+}
+.gen6tinyhoney-mode,
+.gen6tinyhoney-grid,
+.gen6tinyhoney-state-grid,
+.gen6tinyhoney-filter-grid {
+  display: grid;
+  gap: 12px;
+}
+.gen6tinyhoney-mode {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 4px;
+}
+.gen6tinyhoney-mode label {
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.gen6tinyhoney-mode label.active {
+  background: var(--surface);
+  color: var(--brand-strong);
+}
+.gen6tinyhoney-mode input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.gen6tinyhoney-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gen6tinyhoney-state-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 12px 0;
+}
+.gen6tinyhoney-filter-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 16px 0;
+}
+.gen6tinyhoney-results-panel {
+  min-width: 0;
+}
+.gen6tinyhoney-table-shell {
+  min-height: 280px;
+}
+.gen6tinyhoney-table {
+  min-width: 720px;
+}
+.gen6tinyhoney-table .table-header,
+.gen6tinyhoney-table .table-row {
+  grid-template-columns:
+    minmax(52px, 0.65fr) minmax(82px, 1fr) minmax(56px, 0.7fr)
+    minmax(60px, 0.7fr) minmax(52px, 0.65fr) minmax(52px, 0.65fr)
+    minmax(58px, 0.7fr) minmax(60px, 0.75fr) minmax(52px, 0.65fr)
+    minmax(180px, 2.3fr);
+  min-width: 720px;
+}
+.gen6tinyhoney-table .table-header span,
+.gen6tinyhoney-table .table-row span {
+  overflow: hidden;
+  padding: 0 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .gen6tinyhoney-controls {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 620px) {
+  .gen6tinyhoney-grid,
+  .gen6tinyhoney-state-grid,
+  .gen6tinyhoney-filter-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .gen6tinyhoney-panel {
+    padding: 18px;
+  }
+}

@@ -37,6 +37,7 @@ pokerngkit_add_module(gen6mainseed)
 pokerngkit_add_module(gen6tinytimeline)
 pokerngkit_add_module(gen6tinyindex)
 pokerngkit_add_module(gen6tinyrocksmash)
+pokerngkit_add_module(gen6tinyhoney)
 
 pokerngkit_add_module(gen7timefinder)
 pokerngkit_add_module(gen7eventtimefinder)

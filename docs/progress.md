@@ -1,8 +1,17 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-20 TinyFinder T8 Honey Wild（已完成工程实现）
+
+- 新增独立 `gen6tinyhoney` TinyMT / BlinkSystem Wasm、Dedicated Worker、地点数据生成器和蜂蜜野生工作区。
+- 从 TinyFinder XY/ORAS `Locations*` 与 `Table*` 解析 238 个地点/遇敌表，保留地点 NPC、Bag Advances、首次长闪烁和版本差异。
+- 支持普通 12 槽与水面 5 槽分布、Honey Delay、同步、危险帧、笛子、槽位、结果上限和 CSV。
+- 已通过：任务文件格式化、定向 Vitest（2 个文件、4 项测试）、`npm run typecheck`、`npx eslint`、`$env:POKERNGKIT_WASM_MODULES='gen6tinyhoney'; npm run wasm:test:native`（1/1）。
+- 已通过：完整 `npm run verify`（170 个测试文件、595 项测试及生产 Web/PWA 构建）；为适配当前 8.47 MB 主包，将 Workbox 预缓存上限从 8 MiB 更新为 12 MiB。
+- 未运行：Emscripten Wasm 构建、外部 Chrome/Edge UI 和生产页面算法回归；后两项继续按全部 3DS 模块完成后的统一验收门槛执行。
+
 # 当前目标：完成 3DSRNGTool 全范围后统一 UI 验收
 
-- 当前主线：Gen VI TF1/TF2 时间反查 -> TinyFinder 真实缺口。
+- 当前主线：继续实现 TinyFinder T10 Ambush，随后处理 Victory Road Swooping 与 MT Seed/Time Finder。
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
 - 当前状态：TF5、TF6、公共 TSV List 与 IV Range / IV Template 功能已完成工程实现并已提交推送（IV Tools：`7befd11`）；外部页面回归保留到全部 3DS 模块完成后统一执行。
 
@@ -29,7 +38,7 @@
 - 已通过：TinyMT Index 定向 Vitest（2 个文件、4 项测试）、`npm run typecheck`、`$env:POKERNGKIT_WASM_MODULES='gen6tinyindex'; npm run wasm:test:native`（1/1）、任务文件格式化、`npm run format:check`、`git diff --check`。
 - 已通过：在用户级 Emscripten 6.0.6 环境中运行 `cmd /c "call C:\\Users\\Hakuhiro\\emsdk\\emsdk_env.bat && set POKERNGKIT_WASM_MODULES=gen6tinyindex && npm run wasm:build"`；生成 `gen6tinyindex.mjs`（7733 bytes，SHA-256 `381273699382CDB04155F2A66356E685F7D1A616884F5F1921B92F77152DBDC2`）与 `gen6tinyindex.wasm`（6901 bytes，SHA-256 `E5FDB77063C70B0664DAEB755D4C151602391A3E48E377387ECD5EEBDFEEAEB2`）。
 - 未运行：外部 Chrome/Edge UI 与生产页面算法验收；后两项继续按全部 3DS 模块完成后的统一门槛执行。
-- 下一步：继续核对 TinyFinder T6 Rock Smash、T8 Honey Wild、T10 Ambush 和 T12 Victory Road Swooping 的独有分支，再进入 MT Seed/Time Finder。
+- 下一步：实现 TinyFinder T10 Ambush，复用本模块的地点数据、TinyMT 和 Worker/Wasm 协议边界。
 
 ## 2026-08-20 3DSTimeFinder TF1 Gen VI Stationary 时间反查（已完成工程验证）
 

@@ -1,0 +1,13 @@
+{
+  "id": "gen6tinyhoney",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6tinyhoney",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6tinyhoney.mjs",
+    "wasm": "gen6tinyhoney.wasm"
+  },
+  "source": "TinyFinder Methods/Wild.cs, Utils/BlinkSystem.cs, Utils/PrepareRow.cs and RNG/TinyMT.cs"
+}
