@@ -783,7 +783,17 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、数据生成、48/12-word ABI、固定夹具和上游文件见 [Gen 8 Wild](modules/gen8wild.md)。
 
-## 8.45 当前功能需求：`3dsprofiles`
+## 8.45A 当前功能需求：`keybv`
+
+- **FR-KEYBV-01** 提供 3DSRNGTool 公共 `KeyBV` 的本地文件工作流，接受两份用户主动选择或拖放的战斗视频文件；不连接 NTR/TCP、不上传文件、不写回原文件。
+- **FR-KEYBV-02** 仅接受同尺寸的 `0x6E60`（Gen VI）或 `0x6BC0`（Gen VII）文件；尺寸不支持、两份尺寸不一致、PKX 校验失败或无法恢复任何记录时显示错误并拒绝结果。
+- **FR-KEYBV-03** 按上游 `BVBreaker` 与 `PKX` 的 party offset、密钥流 XOR、LCRNG 加解密、四块重排、checksum 和队伍槽位顺序恢复最多 6 条 PKX 记录；TSV 为 `(TID ^ SID) >> 4`，TRV 为 `(TID ^ SID) & 0xF`。
+- **FR-KEYBV-04** 结果显示 Generation、Slot、Species、四位十进制 TSV 和一位大写十六进制 TRV；Species 使用现有三语 Gen VII 物种表，缺失编号显示 `#<id>`。
+- **FR-KEYBV-05** KeyBV 作为轻量全局工具放在右下角悬浮工具菜单，支持键盘焦点、Escape、点外关闭、拖动面板、移动端单列布局、清空和完整的空/错误/成功状态。
+
+完整输入限制、party offset、PKX 字段和上游文件见 [KeyBV](modules/keybv.md)。
+
+## 8.46 当前功能需求：`3dsprofiles`
 
 - **FR-3DSPROFILES-01** 提供 3DSRNGTool `Profile Manager` 与 `Profile View`，支持 X、Y、Omega Ruby、Alpha Sapphire、Transporter、Sun、Moon、Ultra Sun、Ultra Moon，以及 Description、TSV、TRV、Shiny Charm 和四字 Egg Seed。
 - **FR-3DSPROFILES-02** 输入必须匹配上游 WinForms 与模型类型：Description 为 `1..32767` 字符且空白拒绝；TSV 为 `0..4095`；TRV 为一位十六进制 `0..F`；每个 Seed 为 32 位十六进制且空值按 `0`。Gen VI/Transporter 只启用 `[1],[0]`，Gen VII 启用 `[3]..[0]`。

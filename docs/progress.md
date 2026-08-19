@@ -1,5 +1,23 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-19 3DSRNGTool 公共 KeyBV
+
+- 新增：实现 `keybv` 本地战斗视频解析工具，支持 Gen VI `0x6E60` 与 Gen VII `0x6BC0` 两种尺寸，读取两份匹配文件并恢复最多六只队伍记录。
+- 新增：按上游 `BVBreaker.cs`、`PKX.cs` 的 party offset、密钥流 XOR、加密零值、LCRNG 加解密、四块重排和 checksum 规则解析 Species、四位 TSV 与一位十六进制 TRV。
+- 接入：KeyBV 作为轻量全局工具进入右下角悬浮菜单，支持文件选择、拖放、尺寸状态、清空、错误、结果表、键盘焦点和移动端单列布局；不上传、不写回文件、不连接 NTR/TCP。
+- 更新：补充 `docs/modules/keybv.md`、需求、模块库存和三语文案；沿用现有 Gen VII 物种数据与 Ant Neutral HakuStyle 实体浮动面板。
+- 已通过：`npx vitest run src/features/keybv/domain.test.ts`（4/4）、`npm run format:check`、`git diff --check`。
+- 已通过：完整 `npm run verify`；Prettier、ESLint（0 error / 0 warning）、TypeScript、Vitest（152 个文件、545 项测试）和 Vite/PWA 生产构建（210 项预缓存资源）均完成。
+- 未运行：外部 Chrome/Edge UI 回归和生产页面算法验收；需等待部署后由项目所有者提供准确 URL 并授权。
+- 下一步：继续实现 `Misc. RNG Tool`，随后完成 `TSV List` 与 `IV Range / IV Template`，再收口剩余 3DSRNGTool 模块。
+
+> - 最近更新：2026-08-19
+> - 当前分支：`main`
+> - 当前 HEAD：`38e1c5f`（`feat: 实现第六世代TinyMT时间线工具`，KeyBV 尚未提交）
+> - 当前阶段：公共 KeyBV 已完成工程闭环，下一模块为 `Misc. RNG Tool`
+> - 工作区状态：KeyBV 功能、导航、三语、需求、库存和模块文档存在未提交修改
+> - 验证状态：KeyBV 定向测试和完整 `npm run verify` 已通过；外部浏览器未运行
+
 ## 2026-08-19 3DSRNGTool Gen VI TinyMT Timeline Tool
 
 - 新增：实现 `gen6tinytimeline` 四字 TinyMT 状态、11 种方法、1 至 4 个事件、方法参数、Delay、Cry、Consider Delay、ORAS 与 Poke Radar Boost 的本地时间线工作区。

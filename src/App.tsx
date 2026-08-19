@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Database,
   FlaskConical,
+  KeyRound,
   Menu,
   Monitor,
   Moon,
@@ -129,6 +130,7 @@ import { useGen8Profiles } from "./features/gen8profiles/useGen8Profiles";
 import { Gen8EggPanel } from "./features/gen8egg/Gen8EggPanel";
 import { Gen8EventPanel } from "./features/gen8event/Gen8EventPanel";
 import { ResearcherPanel } from "./features/researcher/ResearcherPanel";
+import { KeyBvPanel } from "./features/keybv/KeyBvPanel";
 import { FloatingToolPanel } from "./features/shared/FloatingToolPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
@@ -532,6 +534,7 @@ function App() {
   const [sponsorshipExpanded, setSponsorshipExpanded] = useState(false);
   const [threeDsProfilesExpanded, setThreeDsProfilesExpanded] = useState(false);
   const [researcherExpanded, setResearcherExpanded] = useState(false);
+  const [keyBvExpanded, setKeyBvExpanded] = useState(false);
   const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
     useState<Gen5AdjacentSeedsInitialContext>();
@@ -965,13 +968,15 @@ function App() {
             ? "threeDsProfile"
             : researcherExpanded
               ? "researcher"
-              : profileTools && gen4Tools
-                ? gen4ProfileExpanded
-                  ? "profile"
-                  : undefined
-                : profileTools && profileExpanded
-                  ? "profile"
-                  : undefined;
+              : keyBvExpanded
+                ? "keybv"
+                : profileTools && gen4Tools
+                  ? gen4ProfileExpanded
+                    ? "profile"
+                    : undefined
+                  : profileTools && profileExpanded
+                    ? "profile"
+                    : undefined;
 
   const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
@@ -980,6 +985,7 @@ function App() {
     setSponsorshipExpanded(false);
     setThreeDsProfilesExpanded(false);
     setResearcherExpanded(false);
+    setKeyBvExpanded(false);
     if (gen4Tools) {
       changeGen4ProfileExpanded(false);
     } else {
@@ -1019,6 +1025,7 @@ function App() {
       | "iv"
       | "profile"
       | "researcher"
+      | "keybv"
       | "sponsorship"
       | "threeDsProfile",
   ) => {
@@ -1031,6 +1038,7 @@ function App() {
     else if (tool === "encounter") setEncounterLookupExpanded(true);
     else if (tool === "iv") setIvCalculatorExpanded(true);
     else if (tool === "researcher") setResearcherExpanded(true);
+    else if (tool === "keybv") setKeyBvExpanded(true);
     else if (tool === "threeDsProfile") setThreeDsProfilesExpanded(true);
     else if (gen4Tools) changeGen4ProfileExpanded(true);
     else changeProfileExpanded(true);
@@ -3535,6 +3543,23 @@ function App() {
         >
           <ResearcherPanel uiPreviewMode={uiPreviewMode} />
         </FloatingToolPanel>
+        <KeyBvPanel
+          expanded={activeFloatingTool === "keybv"}
+          onExpandedChange={(expanded) => {
+            setKeyBvExpanded(expanded);
+            if (expanded) {
+              setModuleRailOpen(false);
+              setIvCalculatorExpanded(false);
+              setEncounterLookupExpanded(false);
+              setContributionsExpanded(false);
+              setSponsorshipExpanded(false);
+              setThreeDsProfilesExpanded(false);
+              setResearcherExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
         {profileTools && gen4Tools ? (
           <Gen4ProfileControls
             controller={gen4Profiles}
@@ -3670,6 +3695,23 @@ function App() {
               type="button"
             >
               <FlaskConical aria-hidden="true" size={19} />
+            </button>
+            <button
+              aria-controls="keybv-panel"
+              aria-expanded={activeFloatingTool === "keybv"}
+              aria-haspopup="dialog"
+              aria-label={t("keyBvModule")}
+              className={activeFloatingTool === "keybv" ? "active" : undefined}
+              data-tone="amber"
+              id="keybv-trigger"
+              onClick={() => {
+                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                toggleFloatingTool("keybv");
+              }}
+              title={t("keyBvModule")}
+              type="button"
+            >
+              <KeyRound aria-hidden="true" size={19} />
             </button>
           </nav>
           <button
