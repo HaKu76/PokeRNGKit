@@ -52,7 +52,7 @@ PokeFinder 核对入口：
 | 21   | Gen VII | Poke Pelago 特殊遭遇                     | 已包含 |
 | 22   | 公共    | Profile Manager                          | 已实现 |
 | 23   | 公共    | KeyBV                                    | 已实现 |
-| 24   | 公共    | Misc. RNG Tool                           | 计划   |
+| 24   | 公共    | Misc. RNG Tool                           | 已实现 |
 | 25   | 公共    | TSV List                                 | 计划   |
 | 26   | 公共    | IV Range / IV Template                   | 计划   |
 | 27   | 公共    | NTR Helper                               | 不开发 |
@@ -119,5 +119,5 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary / Pokemon Link / Event / Wild / DexNav / Poke Radar / Egg / ID 与公共 Profile Manager 已实现。
 2. 3DSRNGTool Gen VI Main Seed Finder 已实现；字段、控件边界和算法以对应 WinForms/Core 源码为准。
-3. Gen VI TinyMT Timeline Tool 与公共 KeyBV 已实现；随后继续 Misc. RNG Tool、TSV List 与 IV Range / Template；`NTR Helper` 除外。
+3. Gen VI TinyMT Timeline Tool、公共 KeyBV 与 Misc. RNG Tool 已实现；随后继续 TSV List 与 IV Range / Template；`NTR Helper` 除外。
 4. 全部模块完成后执行全仓验证、Actions 部署和生产页面回归。

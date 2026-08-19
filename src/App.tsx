@@ -14,6 +14,7 @@ import {
   Check,
   ChevronDown,
   Database,
+  Dices,
   FlaskConical,
   KeyRound,
   Menu,
@@ -131,6 +132,7 @@ import { Gen8EggPanel } from "./features/gen8egg/Gen8EggPanel";
 import { Gen8EventPanel } from "./features/gen8event/Gen8EventPanel";
 import { ResearcherPanel } from "./features/researcher/ResearcherPanel";
 import { KeyBvPanel } from "./features/keybv/KeyBvPanel";
+import { MiscRngPanel } from "./features/miscrng/MiscRngPanel";
 import { FloatingToolPanel } from "./features/shared/FloatingToolPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
@@ -535,6 +537,7 @@ function App() {
   const [threeDsProfilesExpanded, setThreeDsProfilesExpanded] = useState(false);
   const [researcherExpanded, setResearcherExpanded] = useState(false);
   const [keyBvExpanded, setKeyBvExpanded] = useState(false);
+  const [miscRngExpanded, setMiscRngExpanded] = useState(false);
   const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
     useState<Gen5AdjacentSeedsInitialContext>();
@@ -970,13 +973,15 @@ function App() {
               ? "researcher"
               : keyBvExpanded
                 ? "keybv"
-                : profileTools && gen4Tools
-                  ? gen4ProfileExpanded
-                    ? "profile"
-                    : undefined
-                  : profileTools && profileExpanded
-                    ? "profile"
-                    : undefined;
+                : miscRngExpanded
+                  ? "miscRng"
+                  : profileTools && gen4Tools
+                    ? gen4ProfileExpanded
+                      ? "profile"
+                      : undefined
+                    : profileTools && profileExpanded
+                      ? "profile"
+                      : undefined;
 
   const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
@@ -986,6 +991,7 @@ function App() {
     setThreeDsProfilesExpanded(false);
     setResearcherExpanded(false);
     setKeyBvExpanded(false);
+    setMiscRngExpanded(false);
     if (gen4Tools) {
       changeGen4ProfileExpanded(false);
     } else {
@@ -1026,6 +1032,7 @@ function App() {
       | "profile"
       | "researcher"
       | "keybv"
+      | "miscRng"
       | "sponsorship"
       | "threeDsProfile",
   ) => {
@@ -1039,6 +1046,7 @@ function App() {
     else if (tool === "iv") setIvCalculatorExpanded(true);
     else if (tool === "researcher") setResearcherExpanded(true);
     else if (tool === "keybv") setKeyBvExpanded(true);
+    else if (tool === "miscRng") setMiscRngExpanded(true);
     else if (tool === "threeDsProfile") setThreeDsProfilesExpanded(true);
     else if (gen4Tools) changeGen4ProfileExpanded(true);
     else changeProfileExpanded(true);
@@ -3560,6 +3568,24 @@ function App() {
             }
           }}
         />
+        <MiscRngPanel
+          expanded={activeFloatingTool === "miscRng"}
+          onExpandedChange={(expanded) => {
+            setMiscRngExpanded(expanded);
+            if (expanded) {
+              setModuleRailOpen(false);
+              setIvCalculatorExpanded(false);
+              setEncounterLookupExpanded(false);
+              setContributionsExpanded(false);
+              setSponsorshipExpanded(false);
+              setThreeDsProfilesExpanded(false);
+              setResearcherExpanded(false);
+              setKeyBvExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
         {profileTools && gen4Tools ? (
           <Gen4ProfileControls
             controller={gen4Profiles}
@@ -3712,6 +3738,25 @@ function App() {
               type="button"
             >
               <KeyRound aria-hidden="true" size={19} />
+            </button>
+            <button
+              aria-controls="misc-rng-panel"
+              aria-expanded={activeFloatingTool === "miscRng"}
+              aria-haspopup="dialog"
+              aria-label={t("miscRngModule")}
+              className={
+                activeFloatingTool === "miscRng" ? "active" : undefined
+              }
+              data-tone="teal"
+              id="misc-rng-trigger"
+              onClick={() => {
+                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                toggleFloatingTool("miscRng");
+              }}
+              title={t("miscRngModule")}
+              type="button"
+            >
+              <Dices aria-hidden="true" size={19} />
             </button>
           </nav>
           <button

@@ -793,6 +793,16 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、party offset、PKX 字段和上游文件见 [KeyBV](modules/keybv.md)。
 
+## 8.45B 当前功能需求：`miscrng`
+
+- **FR-MISCRNG-01** 提供 3DSRNGTool `Misc. RNG Tool` 的公共轻量计算入口，收纳捕获率、暴击/摇晃结果、Random N 比较与 Gen VI/VII Pokerus 菌株解析；不连接 NTR/TCP、不上传文件。
+- **FR-MISCRNG-02** 捕获率输入必须匹配上游 `Capture.cs`：当前/最大 HP 为 `0..1000` 且当前不超过最大，Catch Rate 为 `0..255`，Status/Ball/Dex 为上游倍率，O-Power 仅允许 `1/1.5/2/2.5`；结果保留 Always Capture、Critical、Shake 和 Success 概率。
+- **FR-MISCRNG-03** 捕获模拟按 Gen VI 高位字节、Gen VII 低位字节读取暴击随机值，随后按低 16 位执行最多四次摇晃；Random N 使用无符号 32 位范围取模，比较语义为 `<`、`>=` 和 `=`。
+- **FR-MISCRNG-04** Pokerus 复用上游 `Pokerus7.getStrain()` 的 `0x4000/0x8000/0xC000` 触发字、后续低 8 位非零低三位筛选和菌株掩码；空/非法输入显示错误。
+- **FR-MISCRNG-05** Misc. RNG Tool 作为全局轻量工具放入右下角悬浮菜单，使用实体浮动面板、三语标签、键盘焦点、Escape、点外关闭、清空和移动端单列布局。
+
+完整公式、输入边界、上游来源和固定夹具见 [Misc. RNG Tool](modules/miscrng.md)。
+
 ## 8.46 当前功能需求：`3dsprofiles`
 
 - **FR-3DSPROFILES-01** 提供 3DSRNGTool `Profile Manager` 与 `Profile View`，支持 X、Y、Omega Ruby、Alpha Sapphire、Transporter、Sun、Moon、Ultra Sun、Ultra Moon，以及 Description、TSV、TRV、Shiny Charm 和四字 Egg Seed。
