@@ -4,7 +4,7 @@
 
 - 当前主线：TF5 Gen VII Wild 时间/初始 Seed 反查 -> TF6 Gen VII ID 时间/初始 Seed 反查 -> TSV List / IV Range / Template -> Gen VI 时间反查 -> TinyFinder 真实缺口。
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
-- 当前状态：TF5 与 TF6 功能和工程验证已完成，变更仍待按功能提交推送；外部页面回归保留到全部 3DS 模块完成后统一执行。
+- 当前状态：TF5 与 TF6 功能和工程验证已完成，提交 `8080b35` 已推送；外部页面回归保留到全部 3DS 模块完成后统一执行。
 
 ## 工程验证耗时优化决策
 
@@ -43,8 +43,8 @@
 > - 最近更新：2026-08-20
 > - 当前分支：`main`
 > - 当前阶段：TF6 Gen VII ID 时间反查开发中
-> - 工作区状态：TF5/TF6 功能、导航、契约、测试和文档存在未提交修改，待按功能提交推送
-> - 下一步：补齐 TF6 定向测试与复用 Wasm 验证，再执行全仓工程检查；随后进入 TSV List / IV Range / Template
+> - 工作区状态：TF5/TF6 功能、导航、契约、测试和文档已提交推送，工作区待确认干净
+> - 下一步：开始 TSV List / IV Range / Template；全部 3DS 模块完成后执行外部 Chrome/Edge 八项 UI 验收
 
 ## 2026-08-19 3DSTimeFinder TF3 Gen VII Stationary 时间反查（已完成）
 
