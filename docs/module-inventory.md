@@ -154,3 +154,28 @@ Stationary -> Wild/DexNav/Poke Radar -> SOS -> Egg -> Event/ID -> 扩展工具`�
   只按教程核对入口、字段、流程和缺失分支。
 - `PokemonRNGGuides` 中的教程图片、Rust/React 源码和外部 CFW/NTR 操作不复制进产品；只记录
   可由本地静态工具完成的步骤和输入。
+
+### 全世代人工复核
+
+本轮按本地教程目录逐文件检查非翻译正文，共 12 个分组、165 篇指南；结论只用于工作流、
+入口和排期，不改变 PokeFinder 4.3.2 与 3DSRNGTool 的产品边界。教程中超出本项目范围的
+内容明确标记为不开发，避免把指南站的全部内容误当成 RNG 模块需求。
+
+| 教程分组                          | 指南数量 | 人工确认结论                                                                                                                                          | 对 PokeRNGKit 的动作                                             |
+| --------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Gen 2                             | 3        | PokeFinder/3DSRNGTool 范围外                                                                                                                          | 不开发，不新增 Gen II 入口                                       |
+| Gamecube                          | 4        | 对应现有 Gen 3 GameCube、Channel、PokeSpot/Jirachi 流程                                                                                               | 只做字段和教程入口核对，不重做算法                               |
+| Gen 3                             | 44       | IDs、Static、Wild、Egg、Seed、IV、Pokerus 等均已有对应模块或全局工具                                                                                  | 只补教程流程缺口，不新增同名核心模块                             |
+| Gen 4                             | 34       | Static、Wild、Egg、ID、Advance、Seed to Time、Wondercard 已覆盖；Voltorb Flip、Swarm、Gen4SeedFinder 是真实辅助缺口                                   | 进入 P3，先评估工具边界和上游来源                                |
+| Gen 5                             | 14       | IDs、Static、Wild、Egg、Event、Hidden Grotto、Dream Radar、Entralink、Cache 已覆盖                                                                    | 进入 P4，复核 DS 参数/初始 Seed 与 Entralink 分支                |
+| Gen 6                             | 10       | Stationary、Wild、DexNav、Poke Radar、Egg、ID、Main Seed、TinyMT、Event、Transporter 已覆盖                                                           | 进入 P1，补 TF1/TF2 时间反查并核对教程入口                       |
+| Gen 7                             | 19       | Main、Stationary、Wild、SOS、Egg、Event、ID、Egg Seed、Battle Tree、Festival Plaza 已覆盖；教程依赖 Time Finder、TSV 列表、IV 模板和 Island Scan 分支 | 进入 P0，先做 TF3/TF4，再做 TF5/TF6、TSV List、IV Range/Template |
+| Brilliant Diamond / Shining Pearl | 8        | TID/SID、Static、Wild、Egg、Advancing 与 PokeFinder 工作流已有 Gen 8 对应模块                                                                         | 只核对教程入口和结果字段，不新增 BDSP 核心算法                   |
+| Sword and Shield                  | 3        | Raid Seed 获取与 Raid RNG 对应现有 Gen 8 Raids                                                                                                        | 只核对无 CFW/有 CFW 工作流，不新增模块                           |
+| Legends Arceus                    | 1        | 不在 PokeFinder 4.3.2 或 3DSRNGTool 目标范围                                                                                                          | 不开发                                                           |
+| Tools and Emulators               | 21       | PokeFinder、PokeReader、模拟器、计时器和 NTR Helper 使用说明                                                                                          | PokeFinder/PokeReader 保持本地工具入口；NTR Helper 明确排除      |
+| Transporter                       | 4        | Gen 6 Pokemon Link / Transporter 与离线补丁工作流                                                                                                     | 保持现有 `gen6bank`，只核对字段和教程链接                        |
+
+人工复核后的主线固定为：`Gen 7 Initial Seed / Time Finder -> Gen 6 Initial Seed / Time Finder
+-> TSV List / IV Template -> Gen 4 辅助工具 -> Gen 5 参数与时间缺口 -> TinyFinder 扩展`。
+Gen 2、Legends Arceus 和 NTR Helper 不得因为教程存在而加入开发范围。
