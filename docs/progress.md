@@ -12,8 +12,8 @@
 > - 最近更新：2026-08-19
 > - 当前分支：`main`
 > - 当前 HEAD：`22f568a`（`style: 统一正式工作台与 Demo 组件样式`）
-> - 当前阶段：Gen VI Main Seed Finder 已实现，待本轮格式收尾后提交推送；下一模块为 Gen VI TinyMT Timeline Tool
-> - 工作区状态：本轮包含 Gen VI Main Seed Finder、3DS Profile Manager/Researcher 悬浮入口和对应文档改动，尚未提交
+> - 当前阶段：Gen VI Main Seed Finder 已实现，功能提交 `f50c0e9` 已提交并推送；下一模块为 Gen VI TinyMT Timeline Tool
+> - 工作区状态：本轮包含 Gen VI Main Seed Finder、3DS Profile Manager/Researcher 悬浮入口和对应文档改动，功能代码已提交并推送
 > - 验证状态：格式检查与空白检查已运行；测试、构建、原生/Wasm 和外部浏览器回归未运行
 
 ## 2026-08-19 HakuStyle Demo 对齐第二轮
