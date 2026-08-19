@@ -6,6 +6,14 @@
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
 - 当前状态：TF5、TF6、公共 TSV List 与 IV Range / IV Template 功能已完成工程实现并已提交推送（IV Tools：`7befd11`）；外部页面回归保留到全部 3DS 模块完成后统一执行。
 
+## 2026-08-20 侧边栏长标题与滚动条样式修复（已完成工程验证）
+
+- 修复：侧边栏模块标题在固定宽度下保持单行省略号，保留原有 `title` 完整名称提示；分组标题继续遵循相同截断规则。
+- 优化：侧栏本体锁定溢出，导航内容仍可在模块较多时滚动，但 Chrome、Edge、Firefox 和兼容 WebKit 的滚动条均不显示，避免出现可见滚动条占位。
+- 影响：仅调整 `src/styles.css` 的导航布局和溢出行为，不改变模块路由、键盘焦点、数据流或 RNG 算法。
+- 已通过：任务文件格式化、`npm run format:check`、`git diff --check`。
+- 未运行：测试、TypeScript、构建和外部 Chrome/Edge UI 回归；本轮为 CSS-only 修复，最终浏览器验收仍按全部 3DS 模块完成后的统一门槛执行。
+
 ## 2026-08-20 3DSTimeFinder TF1 Gen VI Stationary 时间反查（已完成工程验证）
 
 - 新增：Gen VI Stationary TF1 时间/初始 Seed Searcher，按 `StationarySearcher6` 逐秒枚举 Citra epoch，使用 Save Variable、Time Variable 与 Epoch 的 32 位加法计算 Initial Seed。
