@@ -921,6 +921,8 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-TIME-04** 结果保留上游实际 Date/Time、Initial Seed、Frame 与生成字段，提供进度、取消、结果上限、排序、CSV、错误和空结果状态。
 - **FR-TIME-05** Gen VII TF3 Stationary 已实现：Citra 时间按整秒枚举，`gen7timefinder` Wasm 计算 SHA-256 初始 Seed，Dedicated Worker 复用 `gen7stationary` 连续会话，结果跨时间点累计并在后续时间仍存在时正确报告结果上限。
 - **FR-TIME-06** TF3 的静态浏览器任务预算为时间点数乘帧数不超过 `5,000,000`；Tick 为 32 位十六进制，Offset 为 `0..4294967295`，取消通过终止并重建 Worker 完成，不依赖后端、SharedArrayBuffer 或 Wasm pthread。
+- **FR-TIME-07** Gen VII TF4 Event 已实现：按 Citra 时间逐秒计算初始 Seed，复用 `EventSearcher7` 的 SFMT/RNGList 顺序、PID/IV/Ability/Nature/Gender 生成和 EventFilter 筛选；Worker 跨时间点累计结果并保留 Date/Time、Initial Seed、Frame 与上游结果字段。
+- **FR-TIME-08** TF4 使用独立 `gen7eventtimefinder` Wasm API v1、45-word 请求和 5-word 原生结果；浏览器帧范围为 `1..5,000,000`，时间点数乘帧数不超过 `5,000,000`，取消通过终止并重建 Worker 完成。
 
 完整模块、上游文件、提交和许可证见 [3DSTimeFinder 来源记录](../third_party/3dstimefinder/UPSTREAM.md)。
 

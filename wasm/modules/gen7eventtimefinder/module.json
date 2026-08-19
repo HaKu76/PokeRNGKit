@@ -1,0 +1,13 @@
+{
+  "id": "gen7eventtimefinder",
+  "generation": 7,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen7eventtimefinder",
+  "operations": ["event-time-search"],
+  "artifacts": {
+    "loader": "gen7eventtimefinder.mjs",
+    "wasm": "gen7eventtimefinder.wasm"
+  },
+  "source": "3DSTimeFinder Core/Gen7/EventSearcher7.cpp, Core/Parents/Result.cpp and Core/RNG/RNGList.hpp"
+}

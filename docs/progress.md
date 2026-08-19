@@ -1,5 +1,21 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-19 3DSTimeFinder TF4 Gen VII Event 时间反查（已完成）
+
+- 新增：加入独立 `gen7eventtimefinder` Wasm、Dedicated Worker、领域校验、预览引擎、三栏参数工作台、虚拟结果表、CSV、取消和空结果状态。
+- 新增：按 `EventSearcher7` 复用 Gen VII Event 的 EC、PID、IV、Ability、Nature、Gender、Hidden Power、Shiny 和筛选语义；结果增加 Date/Time 与 Initial Seed。
+- 修复：收口 45-word ABI 的 TypeScript 偏移、无性别元数据校验和随机性别编码；TF4 导航入口移到 TF3 时间反查旁，符合 `存档信息/ID -> Seed 相关 -> 定点 -> 野生 -> 蛋 -> 事件` 主线。
+- 已通过：`npm run typecheck`、TF4 定向 Vitest（3 个文件、8 项测试）和 `$env:POKERNGKIT_WASM_MODULES='gen7eventtimefinder'; npm run wasm:test:native`（1/1）。
+- 已通过：`npm run verify`（158 个测试文件、565 项测试，Vite/PWA 预缓存 214 项）、`npm run format:check`、`git diff --check` 和 Emscripten 6.0.6 定向 `npm run wasm:build`。
+- 已验证产物：`gen7eventtimefinder.mjs` 8183 bytes，SHA-256 `8759C23CABF0DAC5489854E47C98CF1092CE055FA2B813739C6C80F9A430D728`；`gen7eventtimefinder.wasm` 7246 bytes，SHA-256 `00110E99534F56C8DB6BD5382FE6397242F558EC94C83078F7D244EBA880E1E2`。
+- 未运行：外部 Chrome/Edge UI 回归和生产算法验收；全部 3DSRNGTool 模块完成后，按项目所有者列出的 8 项 UI 清单统一验收，须使用已连接外部浏览器。
+
+> - 最近更新：2026-08-19
+> - 当前分支：`main`
+> - 当前阶段：TF4 Event 时间反查工程闭环完成，待提交推送
+> - 工作区状态：TF4 功能、导航、契约、测试和文档存在未提交修改
+> - 下一步：提交 `feat: 实现第七世代配信时间反查` 并推送；随后开始 TF5 Wild / TF6 ID
+
 ## 2026-08-19 3DSTimeFinder TF3 Gen VII Stationary 时间反查（已完成）
 
 - 新增：加入 `gen7timefinder` Wasm 初始 Seed 哈希模块，按 `3DSTimeFinder` 的 `SHA256::hash(tick, epochLow, epochHigh)` 计算 Citra epoch 对应的 32 位初始 Seed。

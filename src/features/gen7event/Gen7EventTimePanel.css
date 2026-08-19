@@ -1,0 +1,522 @@
+.gen7event-time-panel {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.gen7event-time-workspace {
+  display: grid;
+  min-width: 0;
+  min-height: 720px;
+  height: calc(100vh - 184px);
+  grid-template-rows: minmax(0, auto) 52px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.gen7event-time-controls {
+  display: contents;
+}
+
+.gen7event-time-parameter-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(272px, 0.78fr) minmax(420px, 1.2fr) minmax(
+      300px,
+      0.92fr
+    );
+  gap: 12px;
+}
+
+.gen7event-time-column,
+.gen7event-time-results {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.gen7event-time-column {
+  display: flex;
+  max-height: 472px;
+  flex-direction: column;
+}
+
+.gen7event-time-column-heading,
+.gen7event-time-results-heading,
+.gen7event-time-column-heading > div,
+.gen7event-time-results-heading > div,
+.gen7event-time-section-title,
+.gen7event-time-actions,
+.gen7event-time-result-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.gen7event-time-column-heading,
+.gen7event-time-results-heading {
+  min-height: 56px;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding: 0 14px;
+}
+
+.gen7event-time-column-heading h2,
+.gen7event-time-results-heading h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 26px;
+}
+
+.gen7event-time-section {
+  min-width: 0;
+  overflow: auto;
+  padding: 13px 14px 14px;
+  overscroll-behavior: contain;
+}
+
+.gen7event-time-column > .gen7event-time-section + .gen7event-time-section {
+  border-top: 1px solid var(--line-soft);
+}
+
+.gen7event-time-column h3 {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+.gen7event-time-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gen7event-time-panel .field,
+.gen7event-time-panel .multi-check-field {
+  min-width: 0;
+}
+
+.gen7event-time-panel .field > span {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.gen7event-time-panel .field input,
+.gen7event-time-panel .autocomplete-combobox,
+.gen7event-time-panel .multi-check-trigger,
+.gen7event-time-panel .checkbox-field .autocomplete-combobox,
+.gen7event-time-iv-filter input {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 10px;
+}
+
+.gen7event-time-panel .autocomplete-combobox input {
+  min-height: 44px;
+}
+
+.gen7event-time-panel :disabled {
+  cursor: not-allowed;
+  opacity: 0.54;
+}
+
+.gen7event-time-import,
+.gen7event-time-primary,
+.gen7event-time-icon {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.gen7event-time-import {
+  flex: 0 0 auto;
+  gap: 7px;
+  border: 1px solid var(--line);
+  padding: 0 12px;
+  background: var(--control-bg);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.gen7event-time-import:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.gen7event-time-toggle-grid,
+.gen7event-time-lock-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.gen7event-time-fixed-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.gen7event-time-fixed-grid .checkbox-field {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+
+.gen7event-time-fixed-grid .checkbox-field input:last-child {
+  grid-column: 2;
+  width: 100%;
+  min-width: 0;
+}
+
+.gen7event-time-settings {
+  flex: 1 1 auto;
+}
+
+.gen7event-time-settings > .field {
+  display: grid;
+  width: min(100%, 220px);
+  margin-top: 12px;
+  gap: 6px;
+}
+
+.gen7event-time-lock-grid .checkbox-field {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.gen7event-time-lock-grid .checkbox-field > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen7event-time-filter-column .gen7event-time-section {
+  flex: 1 1 auto;
+}
+
+.gen7event-time-filter-column fieldset {
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.gen7event-time-filter-column .multi-check-menu {
+  z-index: 8;
+  max-height: 220px;
+}
+
+.gen7event-time-iv-filter {
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.gen7event-time-iv-filter > div {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(64px, 1fr) 64px 64px;
+  align-items: center;
+  gap: 6px;
+  min-height: 39px;
+  padding: 3px 7px;
+}
+
+.gen7event-time-iv-filter > div + div {
+  border-top: 1px solid var(--line-soft);
+}
+
+.gen7event-time-iv-filter > div:first-child {
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen7event-time-iv-filter input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  padding: 4px 6px;
+  background: var(--control-bg);
+  color: var(--text);
+  text-align: center;
+}
+
+.gen7event-time-disable-filter {
+  min-height: 44px;
+  margin-top: 12px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 12px;
+}
+
+.gen7event-time-actions {
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding: 4px 0;
+}
+
+.gen7event-time-primary {
+  gap: 8px;
+  border: 1px solid var(--brand-strong);
+  padding: 0 16px;
+  background: var(--brand);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.gen7event-time-primary:hover:not(:disabled) {
+  background: var(--brand-strong);
+}
+
+.gen7event-time-icon {
+  width: 44px;
+  flex: 0 0 44px;
+  border: 1px solid var(--line);
+  padding: 0;
+  background: var(--control-bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.gen7event-time-import:focus-visible,
+.gen7event-time-primary:focus-visible,
+.gen7event-time-icon:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.gen7event-time-results {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.gen7event-time-results-heading {
+  flex: 0 0 56px;
+}
+
+.gen7event-time-results-heading > div {
+  gap: 9px;
+}
+
+.gen7event-time-result-actions {
+  gap: 7px;
+}
+
+.gen7event-time-result-actions output {
+  color: var(--muted);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen7event-time-metrics {
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 9px 14px;
+}
+
+.gen7event-time-table-shell {
+  min-height: 0;
+  height: auto;
+  flex: 1 1 auto;
+}
+
+.gen7event-time-table {
+  position: relative;
+  min-width: 1290px;
+}
+
+.gen7event-time-table-header,
+.gen7event-time-table-row {
+  display: grid;
+  min-width: 1290px;
+  grid-template-columns:
+    168px 100px 70px 100px 100px 80px repeat(6, 52px)
+    94px 100px 74px 90px;
+  align-items: center;
+}
+
+.gen7event-time-table-header {
+  position: sticky;
+  z-index: 3;
+  top: 0;
+  height: 44px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-3);
+}
+
+.gen7event-time-table-header button {
+  height: 100%;
+  overflow: hidden;
+  border: 0;
+  border-right: 1px solid var(--line-soft);
+  padding: 0 9px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen7event-time-table-header button:hover {
+  color: var(--text);
+}
+
+.gen7event-time-table-row {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 42px;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.gen7event-time-table-row:nth-child(even) {
+  background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+}
+
+.gen7event-time-table-row:hover {
+  background: var(--teal-soft);
+}
+
+.gen7event-time-table-row span {
+  overflow: hidden;
+  padding: 0 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1380px) {
+  .gen7event-time-workspace {
+    height: auto;
+    min-height: 0;
+  }
+
+  .gen7event-time-parameter-grid {
+    grid-template-columns: minmax(280px, 0.78fr) minmax(420px, 1.22fr);
+  }
+
+  .gen7event-time-filter-column {
+    grid-column: 1 / -1;
+  }
+
+  .gen7event-time-filter-column .gen7event-time-section {
+    overflow: visible;
+  }
+
+  .gen7event-time-filter-column fieldset {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(272px, 0.9fr);
+    align-items: start;
+    gap: 12px;
+  }
+
+  .gen7event-time-filter-column .gen7event-time-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gen7event-time-iv-filter {
+    margin-top: 0;
+  }
+
+  .gen7event-time-disable-filter {
+    grid-column: 1 / -1;
+  }
+
+  .gen7event-time-results {
+    min-height: 560px;
+  }
+
+  .gen7event-time-table-shell {
+    height: 520px;
+    flex: none;
+  }
+}
+
+@media (max-width: 920px) {
+  .gen7event-time-parameter-grid,
+  .gen7event-time-filter-column fieldset {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen7event-time-filter-column {
+    grid-column: auto;
+  }
+
+  .gen7event-time-filter-column .gen7event-time-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen7event-time-column {
+    max-height: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .gen7event-time-parameter-grid {
+    gap: 10px;
+  }
+
+  .gen7event-time-column-heading,
+  .gen7event-time-results-heading {
+    align-items: flex-start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .gen7event-time-column-heading {
+    min-height: 64px;
+  }
+
+  .gen7event-time-grid,
+  .gen7event-time-filter-column .gen7event-time-grid,
+  .gen7event-time-toggle-grid,
+  .gen7event-time-lock-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen7event-time-fixed-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen7event-time-actions {
+    justify-content: stretch;
+  }
+
+  .gen7event-time-primary {
+    flex: 1 1 auto;
+  }
+
+  .gen7event-time-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
