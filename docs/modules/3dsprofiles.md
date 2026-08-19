@@ -1,6 +1,6 @@
 # 3DSRNGTool 存档信息管理
 
-`3dsprofiles` 对应 3DSRNGTool 的 `Profile Manager`、`Profile View` 与主窗体 Profile 选择器。模块管理 X、Y、Omega Ruby、Alpha Sapphire、Transporter、Sun、Moon、Ultra Sun、Ultra Moon 的本地档案，并向已实现的 Gen VII RNG 工作区提供当前选择。
+`3dsprofiles` 对应 3DSRNGTool 的 `Profile Manager`、`Profile View` 与主窗体 Profile 选择器。模块管理 X、Y、Omega Ruby、Alpha Sapphire、Transporter、Sun、Moon、Ultra Sun、Ultra Moon 的本地档案，并向已实现的 Gen VII RNG 工作区提供当前选择。Profile Manager 作为全局轻量工具放在右下角悬浮工具菜单中，不占用左侧 RNG 模块导航。
 
 本模块不执行 RNG，不使用 Wasm、Worker、后端、账号、遥测或运行时 CDN。IndexedDB 是主存储，localStorage 是镜像与恢复路径。
 
@@ -32,6 +32,7 @@ HTML 的 `maxLength`、数值规范化与领域校验同时执行这些边界。
 ## 管理行为
 
 - 提供新建、编辑、删除、上移、下移、拖放重排、清空、导入和导出；没有选择时编辑、删除和移动命令禁用。
+- 右下角悬浮工具菜单提供全局入口；打开管理器时仍可在浮动面板内完成列表操作，编辑器 modal 会继续接管自己的焦点范围。
 - 桌面使用可滚动表格，显示 Description、Game、TSV、TRV、Shiny Charm 与 Egg Seeds；窄屏改为逐条记录列表。
 - 编辑器使用有名称的 modal，支持初始焦点、Tab 焦点圈定、Escape、点遮罩关闭、滚动锁定和关闭后焦点恢复。
 - 删除单条与清空全部档案前确认。加载、保存、空列表和错误状态保持稳定布局，忙碌时阻止重复操作。

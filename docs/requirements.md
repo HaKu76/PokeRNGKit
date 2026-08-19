@@ -509,6 +509,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-RESEARCHER-03** 支持 Seed、Initial Advances、Max Advances、生成、取消、清空、结果内 Search 与 Next；结果按上游 32 位或 64 位投影显示。
 - **FR-RESEARCHER-04** RNG 生成只在独立 `researcher` Wasm API v1 和 Dedicated Worker 中运行，每批最多 10,000 行，单次浏览器任务最多 250,000 行并支持进度与取消。
 - **FR-RESEARCHER-05** Wasm manifest 只声明实际提供的 `generator`；Search 保持 TypeScript 结果层操作，不伪装为 Wasm `searcher`。
+- **FR-RESEARCHER-06** Researcher 作为全局轻量工具由右下角悬浮工具菜单打开，不进入左侧世代模块导航；打开、关闭、Escape、点外和焦点恢复遵循共享浮动面板契约。
 
 详细输入、表达式、ABI、安全定义和固定夹具见 [Researcher](modules/researcher.md)。
 
@@ -788,7 +789,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-3DSPROFILES-02** 输入必须匹配上游 WinForms 与模型类型：Description 为 `1..32767` 字符且空白拒绝；TSV 为 `0..4095`；TRV 为一位十六进制 `0..F`；每个 Seed 为 32 位十六进制且空值按 `0`。Gen VI/Transporter 只启用 `[1],[0]`，Gen VII 启用 `[3]..[0]`。
 - **FR-3DSPROFILES-03** 提供新建、编辑、删除、上下移动、拖放重排、清空、JSON 导入导出和旧 `profiles_3dsrngtool.xml` / `profiles.xml` 迁移；使用稳定 id，导入先完整校验再合并。
 - **FR-3DSPROFILES-04** 使用独立 IndexedDB `pokerngkit-3dsrngtool/profile-data/profiles` 与 localStorage 镜像 `pokerngkit-3dsrngtool-profiles-v1`；主存储失败时保留较新镜像和待同步标记，清空不影响其他档案模块。
-- **FR-3DSPROFILES-05** 页头选择 Gen VII 档案时按模块同步 GameVersion、TSV、TRV、Shiny Charm 或 Egg State；X/Y/OR/AS/Transporter 不注入 Gen VII 表单。同步只在档案选择或档案更新时间改变时执行，不覆盖后续手动输入。
+- **FR-3DSPROFILES-05** 右下角悬浮工具菜单提供全局 Profile Manager 入口；页头选择 Gen VII 档案时按模块同步 GameVersion、TSV、TRV、Shiny Charm 或 Egg State；X/Y/OR/AS/Transporter 不注入 Gen VII 表单。同步只在档案选择或档案更新时间改变时执行，不覆盖后续手动输入。
 
 完整字段、输入边界、持久化、XML 迁移、调用方和上游文件见 [3DSRNGTool Profiles](modules/3dsprofiles.md)。
 
@@ -865,6 +866,15 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、TinyMT 顺序、6/8-word ABI、固定夹具和上游文件见 [Gen 6 ID](modules/gen6id.md)。
 
+## 8.54A 当前功能需求：`gen6mainseed`
+
+- **FR-G6MAINSEED-01** 提供 3DSRNGTool Gen VI Main RNG Seed Finder 的两种模式：通过两个野生宝可梦完整六项 IV，或通过单个野生宝可梦 IV 范围、性格和帧范围。
+- **FR-G6MAINSEED-02** Seed 为 `0..0xFFFFFFFF` 的 8 位十六进制；两只模式帧范围为 `0..4000` 与 `0..10000`，并满足 `min1 <= max1 <= min2 <= max2`；单只模式帧为 `0..4000`，每项上限最多比下限大 2，性格为 `0..24`，Seed 跨度不超过 `0x10000000`。
+- **FR-G6MAINSEED-03** `MersenneTwister_Fast` 的初始化、整块 twist、63 次预推进、连续 IV 窗口、性格、Gender 和单只帧 0 哨兵只在独立 `gen6mainseed` Wasm API v1 中执行；模块使用 22-word 请求、6-word 结果和最多 8 个独立 Worker/Wasm 实例。
+- **FR-G6MAINSEED-04** 提供 Seed 顺序恢复、进度、取消、CSV、清空、错误和空结果状态；结果表使用 TanStack Virtual，主页面不因大范围 Seed 结果持续增长而卡死。
+
+完整输入限制、MT 推进、22/6-word ABI、固定夹具和上游文件见 [Gen 6 Main Seed Finder](modules/gen6mainseed.md)。
+
 ## 8.54 TinyFinder Gen VI 扩展需求
 
 - **FR-TINY-01** 纳入 TinyFinder 的 TinyMT 日期/Index Searcher、Index 筛选、Normal Wild、Friend Safari、Fishing、Rock Smash、Horde、Honey Wild、Poke Radar、Ambush、DexNav Moving/Searching 与 Victory Road Swooping。
@@ -886,7 +896,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 ## 9. 后续实施顺序
 
 1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID 与 Profile Manager 已实现。
-2. 下一模块为 3DSRNGTool Gen VI Main Seed Finder，完成后继续 Gen VI 与其他公共工具库存。
+2. 3DSRNGTool Gen VI Main Seed Finder 已实现，下一模块为 Gen VI TinyMT Timeline Tool，完成后继续 Gen VI 与其他公共工具库存。
 3. 继续实现 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
 4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
 5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
@@ -1006,7 +1016,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 14. 阶段划分
 
-当前按完整模块库存推进。PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID 与独立 Profile Manager 已实现；下一模块为 Gen VI Main Seed Finder。
+当前按完整模块库存推进。PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder 与独立 Profile Manager 已实现；下一模块为 Gen VI TinyMT Timeline Tool。
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。
@@ -1038,7 +1048,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **阶段 8G：`gen8underground` Underground** - BDSP 18 个房间、剧情/等级标记、队首修正、独立 Wasm/Worker Pool 和完整 20 列结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8H：`gen8wild` Wild** - BDSP 七类野生遭遇、特殊地点、独立 Wasm/Worker Pool 和完整 21 列结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具、三张原图资源、276 个坐标点位和三语地点名称（已实现，待部署回归与最终验收）。
-- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg 与 Profile Manager 已实现；下一模块为 Gen VI ID RNG，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。
+- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder 与 Profile Manager 已实现；下一模块为 Gen VI TinyMT Timeline Tool，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。Profile Manager 与 Researcher 均通过右下角悬浮工具菜单访问。
 - **阶段 10：发布加固** - 完整工程检查、生产页面回归、浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

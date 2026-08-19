@@ -1,0 +1,171 @@
+.gen6mainseed-workspace {
+  display: grid;
+  gap: 16px;
+}
+
+.gen6mainseed-controls {
+  min-width: 0;
+}
+
+.gen6mainseed-panel {
+  min-width: 0;
+  padding: 24px;
+}
+
+.gen6mainseed-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 4px;
+}
+
+.gen6mainseed-mode label {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.gen6mainseed-mode label.active {
+  background: var(--surface);
+  color: var(--brand-strong);
+}
+
+.gen6mainseed-mode input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gen6mainseed-seed-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  align-items: end;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.gen6mainseed-seed-grid input,
+.gen6mainseed-observation input {
+  font-variant-numeric: tabular-nums;
+}
+
+.gen6mainseed-seed-grid input {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  text-transform: uppercase;
+}
+
+.range-separator {
+  align-self: end;
+  padding-bottom: 10px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.gen6mainseed-observation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.gen6mainseed-observation {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 16px;
+}
+
+.gen6mainseed-observation legend {
+  padding: 0 6px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.gen6mainseed-frame-grid,
+.gen6mainseed-single-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.gen6mainseed-frame-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gen6mainseed-single-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gen6mainseed-single-observation {
+  background: transparent;
+}
+
+.gen6mainseed-nature-field {
+  grid-column: span 1;
+}
+
+.gen6mainseed-results-panel {
+  min-width: 0;
+}
+
+.gen6mainseed-table-shell {
+  min-height: 260px;
+}
+
+.gen6mainseed-virtual-table {
+  min-width: 520px;
+}
+
+.gen6mainseed-virtual-table.two-wilds .table-header,
+.gen6mainseed-virtual-table.two-wilds .table-row {
+  grid-template-columns: minmax(180px, 1.4fr) repeat(4, minmax(100px, 1fr));
+}
+
+.gen6mainseed-virtual-table.one-wild-range .table-header,
+.gen6mainseed-virtual-table.one-wild-range .table-row {
+  grid-template-columns: minmax(180px, 1.6fr) repeat(3, minmax(110px, 1fr));
+}
+
+.gen6mainseed-virtual-table .table-row span:first-child,
+.gen6mainseed-virtual-table .table-header span:first-child {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .gen6mainseed-observation-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .gen6mainseed-panel {
+    padding: 20px;
+  }
+
+  .gen6mainseed-single-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .gen6mainseed-mode {
+    grid-template-columns: 1fr;
+  }
+
+  .gen6mainseed-single-grid {
+    grid-template-columns: 1fr;
+  }
+}

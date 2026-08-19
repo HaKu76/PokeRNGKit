@@ -1,0 +1,13 @@
+{
+  "id": "gen6mainseed",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6mainseed",
+  "operations": ["searcher"],
+  "artifacts": {
+    "loader": "gen6mainseed.mjs",
+    "wasm": "gen6mainseed.wasm"
+  },
+  "source": "3DSRNGTool 359bdd7 Gen6MTSeedFinder.cs, Util/MTSeedFinder.cs and RNG/MT.cs"
+}

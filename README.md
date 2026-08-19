@@ -5,12 +5,12 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：实现 3DSRNGTool Gen VI Main Seed Finder。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
+**当前里程碑：实现 3DSRNGTool Gen VI TinyMT Timeline Tool。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
 
 - 当前范围：完整 PokeFinder 4.3.2，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能
 - 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary / Pokemon Link / Transporter / Event / Wild / DexNav / Poke Radar / Egg / ID、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
-- 当前工作：实现 3DSRNGTool Gen VI Main Seed Finder
-- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md) / [Gen 6 DexNav](docs/modules/gen6dexnav.md) / [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md) / [Gen 6 Egg](docs/modules/gen6egg.md) / [Gen 6 ID](docs/modules/gen6id.md)
+- 当前工作：实现 3DSRNGTool Gen VI TinyMT Timeline Tool
+- 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md) / [Gen 6 DexNav](docs/modules/gen6dexnav.md) / [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md) / [Gen 6 Egg](docs/modules/gen6egg.md) / [Gen 6 ID](docs/modules/gen6id.md) / [Gen 6 Main Seed Finder](docs/modules/gen6mainseed.md)
 - 明确排除：仅 3DSRNGTool `NTR Helper`
 - 上游核验基线：PokeFinder 4.3.2
 - 完整库存与状态：[docs/module-inventory.md](docs/module-inventory.md)
@@ -128,6 +128,12 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - TinyMT 四字状态、连续 ID 帧、TID、SID、完整 TID/SID、TSV、TRV、Random Number 与 TinyMT 状态筛选
 - 独立 `gen6id` Wasm API v1、6/8-word 契约、单 Dedicated Worker、虚拟结果表、CSV、进度与取消
 - 输入边界、TinyMT 推进顺序、固定夹具和验证状态见 [Gen 6 ID](docs/modules/gen6id.md)
+
+当前 Gen VI Main Seed Finder 工作区包含：
+
+- 通过两个野生宝可梦完整六项个体值，或单个野生宝可梦个体值范围、性格和帧范围检索主乱数 Seed
+- 独立 `gen6mainseed` Wasm API v1、22/6-word 契约、最多八个 Dedicated Worker、确定顺序、虚拟结果表、CSV、进度与取消
+- 输入边界、MT19937 推进顺序、固定夹具和验证状态见 [Gen 6 Main Seed Finder](docs/modules/gen6mainseed.md)
 
 当前 Gen VII ID 工作区包含：
 
@@ -353,6 +359,7 @@ PokeRNGKit 不是桌面程序的逐像素复刻，而是保留已实现 PokeFind
 - LCRNG、XDRNG、ARNG、MT、BWRNG、SFMT、Xoroshiro、TinyMT 与 Xorshift 共 14 种 RNG
 - 10 个有序 Custom 表达式、当前/上一行 PRNG 与 Custom 引用、十六进制显示和结果内 Search/Next
 - 独立 `researcher` Wasm/Dedicated Worker、API v1、10,000 行分批、250,000 行浏览器上限和确定性 UI 预览
+- Researcher 与 3DSRNGTool Profile Manager 均从右下角全局悬浮工具菜单打开，不占用左侧世代模块导航
 - 输入边界、表达式语义、固定宽度 ABI 与上游来源见 [Researcher](docs/modules/researcher.md)
 
 当前 Gen IV Wondercard IVs 工作区包含：
@@ -536,7 +543,7 @@ npm run verify
 
 ## 构建与测试
 
-`npm run build` 先生成 release 模式的 49 个独立 MJS/Wasm 模块，包括 `gen3id`、`gen4static`、`gen5event`、`gen7festivalplaza`、`gen8id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground`、`pokerusfinder` 与 `researcher`，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。完整默认清单以 `wasm/CMakeLists.txt` 为准；这些目录都是生成物，不提交到 Git。
+`npm run build` 先生成 release 模式的 59 个独立 MJS/Wasm 模块，包括 `gen3id`、`gen4static`、`gen5event`、`gen6mainseed`、`gen7festivalplaza`、`gen8id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground`、`pokerusfinder` 与 `researcher`，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。完整默认清单以 `wasm/CMakeLists.txt` 为准；这些目录都是生成物，不提交到 Git。
 
 测试规划分为五层：
 
@@ -546,7 +553,7 @@ npm run verify
 4. Worker + 真实 Wasm + IndexedDB 的浏览器集成测试（后续补充）。
 5. Playwright 覆盖核心流程、静态子路径部署和离线重载（Pages 预览稳定后引入）。
 
-当前验证门槛要求 47 个 Wasm 模块的固定输入结果对齐已记录夹具、长范围计算可汇报进度并响应取消、GitHub Pages 能加载对应 Worker/Wasm 模块，且离线重载可用。本轮由 Codex 按模块完成本地工程验证、独立提交并推送；算法回归仅能在 Actions 部署完成、项目所有者给出生产 URL 并授权后执行，项目所有者保留界面、设备和正式发布的最终验收。
+当前验证门槛要求 59 个 Wasm 模块的固定输入结果对齐已记录夹具、长范围计算可汇报进度并响应取消、GitHub Pages 能加载对应 Worker/Wasm 模块，且离线重载可用。本轮由 Codex 按模块完成本地工程验证、独立提交并推送；算法回归仅能在 Actions 部署完成、项目所有者给出生产 URL 并授权后执行，项目所有者保留界面、设备和正式发布的最终验收。
 
 ## 部署
 
@@ -618,7 +625,7 @@ npm run build:web
 - **阶段 8G：`gen8underground` Underground** - BDSP 地下大洞窟遇敌（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8H：`gen8wild` Gen 8 Wild** - BDSP 野生 Generator、独立 Wasm/Worker Pool 和完整状态结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具、三张原图资源、276 个坐标点位和三语地点名称（已实现，待部署回归与最终验收）。
-- **阶段 9：3DSRNGTool** - Gen VII 主工作流、Gen VI Stationary、Gen VI Pokemon Link / Transporter、Gen VI Event、Gen VI Wild、Gen VI DexNav、Gen VI Poke Radar、Gen VI Egg、Gen VI ID 与 Profile Manager 已实现；下一模块继续 Gen VI Main Seed Finder，之后继续其他公共工具与其余库存，仅 `NTR Helper` 不开发。
+- **阶段 9：3DSRNGTool** - Gen VII 主工作流、Gen VI Stationary、Gen VI Pokemon Link / Transporter、Gen VI Event、Gen VI Wild、Gen VI DexNav、Gen VI Poke Radar、Gen VI Egg、Gen VI ID、Gen VI Main Seed Finder 与 Profile Manager 已实现；下一模块继续 Gen VI TinyMT Timeline Tool，之后继续其他公共工具与其余库存，仅 `NTR Helper` 不开发。
 - **阶段 10：发布加固与验收** - 完整工程检查、Actions 部署、PWA 离线、可访问性、浏览器矩阵、性能预算、许可证和生产页面回归。
 
 ## 许可证、署名与源码分发

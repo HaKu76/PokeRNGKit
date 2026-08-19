@@ -109,6 +109,12 @@ export function FloatingToolPanel({
 
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || event.defaultPrevented) return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest(".modal-backdrop, .threedsprofiles-overlay")
+      ) {
+        return;
+      }
       event.preventDefault();
       onExpandedChange(false);
       restoreTriggerFocus();
@@ -120,7 +126,7 @@ export function FloatingToolPanel({
         document.getElementById(triggerId)?.contains(target) ||
         (target instanceof Element &&
           target.closest(
-            ".floating-tool-rail, .legal-footer-action, .modal-backdrop",
+            ".floating-tool-rail, .legal-footer-action, .modal-backdrop, .threedsprofiles-overlay",
           ))
       ) {
         return;
@@ -148,7 +154,9 @@ export function FloatingToolPanel({
       if (!panel) return;
       if (
         document.activeElement instanceof Element &&
-        document.activeElement.closest(".modal-backdrop")
+        document.activeElement.closest(
+          ".modal-backdrop, .threedsprofiles-overlay",
+        )
       ) {
         return;
       }

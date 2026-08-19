@@ -1,5 +1,21 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-19 3DSRNGTool Gen VI Main Seed Finder 与全局工具入口
+
+- 新增：实现 `gen6mainseed` 两只野生个体值和单只个体值范围两种检索模式；保留上游 MT19937 初始化、整块 twist、63 次预推进、连续 IV 窗口、性格、Gender 和帧 0 哨兵语义。
+- 新增：接入独立 `gen6mainseed` Wasm/C ABI、最多 8 个单线程 Worker、Seed 分片、确定顺序、进度、取消、CSV、清空、错误、空结果和 TanStack Virtual 结果表；新增模块文档、需求、技术栈和库存记录。
+- 优化：3DSRNGTool Profile Manager 从左侧隐藏模块导航收纳到右下角悬浮工具菜单，并保持全局可见；Researcher 同样由右下角悬浮工具菜单打开。3DS 档案编辑 modal 进入浮动面板后仍独立接管焦点。
+- 修复：清理 Gen VI Main Seed bridge 未使用的辅助代码和 UI 未使用异常变量，补齐嵌套 modal 的点外关闭与 Tab 焦点例外。
+- 已完成：`npm run format:files --` 本轮触及文件、`npm run format:check`、`git diff --check`。
+- 未运行：Vitest、ESLint、TypeScript、原生夹具、Emscripten/Wasm 构建、Web 构建和外部 Chrome/Edge；仓库规则要求对具体工程检查或 URL 明确授权后再运行。算法验收仍需部署后由项目所有者提供准确 URL 并授权。
+
+> - 最近更新：2026-08-19
+> - 当前分支：`main`
+> - 当前 HEAD：`22f568a`（`style: 统一正式工作台与 Demo 组件样式`）
+> - 当前阶段：Gen VI Main Seed Finder 已实现，待本轮格式收尾后提交推送；下一模块为 Gen VI TinyMT Timeline Tool
+> - 工作区状态：本轮包含 Gen VI Main Seed Finder、3DS Profile Manager/Researcher 悬浮入口和对应文档改动，尚未提交
+> - 验证状态：格式检查与空白检查已运行；测试、构建、原生/Wasm 和外部浏览器回归未运行
+
 ## 2026-08-19 HakuStyle Demo 对齐第二轮
 
 - 优化：正式工作台的浅色与深色中性令牌重新对齐 `?demo=hakustyle`，统一页面底色、实体表面、弱表面、边界、正文和次要文字；主内容宽度、页标题分隔、侧栏间距和折叠 Rail 搜索入口同步采用 Demo 几何，页头 `Ready` 状态改用与 Demo 相同的 Lucide 勾选图标。

@@ -4788,6 +4788,30 @@ textarea:disabled {
   border-top-width: 1px;
 }
 
+.three-ds-profile-float-panel {
+  width: min(1080px, calc(100vw - 48px));
+}
+
+.three-ds-profile-float-panel > .threedsprofiles-panel {
+  max-height: calc(100vh - 98px);
+  overflow: auto;
+  padding: 16px;
+}
+
+.three-ds-profile-float-panel .threedsprofiles-header {
+  display: none;
+}
+
+.researcher-float-panel {
+  width: min(1280px, calc(100vw - 48px));
+}
+
+.researcher-float-panel > .researcher-layout {
+  max-height: calc(100vh - 98px);
+  overflow: auto;
+  padding: 16px;
+}
+
 .profile-modal,
 .threedsprofiles-manager,
 .gen5profiles-manager,

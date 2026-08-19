@@ -4,7 +4,8 @@
 the upstream four RNG groups, ten ordered custom expressions, result search,
 and the separate 32-bit/64-bit result projections. Generation runs in a
 dedicated Worker; the UI preview uses a deterministic sample and never
-replaces the production RNG path.
+replaces the production RNG path. The entry point is the global lower-right
+floating tool menu rather than the generation sidebar.
 
 ## 功能
 
@@ -54,7 +55,7 @@ replaces the production RNG path.
 
 - 平台以桌面键鼠为主并支持触控窄屏；产品类型为 operational workspace，
   主任务是连续生成、检索并比较 PRNG 状态。
-- 沿用应用现有语义 token 与 Royal Blueprint 工作台合同，采用 compact workspace
+- 沿用应用现有语义 token 与 Ant Neutral HakuStyle 工作台合同，采用 compact workspace
   密度、圆角控件和高不透明表面；不增加第二套主题或签名特效。
 - 桌面端四个 RNG 页签保持单行，窄屏重排为两列；Custom 与结果宽表保持
   横向滚动，不压缩数值、控件或上游标签。
