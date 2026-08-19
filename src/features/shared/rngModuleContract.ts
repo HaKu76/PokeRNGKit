@@ -6,7 +6,8 @@ export type RngModuleOperation =
   | "slot-generator"
   | "slot-searcher"
   | "pokemon-generator"
-  | "pokemon-searcher";
+  | "pokemon-searcher"
+  | "time-search";
 export type GlobalRngModuleId = "researcher";
 export type RngModuleId = `gen${number}${string}` | GlobalRngModuleId;
 

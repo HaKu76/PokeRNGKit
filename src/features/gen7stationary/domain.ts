@@ -14,6 +14,11 @@ export const GEN7_STATIONARY_MAX_RESULTS = 100_000;
 export const GEN7_STATIONARY_MAX_FRAME = 1_000_000_000;
 export const GEN7_STATIONARY_BROWSER_MAX_FRAME = 5_000_000;
 export const GEN7_STATIONARY_PELAGO_MAX_SHIFT = 255;
+export const GEN7_TIMEFINDER_API_VERSION = 1;
+export const GEN7_TIMEFINDER_MIN_EPOCH = 0;
+export const GEN7_TIMEFINDER_DEFAULT_TICK = 0x041d_9cb9;
+export const GEN7_TIMEFINDER_DEFAULT_OFFSET = 55;
+export const GEN7_TIMEFINDER_BROWSER_MAX_STATES = 5_000_000;
 
 export type Gen7StationaryIvTuple = [
   number,
@@ -104,6 +109,21 @@ export interface Gen7StationaryResult {
   delay: number;
   psv: number;
   prv: number;
+  /** Present only for time-search results. Epoch is milliseconds since 2000-01-01. */
+  initialSeed?: number;
+  epoch?: bigint;
+}
+
+export type Gen7StationaryTimeRequest = Omit<Gen7StationaryRequest, "seed"> & {
+  startEpoch: bigint;
+  endEpoch: bigint;
+  tick: number;
+  offset: number;
+};
+
+export interface Gen7StationaryTimeResult extends Gen7StationaryResult {
+  initialSeed: number;
+  epoch: bigint;
 }
 
 const UINT32_MAX = 0xffff_ffff;
@@ -434,6 +454,104 @@ export function gen7StationaryTaskCount(request: Gen7StationaryRequest) {
   return request.maxFrame - request.minFrame + 1;
 }
 
+export function gen7StationaryTimeTaskCount(
+  request: Gen7StationaryTimeRequest,
+) {
+  const seconds = (request.endEpoch - request.startEpoch) / 1000n;
+  const frames = BigInt(request.maxFrame - request.minFrame + 1);
+  const total = (seconds + 1n) * frames;
+  if (total > BigInt(Number.MAX_SAFE_INTEGER))
+    throw new RangeError("Time Finder search range is too large.");
+  return Number(total);
+}
+
+export function gen7StationaryTimeResultLimitReached(
+  request: Gen7StationaryTimeRequest,
+  epoch: bigint,
+  totalResults: number,
+  stationaryLimitReached: boolean,
+) {
+  return (
+    stationaryLimitReached ||
+    (totalResults >= request.resultLimit && epoch < request.endEpoch)
+  );
+}
+
+export function gen7StationaryTimeEpochFromInput(
+  value: string,
+  offset: number,
+) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(
+    value,
+  );
+  if (!match) return Number.NaN;
+  const [, yearText, monthText, dayText, hourText, minuteText, secondText] =
+    match;
+  const parts = [
+    Number(yearText),
+    Number(monthText),
+    Number(dayText),
+    Number(hourText),
+    Number(minuteText),
+    Number(secondText ?? 0),
+  ] as const;
+  const milliseconds = Date.UTC(
+    parts[0],
+    parts[1] - 1,
+    parts[2],
+    parts[3],
+    parts[4],
+    parts[5],
+  );
+  const normalized = new Date(milliseconds);
+  if (
+    normalized.getUTCFullYear() !== parts[0] ||
+    normalized.getUTCMonth() !== parts[1] - 1 ||
+    normalized.getUTCDate() !== parts[2] ||
+    normalized.getUTCHours() !== parts[3] ||
+    normalized.getUTCMinutes() !== parts[4] ||
+    normalized.getUTCSeconds() !== parts[5]
+  )
+    return Number.NaN;
+  return BigInt(milliseconds) + BigInt(offset) - 946_684_800_000n;
+}
+
+export function formatGen7StationaryTimeEpoch(epoch: bigint, offset: number) {
+  const milliseconds = epoch + 946_684_800_000n - BigInt(offset);
+  return new Date(Number(milliseconds))
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
+}
+
+export function validateGen7StationaryTimeRequest(
+  request: Gen7StationaryTimeRequest,
+) {
+  if (
+    typeof request.startEpoch !== "bigint" ||
+    typeof request.endEpoch !== "bigint"
+  )
+    throw new TypeError("Time Finder epochs must be integers.");
+  if (request.startEpoch < BigInt(GEN7_TIMEFINDER_MIN_EPOCH))
+    throw new RangeError("Start date must be at least 2000-01-01.");
+  if (request.endEpoch < request.startEpoch)
+    throw new RangeError("End date must not be before the start date.");
+  if (!integerIn(request.tick, 0, UINT32_MAX))
+    throw new TypeError("Tick must be between 00000000 and FFFFFFFF.");
+  if (!integerIn(request.offset, 0, UINT32_MAX))
+    throw new TypeError("Offset must be between 0 and 4294967295.");
+  const offset = BigInt(request.offset);
+  if (
+    (request.startEpoch - offset) % 1000n !== 0n ||
+    (request.endEpoch - offset) % 1000n !== 0n
+  )
+    throw new RangeError("Time Finder dates must align to whole seconds.");
+  validateGen7StationaryRequest({ ...request, seed: 0 });
+  if (gen7StationaryTimeTaskCount(request) > GEN7_TIMEFINDER_BROWSER_MAX_STATES)
+    throw new RangeError("Time Finder range exceeds the browser task limit.");
+  return request;
+}
+
 export function validateGen7StationaryRequest(request: Gen7StationaryRequest) {
   if (
     !(["sun", "moon", "ultra-sun", "ultra-moon"] as string[]).includes(
@@ -580,6 +698,30 @@ export function decodeGen7StationaryResults(buffer: ArrayBuffer) {
       };
     },
   );
+}
+
+export const GEN7_STATIONARY_TIME_RESULT_WORDS = 12;
+
+export function decodeGen7StationaryTimeResults(buffer: ArrayBuffer) {
+  const words = new Uint32Array(buffer);
+  if (words.length % GEN7_STATIONARY_TIME_RESULT_WORDS !== 0)
+    throw new RangeError(
+      "Invalid Gen 7 Stationary Time Finder result buffer length.",
+    );
+  const base = words.length / GEN7_STATIONARY_TIME_RESULT_WORDS;
+  const results: Gen7StationaryTimeResult[] = [];
+  for (let index = 0; index < base; index++) {
+    const offset = index * GEN7_STATIONARY_TIME_RESULT_WORDS;
+    const baseWords = new Uint32Array(9);
+    baseWords.set(words.subarray(offset, offset + 9));
+    const decoded = decodeGen7StationaryResults(baseWords.buffer)[0];
+    results.push({
+      ...decoded,
+      initialSeed: words[offset + 9],
+      epoch: (BigInt(words[offset + 11]) << 32n) | BigInt(words[offset + 10]),
+    });
+  }
+  return results;
 }
 
 export function gen7StationaryHiddenPower(ivs: Gen7StationaryIvTuple) {

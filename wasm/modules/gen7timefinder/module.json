@@ -1,0 +1,13 @@
+{
+  "id": "gen7timefinder",
+  "generation": 7,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen7timefinder",
+  "operations": ["time-search"],
+  "artifacts": {
+    "loader": "gen7timefinder.mjs",
+    "wasm": "gen7timefinder.wasm"
+  },
+  "source": "3DSTimeFinder Core/Util/Utility.cpp and Core/RNG/SHA256.cpp"
+}

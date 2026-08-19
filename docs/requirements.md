@@ -919,6 +919,8 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **FR-TIME-02** 日期换算、初始 Seed 生成、SFMT/MT 推进、结果过滤和时间列只在独立时间搜索 Worker/Wasm operation 中执行，不在 React 主线程重写生产 RNG。
 - **FR-TIME-03** Gen VI/Gen VII Profile Manager、Editor 与 Gen VII Profile Calibrator 的时间字段必须与 3DSTimeFinder ProfileLoader、Profile6、Profile7 和校准流程逐字段兼容；已有 3DSRNGTool Profile Manager 只作为持久化层，不覆盖上游计算语义。
 - **FR-TIME-04** 结果保留上游实际 Date/Time、Initial Seed、Frame 与生成字段，提供进度、取消、结果上限、排序、CSV、错误和空结果状态。
+- **FR-TIME-05** Gen VII TF3 Stationary 已实现：Citra 时间按整秒枚举，`gen7timefinder` Wasm 计算 SHA-256 初始 Seed，Dedicated Worker 复用 `gen7stationary` 连续会话，结果跨时间点累计并在后续时间仍存在时正确报告结果上限。
+- **FR-TIME-06** TF3 的静态浏览器任务预算为时间点数乘帧数不超过 `5,000,000`；Tick 为 32 位十六进制，Offset 为 `0..4294967295`，取消通过终止并重建 Worker 完成，不依赖后端、SharedArrayBuffer 或 Wasm pthread。
 
 完整模块、上游文件、提交和许可证见 [3DSTimeFinder 来源记录](../third_party/3dstimefinder/UPSTREAM.md)。
 

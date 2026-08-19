@@ -31,6 +31,9 @@ import {
   gen7StationaryEncounterFromTemplate,
   gen7StationaryStartingFrame,
   gen7StationaryTemplateName,
+  gen7StationaryTimeTaskCount,
+  gen7StationaryTimeEpochFromInput,
+  validateGen7StationaryTimeRequest,
   parseGen7StationaryDecimal,
   parseGen7StationaryHex,
   parseGen7StationarySignedDecimal,
@@ -44,14 +47,19 @@ import {
   type Gen7StationaryRequest,
   type Gen7StationaryResult,
   type Gen7StationaryShinyFilter,
+  type Gen7StationaryTimeRequest,
 } from "./domain";
 import { Gen7StationaryUiPreviewEngine } from "./preview/Gen7StationaryUiPreviewEngine";
+import { Gen7StationaryTimeUiPreviewEngine } from "./preview/Gen7StationaryTimeUiPreviewEngine";
 import type {
   Gen7StationaryEngine,
   Gen7StationaryProgress,
   Gen7StationarySummary,
+  Gen7StationaryTimeEngine,
+  Gen7StationaryTimeProgress,
 } from "./search";
 import { Gen7StationaryWorker } from "./worker/Gen7StationaryWorker";
+import { Gen7StationaryTimeWorker } from "./worker/Gen7StationaryTimeWorker";
 import "./Gen7StationaryPanel.css";
 
 type Status = "ready" | "calculating" | "completed" | "cancelled" | "failed";
@@ -80,8 +88,10 @@ type SortKey =
   | "psv"
   | "prv";
 
+type TimeSortKey = "epoch" | "initialSeed";
+
 interface ResultColumn {
-  key: SortKey;
+  key: SortKey | TimeSortKey;
   label: string;
 }
 
@@ -136,7 +146,12 @@ function tupleFromText(values: IvText): Gen7StationaryIvTuple {
   return values.map(parseGen7StationaryDecimal) as Gen7StationaryIvTuple;
 }
 
-function resultSortValue(result: Gen7StationaryResult, key: SortKey) {
+function resultSortValue(
+  result: Gen7StationaryResult,
+  key: SortKey | TimeSortKey,
+) {
+  if (key === "epoch") return result.epoch ?? 0n;
+  if (key === "initialSeed") return result.initialSeed ?? 0;
   const ivIndex = IV_SORT_KEYS.indexOf(key as (typeof IV_SORT_KEYS)[number]);
   if (ivIndex !== -1) return result.ivs[ivIndex];
   return result[key as keyof Gen7StationaryResult];
@@ -155,12 +170,26 @@ function csvCell(value: string | number | bigint | boolean) {
   return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
 }
 
+function displayTimeEpoch(result: Gen7StationaryResult, offsetText: string) {
+  if (result.epoch === undefined) return "";
+  const parsedOffset = parseGen7StationaryDecimal(offsetText);
+  if (!Number.isInteger(parsedOffset) || parsedOffset < 0) return "";
+  return new Date(
+    Number(result.epoch + 946_684_800_000n - BigInt(parsedOffset)),
+  )
+    .toISOString()
+    .replace("T", " ")
+    .slice(0, 19);
+}
+
 export function Gen7StationaryPanel({
   profile,
   uiPreviewMode,
+  timeFinderMode = false,
 }: {
   profile?: ThreeDsProfile;
   uiPreviewMode: boolean;
+  timeFinderMode?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const language: Gen7StationaryLanguage =
@@ -176,11 +205,22 @@ export function Gen7StationaryPanel({
         : new Gen7StationaryWorker(),
     [uiPreviewMode],
   );
+  const timeEngine = useMemo<Gen7StationaryTimeEngine>(
+    () =>
+      uiPreviewMode
+        ? new Gen7StationaryTimeUiPreviewEngine()
+        : new Gen7StationaryTimeWorker(),
+    [uiPreviewMode],
+  );
   const [version, setVersion] =
     useState<Gen7StationaryGameVersion>("ultra-sun");
   const [seed, setSeed] = useState("0");
   const [minFrame, setMinFrame] = useState("478");
-  const [maxFrame, setMaxFrame] = useState("50000");
+  const [maxFrame, setMaxFrame] = useState(timeFinderMode ? "500" : "50000");
+  const [startDate, setStartDate] = useState("2024-01-01T00:00");
+  const [endDate, setEndDate] = useState("2024-01-01T00:01");
+  const [tick, setTick] = useState("041D9CB9");
+  const [offset, setOffset] = useState("55");
   const [tsv, setTsv] = useState("0");
   const [trv, setTrv] = useState("0");
   const [shinyCharm, setShinyCharm] = useState(false);
@@ -227,7 +267,7 @@ export function Gen7StationaryPanel({
   });
   const [summary, setSummary] = useState<Gen7StationarySummary>();
   const [sort, setSort] = useState<{
-    key: SortKey;
+    key: SortKey | TimeSortKey;
     direction: SortDirection;
   }>({ key: "frame", direction: "asc" });
   const tableRef = useRef<HTMLDivElement>(null);
@@ -264,6 +304,12 @@ export function Gen7StationaryPanel({
     value,
   }));
   const columns: readonly ResultColumn[] = [
+    ...(timeFinderMode
+      ? [
+          { key: "epoch" as const, label: t("gen7TimeDate") },
+          { key: "initialSeed" as const, label: t("gen7TimeInitialSeed") },
+        ]
+      : []),
     { key: "frame", label: t("gen7StationaryFrame") },
     { key: "realTimeFrames", label: t("gen7StationaryRealtime") },
     { key: "random", label: t("gen7RandomNumber") },
@@ -301,7 +347,13 @@ export function Gen7StationaryPanel({
     overscan: 14,
   });
 
-  useEffect(() => () => engine.dispose(), [engine]);
+  useEffect(
+    () => () => {
+      engine.dispose();
+      timeEngine.dispose();
+    },
+    [engine, timeEngine],
+  );
 
   const applyTemplate = (template: Gen7StationaryTemplate) => {
     setTemplateId(template.id);
@@ -322,6 +374,13 @@ export function Gen7StationaryPanel({
     setMinFrame(String(gen7StationaryStartingFrame(next)));
     setCategory(template.category);
     applyTemplate(template);
+    if (next === "sun" || next === "moon") {
+      setTick("036EC43B");
+      setOffset("55");
+    } else {
+      setTick("041D9CB9");
+      setOffset("55");
+    }
   };
 
   useEffect(() => {
@@ -396,12 +455,34 @@ export function Gen7StationaryPanel({
     return validateGen7StationaryRequest(request);
   };
 
+  const readTimeRequest = (): Gen7StationaryTimeRequest => {
+    const base = readRequest();
+    const startEpoch = gen7StationaryTimeEpochFromInput(
+      startDate,
+      parseGen7StationaryDecimal(offset),
+    );
+    const endEpoch = gen7StationaryTimeEpochFromInput(
+      endDate,
+      parseGen7StationaryDecimal(offset),
+    );
+    if (typeof startEpoch !== "bigint" || typeof endEpoch !== "bigint")
+      throw new TypeError("Invalid Time Finder date range.");
+    const request: Gen7StationaryTimeRequest = {
+      ...base,
+      startEpoch,
+      endEpoch,
+      tick: parseGen7StationaryHex(tick),
+      offset: parseGen7StationaryDecimal(offset),
+    };
+    return validateGen7StationaryTimeRequest(request);
+  };
+
   const run = async (event: FormEvent) => {
     event.preventDefault();
     if (status === "calculating") return;
-    let request: Gen7StationaryRequest;
+    let request: Gen7StationaryRequest | Gen7StationaryTimeRequest;
     try {
-      request = readRequest();
+      request = timeFinderMode ? readTimeRequest() : readRequest();
     } catch {
       setError(t("invalidGen7StationaryInput"));
       setStatus("failed");
@@ -411,17 +492,25 @@ export function Gen7StationaryPanel({
     setSummary(undefined);
     setProgress({
       processedStates: 0,
-      totalStates: request.maxFrame - request.minFrame + 1,
+      totalStates: timeFinderMode
+        ? gen7StationaryTimeTaskCount(request as Gen7StationaryTimeRequest)
+        : request.maxFrame - request.minFrame + 1,
       resultCount: 0,
       percent: 0,
     });
     setError("");
     setStatus("calculating");
     try {
-      const next = await engine.search(request, {
-        onBatch: (batch) => setResults((current) => current.concat(batch)),
-        onProgress: setProgress,
-      });
+      const next = timeFinderMode
+        ? await timeEngine.search(request as Gen7StationaryTimeRequest, {
+            onBatch: (batch) => setResults((current) => current.concat(batch)),
+            onProgress: (value: Gen7StationaryTimeProgress) =>
+              setProgress(value),
+          })
+        : await engine.search(request as Gen7StationaryRequest, {
+            onBatch: (batch) => setResults((current) => current.concat(batch)),
+            onProgress: setProgress,
+          });
       setSummary(next);
       setStatus(next.cancelled ? "cancelled" : "completed");
     } catch (cause) {
@@ -430,7 +519,7 @@ export function Gen7StationaryPanel({
     }
   };
 
-  const toggleSort = (key: SortKey) => {
+  const toggleSort = (key: SortKey | TimeSortKey) => {
     setSort((current) =>
       current.key === key
         ? {
@@ -457,6 +546,14 @@ export function Gen7StationaryPanel({
     const rows = [
       columns.map((column) => column.label),
       ...sortedResults.map((result) => [
+        ...(timeFinderMode
+          ? [
+              displayTimeEpoch(result, offset),
+              result.initialSeed === undefined
+                ? ""
+                : formatGen7StationaryHex32(result.initialSeed),
+            ]
+          : []),
         result.frame,
         result.realTimeFrames,
         formatGen7StationaryHex64(result.random),
@@ -508,9 +605,13 @@ export function Gen7StationaryPanel({
           <div className="gen7stationary-control-heading">
             <div>
               <span className="panel-index">01</span>
-              <h2>{t("gen7StationarySetup")}</h2>
+              <h2>
+                {t(timeFinderMode ? "gen7TimeSetup" : "gen7StationarySetup")}
+              </h2>
             </div>
-            <span className="panel-note">SFMT / Stationary7</span>
+            <span className="panel-note">
+              {timeFinderMode ? "3DSTimeFinder / TF3" : "SFMT / Stationary7"}
+            </span>
           </div>
 
           <section className="gen7stationary-control-section">
@@ -533,21 +634,79 @@ export function Gen7StationaryPanel({
                   <option value="ultra-moon">{t("gen7UltraMoon")}</option>
                 </select>
               </label>
-              <label className="field">
-                <span>{t("seed")}</span>
-                <div className="prefixed-input">
-                  <span>0x</span>
-                  <input
-                    disabled={status === "calculating"}
-                    inputMode="text"
-                    maxLength={8}
-                    onChange={(event) =>
-                      setSeed(normalizeHexInput(event.target.value, 8))
-                    }
-                    value={seed}
-                  />
-                </div>
-              </label>
+              {timeFinderMode ? (
+                <>
+                  <label className="field">
+                    <span>{t("gen7TimeStart")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      onChange={(event) => setStartDate(event.target.value)}
+                      step={1}
+                      type="datetime-local"
+                      value={startDate}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("gen7TimeEnd")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      onChange={(event) => setEndDate(event.target.value)}
+                      step={1}
+                      type="datetime-local"
+                      value={endDate}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("gen7TimeTick")}</span>
+                    <div className="prefixed-input">
+                      <span>0x</span>
+                      <input
+                        disabled={status === "calculating"}
+                        inputMode="text"
+                        maxLength={8}
+                        onChange={(event) =>
+                          setTick(normalizeHexInput(event.target.value, 8))
+                        }
+                        value={tick}
+                      />
+                    </div>
+                  </label>
+                  <label className="field">
+                    <span>{t("gen7TimeOffset")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="numeric"
+                      max={0xffff_ffff}
+                      onChange={(event) =>
+                        setOffset(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            0xffff_ffff,
+                            10,
+                          ),
+                        )
+                      }
+                      value={offset}
+                    />
+                  </label>
+                </>
+              ) : (
+                <label className="field">
+                  <span>{t("seed")}</span>
+                  <div className="prefixed-input">
+                    <span>0x</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="text"
+                      maxLength={8}
+                      onChange={(event) =>
+                        setSeed(normalizeHexInput(event.target.value, 8))
+                      }
+                      value={seed}
+                    />
+                  </div>
+                </label>
+              )}
               <label className="field">
                 <span>{t("gen7StationaryMinFrame")}</span>
                 <input
@@ -1089,13 +1248,13 @@ export function Gen7StationaryPanel({
               type="submit"
             >
               <Play aria-hidden="true" size={17} />
-              {t("generate")}
+              {t(timeFinderMode ? "search" : "generate")}
             </button>
             <button
               aria-label={t("cancel")}
               className="gen7stationary-icon-button"
               disabled={status !== "calculating"}
-              onClick={() => engine.cancel()}
+              onClick={() => (timeFinderMode ? timeEngine : engine).cancel()}
               title={t("cancel")}
               type="button"
             >
@@ -1171,7 +1330,9 @@ export function Gen7StationaryPanel({
               </div>
             ) : (
               <div
-                className="gen7stationary-virtual-table"
+                className={`gen7stationary-virtual-table${
+                  timeFinderMode ? " time-mode" : ""
+                }`}
                 style={{ height: `${virtualizer.getTotalSize() + 40}px` }}
               >
                 <div className="gen7stationary-table-header">
@@ -1209,6 +1370,16 @@ export function Gen7StationaryPanel({
                         transform: `translateY(${virtualRow.start + 40}px)`,
                       }}
                     >
+                      {timeFinderMode && (
+                        <>
+                          <span>{displayTimeEpoch(result, offset)}</span>
+                          <span>
+                            {result.initialSeed === undefined
+                              ? ""
+                              : formatGen7StationaryHex32(result.initialSeed)}
+                          </span>
+                        </>
+                      )}
                       <span>{result.frame}</span>
                       <span>{result.realTimeFrames}</span>
                       <span>{formatGen7StationaryHex64(result.random)}</span>

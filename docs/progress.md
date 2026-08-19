@@ -1,5 +1,22 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-19 3DSTimeFinder TF3 Gen VII Stationary 时间反查（已完成）
+
+- 新增：加入 `gen7timefinder` Wasm 初始 Seed 哈希模块，按 `3DSTimeFinder` 的 `SHA256::hash(tick, epochLow, epochHigh)` 计算 Citra epoch 对应的 32 位初始 Seed。
+- 新增：Gen VII Stationary 面板支持 TF3 时间模式，按整秒日期范围枚举时间，复用既有 Stationary Worker/Wasm 生成和筛选，结果增加 Date/Time 与 Initial Seed。
+- 新增：补充 `docs/modules/gen7timefinder.md` 与集中需求池 `docs/roadmap.md`，记录全世代教程共用主线、优先级、状态和排除项。
+- 更新：按项目所有者确认的共有主线，将后续审查与侧栏规则固定为 `存档信息/ID -> Seed 相关 -> 定点 -> 野生 -> 蛋 -> 事件 -> 其他辅助扩展`；教程入口审查不再统一延后到最后。
+- 修复：跨时间点累计结果在当前时间点达到上限但仍有后续时间时，正确报告 `resultLimitReached`；补充 Worker 初始化取消和该边界的回归测试。
+- 已通过：5 个 TF3 定向测试文件、`npm run verify`（155 个测试文件、556 个测试）、`npm run format:check`、`git diff --check`。
+- 已通过：`set POKERNGKIT_WASM_MODULES=gen7timefinder&&npm run wasm:test:native`（1/1）和 Emscripten 6.0.6 定向 Wasm 构建；`gen7timefinder.mjs` 5121 bytes，`gen7timefinder.wasm` 835 bytes。
+- 未运行：外部 Chrome/Edge UI 回归和生产算法回归；需等待 GitHub Actions 部署后由项目所有者提供准确 URL 并授权。
+
+> - 最近更新：2026-08-19
+> - 当前分支：`main`
+> - 当前阶段：TF3 Stationary 时间反查已完成；下一目标为 TF4 Event 时间反查
+> - 工作区状态：TF3 核心、Worker、面板、导航、契约、测试和文档存在未提交修改，待提交推送
+> - 下一步：提交并推送 `feat: 实现第七世代定点时间反查`，随后开始 TF4 Event
+
 ## 2026-08-19 3DSRNGTool 公共 Misc. RNG Tool
 
 - 新增：实现 `miscrng` 全局轻量工具，收纳上游 `MiscRNGTool` 中尚缺的捕获率、暴击/摇晃结果、Random N 比较和 Pokerus 菌株解析。

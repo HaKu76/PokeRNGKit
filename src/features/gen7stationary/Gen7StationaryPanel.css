@@ -356,6 +356,18 @@
   align-items: center;
 }
 
+.gen7stationary-virtual-table.time-mode {
+  min-width: 2210px;
+}
+
+.gen7stationary-virtual-table.time-mode .gen7stationary-table-header,
+.gen7stationary-virtual-table.time-mode .gen7stationary-table-row {
+  min-width: 2210px;
+  grid-template-columns:
+    172px 108px 86px 98px 168px 104px 104px repeat(6, 54px) 98px 110px 84px
+    108px 82px 92px 64px 72px 72px 58px;
+}
+
 .gen7stationary-table-header {
   position: sticky;
   z-index: 3;
