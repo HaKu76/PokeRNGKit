@@ -17,6 +17,16 @@
 - 未运行：外部 Chrome/Edge UI 和生产页面算法回归；继续按全部 3DS 模块完成后的统一
   验收门槛执行。
 
+## 2026-08-20 TinyFinder T12 Victory Road Swooping（已完成范围审查）
+
+- 核对：TinyFinder README 将 Victory Road Outside 的 Map 327 12 槽表称为
+  `Swooping`，但源码没有独立的 Swooping 方法；`EnctrKey.Ambush`、`Wild.Ambush()`、
+  `AmbushTable` 与 Swooping 使用完全相同的槽位、同步和物品消耗。
+- 更新：T12 标记为已包含在 `gen6tinyambush`，文档记录 Fearow/Skarmory/Hydreigon
+  槽位分组及 3DSRNGTool `+40` 操作延迟；不重复引入第二套 RNG 算法。
+- 验证：已对本地 TinyFinder `README.md`、`Methods/Wild.cs`、`Classes/EncounterType.cs`、
+  `Database/Data.cs`、`Database/TableXY.cs` 逐项核对；未新增运行时代码。
+
 ## 2026-08-20 TinyFinder T8 Honey Wild（已完成工程实现）
 
 - 新增独立 `gen6tinyhoney` TinyMT / BlinkSystem Wasm、Dedicated Worker、地点数据生成器和蜂蜜野生工作区。
@@ -28,10 +38,10 @@
 
 # 当前目标：完成 3DSRNGTool 全范围后统一 UI 验收
 
-- 当前主线：继续处理 TinyFinder T12 Victory Road Swooping 与 T13/T14 MT Seed/Time Finder。
+- 当前主线：继续处理 TinyFinder T13/T14 MT Seed/Time Finder。
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
-- 当前状态：TF5、TF6、公共 TSV List、IV Range / IV Template 与 TinyFinder T10 Ambush
-  已完成工程实现；外部页面回归保留到全部 3DS 模块完成后统一执行。
+- 当前状态：TF5、TF6、公共 TSV List、IV Range / IV Template、TinyFinder T10 Ambush
+  与 T12 Swooping 范围审查已完成；外部页面回归保留到全部 3DS 模块完成后统一执行。
 
 ## 2026-08-20 TinyFinder T6 Rock Smash（已完成工程实现与本地验证）
 

@@ -7,6 +7,12 @@
 仍按游戏版本保留 X/Y 地点选择，便于和其它 Gen VI 工具的档案语义一致。ORAS 没有
 Ambush 表，因此不显示 ORAS 选项。
 
+TinyFinder README 将同一组 Victory Road 槽位称为 `Swooping`：1–8 为 Fearow、9–10
+为 Skarmory、11–12 为 Hydreigon，并建议在 3DSRNGTool 中使用 `+40` 延迟。源码中
+没有独立的 Swooping 方法；`EnctrKey.Ambush`、`Wild.Ambush()` 和 Map 327
+`AmbushTable` 是唯一实现。因此模块库存的 T10 Ambush 与 T12 Victory Road Swooping
+由本模块共同覆盖，`+40` 是上游操作提示，不是 TinyMT Index 算法中的额外消耗。
+
 ## 上游来源
 
 - `TinyFinder/Methods/Wild.cs`：`Wild.Ambush()`、`FindWildItem()`
