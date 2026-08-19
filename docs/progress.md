@@ -6,6 +6,15 @@
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
 - 当前状态：TF5、TF6、公共 TSV List 与 IV Range / IV Template 功能已完成工程实现并已提交推送（IV Tools：`7befd11`）；外部页面回归保留到全部 3DS 模块完成后统一执行。
 
+## 2026-08-20 3DSTimeFinder TF1 Gen VI Stationary 时间反查（已完成工程验证）
+
+- 新增：Gen VI Stationary TF1 时间/初始 Seed Searcher，按 `StationarySearcher6` 逐秒枚举 Citra epoch，使用 Save Variable、Time Variable 与 Epoch 的 32 位加法计算 Initial Seed。
+- 接入：六代 Profile Manager 新增 Save Variable / Time Variable 字段并兼容旧档案；定点面板新增 TF1 时间模式、日期范围、时间结果列和 Worker 取消。
+- Wasm：新增 `gen6timefinder` API v1 与 `gen6stationarytimefinder` Dedicated Worker；Stationary 算法继续复用既有 `gen6stationary` Wasm，时间结果为 19-word 固定协议。
+- 已通过：TF1/存档/定点定向 Vitest（3 个文件、13 项）、`npm run typecheck`、`$env:POKERNGKIT_WASM_MODULES='gen6timefinder'; npm run wasm:test:native`（1/1）、任务文件格式化、`npm run format:check` 和 `git diff --check`。
+- 未运行：`npm run wasm:build`，当前环境缺少已激活的 Emscripten / `emcmake`；外部 Chrome/Edge UI 与生产页面算法验收按全部 3DS 模块完成后的统一门槛执行。
+- 下一步：实现 Gen VI TF2 Event 时间反查，复用 `EventSearcher6` 的结果和筛选语义。
+
 ## 2026-08-20 公共 IV Range / IV Template（已完成工程验证）
 
 - 新增：实现 3DSRNGTool `IVRange` 与 `IVTemplate` 的全局本地浮动工具，复用 `AutoCompleteComboBox`，支持六项档位、严格六项模板、默认模板、新增/删除/保存和双亲应用。

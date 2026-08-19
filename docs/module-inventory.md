@@ -86,7 +86,7 @@ TinyFinder 已实现模块仍需逐字段检查其特有分支、日期/Index �
 
 | 编号 | 世代    | 功能                                  | 状态                   |
 | ---- | ------- | ------------------------------------- | ---------------------- |
-| TF1  | Gen VI  | Stationary 时间/初始 Seed Searcher    | 计划                   |
+| TF1  | Gen VI  | Stationary 时间/初始 Seed Searcher    | 已实现（工程验证通过） |
 | TF2  | Gen VI  | Event 时间/初始 Seed Searcher         | 计划                   |
 | TF3  | Gen VII | Stationary 时间/初始 Seed Searcher    | 已实现（工程验证通过） |
 | TF4  | Gen VII | Event 时间/初始 Seed Searcher         | 已实现（工程验证通过） |

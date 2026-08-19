@@ -1,0 +1,7 @@
+{
+  "id": "gen6timefinder",
+  "target": "gen6timefinder",
+  "source": "3DSTimeFinder Core/Gen6/StationarySearcher6.cpp initial-seed arithmetic",
+  "license": "GPL-3.0-or-later",
+  "artifacts": { "loader": "gen6timefinder.mjs", "wasm": "gen6timefinder.wasm" }
+}

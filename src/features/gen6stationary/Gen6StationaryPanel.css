@@ -386,6 +386,19 @@
   box-shadow: none;
 }
 
+.gen6stationary-time-mode .gen6stationary-table,
+.gen6stationary-time-mode .gen6stationary-table-header,
+.gen6stationary-time-mode .gen6stationary-table-row {
+  min-width: 1620px;
+}
+
+.gen6stationary-time-mode .gen6stationary-table-header,
+.gen6stationary-time-mode .gen6stationary-table-row {
+  grid-template-columns:
+    154px 98px 70px 98px 98px repeat(6, 50px) 96px 80px 76px 90px 110px 92px
+    96px 70px 58px;
+}
+
 @media (max-width: 1180px) {
   .gen6stationary-workspace {
     grid-template-columns: 1fr;

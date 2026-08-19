@@ -105,6 +105,25 @@ describe("3DSRNGTool profile domain", () => {
     ).toEqual(state);
   });
 
+  it("migrates profiles saved before Gen VI time variables were added", () => {
+    const profile = createThreeDsProfile({
+      ...DEFAULT_THREE_DS_PROFILE_DRAFT,
+      name: "Legacy",
+    });
+    const legacy = { ...profile } as Record<string, unknown>;
+    delete legacy.saveVariable;
+    delete legacy.timeVariable;
+    const parsed = parseThreeDsProfileState({
+      schemaVersion: 1,
+      profiles: [legacy],
+      selectedProfileId: profile.id,
+    });
+    expect(parsed.profiles[0]).toMatchObject({
+      saveVariable: 0,
+      timeVariable: 0,
+    });
+  });
+
   it("rejects duplicate ids and invalid selected ids", () => {
     const profile = createThreeDsProfile({
       ...DEFAULT_THREE_DS_PROFILE_DRAFT,

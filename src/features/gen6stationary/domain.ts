@@ -123,12 +123,16 @@ export function gen6StationaryProfile(profile: ThreeDsProfile | undefined) {
       tsv: 0,
       trv: 0,
       shinyCharm: false,
+      saveVariable: 0,
+      timeVariable: 0,
     };
   return {
     version: version as Gen6StationaryVersion,
     tsv: profile.tsv,
     trv: profile.trv,
     shinyCharm: profile.shinyCharm,
+    saveVariable: profile.saveVariable ?? 0,
+    timeVariable: profile.timeVariable ?? 0,
   };
 }
 

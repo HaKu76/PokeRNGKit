@@ -34,6 +34,9 @@ export interface ThreeDsProfile {
   tsv: number;
   trv: number;
   shinyCharm: boolean;
+  /** Gen VI Profile6 values used by the 3DSTimeFinder initial-seed formula. */
+  saveVariable: number;
+  timeVariable: number;
   seeds: ThreeDsProfileSeeds;
   createdAt: number;
   updatedAt: number;
@@ -76,6 +79,8 @@ export const DEFAULT_THREE_DS_PROFILE_DRAFT: ThreeDsProfileDraft = {
   tsv: 0,
   trv: 0,
   shinyCharm: false,
+  saveVariable: 0,
+  timeVariable: 0,
   seeds: [0, 0, 0, 0],
 };
 
@@ -156,6 +161,12 @@ export function validateThreeDsProfileDraft(draft: ThreeDsProfileDraft) {
   if (typeof draft.shinyCharm !== "boolean") {
     throw new TypeError("Invalid Shiny Charm value.");
   }
+  if (!isIntegerIn(draft.saveVariable, 0, 0xffff_ffff)) {
+    throw new TypeError("Save Variable must be a 32-bit unsigned integer.");
+  }
+  if (!isIntegerIn(draft.timeVariable, 0, 0xffff_ffff)) {
+    throw new TypeError("Time Variable must be a 32-bit unsigned integer.");
+  }
   if (
     !Array.isArray(draft.seeds) ||
     draft.seeds.length !== 4 ||
@@ -183,7 +194,15 @@ export function createThreeDsProfile(
 export function isThreeDsProfile(value: unknown): value is ThreeDsProfile {
   if (!isRecord(value)) return false;
   try {
-    validateThreeDsProfileDraft(value as unknown as ThreeDsProfileDraft);
+    validateThreeDsProfileDraft({
+      ...(value as unknown as ThreeDsProfileDraft),
+      saveVariable: Number(
+        (value as Record<string, unknown>).saveVariable ?? 0,
+      ),
+      timeVariable: Number(
+        (value as Record<string, unknown>).timeVariable ?? 0,
+      ),
+    });
   } catch {
     return false;
   }
@@ -196,6 +215,15 @@ export function isThreeDsProfile(value: unknown): value is ThreeDsProfile {
     typeof value.updatedAt === "number" &&
     Number.isFinite(value.updatedAt)
   );
+}
+
+function normalizeProfile(value: ThreeDsProfile): ThreeDsProfile {
+  return {
+    ...value,
+    saveVariable: value.saveVariable ?? 0,
+    timeVariable: value.timeVariable ?? 0,
+    seeds: [...value.seeds] as ThreeDsProfileSeeds,
+  };
 }
 
 export function parseThreeDsProfileState(value: unknown): ThreeDsProfileState {
@@ -227,10 +255,7 @@ export function parseThreeDsProfileState(value: unknown): ThreeDsProfileState {
   }
   return {
     schemaVersion: THREE_DS_PROFILE_SCHEMA_VERSION,
-    profiles: value.profiles.map((profile) => ({
-      ...profile,
-      seeds: [...profile.seeds] as ThreeDsProfileSeeds,
-    })),
+    profiles: value.profiles.map((profile) => normalizeProfile(profile)),
     selectedProfileId,
   };
 }
@@ -290,6 +315,14 @@ export function parseLegacyThreeDsProfiles(xml: string): ThreeDsProfileState {
       trv: Number(childText(element, "TRV")),
       shinyCharm:
         childText(element, "ShinyCharm").trim().toLowerCase() === "true",
+      saveVariable: Number.parseInt(
+        childText(element, "SaveVariable") || "0",
+        16,
+      ),
+      timeVariable: Number.parseInt(
+        childText(element, "TimeVariable") || "0",
+        16,
+      ),
       seeds,
     };
     return createThreeDsProfile(draft);

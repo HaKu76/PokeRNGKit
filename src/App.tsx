@@ -204,6 +204,7 @@ type ActiveModule =
   | "gen5egg"
   | "gen5event"
   | "gen6stationary"
+  | "gen6timefinder"
   | "gen6bank"
   | "gen6event"
   | "gen6wild"
@@ -324,6 +325,7 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
     marker: "6",
     items: [
       { id: "gen6stationary", label: "gen6StationaryModule" },
+      { id: "gen6timefinder", label: "gen6StationaryTimeModule" },
       { id: "gen6bank", label: "gen6BankModule" },
       { id: "gen6event", label: "gen6EventModule" },
       { id: "gen6wild", label: "gen6WildModule" },
@@ -897,6 +899,7 @@ function App() {
     activeModule === "gen5event";
   const gen6Module =
     activeModule === "gen6stationary" ||
+    activeModule === "gen6timefinder" ||
     activeModule === "gen6bank" ||
     activeModule === "gen6event" ||
     activeModule === "gen6wild" ||
@@ -949,6 +952,7 @@ function App() {
     activeModule !== "gen5egg" &&
     activeModule !== "gen5event" &&
     activeModule !== "gen6stationary" &&
+    activeModule !== "gen6timefinder" &&
     activeModule !== "gen6bank" &&
     activeModule !== "gen6event" &&
     activeModule !== "gen6wild" &&
@@ -1893,6 +1897,24 @@ function App() {
               <span>
                 <strong>{t("gen6StationaryModule")}</strong>
                 <small>{t("gen6StationaryVersion")}</small>
+              </span>
+            </button>
+            <button
+              className={
+                activeModule === "gen6timefinder"
+                  ? "module-entry active"
+                  : "module-entry"
+              }
+              onClick={() => {
+                setActiveModule("gen6timefinder");
+                setModuleRailOpen(false);
+              }}
+              type="button"
+            >
+              <span className="module-index">TF1</span>
+              <span>
+                <strong>{t("gen6StationaryTimeModule")}</strong>
+                <small>{t("gen6StationaryTimeVersion")}</small>
               </span>
             </button>
             <button
@@ -3426,6 +3448,12 @@ function App() {
           ) : activeModule === "gen6stationary" ? (
             <Gen6StationaryPanel
               profile={threeDsProfiles.selectedProfile}
+              uiPreviewMode={uiPreviewMode}
+            />
+          ) : activeModule === "gen6timefinder" ? (
+            <Gen6StationaryPanel
+              profile={threeDsProfiles.selectedProfile}
+              timeFinderMode
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen6bank" ? (

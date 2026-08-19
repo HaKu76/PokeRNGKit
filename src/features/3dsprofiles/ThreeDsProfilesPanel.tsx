@@ -77,6 +77,8 @@ function ProfileEditor({
           tsv: original.tsv,
           trv: original.trv,
           shinyCharm: original.shinyCharm,
+          saveVariable: original.saveVariable,
+          timeVariable: original.timeVariable,
           seeds: [...original.seeds] as ThreeDsProfileSeeds,
         }
       : {
@@ -87,6 +89,12 @@ function ProfileEditor({
   const [tsvText, setTsvText] = useState(original ? String(original.tsv) : "0");
   const [trvText, setTrvText] = useState(
     original ? original.trv.toString(16).toUpperCase() : "0",
+  );
+  const [saveVariableText, setSaveVariableText] = useState(
+    original ? formatThreeDsProfileSeed(original.saveVariable) : "00000000",
+  );
+  const [timeVariableText, setTimeVariableText] = useState(
+    original ? formatThreeDsProfileSeed(original.timeVariable) : "00000000",
   );
   const [seedTexts, setSeedTexts] = useState<[string, string, string, string]>(
     () =>
@@ -169,6 +177,8 @@ function ProfileEditor({
         ...draft,
         tsv: Number(tsvText || "0"),
         trv: parseHex(trvText),
+        saveVariable: parseHex(saveVariableText),
+        timeVariable: parseHex(timeVariableText),
         seeds: seedTexts.map(parseHex) as ThreeDsProfileSeeds,
       };
       if (!next.name.trim()) {
@@ -272,6 +282,30 @@ function ProfileEditor({
                 setTrvText(normalizeHex(event.target.value, 1))
               }
               value={trvText}
+            />
+          </label>
+          <label className="threedsprofiles-field">
+            <span>{t("threeDsProfilesSaveVariable")}</span>
+            <input
+              disabled={busy}
+              inputMode="text"
+              maxLength={8}
+              onChange={(event) =>
+                setSaveVariableText(normalizeHex(event.target.value, 8))
+              }
+              value={saveVariableText}
+            />
+          </label>
+          <label className="threedsprofiles-field">
+            <span>{t("threeDsProfilesTimeVariable")}</span>
+            <input
+              disabled={busy}
+              inputMode="text"
+              maxLength={8}
+              onChange={(event) =>
+                setTimeVariableText(normalizeHex(event.target.value, 8))
+              }
+              value={timeVariableText}
             />
           </label>
         </div>
@@ -433,6 +467,12 @@ function ProfileRows({
         <td>{t(`threeDsProfilesVersion_${profile.version}`)}</td>
         <td>{profile.tsv}</td>
         <td>{profile.trv.toString(16).toUpperCase()}</td>
+        <td className="mono">
+          {formatThreeDsProfileSeed(profile.saveVariable)}
+        </td>
+        <td className="mono">
+          {formatThreeDsProfileSeed(profile.timeVariable)}
+        </td>
         <td>
           <BooleanValue value={profile.shinyCharm} />
         </td>
@@ -471,6 +511,18 @@ function MobileProfiles({
               <span>
                 <small>TSV / TRV</small>
                 {profile.tsv} / {profile.trv.toString(16).toUpperCase()}
+              </span>
+              <span>
+                <small>{t("threeDsProfilesSaveVariable")}</small>
+                <span className="mono">
+                  {formatThreeDsProfileSeed(profile.saveVariable)}
+                </span>
+              </span>
+              <span>
+                <small>{t("threeDsProfilesTimeVariable")}</small>
+                <span className="mono">
+                  {formatThreeDsProfileSeed(profile.timeVariable)}
+                </span>
               </span>
               <span>
                 <small>{t("threeDsProfilesShinyCharm")}</small>
@@ -716,6 +768,8 @@ export function ThreeDsProfilesPanel({
                     <th>Game</th>
                     <th>TSV</th>
                     <th>TRV</th>
+                    <th>{t("threeDsProfilesSaveVariable")}</th>
+                    <th>{t("threeDsProfilesTimeVariable")}</th>
                     <th>Shiny Charm?</th>
                     <th>Egg Seeds</th>
                   </tr>

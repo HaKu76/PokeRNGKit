@@ -23,7 +23,18 @@ import {
   type Gen6StationaryTemplate,
 } from "./data";
 import type { Gen6StationaryEngine } from "./search";
+import {
+  gen6StationaryTimeEpochFromInput,
+  gen6StationaryTimeTaskCount,
+  formatGen6StationaryTimeEpoch,
+  validateGen6StationaryTimeRequest,
+  type Gen6StationaryTimeRequest,
+  type Gen6StationaryTimeResult,
+} from "./timeDomain";
+import type { Gen6StationaryTimeEngine } from "./timeSearch";
+import { Gen6StationaryTimeWorker } from "./worker/Gen6StationaryTimeWorker";
 import { Gen6StationaryUiPreviewEngine } from "./preview/Gen6StationaryUiPreviewEngine";
+import { Gen6StationaryTimePreviewEngine } from "./preview/Gen6StationaryTimePreviewEngine";
 import { Gen6StationaryWorker } from "./worker/Gen6StationaryWorker";
 import "./Gen6StationaryPanel.css";
 
@@ -164,11 +175,13 @@ export function Gen6StationaryPanel({
   profile,
   uiPreviewMode,
   bankOnly = false,
+  timeFinderMode = false,
   engineOverride,
 }: {
   profile: ThreeDsProfile | undefined;
   uiPreviewMode: boolean;
   bankOnly?: boolean;
+  timeFinderMode?: boolean;
   engineOverride?: Gen6StationaryEngine;
 }) {
   const { t, i18n } = useTranslation();
@@ -180,6 +193,13 @@ export function Gen6StationaryPanel({
         ? new Gen6StationaryUiPreviewEngine()
         : new Gen6StationaryWorker()),
     [engineOverride, uiPreviewMode],
+  );
+  const timeEngine = useMemo<Gen6StationaryTimeEngine>(
+    () =>
+      uiPreviewMode
+        ? new Gen6StationaryTimePreviewEngine()
+        : new Gen6StationaryTimeWorker(),
+    [uiPreviewMode],
   );
   const profileInfo = gen6StationaryProfile(profile);
   const categories: readonly string[] = useMemo(
@@ -205,6 +225,8 @@ export function Gen6StationaryPanel({
     templates[0] ??
     GEN6_STATIONARY_TEMPLATES[0];
   const [seed, setSeed] = useState("00000000");
+  const [startDate, setStartDate] = useState("2000-01-01T00:00:00");
+  const [endDate, setEndDate] = useState("2000-01-01T00:01:00");
   const [minFrame, setMinFrame] = useState("0");
   const [maxFrame, setMaxFrame] = useState("1000");
   const [delay, setDelay] = useState("0");
@@ -221,7 +243,9 @@ export function Gen6StationaryPanel({
   const [customAlwaysSync, setCustomAlwaysSync] = useState(false);
   const [customShinyLocked, setCustomShinyLocked] = useState(false);
   const [filters, setFilters] = useState(gen6StationaryDefaultFilters());
-  const [results, setResults] = useState<Gen6StationaryResult[]>([]);
+  const [results, setResults] = useState<
+    (Gen6StationaryResult | Gen6StationaryTimeResult)[]
+  >([]);
   const [status, setStatus] = useState<Status>("ready");
   const [error, setError] = useState("");
   const [progress, setProgress] = useState({
@@ -297,7 +321,13 @@ export function Gen6StationaryPanel({
     selectedTemplate.shinyLocked,
     selectedTemplate.species,
   ]);
-  useEffect(() => () => engine.dispose(), [engine]);
+  useEffect(
+    () => () => {
+      engine.dispose();
+      timeEngine.dispose();
+    },
+    [engine, timeEngine],
+  );
 
   const request = (): Gen6StationaryRequest => ({
     version: profileInfo.version,
@@ -317,22 +347,52 @@ export function Gen6StationaryPanel({
     filters,
     resultLimit: parseDecimal(resultLimit),
   });
+  const timeRequest = (): Gen6StationaryTimeRequest => {
+    const startEpoch = gen6StationaryTimeEpochFromInput(startDate);
+    const endEpoch = gen6StationaryTimeEpochFromInput(endDate);
+    if (typeof startEpoch !== "bigint" || typeof endEpoch !== "bigint")
+      throw new TypeError("Invalid Gen VI Time Finder date range.");
+    return validateGen6StationaryTimeRequest({
+      ...request(),
+      startEpoch,
+      endEpoch,
+      saveVariable: profileInfo.saveVariable,
+      timeVariable: profileInfo.timeVariable,
+    });
+  };
   const run = async (event: FormEvent) => {
     event.preventDefault();
     setError("");
     setResults([]);
+    let searchRequest: Gen6StationaryRequest | Gen6StationaryTimeRequest;
+    try {
+      searchRequest = timeFinderMode ? timeRequest() : request();
+    } catch (caught) {
+      setStatus("failed");
+      setError(caught instanceof Error ? caught.message : String(caught));
+      return;
+    }
     setProgress({
       processedStates: 0,
-      totalStates: 0,
+      totalStates: timeFinderMode
+        ? gen6StationaryTimeTaskCount(
+            searchRequest as Gen6StationaryTimeRequest,
+          )
+        : searchRequest.maxFrame - searchRequest.minFrame + 1,
       resultCount: 0,
       percent: 0,
     });
     setStatus("calculating");
     try {
-      const summary = await engine.search(request(), {
-        onBatch: setResults,
-        onProgress: setProgress,
-      });
+      const summary = timeFinderMode
+        ? await timeEngine.search(searchRequest as Gen6StationaryTimeRequest, {
+            onBatch: (batch) => setResults((current) => current.concat(batch)),
+            onProgress: setProgress,
+          })
+        : await engine.search(searchRequest as Gen6StationaryRequest, {
+            onBatch: (batch) => setResults(batch),
+            onProgress: setProgress,
+          });
       setStatus(summary.cancelled ? "cancelled" : "completed");
     } catch (caught) {
       setStatus("failed");
@@ -352,6 +412,7 @@ export function Gen6StationaryPanel({
     if (!results.length) return;
     const rows: (string | number | boolean)[][] = [
       [
+        ...(timeFinderMode ? ["Date/Time", "Initial Seed"] : []),
         "Frame",
         "Random",
         "EC",
@@ -368,6 +429,12 @@ export function Gen6StationaryPanel({
         "PRV",
       ],
       ...results.map((result) => [
+        ...(timeFinderMode && "epoch" in result
+          ? [
+              formatGen6StationaryTimeEpoch(result.epoch),
+              formatGen6StationaryHex(result.initialSeed),
+            ]
+          : []),
         result.frame,
         formatGen6StationaryHex(result.random),
         formatGen6StationaryHex(result.ec),
@@ -402,19 +469,77 @@ export function Gen6StationaryPanel({
   const disabled = status === "calculating";
 
   return (
-    <div className="gen6stationary-panel">
+    <div
+      className={`gen6stationary-panel${timeFinderMode ? " gen6stationary-time-mode" : ""}`}
+    >
       <div className="gen6stationary-workspace">
         <form className="panel gen6stationary-controls" onSubmit={run}>
           <div className="gen6stationary-heading">
             <div>
               <span className="panel-index">01</span>
-              <h2>{t(bankOnly ? "gen6BankModule" : "gen6StationaryModule")}</h2>
+              <h2>
+                {t(
+                  timeFinderMode
+                    ? "gen6StationaryTimeModule"
+                    : bankOnly
+                      ? "gen6BankModule"
+                      : "gen6StationaryModule",
+                )}
+              </h2>
             </div>
             <span className={`run-status ${status}`}>{t(status)}</span>
           </div>
           <section className="gen6stationary-section">
-            <h3>{t("gen6StationarySetup")}</h3>
+            <h3>
+              {t(
+                timeFinderMode
+                  ? "gen6StationaryTimeSetup"
+                  : "gen6StationarySetup",
+              )}
+            </h3>
             <div className="gen6stationary-grid">
+              {timeFinderMode && (
+                <>
+                  <label className="field">
+                    <span>{t("gen7TimeStart")}</span>
+                    <input
+                      disabled={disabled}
+                      max="2000-02-19T17:02:48"
+                      min="2000-01-01T00:00:00"
+                      onChange={(event) => setStartDate(event.target.value)}
+                      step="1"
+                      type="datetime-local"
+                      value={startDate}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("gen7TimeEnd")}</span>
+                    <input
+                      disabled={disabled}
+                      max="2000-02-19T17:02:48"
+                      min="2000-01-01T00:00:00"
+                      onChange={(event) => setEndDate(event.target.value)}
+                      step="1"
+                      type="datetime-local"
+                      value={endDate}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("threeDsProfilesSaveVariable")}</span>
+                    <input
+                      disabled
+                      value={formatGen6StationaryHex(profileInfo.saveVariable)}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("threeDsProfilesTimeVariable")}</span>
+                    <input
+                      disabled
+                      value={formatGen6StationaryHex(profileInfo.timeVariable)}
+                    />
+                  </label>
+                </>
+              )}
               <label className="field">
                 <span>{t("category")}</span>
                 <select
@@ -443,18 +568,20 @@ export function Gen6StationaryPanel({
                   ))}
                 </select>
               </label>
-              <label className="field">
-                <span>Seed</span>
-                <input
-                  disabled={disabled}
-                  inputMode="text"
-                  maxLength={8}
-                  onChange={(event) =>
-                    setSeed(normalizeHexInput(event.target.value, 8))
-                  }
-                  value={seed}
-                />
-              </label>
+              {!timeFinderMode && (
+                <label className="field">
+                  <span>Seed</span>
+                  <input
+                    disabled={disabled}
+                    inputMode="text"
+                    maxLength={8}
+                    onChange={(event) =>
+                      setSeed(normalizeHexInput(event.target.value, 8))
+                    }
+                    value={seed}
+                  />
+                </label>
+              )}
               <label className="field">
                 <span>{t("gen6StationaryFrameRange")}</span>
                 <input
@@ -885,13 +1012,13 @@ export function Gen6StationaryPanel({
               type="submit"
             >
               <Play aria-hidden="true" size={17} />
-              {t("generate")}
+              {t(timeFinderMode ? "search" : "generate")}
             </button>
             <button
               aria-label={t("cancel")}
               className="gen6stationary-icon"
               disabled={!disabled}
-              onClick={() => engine.cancel()}
+              onClick={() => (timeFinderMode ? timeEngine : engine).cancel()}
               title={t("cancel")}
               type="button"
             >
@@ -952,6 +1079,12 @@ export function Gen6StationaryPanel({
                 style={{ height: `${virtualizer.getTotalSize() + 40}px` }}
               >
                 <div className="gen6stationary-table-header">
+                  {timeFinderMode && (
+                    <>
+                      <span>{t("gen7TimeDate")}</span>
+                      <span>{t("gen7TimeInitialSeed")}</span>
+                    </>
+                  )}
                   <span>Frame</span>
                   <span>Random</span>
                   <span>EC</span>
@@ -977,6 +1110,16 @@ export function Gen6StationaryPanel({
                       key={`${result.frame}-${item.index}`}
                       style={{ transform: `translateY(${item.start + 40}px)` }}
                     >
+                      {timeFinderMode && "epoch" in result && (
+                        <>
+                          <span>
+                            {formatGen6StationaryTimeEpoch(result.epoch)}
+                          </span>
+                          <span>
+                            {formatGen6StationaryHex(result.initialSeed)}
+                          </span>
+                        </>
+                      )}
                       <span>{result.frame}</span>
                       <span>{formatGen6StationaryHex(result.random)}</span>
                       <span>{formatGen6StationaryHex(result.ec)}</span>
