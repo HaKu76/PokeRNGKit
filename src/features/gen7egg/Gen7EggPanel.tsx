@@ -18,6 +18,7 @@ import {
   type ThreeDsProfile,
 } from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { useTsvListText } from "../tsvlist/domain";
 import { GEN7_WILD_NATURES } from "../gen7wild/data";
 import {
   formatGen7EggHex32,
@@ -150,6 +151,7 @@ export function Gen7EggPanel({
   uiPreviewMode: boolean;
 }) {
   const { t, i18n } = useTranslation();
+  const storedTsvList = useTsvListText();
   const language =
     i18n.resolvedLanguage === "ja"
       ? "ja"
@@ -199,7 +201,7 @@ export function Gen7EggPanel({
   const [nidoType, setNidoType] = useState(false);
   const [homogeneous, setHomogeneous] = useState(false);
   const [considerOtherTsv, setConsiderOtherTsv] = useState(false);
-  const [otherTsvs, setOtherTsvs] = useState("");
+  const [otherTsvs, setOtherTsvs] = useState(storedTsvList);
   const [shinyReminder, setShinyReminder] = useState(false);
   const [filtersDisabled, setFiltersDisabled] = useState(false);
   const [shinyFilter, setShinyFilter] = useState<Gen7EggShinyFilter>("any");
@@ -244,6 +246,10 @@ export function Gen7EggPanel({
     setTrv(profile.trv.toString(16).toUpperCase());
     setShinyCharm(profile.shinyCharm);
   }, [profile]);
+
+  useEffect(() => {
+    setOtherTsvs(storedTsvList);
+  }, [storedTsvList]);
 
   useEffect(() => () => engine.dispose(), [engine]);
 

@@ -1,0 +1,66 @@
+.tsv-list-display {
+  width: min(520px, calc(100vw - 48px));
+}
+
+.tsv-list-body {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px 20px;
+}
+
+.tsv-list-editor {
+  display: grid;
+  gap: 7px;
+}
+
+.tsv-list-editor > span {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.tsv-list-editor textarea {
+  width: 100%;
+  min-height: 260px;
+  resize: vertical;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.55;
+  padding: 10px 12px;
+}
+
+.tsv-list-editor textarea:focus {
+  border-color: var(--brand);
+  outline: 0;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 16%, transparent);
+}
+
+.tsv-list-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.tsv-list-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tsv-list-status {
+  color: var(--teal);
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .tsv-list-display {
+    width: min(520px, calc(100vw - 24px));
+  }
+}

@@ -803,6 +803,15 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整公式、输入边界、上游来源和固定夹具见 [Misc. RNG Tool](modules/miscrng.md)。
 
+## 8.45C 当前功能需求：`tsvlist`
+
+- **FR-TSVLIST-01** 提供 3DSRNGTool `TSVListForm` 的全局本地编辑入口，支持逐行、逗号、空白或分号分隔的 TSV 文本；重复值只保留一次，非法值和超出范围的值忽略。
+- **FR-TSVLIST-02** TSV 必须为 `0..4095`；列表最多保留 `4096` 个值，以匹配 Gen VI/Gen VII Egg Other TSV 的 4096-bit 掩码；保存后使用稳定顺序写入本地存储，清空操作可显式保存空列表。
+- **FR-TSVLIST-03** 使用 `localStorage` 的 `pokerngkit-tsv-list-v1` 键，并通过同页事件和 `storage` 事件同步 Gen VI/Gen VII Egg 工作区；不上传、不连接 NTR/TCP。
+- **FR-TSVLIST-04** TSV List 作为全局轻量工具放在右下角悬浮菜单，使用实体浮动面板、保存/清空、数量与范围状态、键盘焦点、Escape、点外关闭和移动端布局。
+
+完整输入边界、持久化、Egg 接线、上游来源和测试见 [TSV List](modules/tsvlist.md)。
+
 ## 8.46 当前功能需求：`3dsprofiles`
 
 - **FR-3DSPROFILES-01** 提供 3DSRNGTool `Profile Manager` 与 `Profile View`，支持 X、Y、Omega Ruby、Alpha Sapphire、Transporter、Sun、Moon、Ultra Sun、Ultra Moon，以及 Description、TSV、TRV、Shiny Charm 和四字 Egg Seed。

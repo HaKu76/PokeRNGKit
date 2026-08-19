@@ -4183,18 +4183,12 @@ select:not([multiple]) {
   align-content: start;
   gap: 4px;
   padding: 0;
-  scrollbar-color: var(--rail-line) transparent;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .module-navigation::-webkit-scrollbar {
-  display: block;
-  width: 6px;
-}
-
-.module-navigation::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: var(--rail-line);
+  display: none;
 }
 
 .module-nav-group {
@@ -4244,6 +4238,7 @@ select:not([multiple]) {
 }
 
 .module-nav-group-label {
+  min-width: 0;
   overflow: hidden;
   color: var(--rail-text);
   font-size: 15px;
@@ -4299,6 +4294,9 @@ select:not([multiple]) {
 }
 
 .module-entry strong {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: block;
   overflow: hidden;
   font-size: 15px;
   font-weight: 600;

@@ -9,6 +9,7 @@ import {
 } from "../3dsprofiles/domain";
 import { GEN7_WILD_NATURES } from "../gen7wild/data";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { useTsvListText } from "../tsvlist/domain";
 import {
   formatGen6EggHex,
   GEN6_EGG_BROWSER_MAX_FRAME,
@@ -118,6 +119,7 @@ export function Gen6EggPanel({
   uiPreviewMode: boolean;
 }) {
   const { t, i18n } = useTranslation();
+  const storedTsvList = useTsvListText();
   const language =
     i18n.resolvedLanguage === "ja"
       ? "ja"
@@ -163,7 +165,7 @@ export function Gen6EggPanel({
   const [shinyCharm, setShinyCharm] = useState(false);
   const [masudaMethod, setMasudaMethod] = useState(false);
   const [considerOtherTsv, setConsiderOtherTsv] = useState(false);
-  const [otherTsvs, setOtherTsvs] = useState("");
+  const [otherTsvs, setOtherTsvs] = useState(storedTsvList);
   const [acceptEgg, setAcceptEgg] = useState(true);
   const [filtersDisabled, setFiltersDisabled] = useState(false);
   const [shinyFilter, setShinyFilter] = useState<Gen6EggShinyFilter>("any");
@@ -203,6 +205,10 @@ export function Gen6EggPanel({
     setTrv(profile.trv.toString(16).toUpperCase());
     setShinyCharm(profile.shinyCharm);
   }, [profile]);
+
+  useEffect(() => {
+    setOtherTsvs(storedTsvList);
+  }, [storedTsvList]);
 
   function changeGenderRatio(next: Gen6EggGenderRatio) {
     setGenderRatio(next);

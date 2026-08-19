@@ -17,6 +17,7 @@ import {
   Dices,
   FlaskConical,
   KeyRound,
+  ListChecks,
   Menu,
   Monitor,
   Moon,
@@ -136,6 +137,7 @@ import { Gen8EventPanel } from "./features/gen8event/Gen8EventPanel";
 import { ResearcherPanel } from "./features/researcher/ResearcherPanel";
 import { KeyBvPanel } from "./features/keybv/KeyBvPanel";
 import { MiscRngPanel } from "./features/miscrng/MiscRngPanel";
+import { TsvListPanel } from "./features/tsvlist/TsvListPanel";
 import { FloatingToolPanel } from "./features/shared/FloatingToolPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
@@ -549,6 +551,7 @@ function App() {
   const [researcherExpanded, setResearcherExpanded] = useState(false);
   const [keyBvExpanded, setKeyBvExpanded] = useState(false);
   const [miscRngExpanded, setMiscRngExpanded] = useState(false);
+  const [tsvListExpanded, setTsvListExpanded] = useState(false);
   const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
     useState<Gen5AdjacentSeedsInitialContext>();
@@ -994,13 +997,15 @@ function App() {
                 ? "keybv"
                 : miscRngExpanded
                   ? "miscRng"
-                  : profileTools && gen4Tools
-                    ? gen4ProfileExpanded
-                      ? "profile"
-                      : undefined
-                    : profileTools && profileExpanded
-                      ? "profile"
-                      : undefined;
+                  : tsvListExpanded
+                    ? "tsvList"
+                    : profileTools && gen4Tools
+                      ? gen4ProfileExpanded
+                        ? "profile"
+                        : undefined
+                      : profileTools && profileExpanded
+                        ? "profile"
+                        : undefined;
 
   const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
@@ -1011,6 +1016,7 @@ function App() {
     setResearcherExpanded(false);
     setKeyBvExpanded(false);
     setMiscRngExpanded(false);
+    setTsvListExpanded(false);
     if (gen4Tools) {
       changeGen4ProfileExpanded(false);
     } else {
@@ -1052,6 +1058,7 @@ function App() {
       | "researcher"
       | "keybv"
       | "miscRng"
+      | "tsvList"
       | "sponsorship"
       | "threeDsProfile",
   ) => {
@@ -1066,6 +1073,7 @@ function App() {
     else if (tool === "researcher") setResearcherExpanded(true);
     else if (tool === "keybv") setKeyBvExpanded(true);
     else if (tool === "miscRng") setMiscRngExpanded(true);
+    else if (tool === "tsvList") setTsvListExpanded(true);
     else if (tool === "threeDsProfile") setThreeDsProfilesExpanded(true);
     else if (gen4Tools) changeGen4ProfileExpanded(true);
     else changeProfileExpanded(true);
@@ -3722,6 +3730,25 @@ function App() {
             }
           }}
         />
+        <TsvListPanel
+          expanded={activeFloatingTool === "tsvList"}
+          onExpandedChange={(expanded) => {
+            setTsvListExpanded(expanded);
+            if (expanded) {
+              setModuleRailOpen(false);
+              setIvCalculatorExpanded(false);
+              setEncounterLookupExpanded(false);
+              setContributionsExpanded(false);
+              setSponsorshipExpanded(false);
+              setThreeDsProfilesExpanded(false);
+              setResearcherExpanded(false);
+              setKeyBvExpanded(false);
+              setMiscRngExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
         {profileTools && gen4Tools ? (
           <Gen4ProfileControls
             controller={gen4Profiles}
@@ -3893,6 +3920,25 @@ function App() {
               type="button"
             >
               <Dices aria-hidden="true" size={19} />
+            </button>
+            <button
+              aria-controls="tsv-list-panel"
+              aria-expanded={activeFloatingTool === "tsvList"}
+              aria-haspopup="dialog"
+              aria-label={t("tsvListModule")}
+              className={
+                activeFloatingTool === "tsvList" ? "active" : undefined
+              }
+              data-tone="teal"
+              id="tsv-list-trigger"
+              onClick={() => {
+                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                toggleFloatingTool("tsvList");
+              }}
+              title={t("tsvListModule")}
+              type="button"
+            >
+              <ListChecks aria-hidden="true" size={19} />
             </button>
           </nav>
           <button

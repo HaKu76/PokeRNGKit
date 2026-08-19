@@ -2,9 +2,9 @@
 
 # 当前目标：完成 3DSRNGTool 全范围后统一 UI 验收
 
-- 当前主线：TF5 Gen VII Wild 时间/初始 Seed 反查 -> TF6 Gen VII ID 时间/初始 Seed 反查 -> TSV List / IV Range / Template -> Gen VI 时间反查 -> TinyFinder 真实缺口。
+- 当前主线：公共 TSV List -> IV Range / Template -> Gen VI TF1/TF2 时间反查 -> TinyFinder 真实缺口。
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
-- 当前状态：TF5 与 TF6 功能和工程验证已完成，提交 `8080b35` 已推送；外部页面回归保留到全部 3DS 模块完成后统一执行。
+- 当前状态：TF5、TF6 与公共 TSV List 功能和工程验证已完成；TF5/TF6 提交 `8080b35` 已推送，TSV List 待本轮提交；外部页面回归保留到全部 3DS 模块完成后统一执行。
 
 ## 工程验证耗时优化决策
 
@@ -12,6 +12,17 @@
 - 基准：本机默认 `npm test` 的 159 个测试文件、568 项测试约 57 秒通过；强制 Vitest `threads` 池并发 4 在 Windows 上耗时约 148 秒并出现 3 个 worker 启动超时，因此不切换默认测试池。
 - 决策：开发循环使用 `npx vitest run <module-test-files>`、`npx eslint <changed-files>`、定向 `POKERNGKIT_WASM_MODULES=<module>` 原生/Wasm 检查；提交前继续使用完整 `npm run verify` 与 `npm run verify:full`。
 - 适用范围：增量 TypeScript、按修改文件 lint、按模块测试和按目标构建是多数 TS/Vite/Vitest 仓库都可复用的优化方向；测试池、Worker 数量、缓存策略和全量构建拆分不能直接照搬，必须在目标仓库和操作系统上以实际耗时、稳定性和资源占用重新基准测试。
+- 文档化：已将上述分层验证原则写入 `docs/ai-development.md`，作为跨项目可复用的方法；本仓库的具体命令、基准和提交前全量门槛仍以本节实测记录为准。
+
+## 2026-08-20 公共 TSV List（已完成工程实现）
+
+- 新增：实现 3DSRNGTool `TSVListForm` 的本地 Web 版本，支持逐行、逗号、空白和分号分隔，按上游规则去重并忽略非法 TSV。
+- 接入：TSV List 进入右下角悬浮工具菜单，使用 localStorage `pokerngkit-tsv-list-v1` 持久化，并通过同页/跨标签页事件同步 Gen VI 与 Gen VII Egg 的 Other TSV 输入。
+- 约束：TSV 保持 `0..4095`，最多 4096 项，与两代 Egg 的 4096-bit Other TSV 掩码一致；不连接 NTR/TCP，不上传数据。
+- UI：补充实体浮动面板、保存/清空、有效项数量、范围状态和移动端布局；侧边栏长标题统一单行省略号，滚动能力保留但隐藏可见滚动条。
+- 已通过：TSV List 定向 Vitest（3 项）、定向 ESLint、TypeScript、任务文件格式化、`git diff --check`。
+- 已通过：完整 `npm run verify`，包含 161 个测试文件共 574 项测试、Vite/PWA 生产构建 2265 个模块和 220 项预缓存资源。
+- 待完成：提交推送，以及外部 Chrome/Edge 与生产页面回归；后两项按全部 3DS 模块完成后的统一验收门槛执行。
 
 ## 2026-08-19 3DSTimeFinder TF5 Gen VII Wild 时间反查（已完成）
 
@@ -42,9 +53,9 @@
 
 > - 最近更新：2026-08-20
 > - 当前分支：`main`
-> - 当前阶段：TF6 Gen VII ID 时间反查开发中
-> - 工作区状态：TF5/TF6 功能、导航、契约、测试和文档已提交推送，工作区待确认干净
-> - 下一步：开始 TSV List / IV Range / Template；全部 3DS 模块完成后执行外部 Chrome/Edge 八项 UI 验收
+> - 当前阶段：公共 TSV List 已实现并通过提交前全量验证，待提交推送
+> - 工作区状态：TSV List、Gen VI/Gen VII Egg 接线、侧边栏样式和对应文档存在未提交修改
+> - 下一步：完成全仓 `npm run verify` 后提交推送；随后实现 IV Range / IV Template
 
 ## 2026-08-19 3DSTimeFinder TF3 Gen VII Stationary 时间反查（已完成）
 
