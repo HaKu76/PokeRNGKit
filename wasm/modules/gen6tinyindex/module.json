@@ -1,0 +1,13 @@
+{
+  "id": "gen6tinyindex",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6tinyindex",
+  "operations": ["generator", "dateSearcher"],
+  "artifacts": {
+    "loader": "gen6tinyindex.mjs",
+    "wasm": "gen6tinyindex.wasm"
+  },
+  "source": "TinyFinder RNG/TinyMT.cs and Main/FindResults.cs"
+}

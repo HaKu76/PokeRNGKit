@@ -1,0 +1,126 @@
+.gen6tinyindex-workspace {
+  display: grid;
+  gap: 16px;
+}
+.gen6tinyindex-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 16px;
+}
+.gen6tinyindex-panel {
+  min-width: 0;
+  padding: 24px;
+}
+.gen6tinyindex-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 4px;
+}
+.gen6tinyindex-mode label {
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.gen6tinyindex-mode label.active {
+  background: var(--surface);
+  color: var(--brand-strong);
+}
+.gen6tinyindex-mode input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.gen6tinyindex-state-grid,
+.gen6tinyindex-input-grid,
+.gen6tinyindex-range-grid,
+.gen6tinyindex-filter-grid {
+  display: grid;
+  gap: 12px;
+}
+.gen6tinyindex-state-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.gen6tinyindex-input-grid,
+.gen6tinyindex-range-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 16px;
+}
+.gen6tinyindex-state-grid input,
+.gen6tinyindex-table-shell span:nth-child(2),
+.gen6tinyindex-table-shell span:nth-child(4),
+.gen6tinyindex-table-shell span:last-child {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.gen6tinyindex-limit-note {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+.gen6tinyindex-filter-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gen6tinyindex-filter-grid textarea {
+  min-height: 172px;
+  resize: vertical;
+}
+.gen6tinyindex-filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-top: 16px;
+}
+.gen6tinyindex-results-panel {
+  min-width: 0;
+}
+.gen6tinyindex-table-shell {
+  min-height: 260px;
+}
+.gen6tinyindex-virtual-table {
+  min-width: 920px;
+}
+.gen6tinyindex-virtual-table .table-header,
+.gen6tinyindex-virtual-table .table-row {
+  grid-template-columns: 190px 130px 90px 130px minmax(320px, 1fr);
+}
+.gen6tinyindex-virtual-table span:nth-child(1),
+.gen6tinyindex-virtual-table span:nth-child(2),
+.gen6tinyindex-virtual-table span:nth-child(4),
+.gen6tinyindex-virtual-table span:nth-child(5) {
+  text-align: left;
+}
+@media (max-width: 1080px) {
+  .gen6tinyindex-controls {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .gen6tinyindex-panel {
+    padding: 20px;
+  }
+  .gen6tinyindex-state-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gen6tinyindex-input-grid,
+  .gen6tinyindex-range-grid,
+  .gen6tinyindex-filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .gen6tinyindex-state-grid {
+    grid-template-columns: 1fr;
+  }
+}

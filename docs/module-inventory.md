@@ -63,8 +63,8 @@ PokeFinder 核对入口：
 
 | 编号 | 功能                                                   | 状态                                |
 | ---- | ------------------------------------------------------ | ----------------------------------- |
-| T1   | TinyMT 日期 / Index Searcher                           | 计划                                |
-| T2   | Index 筛选与状态查看                                   | 计划                                |
+| T1   | TinyMT 日期 / Index Searcher                           | 已实现（gen6tinyindex）             |
+| T2   | Index 筛选与状态查看                                   | 已实现（gen6tinyindex）             |
 | T3   | ID RNG                                                 | 已实现（与 gen6id 合并核对）        |
 | T4   | Normal Wild / Friend Safari                            | 已实现（与 gen6wild 合并核对）      |
 | T5   | Fishing RNG                                            | 已实现（与 gen6wild 合并核对）      |

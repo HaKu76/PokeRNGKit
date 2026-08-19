@@ -14,6 +14,16 @@
 - 已通过：任务文件格式化、`npm run format:check`、`git diff --check`。
 - 未运行：测试、TypeScript、构建和外部 Chrome/Edge UI 回归；本轮为 CSS-only 修复，最终浏览器验收仍按全部 3DS 模块完成后的统一门槛执行。
 
+## 2026-08-20 TinyFinder T1/T2 TinyMT 日期与 Index 查询（已完成工程验证）
+
+- 新增：Gen VI TinyMT `Date Searcher` 与 `Generator`，日期模式按所选月份到年末枚举，每秒沿用 TinyFinder 的 `Seed + 1000` 规则；Generator 从四字状态生成连续 Index。
+- 新增：Index / TinyMT 状态普通包含和正则筛选、结果上限、进度、取消、虚拟结果表与 CSV；生产 RNG 只在 `gen6tinyindex` Dedicated Worker/Wasm 中执行。
+- 接入：第六世代侧栏、引擎标题和 API 版本文案；新增 `docs/modules/gen6tinyindex.md`，库存 T1/T2 更新为已实现。
+- 已通过：TinyMT Index 定向 Vitest（2 个文件、4 项测试）、`npm run typecheck`、`$env:POKERNGKIT_WASM_MODULES='gen6tinyindex'; npm run wasm:test:native`（1/1）、任务文件格式化、`npm run format:check`、`git diff --check`。
+- 已通过：在用户级 Emscripten 6.0.6 环境中运行 `cmd /c "call C:\\Users\\Hakuhiro\\emsdk\\emsdk_env.bat && set POKERNGKIT_WASM_MODULES=gen6tinyindex && npm run wasm:build"`；生成 `gen6tinyindex.mjs`（7733 bytes，SHA-256 `381273699382CDB04155F2A66356E685F7D1A616884F5F1921B92F77152DBDC2`）与 `gen6tinyindex.wasm`（6901 bytes，SHA-256 `E5FDB77063C70B0664DAEB755D4C151602391A3E48E377387ECD5EEBDFEEAEB2`）。
+- 未运行：外部 Chrome/Edge UI 与生产页面算法验收；后两项继续按全部 3DS 模块完成后的统一门槛执行。
+- 下一步：继续核对 TinyFinder T6 Rock Smash、T8 Honey Wild、T10 Ambush 和 T12 Victory Road Swooping 的独有分支，再进入 MT Seed/Time Finder。
+
 ## 2026-08-20 3DSTimeFinder TF1 Gen VI Stationary 时间反查（已完成工程验证）
 
 - 新增：Gen VI Stationary TF1 时间/初始 Seed Searcher，按 `StationarySearcher6` 逐秒枚举 Citra epoch，使用 Save Variable、Time Variable 与 Epoch 的 32 位加法计算 Initial Seed。
