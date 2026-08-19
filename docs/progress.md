@@ -9,13 +9,13 @@
 - 已通过：`npx vitest run src/features/miscrng/domain.test.ts`（5/5）、`npm run format:check`、`git diff --check`。
 - 已通过：完整 `npm run verify`；Prettier、ESLint（0 error / 0 warning）、TypeScript、Vitest（153 个文件、550 项测试）和 Vite/PWA 生产构建（210 项预缓存资源）均完成。
 - 未运行：外部 Chrome/Edge UI 回归和生产页面算法验收；需等待部署后由项目所有者提供准确 URL 并授权。
-- 排序更新：项目所有者要求将本地 `PokemonRNGGuides` 教程作为后续规划最高优先级；当前模块收口后先读取教程目录、流程和功能覆盖，再决定 TSV List、IV Template、TinyFinder/3DSTimeFinder 等剩余模块顺序，避免超出教程范围的重复开发。
+- 排序更新：项目所有者要求将本地 `PokemonRNGGuides` 教程作为后续规划最高优先级；已完成教程目录、流程和功能覆盖审查，后续先做 Gen VII/Gen VI 3DSTimeFinder，再做 TSV List 与 IV Range / IV Template，TinyFinder 扩展后移。
 
 > - 最近更新：2026-08-19
 > - 当前分支：`main`
 > - 当前 HEAD：`main` 已包含 `feat: 实现公共杂项乱数工具`
-> - 当前阶段：公共 Misc. RNG Tool 已完成工程闭环，等待提交；下一动作是读取 PokemonRNGGuides 教程并重排后续计划
-> - 工作区状态：Misc. RNG Tool 功能、导航、三语、需求、库存和模块文档存在未提交修改
+> - 当前阶段：公共 Misc. RNG Tool 已完成工程闭环；PokemonRNGGuides 教程审查已完成并重排后续计划
+> - 工作区状态：Misc. RNG Tool 与教程优先级规划已提交，当前只有规划文档待提交
 > - 验证状态：Misc. RNG Tool 定向测试和完整 `npm run verify` 已通过；外部浏览器未运行
 
 ## 2026-08-19 3DSRNGTool 公共 KeyBV
@@ -27,7 +27,7 @@
 - 已通过：`npx vitest run src/features/keybv/domain.test.ts`（4/4）、`npm run format:check`、`git diff --check`。
 - 已通过：完整 `npm run verify`；Prettier、ESLint（0 error / 0 warning）、TypeScript、Vitest（152 个文件、545 项测试）和 Vite/PWA 生产构建（210 项预缓存资源）均完成。
 - 未运行：外部 Chrome/Edge UI 回归和生产页面算法验收；需等待部署后由项目所有者提供准确 URL 并授权。
-- 下一步：继续实现 `Misc. RNG Tool`，随后完成 `TSV List` 与 `IV Range / IV Template`，再收口剩余 3DSRNGTool 模块。
+- 下一步：实现 3DSTimeFinder TF3/TF4（Gen VII Stationary/Event），再实现 TF1/TF2（Gen VI Stationary/Event）。
 
 > - 最近更新：2026-08-19
 > - 当前分支：`main`
