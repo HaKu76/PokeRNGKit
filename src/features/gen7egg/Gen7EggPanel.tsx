@@ -19,6 +19,7 @@ import {
 } from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import { useTsvListText } from "../tsvlist/domain";
+import { subscribeIvToolsChanges } from "../ivtools/domain";
 import { GEN7_WILD_NATURES } from "../gen7wild/data";
 import {
   formatGen7EggHex32,
@@ -250,6 +251,21 @@ export function Gen7EggPanel({
   useEffect(() => {
     setOtherTsvs(storedTsvList);
   }, [storedTsvList]);
+
+  useEffect(
+    () =>
+      subscribeIvToolsChanges((change) => {
+        if (change.type === "range") {
+          setIvMin(change.bounds.min.map(String) as IvText);
+          setIvMax(change.bounds.max.map(String) as IvText);
+        } else if (change.parent === "male") {
+          setMaleIvs(change.values.map(String) as IvText);
+        } else {
+          setFemaleIvs(change.values.map(String) as IvText);
+        }
+      }),
+    [],
+  );
 
   useEffect(() => () => engine.dispose(), [engine]);
 

@@ -812,6 +812,15 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入边界、持久化、Egg 接线、上游来源和测试见 [TSV List](modules/tsvlist.md)。
 
+## 8.45D 当前功能需求：`ivtools`
+
+- **FR-IVTOOLS-01** 提供 3DSRNGTool `IVRange` 与 `IVTemplate` 的全局本地辅助入口，六项统计顺序固定为 `HP / Atk / Def / SpA / SpD / Spe`，范围档位严格映射到上游闭区间。
+- **FR-IVTOOLS-02** IV Template 严格接受 `Name = 1,2,3,4,5,6`，恰好六项且每项为 `0..31`；默认提供 `Perfect`、`6Zero`、`HPIce`、`HPFire`，支持新增、删除、保存和选择。
+- **FR-IVTOOLS-03** `Apply Range` 将六项范围同步到 Gen VI/Gen VII Egg 的 `ivMin` / `ivMax`；`Set as Male` / `Set as Female` 将所选模板同步到对应双亲 IV，不覆盖其他参数。
+- **FR-IVTOOLS-04** IV Tools 作为全局轻量工具放在右下角悬浮菜单，使用实体浮动面板、候选控件、键盘焦点、Escape、点外关闭和移动端布局；模板使用 localStorage `pokerngkit-iv-tools-v1`。
+
+完整输入边界、上游文件、事件协议和测试见 [IV Range / IV Template](modules/ivtools.md)。
+
 ## 8.46 当前功能需求：`3dsprofiles`
 
 - **FR-3DSPROFILES-01** 提供 3DSRNGTool `Profile Manager` 与 `Profile View`，支持 X、Y、Omega Ruby、Alpha Sapphire、Transporter、Sun、Moon、Ultra Sun、Ultra Moon，以及 Description、TSV、TRV、Shiny Charm 和四字 Egg Seed。

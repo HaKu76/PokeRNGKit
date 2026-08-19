@@ -19,7 +19,7 @@
 | P0     | Gen VII TF5 Wild / TF6 ID                         | 进行中 | TF5 已完成工程验证；TF6 复用 `gen7timefinder` / `gen7id` Wasm 实现时间反查        | TF6 外部页面回归后进入 Gen VI TF1/TF2       |
 | P1     | Gen VI TF1/TF2 Stationary/Event                   | 计划   | `3DSTimeFinder` Gen VI 时间入口                                                   | Gen VII TF3-TF6 完成后                      |
 | P2     | 公共 TSV List                                     | 已完成 | Gen VII Egg 教程要求编辑 TSV List                                                 | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具    |
-| P2     | IV Range / IV Template                            | 计划   | 3DSRNGTool `IVRange.cs`、`IVTemplate.cs`                                          | TSV List 后实现                             |
+| P2     | IV Range / IV Template                            | 已完成 | 3DSRNGTool `IVRange.cs`、`IVTemplate.cs`                                          | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具    |
 | P3     | Gen IV Gen4SeedFinder、Voltorb Flip、Swarm 辅助   | 计划   | 教程复核确认的真实辅助缺口                                                        | P0-P2 完成后评估                            |
 | P4     | Gen V DS 参数、Initial Seed、Entralink 缺口       | 计划   | 教程中的 DS 参数和时间流程                                                        | 仅补确认存在的缺口                          |
 | P5     | TinyFinder 独有扩展                               | 计划   | Rock Smash、Honey Wild、Ambush、Victory Road、MT Seed/Time                        | 主线闭环完成后                              |

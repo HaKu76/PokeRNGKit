@@ -54,7 +54,7 @@ PokeFinder 核对入口：
 | 23   | 公共    | KeyBV                                    | 已实现 |
 | 24   | 公共    | Misc. RNG Tool                           | 已实现 |
 | 25   | 公共    | TSV List                                 | 已实现 |
-| 26   | 公共    | IV Range / IV Template                   | 计划   |
+| 26   | 公共    | IV Range / IV Template                   | 已实现 |
 | 27   | 公共    | NTR Helper                               | 不开发 |
 
 ## TinyFinder（Gen VI 扩展）
@@ -119,7 +119,7 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary / Pokemon Link / Event / Wild / DexNav / Poke Radar / Egg / ID 与公共 Profile Manager 已实现；当前不再回退到旧世代 UI 整改，先完成 TF5/TF6 时间反查主线。
 2. 3DSRNGTool Gen VI Main Seed Finder 已实现；字段、控件边界和算法以对应 WinForms/Core 源码为准。
-3. Gen VI TinyMT Timeline Tool、公共 KeyBV、Misc. RNG Tool 与 TSV List 已实现；随后继续 IV Range / Template；`NTR Helper` 除外。
+3. Gen VI TinyMT Timeline Tool、公共 KeyBV、Misc. RNG Tool、TSV List 与 IV Range / Template 已实现；随后继续 Gen VI 时间反查与 TinyFinder 缺口；`NTR Helper` 除外。
 4. TF5/TF6、IV Range / Template、Gen VI 时间反查和 TinyFinder 缺口全部完成后，执行全仓验证、Actions 部署和生产页面回归。
 5. 生产页面回归前固定执行八项 UI 门槛：实体不透明悬浮窗、Demo 候选控件、图标居中、自适应列宽、定点三栏布局、Wild 筛选对齐、存档工具悬浮收纳、Encounter Lookup 去除遗留有色粗描边。
 

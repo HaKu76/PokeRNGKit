@@ -10,6 +10,7 @@ import {
 import { GEN7_WILD_NATURES } from "../gen7wild/data";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import { useTsvListText } from "../tsvlist/domain";
+import { subscribeIvToolsChanges } from "../ivtools/domain";
 import {
   formatGen6EggHex,
   GEN6_EGG_BROWSER_MAX_FRAME,
@@ -209,6 +210,21 @@ export function Gen6EggPanel({
   useEffect(() => {
     setOtherTsvs(storedTsvList);
   }, [storedTsvList]);
+
+  useEffect(
+    () =>
+      subscribeIvToolsChanges((change) => {
+        if (change.type === "range") {
+          setIvMin(change.bounds.min.map(String) as IvText);
+          setIvMax(change.bounds.max.map(String) as IvText);
+        } else if (change.parent === "male") {
+          setMaleIvs(change.values.map(String) as IvText);
+        } else {
+          setFemaleIvs(change.values.map(String) as IvText);
+        }
+      }),
+    [],
+  );
 
   function changeGenderRatio(next: Gen6EggGenderRatio) {
     setGenderRatio(next);

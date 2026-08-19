@@ -2,9 +2,19 @@
 
 # 当前目标：完成 3DSRNGTool 全范围后统一 UI 验收
 
-- 当前主线：公共 TSV List -> IV Range / Template -> Gen VI TF1/TF2 时间反查 -> TinyFinder 真实缺口。
+- 当前主线：Gen VI TF1/TF2 时间反查 -> TinyFinder 真实缺口。
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
-- 当前状态：TF5、TF6 与公共 TSV List 功能和工程验证已完成；TF5/TF6 提交 `8080b35` 已推送，TSV List 待本轮提交；外部页面回归保留到全部 3DS 模块完成后统一执行。
+- 当前状态：TF5、TF6、公共 TSV List 与 IV Range / IV Template 功能已完成工程实现；本轮 IV Tools 待验证、提交和推送；外部页面回归保留到全部 3DS 模块完成后统一执行。
+
+## 2026-08-20 公共 IV Range / IV Template（已完成工程验证）
+
+- 新增：实现 3DSRNGTool `IVRange` 与 `IVTemplate` 的全局本地浮动工具，复用 `AutoCompleteComboBox`，支持六项档位、严格六项模板、默认模板、新增/删除/保存和双亲应用。
+- 接入：`Apply Range` 同步 Gen VI/Gen VII Egg 的 `ivMin` / `ivMax`；`Set as Male` / `Set as Female` 通过同页事件更新对应双亲六项 IV；模板保存到 `pokerngkit-iv-tools-v1`。
+- UI：新增 IV Tools 悬浮入口，保持实体面板、焦点管理、Escape、点外关闭、拖动和移动端布局；不新增 RNG/Wasm 算法。
+- 已完成：上游 `IVRange.cs`、`IVTemplate.cs`、`StringItem.cs`、`MainForm_CtrlGroup.cs`、`MainForm_Egg.cs` 输入边界和统计顺序核对；模块文档、需求和库存已更新。
+- 已通过：`npx vitest run src/features/ivtools/domain.test.ts`（3 项）、改动文件 ESLint、`npm run typecheck`、`npm run format:check` 和 `git diff --check`。
+- 已通过：完整 `npm run verify`，包含 162 个测试文件共 577 项测试、Vite 转换 2268 个模块和 PWA 220 项预缓存资源；仅保留既有主包超过 500 kB 的构建提示。
+- 待完成：提交推送；外部 Chrome/Edge UI 回归和生产页面算法验收按全部 3DS 模块完成后的统一验收门槛执行。
 
 ## 工程验证耗时优化决策
 

@@ -138,6 +138,7 @@ import { ResearcherPanel } from "./features/researcher/ResearcherPanel";
 import { KeyBvPanel } from "./features/keybv/KeyBvPanel";
 import { MiscRngPanel } from "./features/miscrng/MiscRngPanel";
 import { TsvListPanel } from "./features/tsvlist/TsvListPanel";
+import { IvToolsPanel } from "./features/ivtools/IvToolsPanel";
 import { FloatingToolPanel } from "./features/shared/FloatingToolPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
@@ -552,6 +553,7 @@ function App() {
   const [keyBvExpanded, setKeyBvExpanded] = useState(false);
   const [miscRngExpanded, setMiscRngExpanded] = useState(false);
   const [tsvListExpanded, setTsvListExpanded] = useState(false);
+  const [ivToolsExpanded, setIvToolsExpanded] = useState(false);
   const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
     useState<Gen5AdjacentSeedsInitialContext>();
@@ -999,13 +1001,15 @@ function App() {
                   ? "miscRng"
                   : tsvListExpanded
                     ? "tsvList"
-                    : profileTools && gen4Tools
-                      ? gen4ProfileExpanded
-                        ? "profile"
-                        : undefined
-                      : profileTools && profileExpanded
-                        ? "profile"
-                        : undefined;
+                    : ivToolsExpanded
+                      ? "ivTools"
+                      : profileTools && gen4Tools
+                        ? gen4ProfileExpanded
+                          ? "profile"
+                          : undefined
+                        : profileTools && profileExpanded
+                          ? "profile"
+                          : undefined;
 
   const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
@@ -1017,6 +1021,7 @@ function App() {
     setKeyBvExpanded(false);
     setMiscRngExpanded(false);
     setTsvListExpanded(false);
+    setIvToolsExpanded(false);
     if (gen4Tools) {
       changeGen4ProfileExpanded(false);
     } else {
@@ -1059,6 +1064,7 @@ function App() {
       | "keybv"
       | "miscRng"
       | "tsvList"
+      | "ivTools"
       | "sponsorship"
       | "threeDsProfile",
   ) => {
@@ -1074,6 +1080,7 @@ function App() {
     else if (tool === "keybv") setKeyBvExpanded(true);
     else if (tool === "miscRng") setMiscRngExpanded(true);
     else if (tool === "tsvList") setTsvListExpanded(true);
+    else if (tool === "ivTools") setIvToolsExpanded(true);
     else if (tool === "threeDsProfile") setThreeDsProfilesExpanded(true);
     else if (gen4Tools) changeGen4ProfileExpanded(true);
     else changeProfileExpanded(true);
@@ -3589,6 +3596,26 @@ function App() {
         </main>
       </div>
       <div className="floating-tools">
+        <IvToolsPanel
+          expanded={activeFloatingTool === "ivTools"}
+          onExpandedChange={(expanded) => {
+            setIvToolsExpanded(expanded);
+            if (expanded) {
+              setModuleRailOpen(false);
+              setIvCalculatorExpanded(false);
+              setEncounterLookupExpanded(false);
+              setContributionsExpanded(false);
+              setSponsorshipExpanded(false);
+              setThreeDsProfilesExpanded(false);
+              setResearcherExpanded(false);
+              setKeyBvExpanded(false);
+              setMiscRngExpanded(false);
+              setTsvListExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
         <SponsorshipPanel
           expanded={activeFloatingTool === "sponsorship"}
           onExpandedChange={(expanded) => {
@@ -3788,6 +3815,25 @@ function App() {
             className="floating-tool-actions"
             id="floating-tool-actions"
           >
+            <button
+              aria-controls="iv-tools-panel"
+              aria-expanded={activeFloatingTool === "ivTools"}
+              aria-haspopup="dialog"
+              aria-label={t("ivToolsModule")}
+              className={
+                activeFloatingTool === "ivTools" ? "active" : undefined
+              }
+              data-tone="teal"
+              id="iv-tools-trigger"
+              onClick={() => {
+                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                toggleFloatingTool("ivTools");
+              }}
+              title={t("ivToolsModule")}
+              type="button"
+            >
+              <SlidersHorizontal aria-hidden="true" size={19} />
+            </button>
             <button
               aria-controls="iv-calculator-panel"
               aria-expanded={activeFloatingTool === "iv"}
