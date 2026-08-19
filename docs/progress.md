@@ -4,7 +4,7 @@
 
 - 当前主线：Gen VI TF1/TF2 时间反查 -> TinyFinder 真实缺口。
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
-- 当前状态：TF5、TF6、公共 TSV List 与 IV Range / IV Template 功能已完成工程实现；本轮 IV Tools 待验证、提交和推送；外部页面回归保留到全部 3DS 模块完成后统一执行。
+- 当前状态：TF5、TF6、公共 TSV List 与 IV Range / IV Template 功能已完成工程实现并已提交推送（IV Tools：`7befd11`）；外部页面回归保留到全部 3DS 模块完成后统一执行。
 
 ## 2026-08-20 公共 IV Range / IV Template（已完成工程验证）
 
@@ -63,9 +63,9 @@
 
 > - 最近更新：2026-08-20
 > - 当前分支：`main`
-> - 当前阶段：公共 TSV List 已实现并通过提交前全量验证，待提交推送
-> - 工作区状态：TSV List、Gen VI/Gen VII Egg 接线、侧边栏样式和对应文档存在未提交修改
-> - 下一步：完成全仓 `npm run verify` 后提交推送；随后实现 IV Range / IV Template
+> - 当前阶段：公共 TSV List、IV Range / IV Template 已实现并通过提交前全量验证
+> - 工作区状态：当前工作区干净，`main` 与 `origin/main` 对齐于 `7befd11`
+> - 下一步：实现 Gen VI TF1/TF2 时间反查，随后评估 TinyFinder 独有缺口
 
 ## 2026-08-19 3DSTimeFinder TF3 Gen VII Stationary 时间反查（已完成）
 
