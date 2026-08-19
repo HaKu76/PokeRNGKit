@@ -94,6 +94,7 @@ import { Gen6PokeRadarPanel } from "./features/gen6pokeradar/Gen6PokeRadarPanel"
 import { Gen6EggPanel } from "./features/gen6egg/Gen6EggPanel";
 import { Gen6IdPanel } from "./features/gen6id/Gen6IdPanel";
 import { Gen6MainSeedPanel } from "./features/gen6mainseed/Gen6MainSeedPanel";
+import { Gen6MtSeedPanel } from "./features/gen6mtseed/Gen6MtSeedPanel";
 import { Gen6TinyTimelinePanel } from "./features/gen6tinytimeline/Gen6TinyTimelinePanel";
 import { Gen6TinyIndexPanel } from "./features/gen6tinyindex/Gen6TinyIndexPanel";
 import { Gen6TinyRockSmashPanel } from "./features/gen6tinyrocksmash/Gen6TinyRockSmashPanel";
@@ -218,6 +219,7 @@ type ActiveModule =
   | "gen6egg"
   | "gen6id"
   | "gen6mainseed"
+  | "gen6mtseed"
   | "gen6tinytimeline"
   | "gen6tinyindex"
   | "gen6tinyrocksmash"
@@ -344,6 +346,7 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
       { id: "gen6egg", label: "gen6EggModule" },
       { id: "gen6id", label: "gen6IdModule" },
       { id: "gen6mainseed", label: "gen6MainSeedModule" },
+      { id: "gen6mtseed", label: "gen6MtSeedModule" },
       { id: "gen6tinytimeline", label: "gen6TinyTimelineModule" },
       { id: "gen6tinyindex", label: "gen6TinyIndexModule" },
       { id: "gen6tinyrocksmash", label: "gen6TinyRockSmashModule" },
@@ -3560,6 +3563,8 @@ function App() {
             <Gen6IdPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "gen6mainseed" ? (
             <Gen6MainSeedPanel uiPreviewMode={uiPreviewMode} />
+          ) : activeModule === "gen6mtseed" ? (
+            <Gen6MtSeedPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "gen6tinytimeline" ? (
             <Gen6TinyTimelinePanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "gen6tinyindex" ? (

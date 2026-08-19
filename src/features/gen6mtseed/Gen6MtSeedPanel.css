@@ -1,0 +1,120 @@
+.gen6mtseed-workspace {
+  display: grid;
+  gap: 16px;
+}
+.gen6mtseed-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.gen6mtseed-panel {
+  min-width: 0;
+  padding: 24px;
+}
+.gen6mtseed-grid,
+.gen6mtseed-iv-grid {
+  display: grid;
+  gap: 12px;
+}
+.gen6mtseed-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.gen6mtseed-iv-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gen6mtseed-mode {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.gen6mtseed-mode label {
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.gen6mtseed-mode label.active {
+  border-color: var(--brand);
+  background: var(--surface);
+  color: var(--brand-strong);
+}
+.gen6mtseed-mode input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.gen6mtseed-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.gen6mtseed-checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.gen6mtseed-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+.gen6mtseed-results-panel {
+  min-width: 0;
+}
+.gen6mtseed-table-shell {
+  min-height: 300px;
+}
+.gen6mtseed-table {
+  min-width: 1050px;
+}
+.gen6mtseed-table .table-header,
+.gen6mtseed-table .table-row {
+  grid-template-columns:
+    0.8fr 0.6fr 1fr 0.6fr 0.5fr repeat(6, 0.45fr)
+    0.8fr 0.6fr;
+}
+.gen6mtseed-table.ec .table-header,
+.gen6mtseed-table.ec .table-row {
+  grid-template-columns: 0.8fr 0.6fr 1fr repeat(12, 0.45fr);
+}
+.gen6mtseed-table.horde .table-header,
+.gen6mtseed-table.horde .table-row {
+  grid-template-columns: 0.8fr 0.6fr 0.6fr 0.55fr 0.55fr 0.55fr 0.85fr repeat(
+      5,
+      0.55fr
+    );
+}
+.gen6mtseed-table.ec-pid .table-header,
+.gen6mtseed-table.ec-pid .table-row {
+  grid-template-columns:
+    0.8fr 0.6fr 1fr 0.6fr 0.5fr repeat(6, 0.45fr)
+    0.8fr 0.6fr 1fr 0.5fr;
+}
+@media (max-width: 980px) {
+  .gen6mtseed-controls {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .gen6mtseed-grid,
+  .gen6mtseed-iv-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .gen6mtseed-mode {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gen6mtseed-panel {
+    padding: 18px;
+  }
+}

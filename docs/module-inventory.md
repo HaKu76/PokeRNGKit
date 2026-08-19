@@ -75,7 +75,7 @@ PokeFinder 核对入口：
 | T10  | Ambush Encounter                                       | 已实现（gen6tinyambush）            |
 | T11  | DexNav Moving / Searching                              | 已实现（与 gen6dexnav 合并核对）    |
 | T12  | Victory Road Swooping                                  | 已包含（gen6tinyambush）            |
-| T13  | MT Seed Searcher（IV、PID、PID reroll、EC/PID、Horde） | 计划                                |
+| T13  | MT Seed Searcher（IV、PID、PID reroll、EC/PID、Horde） | 已实现（gen6mtseed）                |
 | T14  | MT 初始 Seed / Time Finder                             | 计划                                |
 
 TinyFinder 已实现模块仍需逐字段检查其特有分支、日期/Index 语义和固定夹具，不能仅凭同名 3DSRNGTool 模块视为完成。

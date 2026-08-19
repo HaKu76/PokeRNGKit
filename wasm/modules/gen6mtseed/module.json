@@ -1,0 +1,14 @@
+{
+  "id": "gen6mtseed",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6mtseed",
+  "operations": ["searcher"],
+  "artifacts": {
+    "loader": "gen6mtseed.mjs",
+    "wasm": "gen6mtseed.wasm"
+  },
+  "source": "TinyFinder Subforms/MT/Core.cs, Subforms/MT/MTForm.cs, RNG/MT.cs and FastHordes",
+  "license": "GPL-3.0-or-later"
+}
