@@ -1,5 +1,22 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-20 TinyFinder T10 Ambush Encounter（已完成工程实现与本地验证）
+
+- 新增独立 `gen6tinyambush` TinyMT Wasm、Dedicated Worker、XY Victory Road Outside
+  地点数据和伏击遭遇工作区；X/Y 共用 TinyFinder Map 327 的 12 槽表，默认 Min Index
+  遵循 XY `Bag Advances = 27`。
+- 按 TinyFinder `Wild.Ambush()` 严格实现槽位随机、Rand100、同步随机和物品槽消耗；
+  不引入 Honey/Rock Smash 的闪烁、延迟、笛子或触发参数。支持 Seed / State、Index
+  范围、同步与槽位掩码筛选、结果上限、虚拟结果表和 CSV。
+- 接入 Gen VI 侧栏、三语文案、模块库存、固定宽度请求/结果协议和 `wasm/CMakeLists.txt`。
+- 已通过：任务文件格式化、`npm run format:check`、`git diff --check`、改动范围
+  ESLint、`npm run typecheck`、Ambush 定向 Vitest（2 个文件、5 项）、
+  `$env:POKERNGKIT_WASM_MODULES='gen6tinyambush'; npm run wasm:test:native`（1/1）、
+  完整 `npm run verify`（172 个测试文件、600 项测试及生产 Web/PWA 构建），以及在
+  Emscripten 6.0.6 环境中运行的定向 `npm run wasm:build`。
+- 未运行：外部 Chrome/Edge UI 和生产页面算法回归；继续按全部 3DS 模块完成后的统一
+  验收门槛执行。
+
 ## 2026-08-20 TinyFinder T8 Honey Wild（已完成工程实现）
 
 - 新增独立 `gen6tinyhoney` TinyMT / BlinkSystem Wasm、Dedicated Worker、地点数据生成器和蜂蜜野生工作区。
@@ -11,9 +28,10 @@
 
 # 当前目标：完成 3DSRNGTool 全范围后统一 UI 验收
 
-- 当前主线：继续实现 TinyFinder T10 Ambush，随后处理 Victory Road Swooping 与 MT Seed/Time Finder。
+- 当前主线：继续处理 TinyFinder T12 Victory Road Swooping 与 T13/T14 MT Seed/Time Finder。
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
-- 当前状态：TF5、TF6、公共 TSV List 与 IV Range / IV Template 功能已完成工程实现并已提交推送（IV Tools：`7befd11`）；外部页面回归保留到全部 3DS 模块完成后统一执行。
+- 当前状态：TF5、TF6、公共 TSV List、IV Range / IV Template 与 TinyFinder T10 Ambush
+  已完成工程实现；外部页面回归保留到全部 3DS 模块完成后统一执行。
 
 ## 2026-08-20 TinyFinder T6 Rock Smash（已完成工程实现与本地验证）
 

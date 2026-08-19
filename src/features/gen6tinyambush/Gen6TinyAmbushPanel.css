@@ -1,0 +1,96 @@
+.gen6tinyambush-workspace {
+  display: grid;
+  gap: 16px;
+}
+.gen6tinyambush-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.gen6tinyambush-panel {
+  min-width: 0;
+  padding: 24px;
+}
+.gen6tinyambush-mode,
+.gen6tinyambush-grid,
+.gen6tinyambush-state-grid {
+  display: grid;
+  gap: 12px;
+}
+.gen6tinyambush-mode {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 4px;
+}
+.gen6tinyambush-mode label {
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.gen6tinyambush-mode label.active {
+  background: var(--surface);
+  color: var(--brand-strong);
+}
+.gen6tinyambush-mode input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.gen6tinyambush-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gen6tinyambush-range-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.gen6tinyambush-state-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 12px 0;
+}
+.gen6tinyambush-slot-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin: 18px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+.gen6tinyambush-results-panel {
+  min-width: 0;
+}
+.gen6tinyambush-table-shell {
+  min-height: 280px;
+}
+.gen6tinyambush-table {
+  min-width: 700px;
+}
+.gen6tinyambush-table .table-header,
+.gen6tinyambush-table .table-row {
+  grid-template-columns: 0.9fr 0.9fr 0.8fr 0.7fr 0.7fr 1fr 0.7fr;
+}
+@media (max-width: 900px) {
+  .gen6tinyambush-controls {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 620px) {
+  .gen6tinyambush-grid,
+  .gen6tinyambush-state-grid,
+  .gen6tinyambush-range-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .gen6tinyambush-slot-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gen6tinyambush-panel {
+    padding: 18px;
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "gen6tinyambush",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6tinyambush",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6tinyambush.mjs",
+    "wasm": "gen6tinyambush.wasm"
+  },
+  "source": "TinyFinder Methods/Wild.cs, Classes/Index.cs and RNG/TinyMT.cs"
+}

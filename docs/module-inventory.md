@@ -72,7 +72,7 @@ PokeFinder 核对入口：
 | T7   | Horde RNG                                              | 已实现（与 gen6wild 分支核对）      |
 | T8   | Honey Wild RNG                                         | 已实现（gen6tinyhoney）             |
 | T9   | Poke Radar RNG                                         | 已实现（与 gen6pokeradar 合并核对） |
-| T10  | Ambush Encounter                                       | 计划                                |
+| T10  | Ambush Encounter                                       | 已实现（gen6tinyambush）            |
 | T11  | DexNav Moving / Searching                              | 已实现（与 gen6dexnav 合并核对）    |
 | T12  | Victory Road Swooping                                  | 计划                                |
 | T13  | MT Seed Searcher（IV、PID、PID reroll、EC/PID、Horde） | 计划                                |
