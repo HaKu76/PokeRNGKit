@@ -1,0 +1,13 @@
+{
+  "id": "gen6tinytimeline",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6tinytimeline",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6tinytimeline.mjs",
+    "wasm": "gen6tinytimeline.wasm"
+  },
+  "source": "3DSRNGTool Gen6/TinyTimeline.cs, Controls/Frame_Tiny.cs and RNG/TinyMT.cs"
+}

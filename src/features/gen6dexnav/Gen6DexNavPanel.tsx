@@ -107,6 +107,8 @@ export function Gen6DexNavPanel({
     setShinyCharm(defaults.shinyCharm);
   }, [defaults.shinyCharm, defaults.trv, defaults.tsv]);
   useEffect(() => () => engine.dispose(), [engine]);
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: results.length,
     getScrollElement: () => tableRef.current,

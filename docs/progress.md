@@ -1,5 +1,25 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-19 3DSRNGTool Gen VI TinyMT Timeline Tool
+
+- 新增：实现 `gen6tinytimeline` 四字 TinyMT 状态、11 种方法、1 至 4 个事件、方法参数、Delay、Cry、Consider Delay、ORAS 与 Poke Radar Boost 的本地时间线工作区。
+- 新增：接入独立 22/16-word Wasm C ABI 与单 Dedicated Worker，保留 TinyStatus 事件队列、冷却时间、延迟拆分、Horde 五只 Flute/Item、Poke Radar 五个摇草块、虚拟结果表、CSV、进度和取消。
+- 调整：静态浏览器不连接 NTR/TCP；实时校准改为本地事件表输入。模块继续使用 Ant Neutral HakuStyle 的 44px 控件、实体面板、共享候选下拉和结果区滚动。
+- 已通过：`npm run typecheck`、`npm run lint`、定向 Vitest 3/3、`npm run build:web`；`POKERNGKIT_WASM_MODULES=gen6tinytimeline npm run wasm:test:native` 在修正 C++ 十六进制字面量后通过 1/1。第一次原生夹具在编译阶段失败，未执行算法断言。
+- 已通过：激活 Emscripten 6.0.6 后定向 `npm run wasm:build`；`gen6tinytimeline.mjs` 7,640 bytes，SHA-256 `50E8D20E03359015C8CC28FA5E557499E0A369AB791B602D07158434A29F5208`；`gen6tinytimeline.wasm` 23,892 bytes，SHA-256 `8FC36396E136498DAE09390B85B2A76668054D0B4C81D05E5DF2E6CACDFC5D3C`。
+- 修复：首次完整 `npm run verify` 在 TypeScript 阶段发现 TinyMT 方法文本、AbortSignal 与 `gen6mainseed` 类型重导出问题；补充显式类型后从头重跑通过。
+- 修复：为 12 个既有 TanStack Virtual 调用增加 `react-hooks/incompatible-library` 定点豁免；保留全仓 React Compiler 规则，不改变虚拟列表业务逻辑。定向 `npm run lint` 从 0 error / 12 warning 收敛为 0 error / 0 warning。
+- 已通过：定点处理后从头运行完整 `npm run verify`；Prettier、ESLint（0 error / 0 warning）、TypeScript、Vitest（151 个文件、541 项测试）和 Vite/PWA 生产构建（2,240 个模块、210 项预缓存资源）均完成。
+- 未运行：外部 Chrome/Edge UI 回归和生产页面算法验收；需等待 GitHub Actions 部署后由项目所有者提供准确 URL 并授权。
+- 下一步：核对公共 KeyBV，并按悬浮工具菜单规则落地轻量全局工具。
+
+> - 最近更新：2026-08-19
+> - 当前分支：`main`
+> - 功能起点：`c11f451`（`docs: 更新第六世代主Seed交接状态`）
+> - 当前阶段：Gen VI TinyMT Timeline Tool 已完成工程闭环；下一模块为公共 KeyBV
+> - 变更范围：TinyMT Timeline 功能、导航、三语、Wasm/C++、TanStack Virtual 警告收口和对应文档
+> - 验证状态：完整 verify、定向原生夹具和生产 Wasm 构建已通过；外部浏览器未运行
+
 ## 2026-08-19 3DSRNGTool Gen VI Main Seed Finder 与全局工具入口
 
 - 新增：实现 `gen6mainseed` 两只野生个体值和单只个体值范围两种检索模式；保留上游 MT19937 初始化、整块 twist、63 次预推进、连续 IV 窗口、性格、Gender 和帧 0 哨兵语义。

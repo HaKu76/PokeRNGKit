@@ -314,6 +314,8 @@ export function Gen3EggPanel({
     // Result values derive from the selected species and display mode.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [personal, results, showStats, sort, species]);
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: sortedResults.length,
     getScrollElement: () => tableRef.current,

@@ -5,6 +5,8 @@ import type {
   Gen6MainSeedSummary,
 } from "./types";
 
+export type { Gen6MainSeedProgress, Gen6MainSeedSummary } from "./types";
+
 export interface Gen6MainSeedSearchOptions {
   workerCount?: number;
   chunkSize?: number;

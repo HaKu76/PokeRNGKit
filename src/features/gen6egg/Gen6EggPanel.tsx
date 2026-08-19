@@ -237,6 +237,8 @@ export function Gen6EggPanel({
     () => POWER_KEYS.map((key, value) => ({ label: t(key), value })),
     [t],
   );
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: results.length,
     getScrollElement: () => scrollRef.current,

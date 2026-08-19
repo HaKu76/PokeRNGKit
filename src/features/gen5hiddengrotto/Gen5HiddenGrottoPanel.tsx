@@ -763,6 +763,8 @@ export function Gen5HiddenGrottoPanel({
       : "";
   };
 
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: sortedResults.length,
     getScrollElement: () => tableRef.current,

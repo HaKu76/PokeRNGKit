@@ -1,6 +1,6 @@
 # PokeRNGKit 技术栈与工程方案
 
-> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder 与 Profile Manager 已实现，下一模块为 Gen VI TinyMT Timeline Tool
+> - 状态：PokeFinder 全部产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder、TinyMT Timeline 与 Profile Manager 已实现，继续推进后续 3DSRNGTool 模块
 > - 更新日期：2026-08-19
 > - 当前范围：完整 PokeFinder 4.3.2，以及 `docs/module-inventory.md` 中除 `NTR Helper` 外的全部 3DSRNGTool 功能
 > - 包管理器：npm
@@ -506,6 +506,8 @@ packedIvs / metadata / delay / packedEncounter / specialValue
 `gen7eggseedfinder` 提供 8 蛋性格 Seed Search 与 127 鲤鱼王逆矩阵两组 C ABI。Seed Search 默认按 `2^20` Seed 分片交给最多八个独立 Worker；逆矩阵将 127 个观测位按 TinyMT 的 `31 + 32 + 32 + 32` 位有效状态布局写入四字结果。完整协议见 [Gen 7 Egg Seed Finder](modules/gen7eggseedfinder.md)。
 
 `gen6mainseed` 使用 22 个 32 位请求字和 6 个 32 位结果字；两只野生模式检索两个连续六项 IV 窗口，单只模式检索 IV 范围并匹配性格/Gender。Seed 空间按 4096 个候选分片交给最多八个独立 Worker，结果按 `chunkIndex` 恢复顺序；完整协议见 [Gen 6 Main Seed Finder](modules/gen6mainseed.md)。
+
+`gen6tinytimeline` 使用 22 个 32 位请求字和 16 个 32 位结果字；请求包含四字 TinyMT 状态、事件序列、方法参数、延迟和结果上限，结果包含主乱数帧范围、命中 Index、TinyMT 状态及 Sync/Encounter/Slot/BGM 等字段。模块使用单 Dedicated Worker，保留上游事件队列和 Consider Delay 拆分；NTR/TCP 校准明确排除。完整协议见 [Gen 6 TinyMT Timeline](modules/gen6tinytimeline.md)。
 
 `gen7festivalplaza` 使用 13 个 32 位请求字和 10 个 32 位固定结果字的连续会话 C ABI。请求包含版本、Seed、闭区间帧范围、NPC、Delay、Rank、四项筛选、NPC Status 开关和结果上限；结果包含 Index、Actual Hit、Real Time Frames、64 位 Random Number、Stars、Facility、NPC Type、Color 与 Mark，NPC Status 开启时每行追加 `NPC + 1` 个状态字。模块只使用一个 Dedicated Worker，默认每批处理 16384 帧；当前浏览器绝对帧限制为 `5,000,000`。完整协议见 [Gen 7 Festival Plaza](modules/gen7festivalplaza.md)。
 

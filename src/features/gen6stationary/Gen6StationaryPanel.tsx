@@ -232,6 +232,8 @@ export function Gen6StationaryPanel({
   });
   const [resultLimit, setResultLimit] = useState("1000");
   const tableRef = useRef<HTMLDivElement>(null);
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: results.length,
     getScrollElement: () => tableRef.current,

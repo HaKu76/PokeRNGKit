@@ -189,6 +189,8 @@ export function Gen6EventPanel({
     () => Array.from({ length: formCount }, (_, value) => value),
     [formCount],
   );
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: results.length,
     getScrollElement: () => tableRef.current,

@@ -875,12 +875,21 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 完整输入限制、MT 推进、22/6-word ABI、固定夹具和上游文件见 [Gen 6 Main Seed Finder](modules/gen6mainseed.md)。
 
+## 8.54B 当前功能需求：`gen6tinytimeline`
+
+- **FR-G6TINY-01** 提供 3DSRNGTool Gen VI TinyMT Timeline 的本地时间线工作区，覆盖 11 种方法、四字 TinyMT 状态、1 至 4 个递增事件、方法参数、Delay、Cry、Consider Delay、ORAS 与 Poke Radar Boost。
+- **FR-G6TINY-02** 输入必须匹配上游控件：TinyMT 为四个 32 位十六进制字，Main RNG Frame / Target Frame 与事件帧为 `0..1,000,000,000`，浏览器 Target Frame 上限为 `5,000,000`；Party Size 为 `1..6`，Friend Safari Slot Number 为 `2..3`，Encounter Rate 为 `0..99`，Poke Radar Chain Length 为 `0..255`。
+- **FR-G6TINY-03** TinyMT、TinyStatus 事件队列、冷却时间、Horde/Poke Radar/Encounter 标记和 Consider Delay 的 split timeline 只在独立 `gen6tinytimeline` Wasm API v1 中执行；模块使用 22-word 请求、16-word 结果和单 Dedicated Worker。
+- **FR-G6TINY-04** 提供进度、取消、100000 行结果上限、虚拟滚动、CSV、清空、错误、空结果和三语界面；NTR/TCP 实时校准不实现，改由本地事件表输入观测事件。
+
+完整输入限制、事件队列、22/16-word ABI 和上游文件见 [Gen 6 TinyMT Timeline](modules/gen6tinytimeline.md)。
+
 ## 8.54 TinyFinder Gen VI 扩展需求
 
 - **FR-TINY-01** 纳入 TinyFinder 的 TinyMT 日期/Index Searcher、Index 筛选、Normal Wild、Friend Safari、Fishing、Rock Smash、Horde、Honey Wild、Poke Radar、Ambush、DexNav Moving/Searching 与 Victory Road Swooping。
 - **FR-TINY-02** 纳入 TinyFinder 独立 MT Seed Searcher 的 IV、PID、PID reroll、EC/PID、群聚闪光和 MT 初始 Seed/Time Finder；MT/TinyMT 算法仍只能在对应 Wasm Worker 内执行。
 - **FR-TINY-03** 已有 Gen VI ID、Wild、DexNav 和 Poke Radar 必须按 TinyFinder Methods、RNG/TinyMT.cs、数据表和 BlinkSystem.cs 逐字段核对；独有 Honey、Ambush、Swooping、Rock Smash、日期/Index 与 MT Searcher 分支不得遗漏。
-- **FR-TINY-04** TinyFinder 未实现 TinyMT Timeline calibration；该功能仍按 3DSRNGTool 库存独立开发，不以 TinyFinder README 的缺失作为完成依据。
+- **FR-TINY-04** TinyFinder 未实现 TinyMT Timeline calibration；PokeRNGKit 已按 3DSRNGTool 库存实现独立本地事件时间线，NTR/TCP 实时校准按静态架构约束排除。
 
 完整来源、许可和后续模块映射见 [TinyFinder 来源记录](../third_party/tinyfinder/UPSTREAM.md)。
 
@@ -896,7 +905,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 ## 9. 后续实施顺序
 
 1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID 与 Profile Manager 已实现。
-2. 3DSRNGTool Gen VI Main Seed Finder 已实现，下一模块为 Gen VI TinyMT Timeline Tool，完成后继续 Gen VI 与其他公共工具库存。
+2. 3DSRNGTool Gen VI Main Seed Finder 与 TinyMT Timeline Tool 已实现，继续 Gen VI 与其他公共工具库存。
 3. 继续实现 Gen VI 与其他公共工具；仅 `NTR Helper` 不开发。
 4. Codex 在每个模块完成后执行格式收尾、测试、原生夹具和 Wasm 构建，并按项目所有者本轮授权独立提交和推送。
 5. 全部模块由 GitHub Actions 部署后，项目所有者提供准确 URL 并授权，再使用外部 Chrome 或 Edge 完成生产算法与交互回归及最终验收。
@@ -1016,7 +1025,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 14. 阶段划分
 
-当前按完整模块库存推进。PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder 与独立 Profile Manager 已实现；下一模块为 Gen VI TinyMT Timeline Tool。
+当前按完整模块库存推进。PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder、TinyMT Timeline 与独立 Profile Manager 已实现。
 
 - **阶段 0：仓库基线** - README、需求、技术方案、进度文档、许可证、npm 基线（已完成）。
 - **阶段 1：`gen3id` Generator/Searcher** - React UI、Generator Worker Pool、独立 Searcher Worker、C++ bridge API v2、三语和固定夹具（已实现，待 Actions、部署回归与最终验收）。
@@ -1048,7 +1057,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 - **阶段 8G：`gen8underground` Underground** - BDSP 18 个房间、剧情/等级标记、队首修正、独立 Wasm/Worker Pool 和完整 20 列结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8H：`gen8wild` Wild** - BDSP 七类野生遭遇、特殊地点、独立 Wasm/Worker Pool 和完整 21 列结果（已实现，待 Actions、部署回归与最终验收）。
 - **阶段 8I：`gen8denmap` Den Map** - 第八世代巢穴地图工具、三张原图资源、276 个坐标点位和三语地点名称（已实现，待部署回归与最终验收）。
-- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder 与 Profile Manager 已实现；下一模块为 Gen VI TinyMT Timeline Tool，之后继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。Profile Manager 与 Researcher 均通过右下角悬浮工具菜单访问。
+- **阶段 9：3DSRNGTool** - Gen VII Stationary、Wild、SOS、Egg、Battle Tree、Event、ID、Main RNG Tool、Egg Seed Finder、Festival Plaza Facility RNG、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder、TinyMT Timeline 与 Profile Manager 已实现；继续 Gen VI 与其他公共工具，仅 `NTR Helper` 排除。Profile Manager 与 Researcher 均通过右下角悬浮工具菜单访问。
 - **阶段 10：发布加固** - 完整工程检查、生产页面回归、浏览器矩阵、PWA、性能、可访问性、GPL inventory 和 Cloudflare 正式部署。
 
 ## 15. 未决事项

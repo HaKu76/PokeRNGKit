@@ -59,6 +59,8 @@ export function Gen6PokeRadarPanel({
   const abortRef = useRef<AbortController | undefined>(undefined),
     scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => () => engine.dispose(), [engine]);
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: results.length,
     getScrollElement: () => scrollRef.current,

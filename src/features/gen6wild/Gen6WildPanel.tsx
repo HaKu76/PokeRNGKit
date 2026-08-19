@@ -234,6 +234,8 @@ export function Gen6WildPanel({
       (left, right) => compare(left[sort.key], right[sort.key]) * factor,
     );
   }, [results, sort]);
+  // TanStack Virtual exposes an imperative virtualizer object by design.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const rowVirtualizer = useVirtualizer({
     count: sortedResults.length,
     getScrollElement: () => tableRef.current,
