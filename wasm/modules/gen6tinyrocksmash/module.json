@@ -1,0 +1,13 @@
+{
+  "id": "gen6tinyrocksmash",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6tinyrocksmash",
+  "operations": ["generator"],
+  "artifacts": {
+    "loader": "gen6tinyrocksmash.mjs",
+    "wasm": "gen6tinyrocksmash.wasm"
+  },
+  "source": "TinyFinder Methods/Wild.cs, Utils/BlinkSystem.cs, Utils/PrepareRow.cs and RNG/TinyMT.cs"
+}

@@ -68,7 +68,7 @@ PokeFinder 核对入口：
 | T3   | ID RNG                                                 | 已实现（与 gen6id 合并核对）        |
 | T4   | Normal Wild / Friend Safari                            | 已实现（与 gen6wild 合并核对）      |
 | T5   | Fishing RNG                                            | 已实现（与 gen6wild 合并核对）      |
-| T6   | Rock Smash RNG                                         | 计划                                |
+| T6   | Rock Smash RNG                                         | 已实现（gen6tinyrocksmash）         |
 | T7   | Horde RNG                                              | 已实现（与 gen6wild 分支核对）      |
 | T8   | Honey Wild RNG                                         | 计划                                |
 | T9   | Poke Radar RNG                                         | 已实现（与 gen6pokeradar 合并核对） |

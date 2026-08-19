@@ -6,6 +6,13 @@
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
 - 当前状态：TF5、TF6、公共 TSV List 与 IV Range / IV Template 功能已完成工程实现并已提交推送（IV Tools：`7befd11`）；外部页面回归保留到全部 3DS 模块完成后统一执行。
 
+## 2026-08-20 TinyFinder T6 Rock Smash（已完成工程实现与本地验证）
+
+- 新增独立 `gen6tinyrocksmash` TinyMT / BlinkSystem Wasm 与 Dedicated Worker，避免改变现有 `gen6wild` 的 3DSRNGTool 主 MT 结果。
+- 接入第六世代导航、三语文案和 TinyFinder Rock Smash 工作区；支持 Seed / State、Index 范围、五槽遇敌表、闪烁参数、触发/同步/危险帧/笛子/槽位筛选、时间线和 CSV。
+- 修正槽位掩码的 1–5 编号偏移，并按 TinyFinder `RandU32` 的先推进后取值语义复核闪烁消耗；原生夹具覆盖五个槽位的独立过滤。
+- 已通过：任务文件格式化、`npm run format:check`、`git diff --check`、`npm run lint`、`npm run typecheck`、定向 Vitest（2 个文件、4 项测试）、定向原生夹具（1/1）、定向 Emscripten Wasm 构建和完整 `npm run verify`（168 个测试文件、591 项测试及生产 Web 构建）。
+
 ## 2026-08-20 侧边栏长标题与滚动条样式修复（已完成工程验证）
 
 - 修复：侧边栏模块标题在固定宽度下保持单行省略号，保留原有 `title` 完整名称提示；分组标题继续遵循相同截断规则。
