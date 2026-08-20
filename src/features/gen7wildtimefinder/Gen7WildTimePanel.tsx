@@ -1,6 +1,6 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Play, Square, Trash2 } from "lucide-react";
-import { type FormEvent, useMemo, useRef, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import {
@@ -174,6 +174,20 @@ export function Gen7WildTimePanel({
     estimateSize: () => 42,
     overscan: 12,
   });
+  useEffect(() => () => engine.dispose(), [engine]);
+  useEffect(() => {
+    if (!isThreeDsGen7Profile(profile)) return;
+    setVersion(profile.version);
+    setTick(
+      (profile.timeTick ?? 0x041d_9cb9)
+        .toString(16)
+        .toUpperCase()
+        .padStart(8, "0"),
+    );
+    setOffset(String(profile.timeOffset ?? 55));
+    setTid(String((profile.tsv << 4) | profile.trv));
+    setCharm(profile.shinyCharm);
+  }, [engine, profile]);
   const setIv = (setter: typeof setIvMin, index: number, value: string) =>
     setter(
       (current) =>

@@ -4224,6 +4224,7 @@ select:not([multiple]) {
 
 .module-nav-group-toggle {
   width: 100%;
+  min-width: 0;
   min-height: var(--control-height);
   display: grid;
   grid-template-columns: var(--control-height) minmax(0, 1fr) 18px;
@@ -4235,6 +4236,7 @@ select:not([multiple]) {
   color: var(--rail-muted);
   padding: 0;
   text-align: left;
+  overflow: hidden;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0;
@@ -4260,7 +4262,9 @@ select:not([multiple]) {
 }
 
 .module-nav-group-label {
+  display: block;
   min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   color: var(--rail-text);
   font-size: 15px;
@@ -4282,13 +4286,17 @@ select:not([multiple]) {
 .module-nav-group-items {
   display: grid;
   gap: 2px;
+  min-width: 0;
+  overflow: hidden;
   padding-left: 8px;
 }
 
 .module-entry {
   min-width: 0;
+  max-width: 100%;
   min-height: var(--row-height);
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   border: 1px solid transparent;
   border-left: 1px solid transparent;
@@ -4319,9 +4327,7 @@ select:not([multiple]) {
 
 .module-entry strong {
   min-width: 0;
-  flex: 1 1 auto;
   display: block;
-  width: 0;
   max-width: 100%;
   overflow: hidden;
   font-size: 15px;

@@ -92,8 +92,8 @@ TinyFinder 已实现模块仍需逐字段检查其特有分支、日期/Index �
 | TF4  | Gen VII | Event 时间/初始 Seed Searcher         | 已实现（工程验证通过） |
 | TF5  | Gen VII | Wild 时间/初始 Seed Searcher          | 已实现（工程验证通过） |
 | TF6  | Gen VII | ID 时间/初始 Seed Searcher            | 已实现（工程验证通过） |
-| TF7  | Gen VI  | Profile Manager / Editor 时间字段     | 已实现（需核对）       |
-| TF8  | Gen VII | Profile Manager / Editor / Calibrator | 已实现（需核对）       |
+| TF7  | Gen VI  | Profile Manager / Editor 时间字段     | 已实现（工程验证通过） |
+| TF8  | Gen VII | Profile Manager / Editor / Calibrator | 已实现（工程验证通过） |
 
 Options、Language 和结果表通用操作属于应用外壳或模块支撑，不单独作为 RNG 模块提交。
 
@@ -117,10 +117,10 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 ## 实施顺序
 
-1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary / Pokemon Link / Event / Wild / DexNav / Poke Radar / Egg / ID 与公共 Profile Manager 已实现；当前不再回退到旧世代 UI 整改，先完成 TF5/TF6 时间反查主线。
+1. PokeFinder 4.3.2 产品模块、3DSRNGTool Gen VII、Gen VI Stationary / Pokemon Link / Event / Wild / DexNav / Poke Radar / Egg / ID 与公共 Profile Manager 已实现；3DSTimeFinder TF1-TF8 已完成工程实现。
 2. 3DSRNGTool Gen VI Main Seed Finder 已实现；字段、控件边界和算法以对应 WinForms/Core 源码为准。
 3. Gen VI TinyMT Timeline Tool、公共 KeyBV、Misc. RNG Tool、TSV List 与 IV Range / Template 已实现；随后继续 Gen VI 时间反查与 TinyFinder 缺口；`NTR Helper` 除外。
-4. TF5/TF6、IV Range / Template、Gen VI 时间反查和 TinyFinder 缺口全部完成后，执行全仓验证、Actions 部署和生产页面回归。
+4. PokeFinder、3DSRNGTool、TinyFinder 和 3DSTimeFinder 的计划功能已完成；下一步执行全仓验证、Actions 部署和生产页面回归。
 5. 生产页面回归前固定执行八项 UI 门槛：实体不透明悬浮窗、Demo 候选控件、图标居中、自适应列宽、定点三栏布局、Wild 筛选对齐、存档工具悬浮收纳、Encounter Lookup 去除遗留有色粗描边。
 
 ## PokemonRNGGuides 最高优先级规划
@@ -133,9 +133,9 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 | 优先级 | 教程主线缺口或入口                 | 计划动作                                                                                                  | 依据                                                                                        |
 | ------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| P0     | Gen VII Initial Seed / Time Finder | TF3-TF6 已落地；TF5/TF6 工程验证完成，Profile Calibrator 的存档信息继续使用悬浮菜单                       | Gen VII `Finding Initial Seed with Clocks.mdx`、`Time Finder.js (Citra).mdx`                |
+| P0     | Gen VII Initial Seed / Time Finder | TF3-TF6 与 TF8 Profile Calibrator 已落地，存档信息继续使用悬浮菜单                                        | Gen VII `Finding Initial Seed with Clocks.mdx`、`Time Finder.js (Citra).mdx`                |
 | P1     | Gen VI Initial Seed / Time Finder  | TF1/TF2 与 TinyFinder MT 初始 Seed / Time Finder 已落地，等待统一验收                                     | Gen VI `DexNav.mdx`、`PokeRadar.mdx`、`Friend Safari RNG Guide.mdx`                         |
-| P2     | Gen VII Egg 配置入口               | 实现公共 `TSV List`，随后实现 `IV Range / IV Template`，覆盖教程中的 ESV/异色和个体值模板工作流           | Gen VII 两篇 `Egg RNG` 教程明确要求 Edit TSV List；3DSRNGTool `IVRange.cs`、`IVTemplate.cs` |
+| P2     | Gen VII Egg 配置入口               | 公共 `TSV List` 与 `IV Range / IV Template` 已落地，覆盖教程中的 ESV/异色和个体值模板工作流               | Gen VII 两篇 `Egg RNG` 教程明确要求 Edit TSV List；3DSRNGTool `IVRange.cs`、`IVTemplate.cs` |
 | P3     | Gen IV 教程工具                    | 评估并实现 `Gen4SeedFinder`、Voltorb Flip Seed/Board；与现有 Gen4 Seed to Time、Advance、Static/Wild 去重 | Gen IV `Swarm.mdx`、`Voltorb Flip.mdx`、`Retail Initial Seed.mdx`                           |
 | P4     | Gen V 时间/参数入口                | 复核教程中的 DS 参数、初始 Seed、Dream Radar/Entralink 工具是否已有对应工作区；只补真实缺口               | Gen V `Find DS Parameters.mdx`、`Retail Find DS Parameters.mdx`、`Dream Radar.mdx`          |
 | P5     | TinyFinder 扩展                    | T1-T14 已落地；Ambush/Swooping 与 MT Seed/Time 已按独立边界实现，等待统一验收                             | `docs/module-inventory.md` TinyFinder T10/T12-T14                                           |

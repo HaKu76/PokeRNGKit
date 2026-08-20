@@ -10,6 +10,7 @@ import {
   LoaderCircle,
   Pencil,
   Plus,
+  Search,
   Save,
   Trash2,
   X,
@@ -19,14 +20,18 @@ import {
   type FormEvent,
   type KeyboardEvent as ReactKeyboardEvent,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  DEFAULT_THREE_DS_GEN7_TIME_OFFSET,
+  DEFAULT_THREE_DS_GEN7_TIME_TICK,
   DEFAULT_THREE_DS_PROFILE_DRAFT,
   formatThreeDsProfileSeed,
   formatThreeDsProfileSeeds,
+  isThreeDsGen7Version,
   serializeThreeDsProfileBackup,
   THREE_DS_GAME_VERSIONS,
   threeDsProfileUsesFourSeeds,
@@ -36,6 +41,17 @@ import {
   type ThreeDsProfileDraft,
   type ThreeDsProfileSeeds,
 } from "./domain";
+import {
+  THREE_DS_PROFILE_CALIBRATOR_DEFAULTS,
+  profileCalibratorEpochFromInput,
+  type ThreeDsProfileCalibratorResult,
+  type ThreeDsProfileCalibratorVersion,
+} from "./calibratorDomain";
+import { ThreeDsProfileCalibrator } from "./ThreeDsProfileCalibrator";
+import {
+  AutoCompleteComboBox,
+  type AutoCompleteOption,
+} from "../shared/AutoCompleteComboBox";
 import type { ThreeDsProfilesController } from "./useThreeDsProfiles";
 import "./ThreeDsProfilesPanel.css";
 
@@ -55,8 +71,57 @@ function parseHex(value: string) {
   return Number.parseInt(value || "0", 16);
 }
 
+const PROFILE_CALIBRATOR_VERSION_OPTIONS: readonly AutoCompleteOption<ThreeDsProfileCalibratorVersion>[] =
+  [
+    { value: "sun-moon", label: "Sun/Moon" },
+    { value: "ultra-sun-moon", label: "Ultra Sun/Ultra Moon" },
+  ];
+
+function ProfileVersionSelect({
+  disabled,
+  label,
+  onChange,
+  value,
+}: {
+  disabled?: boolean;
+  label: string;
+  onChange(value: ThreeDsGameVersion): void;
+  value: ThreeDsGameVersion;
+}) {
+  const { t } = useTranslation();
+  const options = useMemo<readonly AutoCompleteOption<ThreeDsGameVersion>[]>(
+    () =>
+      THREE_DS_GAME_VERSIONS.map((version) => ({
+        value: version,
+        label: String(t(`threeDsProfilesVersion_${version}`)),
+      })),
+    [t],
+  );
+  const [inputValue, setInputValue] = useState(
+    options.find((option) => option.value === value)?.label ?? "",
+  );
+  return (
+    <AutoCompleteComboBox
+      disabled={disabled}
+      inputValue={inputValue}
+      label={label}
+      onInputChange={setInputValue}
+      onValueChange={(next) => {
+        onChange(next);
+        setInputValue(
+          options.find((option) => option.value === next)?.label ?? "",
+        );
+      }}
+      options={options}
+      value={value}
+    />
+  );
+}
+
 interface ProfileEditorProps {
   original?: ThreeDsProfile;
+  initialVersion?: ThreeDsGameVersion;
+  initialTime?: { tick: number; offset: number };
   busy: boolean;
   onCancel(): void;
   onSave(draft: ThreeDsProfileDraft): Promise<void>;
@@ -64,6 +129,8 @@ interface ProfileEditorProps {
 
 function ProfileEditor({
   original,
+  initialVersion,
+  initialTime,
   busy,
   onCancel,
   onSave,
@@ -79,13 +146,22 @@ function ProfileEditor({
           shinyCharm: original.shinyCharm,
           saveVariable: original.saveVariable,
           timeVariable: original.timeVariable,
+          timeTick: original.timeTick,
+          timeOffset: original.timeOffset,
           seeds: [...original.seeds] as ThreeDsProfileSeeds,
         }
       : {
           ...DEFAULT_THREE_DS_PROFILE_DRAFT,
+          version: initialVersion ?? DEFAULT_THREE_DS_PROFILE_DRAFT.version,
           seeds: [...DEFAULT_THREE_DS_PROFILE_DRAFT.seeds],
         },
   );
+  const defaultTick =
+    initialTime?.tick ?? draft.timeTick ?? DEFAULT_THREE_DS_GEN7_TIME_TICK;
+  const defaultOffset =
+    initialTime?.offset ??
+    draft.timeOffset ??
+    DEFAULT_THREE_DS_GEN7_TIME_OFFSET;
   const [tsvText, setTsvText] = useState(original ? String(original.tsv) : "0");
   const [trvText, setTrvText] = useState(
     original ? original.trv.toString(16).toUpperCase() : "0",
@@ -96,6 +172,10 @@ function ProfileEditor({
   const [timeVariableText, setTimeVariableText] = useState(
     original ? formatThreeDsProfileSeed(original.timeVariable) : "00000000",
   );
+  const [timeTickText, setTimeTickText] = useState(
+    formatThreeDsProfileSeed(defaultTick),
+  );
+  const [timeOffsetText, setTimeOffsetText] = useState(String(defaultOffset));
   const [seedTexts, setSeedTexts] = useState<[string, string, string, string]>(
     () =>
       original
@@ -179,6 +259,12 @@ function ProfileEditor({
         trv: parseHex(trvText),
         saveVariable: parseHex(saveVariableText),
         timeVariable: parseHex(timeVariableText),
+        timeTick: isThreeDsGen7Version(draft.version)
+          ? parseHex(timeTickText)
+          : undefined,
+        timeOffset: isThreeDsGen7Version(draft.version)
+          ? Number(timeOffsetText || "0")
+          : undefined,
         seeds: seedTexts.map(parseHex) as ThreeDsProfileSeeds,
       };
       if (!next.name.trim()) {
@@ -242,22 +328,14 @@ function ProfileEditor({
           </label>
           <label className="threedsprofiles-field threedsprofiles-span-2">
             <span>{t("threeDsProfilesGameVersion")}</span>
-            <select
+            <ProfileVersionSelect
               disabled={busy}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  version: event.target.value as ThreeDsGameVersion,
-                }))
+              label={String(t("threeDsProfilesGameVersion"))}
+              onChange={(version) =>
+                setDraft((current) => ({ ...current, version }))
               }
               value={draft.version}
-            >
-              {THREE_DS_GAME_VERSIONS.map((version) => (
-                <option key={version} value={version}>
-                  {t(`threeDsProfilesVersion_${version}`)}
-                </option>
-              ))}
-            </select>
+            />
           </label>
           <label className="threedsprofiles-field">
             <span>TSV</span>
@@ -308,6 +386,36 @@ function ProfileEditor({
               value={timeVariableText}
             />
           </label>
+          {isThreeDsGen7Version(draft.version) && (
+            <>
+              <label className="threedsprofiles-field">
+                <span>{t("threeDsProfilesTimeTick")}</span>
+                <input
+                  disabled={busy}
+                  inputMode="text"
+                  maxLength={8}
+                  onChange={(event) =>
+                    setTimeTickText(normalizeHex(event.target.value, 8))
+                  }
+                  value={timeTickText}
+                />
+              </label>
+              <label className="threedsprofiles-field">
+                <span>{t("threeDsProfilesTimeOffset")}</span>
+                <input
+                  disabled={busy}
+                  inputMode="numeric"
+                  maxLength={10}
+                  onChange={(event) =>
+                    setTimeOffsetText(
+                      normalizeDecimal(event.target.value, 0xffff_ffff, 10),
+                    )
+                  }
+                  value={timeOffsetText}
+                />
+              </label>
+            </>
+          )}
         </div>
         <label className="threedsprofiles-boolean-option">
           <input
@@ -473,6 +581,18 @@ function ProfileRows({
         <td className="mono">
           {formatThreeDsProfileSeed(profile.timeVariable)}
         </td>
+        <td className="mono">
+          {isThreeDsGen7Version(profile.version)
+            ? formatThreeDsProfileSeed(
+                profile.timeTick ?? DEFAULT_THREE_DS_GEN7_TIME_TICK,
+              )
+            : "-"}
+        </td>
+        <td>
+          {isThreeDsGen7Version(profile.version)
+            ? (profile.timeOffset ?? DEFAULT_THREE_DS_GEN7_TIME_OFFSET)
+            : "-"}
+        </td>
         <td>
           <BooleanValue value={profile.shinyCharm} />
         </td>
@@ -524,6 +644,22 @@ function MobileProfiles({
                   {formatThreeDsProfileSeed(profile.timeVariable)}
                 </span>
               </span>
+              {isThreeDsGen7Version(profile.version) && (
+                <>
+                  <span>
+                    <small>{t("threeDsProfilesTimeTick")}</small>
+                    <span className="mono">
+                      {formatThreeDsProfileSeed(
+                        profile.timeTick ?? DEFAULT_THREE_DS_GEN7_TIME_TICK,
+                      )}
+                    </span>
+                  </span>
+                  <span>
+                    <small>{t("threeDsProfilesTimeOffset")}</small>
+                    {profile.timeOffset ?? DEFAULT_THREE_DS_GEN7_TIME_OFFSET}
+                  </span>
+                </>
+              )}
               <span>
                 <small>{t("threeDsProfilesShinyCharm")}</small>
                 {profile.shinyCharm
@@ -548,15 +684,265 @@ function MobileProfiles({
   );
 }
 
+function ProfileCalibrator({
+  onCreate,
+}: {
+  onCreate(
+    result: ThreeDsProfileCalibratorResult,
+    version: "sun" | "ultra-sun",
+  ): void;
+}) {
+  const { t } = useTranslation();
+  const engine = useMemo(() => new ThreeDsProfileCalibrator(), []);
+  const [version, setVersion] = useState<"sun-moon" | "ultra-sun-moon">(
+    "sun-moon",
+  );
+  const [versionInput, setVersionInput] = useState(
+    PROFILE_CALIBRATOR_VERSION_OPTIONS[0].label,
+  );
+  const [dateTime, setDateTime] = useState("2024-01-01T00:00:00");
+  const [initialSeed, setInitialSeed] = useState("");
+  const [baseTick, setBaseTick] = useState("036EC43B");
+  const [baseOffset, setBaseOffset] = useState("55");
+  const [tickRange, setTickRange] = useState("1000");
+  const [offsetRange, setOffsetRange] = useState("10");
+  const [results, setResults] = useState<ThreeDsProfileCalibratorResult[]>([]);
+  const [running, setRunning] = useState(false);
+  const [error, setError] = useState("");
+  const [progress, setProgress] = useState({
+    processedStates: 0,
+    totalStates: 0,
+    percent: 0,
+  });
+  const abortRef = useRef<AbortController | undefined>(undefined);
+  useEffect(() => () => engine.dispose(), [engine]);
+
+  const search = async (event: FormEvent) => {
+    event.preventDefault();
+    if (running) return;
+    const epoch = profileCalibratorEpochFromInput(dateTime);
+    if (typeof epoch !== "bigint") {
+      setError("Invalid date.");
+      return;
+    }
+    const request = {
+      version,
+      dateEpoch: epoch,
+      initialSeed: parseHex(initialSeed),
+      baseTick: parseHex(baseTick),
+      baseOffset: Number(baseOffset || 0),
+      tickRange: Number(tickRange || 0),
+      offsetRange: Number(offsetRange || 0),
+      resultLimit: 100_000,
+    } as const;
+    setError("");
+    setResults([]);
+    setRunning(true);
+    abortRef.current = new AbortController();
+    try {
+      await engine.search(request, {
+        signal: abortRef.current.signal,
+        onBatch: (batch) => setResults((current) => [...current, ...batch]),
+        onProgress: (next) => setProgress(next),
+      });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause));
+    } finally {
+      abortRef.current = undefined;
+      setRunning(false);
+    }
+  };
+
+  return (
+    <section className="threedsprofiles-calibrator">
+      <form className="threedsprofiles-calibrator-form" onSubmit={search}>
+        <label className="threedsprofiles-field">
+          <span>{t("threeDsProfilesGameVersion")}</span>
+          <AutoCompleteComboBox
+            disabled={running}
+            inputValue={versionInput}
+            label={String(t("threeDsProfilesGameVersion"))}
+            onInputChange={setVersionInput}
+            onValueChange={(nextVersion) => {
+              setVersion(nextVersion);
+              setVersionInput(
+                PROFILE_CALIBRATOR_VERSION_OPTIONS.find(
+                  (option) => option.value === nextVersion,
+                )?.label ?? "",
+              );
+              const nextDefaults =
+                THREE_DS_PROFILE_CALIBRATOR_DEFAULTS[nextVersion];
+              setBaseTick(formatThreeDsProfileSeed(nextDefaults.baseTick));
+              setBaseOffset(String(nextDefaults.baseOffset));
+            }}
+            options={PROFILE_CALIBRATOR_VERSION_OPTIONS}
+            value={version}
+          />
+        </label>
+        <label className="threedsprofiles-field">
+          <span>{t("threeDsProfilesCalibratorDateTime")}</span>
+          <input
+            disabled={running}
+            onChange={(event) => setDateTime(event.target.value)}
+            step="1"
+            type="datetime-local"
+            value={dateTime.replace(" ", "T")}
+          />
+        </label>
+        <label className="threedsprofiles-field">
+          <span>{t("threeDsProfilesCalibratorInitialSeed")}</span>
+          <input
+            disabled={running}
+            inputMode="text"
+            maxLength={8}
+            onChange={(event) =>
+              setInitialSeed(normalizeHex(event.target.value, 8))
+            }
+            value={initialSeed}
+          />
+        </label>
+        <label className="threedsprofiles-field">
+          <span>{t("threeDsProfilesCalibratorBaseTick")}</span>
+          <input
+            disabled={running}
+            inputMode="text"
+            maxLength={8}
+            onChange={(event) =>
+              setBaseTick(normalizeHex(event.target.value, 8))
+            }
+            value={baseTick}
+          />
+        </label>
+        <label className="threedsprofiles-field">
+          <span>{t("threeDsProfilesCalibratorBaseOffset")}</span>
+          <input
+            disabled={running}
+            inputMode="numeric"
+            maxLength={10}
+            onChange={(event) =>
+              setBaseOffset(
+                normalizeDecimal(event.target.value, 0xffff_ffff, 10),
+              )
+            }
+            value={baseOffset}
+          />
+        </label>
+        <label className="threedsprofiles-field">
+          <span>{t("threeDsProfilesCalibratorTickRange")}</span>
+          <input
+            disabled={running}
+            inputMode="numeric"
+            onChange={(event) =>
+              setTickRange(
+                normalizeDecimal(event.target.value, 0xffff_ffff, 10),
+              )
+            }
+            value={tickRange}
+          />
+        </label>
+        <label className="threedsprofiles-field">
+          <span>{t("threeDsProfilesCalibratorOffsetRange")}</span>
+          <input
+            disabled={running}
+            inputMode="numeric"
+            onChange={(event) =>
+              setOffsetRange(
+                normalizeDecimal(event.target.value, 0xffff_ffff, 10),
+              )
+            }
+            value={offsetRange}
+          />
+        </label>
+        <div className="threedsprofiles-calibrator-actions">
+          <button
+            className="threedsprofiles-primary-button"
+            disabled={running}
+            type="submit"
+          >
+            {running ? (
+              <LoaderCircle
+                aria-hidden="true"
+                className="threedsprofiles-spin"
+                size={18}
+              />
+            ) : (
+              <Search aria-hidden="true" size={18} />
+            )}
+            <span>{t("threeDsProfilesCalibratorSearch")}</span>
+          </button>
+          <button
+            className="threedsprofiles-secondary-button"
+            disabled={!running}
+            onClick={() => engine.cancel()}
+            type="button"
+          >
+            <X aria-hidden="true" size={18} />
+            <span>{t("threeDsProfilesCalibratorCancel")}</span>
+          </button>
+        </div>
+      </form>
+      {error && (
+        <div className="threedsprofiles-alert error" role="alert">
+          {error}
+        </div>
+      )}
+      <div className="threedsprofiles-calibrator-progress" aria-live="polite">
+        {progress.totalStates
+          ? `${Math.round(progress.percent)}% · ${progress.processedStates}/${progress.totalStates}`
+          : ""}
+      </div>
+      {results.length ? (
+        <div className="threedsprofiles-calibrator-results">
+          <div className="threedsprofiles-calibrator-result-heading">
+            <span>Tick</span>
+            <span>Offset</span>
+            <span />
+          </div>
+          {results.map((result, index) => (
+            <div
+              className="threedsprofiles-calibrator-result"
+              key={`${result.tick}-${result.offset}-${index}`}
+            >
+              <span className="mono">
+                {formatThreeDsProfileSeed(result.tick)}
+              </span>
+              <span>{result.offset}</span>
+              <button
+                className="threedsprofiles-secondary-button"
+                onClick={() =>
+                  onCreate(result, version === "sun-moon" ? "sun" : "ultra-sun")
+                }
+                type="button"
+              >
+                <Plus aria-hidden="true" size={16} />
+                <span>{t("threeDsProfilesCalibratorCreate")}</span>
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : !running ? (
+        <div className="threedsprofiles-empty">
+          <span>{t("threeDsProfilesCalibratorNoResults")}</span>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 export function ThreeDsProfilesPanel({
   controller,
 }: {
   controller: ThreeDsProfilesController;
 }) {
   const { t } = useTranslation();
-  const [editor, setEditor] = useState<{ original?: ThreeDsProfile }>();
+  const [editor, setEditor] = useState<{
+    original?: ThreeDsProfile;
+    initialVersion?: ThreeDsGameVersion;
+    initialTime?: { tick: number; offset: number };
+  }>();
   const [draggedId, setDraggedId] = useState<string>();
   const [importError, setImportError] = useState("");
+  const [mode, setMode] = useState<"manager" | "calibrator">("manager");
   const selectedIndex = controller.profiles.findIndex(
     (profile) => profile.id === controller.selectedProfileId,
   );
@@ -612,182 +998,222 @@ export function ThreeDsProfilesPanel({
         </div>
       </header>
       <section className="threedsprofiles-manager">
-        <div className="threedsprofiles-toolbar">
-          <div className="threedsprofiles-toolbar-summary">
-            <Database aria-hidden="true" size={18} />
-            <span>
-              {controller.storageMode === "indexeddb"
-                ? "IndexedDB"
-                : t("threeDsProfilesLocalStorage")}
-            </span>
-            <strong>{controller.profiles.length}</strong>
-          </div>
-          <div
-            aria-label={String(t("threeDsProfilesActions"))}
-            className="threedsprofiles-toolbar-actions"
-            role="toolbar"
+        <div className="threedsprofiles-mode-tabs" role="tablist">
+          <button
+            aria-selected={mode === "manager"}
+            className={mode === "manager" ? "selected" : ""}
+            onClick={() => setMode("manager")}
+            role="tab"
+            type="button"
           >
-            <button
-              aria-label="Add"
-              className="threedsprofiles-icon-button primary"
-              disabled={locked}
-              onClick={() => setEditor({})}
-              title="Add"
-              type="button"
-            >
-              <Plus aria-hidden="true" size={18} />
-            </button>
-            <button
-              aria-label="Edit"
-              className="threedsprofiles-icon-button"
-              disabled={locked || !selected}
-              onClick={() => selected && setEditor({ original: selected })}
-              title="Edit"
-              type="button"
-            >
-              <Pencil aria-hidden="true" size={17} />
-            </button>
-            <button
-              aria-label="Remove"
-              className="threedsprofiles-icon-button danger"
-              disabled={locked || !selected}
-              onClick={() => {
-                if (
-                  selected &&
-                  window.confirm(String(t("threeDsProfilesConfirmDelete")))
-                ) {
-                  persist(controller.deleteProfile(selected));
-                }
-              }}
-              title="Remove"
-              type="button"
-            >
-              <Trash2 aria-hidden="true" size={17} />
-            </button>
-            <span
-              aria-hidden="true"
-              className="threedsprofiles-toolbar-divider"
-            />
-            <button
-              aria-label="Move up"
-              className="threedsprofiles-icon-button"
-              disabled={locked || selectedIndex <= 0}
-              onClick={() =>
-                selected && persist(controller.moveProfile(selected.id, -1))
-              }
-              title="Move up"
-              type="button"
-            >
-              <ArrowUp aria-hidden="true" size={18} />
-            </button>
-            <button
-              aria-label="Move down"
-              className="threedsprofiles-icon-button"
-              disabled={
-                locked ||
-                selectedIndex < 0 ||
-                selectedIndex >= controller.profiles.length - 1
-              }
-              onClick={() =>
-                selected && persist(controller.moveProfile(selected.id, 1))
-              }
-              title="Move down"
-              type="button"
-            >
-              <ArrowDown aria-hidden="true" size={18} />
-            </button>
-            <label
-              aria-disabled={locked}
-              aria-label={String(t("threeDsProfilesImport"))}
-              className="threedsprofiles-icon-button threedsprofiles-file-button"
-              title={String(t("threeDsProfilesImport"))}
-            >
-              <FileUp aria-hidden="true" size={17} />
-              <input
-                accept="application/json,application/xml,text/xml,.json,.xml"
-                disabled={locked}
-                onChange={importProfiles}
-                type="file"
-              />
-            </label>
-            <button
-              aria-label={String(t("threeDsProfilesExport"))}
-              className="threedsprofiles-icon-button"
-              disabled={locked || controller.profiles.length === 0}
-              onClick={exportBackup}
-              title={String(t("threeDsProfilesExport"))}
-              type="button"
-            >
-              <Download aria-hidden="true" size={17} />
-            </button>
-            <button
-              aria-label={String(t("threeDsProfilesClear"))}
-              className="threedsprofiles-icon-button danger"
-              disabled={locked || controller.profiles.length === 0}
-              onClick={() => {
-                if (window.confirm(String(t("threeDsProfilesConfirmClear")))) {
-                  persist(controller.clearProfiles());
-                }
-              }}
-              title={String(t("threeDsProfilesClear"))}
-              type="button"
-            >
-              <Eraser aria-hidden="true" size={17} />
-            </button>
-          </div>
+            <Database aria-hidden="true" size={17} />
+            <span>{t("threeDsProfilesTitle")}</span>
+          </button>
+          <button
+            aria-selected={mode === "calibrator"}
+            className={mode === "calibrator" ? "selected" : ""}
+            onClick={() => setMode("calibrator")}
+            role="tab"
+            type="button"
+          >
+            <Search aria-hidden="true" size={17} />
+            <span>{t("threeDsProfilesCalibrator")}</span>
+          </button>
         </div>
-        {(controller.error || importError) && (
-          <div className="threedsprofiles-alert error" role="alert">
-            {controller.error || importError}
-          </div>
-        )}
-        {controller.loading ? (
-          <div className="threedsprofiles-empty" role="status">
-            <LoaderCircle
-              aria-hidden="true"
-              className="threedsprofiles-spin"
-              size={22}
-            />
-            <span>{t("threeDsProfilesLoading")}</span>
-          </div>
-        ) : controller.profiles.length === 0 ? (
-          <div className="threedsprofiles-empty">
-            <span>{t("threeDsProfilesEmpty")}</span>
-          </div>
+        {mode === "calibrator" ? (
+          <ProfileCalibrator
+            onCreate={(result, version) => {
+              setMode("manager");
+              setEditor({
+                initialTime: { tick: result.tick, offset: result.offset },
+                initialVersion: version,
+              });
+            }}
+          />
         ) : (
           <>
-            <div className="threedsprofiles-table-shell">
-              <table
-                aria-label={String(t("threeDsProfilesTitle"))}
-                className="threedsprofiles-table"
-                role="grid"
+            <div className="threedsprofiles-toolbar">
+              <div className="threedsprofiles-toolbar-summary">
+                <Database aria-hidden="true" size={18} />
+                <span>
+                  {controller.storageMode === "indexeddb"
+                    ? "IndexedDB"
+                    : t("threeDsProfilesLocalStorage")}
+                </span>
+                <strong>{controller.profiles.length}</strong>
+              </div>
+              <div
+                aria-label={String(t("threeDsProfilesActions"))}
+                className="threedsprofiles-toolbar-actions"
+                role="toolbar"
               >
-                <thead>
-                  <tr>
-                    <th>{t("threeDsProfilesDescription")}</th>
-                    <th>Game</th>
-                    <th>TSV</th>
-                    <th>TRV</th>
-                    <th>{t("threeDsProfilesSaveVariable")}</th>
-                    <th>{t("threeDsProfilesTimeVariable")}</th>
-                    <th>Shiny Charm?</th>
-                    <th>Egg Seeds</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <ProfileRows
-                    controller={controller}
-                    draggedId={draggedId}
-                    onEdit={(profile) => setEditor({ original: profile })}
-                    setDraggedId={setDraggedId}
+                <button
+                  aria-label="Add"
+                  className="threedsprofiles-icon-button primary"
+                  disabled={locked}
+                  onClick={() => setEditor({})}
+                  title="Add"
+                  type="button"
+                >
+                  <Plus aria-hidden="true" size={18} />
+                </button>
+                <button
+                  aria-label="Edit"
+                  className="threedsprofiles-icon-button"
+                  disabled={locked || !selected}
+                  onClick={() => selected && setEditor({ original: selected })}
+                  title="Edit"
+                  type="button"
+                >
+                  <Pencil aria-hidden="true" size={17} />
+                </button>
+                <button
+                  aria-label="Remove"
+                  className="threedsprofiles-icon-button danger"
+                  disabled={locked || !selected}
+                  onClick={() => {
+                    if (
+                      selected &&
+                      window.confirm(String(t("threeDsProfilesConfirmDelete")))
+                    ) {
+                      persist(controller.deleteProfile(selected));
+                    }
+                  }}
+                  title="Remove"
+                  type="button"
+                >
+                  <Trash2 aria-hidden="true" size={17} />
+                </button>
+                <span
+                  aria-hidden="true"
+                  className="threedsprofiles-toolbar-divider"
+                />
+                <button
+                  aria-label="Move up"
+                  className="threedsprofiles-icon-button"
+                  disabled={locked || selectedIndex <= 0}
+                  onClick={() =>
+                    selected && persist(controller.moveProfile(selected.id, -1))
+                  }
+                  title="Move up"
+                  type="button"
+                >
+                  <ArrowUp aria-hidden="true" size={18} />
+                </button>
+                <button
+                  aria-label="Move down"
+                  className="threedsprofiles-icon-button"
+                  disabled={
+                    locked ||
+                    selectedIndex < 0 ||
+                    selectedIndex >= controller.profiles.length - 1
+                  }
+                  onClick={() =>
+                    selected && persist(controller.moveProfile(selected.id, 1))
+                  }
+                  title="Move down"
+                  type="button"
+                >
+                  <ArrowDown aria-hidden="true" size={18} />
+                </button>
+                <label
+                  aria-disabled={locked}
+                  aria-label={String(t("threeDsProfilesImport"))}
+                  className="threedsprofiles-icon-button threedsprofiles-file-button"
+                  title={String(t("threeDsProfilesImport"))}
+                >
+                  <FileUp aria-hidden="true" size={17} />
+                  <input
+                    accept="application/json,application/xml,text/xml,.json,.xml"
+                    disabled={locked}
+                    onChange={importProfiles}
+                    type="file"
                   />
-                </tbody>
-              </table>
+                </label>
+                <button
+                  aria-label={String(t("threeDsProfilesExport"))}
+                  className="threedsprofiles-icon-button"
+                  disabled={locked || controller.profiles.length === 0}
+                  onClick={exportBackup}
+                  title={String(t("threeDsProfilesExport"))}
+                  type="button"
+                >
+                  <Download aria-hidden="true" size={17} />
+                </button>
+                <button
+                  aria-label={String(t("threeDsProfilesClear"))}
+                  className="threedsprofiles-icon-button danger"
+                  disabled={locked || controller.profiles.length === 0}
+                  onClick={() => {
+                    if (
+                      window.confirm(String(t("threeDsProfilesConfirmClear")))
+                    ) {
+                      persist(controller.clearProfiles());
+                    }
+                  }}
+                  title={String(t("threeDsProfilesClear"))}
+                  type="button"
+                >
+                  <Eraser aria-hidden="true" size={17} />
+                </button>
+              </div>
             </div>
-            <MobileProfiles
-              controller={controller}
-              onEdit={(profile) => setEditor({ original: profile })}
-            />
+            {(controller.error || importError) && (
+              <div className="threedsprofiles-alert error" role="alert">
+                {controller.error || importError}
+              </div>
+            )}
+            {controller.loading ? (
+              <div className="threedsprofiles-empty" role="status">
+                <LoaderCircle
+                  aria-hidden="true"
+                  className="threedsprofiles-spin"
+                  size={22}
+                />
+                <span>{t("threeDsProfilesLoading")}</span>
+              </div>
+            ) : controller.profiles.length === 0 ? (
+              <div className="threedsprofiles-empty">
+                <span>{t("threeDsProfilesEmpty")}</span>
+              </div>
+            ) : (
+              <>
+                <div className="threedsprofiles-table-shell">
+                  <table
+                    aria-label={String(t("threeDsProfilesTitle"))}
+                    className="threedsprofiles-table"
+                    role="grid"
+                  >
+                    <thead>
+                      <tr>
+                        <th>{t("threeDsProfilesDescription")}</th>
+                        <th>Game</th>
+                        <th>TSV</th>
+                        <th>TRV</th>
+                        <th>{t("threeDsProfilesSaveVariable")}</th>
+                        <th>{t("threeDsProfilesTimeVariable")}</th>
+                        <th>{t("threeDsProfilesTimeTick")}</th>
+                        <th>{t("threeDsProfilesTimeOffset")}</th>
+                        <th>Shiny Charm?</th>
+                        <th>Egg Seeds</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ProfileRows
+                        controller={controller}
+                        draggedId={draggedId}
+                        onEdit={(profile) => setEditor({ original: profile })}
+                        setDraggedId={setDraggedId}
+                      />
+                    </tbody>
+                  </table>
+                </div>
+                <MobileProfiles
+                  controller={controller}
+                  onEdit={(profile) => setEditor({ original: profile })}
+                />
+              </>
+            )}
           </>
         )}
       </section>
@@ -796,6 +1222,8 @@ export function ThreeDsProfilesPanel({
           busy={controller.busy}
           onCancel={() => setEditor(undefined)}
           onSave={save}
+          initialVersion={editor.initialVersion}
+          initialTime={editor.initialTime}
           original={editor.original}
         />
       )}

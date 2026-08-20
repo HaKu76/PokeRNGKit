@@ -352,6 +352,13 @@ export function Gen7EventTimePanel({
   useEffect(() => {
     if (!isThreeDsGen7Profile(profile)) return;
     setVersion(profile.version);
+    setTick(
+      (profile.timeTick ?? 0x041d_9cb9)
+        .toString(16)
+        .toUpperCase()
+        .padStart(8, "0"),
+    );
+    setOffset(String(profile.timeOffset ?? 55));
     setProfileTid(String((profile.tsv << 4) | profile.trv));
     setProfileSid("0");
   }, [profile]);

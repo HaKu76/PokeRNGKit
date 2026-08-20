@@ -386,6 +386,13 @@ export function Gen7StationaryPanel({
   useEffect(() => {
     if (!isThreeDsGen7Profile(profile)) return;
     changeVersion(profile.version);
+    setTick(
+      (profile.timeTick ?? 0x041d_9cb9)
+        .toString(16)
+        .toUpperCase()
+        .padStart(8, "0"),
+    );
+    setOffset(String(profile.timeOffset ?? 55));
     setTsv(String(profile.tsv));
     setTrv(profile.trv.toString(16).toUpperCase());
     setShinyCharm(profile.shinyCharm);

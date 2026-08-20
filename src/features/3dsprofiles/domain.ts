@@ -27,6 +27,9 @@ export const THREE_DS_GAME_VERSIONS: readonly ThreeDsGameVersion[] = [
 
 export type ThreeDsProfileSeeds = [number, number, number, number];
 
+export const DEFAULT_THREE_DS_GEN7_TIME_TICK = 0x041d_9cb9;
+export const DEFAULT_THREE_DS_GEN7_TIME_OFFSET = 55;
+
 export interface ThreeDsProfile {
   id: string;
   name: string;
@@ -37,6 +40,9 @@ export interface ThreeDsProfile {
   /** Gen VI Profile6 values used by the 3DSTimeFinder initial-seed formula. */
   saveVariable: number;
   timeVariable: number;
+  /** Gen VII Profile7 calibration parameters. Optional for schema-1 migration. */
+  timeTick?: number;
+  timeOffset?: number;
   seeds: ThreeDsProfileSeeds;
   createdAt: number;
   updatedAt: number;
@@ -81,6 +87,8 @@ export const DEFAULT_THREE_DS_PROFILE_DRAFT: ThreeDsProfileDraft = {
   shinyCharm: false,
   saveVariable: 0,
   timeVariable: 0,
+  timeTick: DEFAULT_THREE_DS_GEN7_TIME_TICK,
+  timeOffset: DEFAULT_THREE_DS_GEN7_TIME_OFFSET,
   seeds: [0, 0, 0, 0],
 };
 
@@ -168,6 +176,18 @@ export function validateThreeDsProfileDraft(draft: ThreeDsProfileDraft) {
     throw new TypeError("Time Variable must be a 32-bit unsigned integer.");
   }
   if (
+    draft.timeTick !== undefined &&
+    !isIntegerIn(draft.timeTick, 0, 0xffff_ffff)
+  ) {
+    throw new TypeError("Tick must be a 32-bit unsigned integer.");
+  }
+  if (
+    draft.timeOffset !== undefined &&
+    !isIntegerIn(draft.timeOffset, 0, 0xffff_ffff)
+  ) {
+    throw new TypeError("Offset must be a 32-bit unsigned integer.");
+  }
+  if (
     !Array.isArray(draft.seeds) ||
     draft.seeds.length !== 4 ||
     !draft.seeds.every((seed) => isIntegerIn(seed, 0, 0xffff_ffff))
@@ -182,13 +202,30 @@ export function createThreeDsProfile(
 ): ThreeDsProfile {
   validateThreeDsProfileDraft(draft);
   const now = Date.now();
+  const gen7 = isThreeDsGen7Version(draft.version);
+  const { timeTick, timeOffset, ...baseDraft } = draft;
   return {
-    ...draft,
+    ...baseDraft,
+    ...(gen7
+      ? {
+          timeTick: timeTick ?? DEFAULT_THREE_DS_GEN7_TIME_TICK,
+          timeOffset: timeOffset ?? DEFAULT_THREE_DS_GEN7_TIME_OFFSET,
+        }
+      : {}),
     seeds: [...draft.seeds] as ThreeDsProfileSeeds,
     id: original?.id ?? createId(),
     createdAt: original?.createdAt ?? now,
     updatedAt: now,
   };
+}
+
+export function isThreeDsGen7Version(version: ThreeDsGameVersion) {
+  return (
+    version === "sun" ||
+    version === "moon" ||
+    version === "ultra-sun" ||
+    version === "ultra-moon"
+  );
 }
 
 export function isThreeDsProfile(value: unknown): value is ThreeDsProfile {
@@ -218,10 +255,18 @@ export function isThreeDsProfile(value: unknown): value is ThreeDsProfile {
 }
 
 function normalizeProfile(value: ThreeDsProfile): ThreeDsProfile {
+  const gen7 = isThreeDsGen7Version(value.version);
+  const { timeTick, timeOffset, ...baseProfile } = value;
   return {
-    ...value,
+    ...baseProfile,
     saveVariable: value.saveVariable ?? 0,
     timeVariable: value.timeVariable ?? 0,
+    ...(gen7
+      ? {
+          timeTick: timeTick ?? DEFAULT_THREE_DS_GEN7_TIME_TICK,
+          timeOffset: timeOffset ?? DEFAULT_THREE_DS_GEN7_TIME_OFFSET,
+        }
+      : {}),
     seeds: [...value.seeds] as ThreeDsProfileSeeds,
   };
 }

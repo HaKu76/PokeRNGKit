@@ -2,7 +2,9 @@
 
 `3dsprofiles` 对应 3DSRNGTool 的 `Profile Manager`、`Profile View` 与主窗体 Profile 选择器。模块管理 X、Y、Omega Ruby、Alpha Sapphire、Transporter、Sun、Moon、Ultra Sun、Ultra Moon 的本地档案，并向已实现的 Gen VII RNG 工作区提供当前选择。Profile Manager 作为全局轻量工具放在右下角悬浮工具菜单中，不占用左侧 RNG 模块导航。
 
-本模块不执行 RNG，不使用 Wasm、Worker、后端、账号、遥测或运行时 CDN。IndexedDB 是主存储，localStorage 是镜像与恢复路径。
+Profile Manager 不执行 RNG；Gen VII Profile Calibrator 只在 Dedicated Worker 中复用
+`gen7timefinder` Wasm 的 Initial Seed 哈希，不在 React 主线程运行算法。模块不使用后端、账号、
+遥测或运行时 CDN。IndexedDB 是主存储，localStorage 是镜像与恢复路径。
 
 ## 上游范围
 
@@ -11,6 +13,10 @@
 - 管理列表：`3DSRNGTool/Subforms/ProfileManager.cs`、`ProfileManager.Designer.cs`。
 - 十六进制输入：`3DSRNGTool/Controls/HexMaskedTextBox.cs`。
 - 版本名称与界面文本：`3DSRNGTool/Controls/StringItem.cs`、`Resources/text/lang_en.txt`、`lang_ja.txt`、`lang_zh.txt`。
+- Gen VII Profile Manager / Editor：`3DSTimeFinder/Source/Forms/Gen7/ProfileManager7.cpp`、
+  `ProfileEditor7.cpp`、`ProfileModel7.cpp`、`Profile7.cpp`。
+- Gen VII Profile Calibrator：`3DSTimeFinder/Source/Forms/Gen7/ProfileCalibrater7.cpp`、
+  `ProfileCalibrater7.ui`、`3DSTimeFinder/Source/Core/Gen7/ProfileSearcher7.cpp`。
 
 行为基线为本地 3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62`。来源、许可证和本地优化版与公开祖先的关系见 [`third_party/3dsrngtool/UPSTREAM.md`](../../third_party/3dsrngtool/UPSTREAM.md)。
 
@@ -24,16 +30,37 @@
 | TRV               | `NumericUpDown` / `ushort`       | `0`        | 一位十六进制；空文本按 `0` | `0`            | `F`                                  |
 | Shiny Charm       | `CheckBox` / `bool`              | `false`    | 布尔                       | `false`        | `true`                               |
 | Egg Seed `[0..3]` | `HexMaskedTextBox` / `uint[4]`   | `00000000` | 八位十六进制；空文本按 `0` | `00000000`     | `FFFFFFFF`                           |
+| Gen VII Tick      | `TextBox` / `uint32`             | `041D9CB9` | 八位十六进制；空文本按 `0` | `00000000`     | `FFFFFFFF`                           |
+| Gen VII Offset    | `TextBox` / `uint32`             | `55`       | 十进制；空文本按 `0`       | `0`            | `4294967295`                         |
 
 版本索引顺序固定为 X、Y、Omega Ruby、Alpha Sapphire、Transporter、Sun、Moon、Ultra Sun、Ultra Moon。X/Y/OR/AS/Transporter 只启用 Seed `[1]` 与 `[0]`；Sun/Moon/USUM 启用 `[3]..[0]`。模型始终保存四个 `uint32`，列表显示顺序与上游一致：Gen VI/Transporter 为 `[1],[0]`，Gen VII 为 `[3],[2],[1],[0]`。
 
-HTML 的 `maxLength`、数值规范化与领域校验同时执行这些边界。Web 档案增加稳定 `id`、`createdAt`、`updatedAt`，避免上游按对象引用和列表位置修改记录时产生选择漂移。
+HTML 的 `maxLength`、数值规范化与领域校验同时执行这些边界。Gen VII 档案缺少新字段时迁移为
+上游默认 Tick `0x041D9CB9` 与 Offset `55`；Gen VI 档案不使用这两个字段。Web 档案增加稳定
+`id`、`createdAt`、`updatedAt`，避免上游按对象引用和列表位置修改记录时产生选择漂移。
+
+## Gen VII Profile Calibrator
+
+上游 `ProfileSearcher7` 以选定日期、Initial Seed、版本组默认参数枚举 Tick/Offset：
+
+| 版本组               | Base Tick    | Base Offset | 创建档案默认版本 |
+| -------------------- | ------------ | ----------- | ---------------- |
+| Sun/Moon             | `0x036EC43B` | `55`        | Sun              |
+| Ultra Sun/Ultra Moon | `0x043B1CF3` | `56`        | Ultra Sun        |
+
+每个 Tick/Offset 组合分别检查正向和负向参数，结果保留上游的 `uint32` 回绕语义。日期最早为
+`2000-01-01 00:00:00`；Tick Range 和 Offset Range 的上游输入类型均为 `uint32`。浏览器任务
+限制为最多 `5,000,000` 个组合，结果最多 `100,000` 条；超出范围在提交前拒绝。Base Tick、
+Base Offset 可按上游 Settings 输入修改，版本切换时恢复对应默认值。命中结果表提供
+`Create profile from parameters`，使用现有 Profile View 保存名称、版本、TID/SID、Shiny Charm
+和校准字段。
 
 ## 管理行为
 
 - 提供新建、编辑、删除、上移、下移、拖放重排、清空、导入和导出；没有选择时编辑、删除和移动命令禁用。
 - 右下角悬浮工具菜单提供全局入口；打开管理器时仍可在浮动面板内完成列表操作，编辑器 modal 会继续接管自己的焦点范围。
-- 桌面使用可滚动表格，显示 Description、Game、TSV、TRV、Shiny Charm 与 Egg Seeds；窄屏改为逐条记录列表。
+- 桌面使用可滚动表格，显示 Description、Game、TSV、TRV、Tick、Offset、Shiny Charm 与 Egg Seeds；窄屏改为逐条记录列表。
+- Profile Manager 与 Profile Calibrator 共用右下角悬浮工具面板；校准器不新增世代侧栏入口。
 - 编辑器使用有名称的 modal，支持初始焦点、Tab 焦点圈定、Escape、点遮罩关闭、滚动锁定和关闭后焦点恢复。
 - 删除单条与清空全部档案前确认。加载、保存、空列表和错误状态保持稳定布局，忙碌时阻止重复操作。
 - 图标命令保留 tooltip 和可访问名称；上游语言文件没有对应翻译时保留 English source label。
@@ -53,18 +80,18 @@ HTML 的 `maxLength`、数值规范化与领域校验同时执行这些边界。
 
 页头选择器只把 Sun、Moon、Ultra Sun、Ultra Moon 档案注入 Gen VII 工作区。X/Y/OR/AS/Transporter 档案可管理，但不会写入 Gen VII 表单。
 
-| 工作区                | 档案切换时同步                         |
-| --------------------- | -------------------------------------- |
-| Stationary、Wild、SOS | GameVersion、TSV、TRV、Shiny Charm     |
-| Event                 | GameVersion、TSV、TRV                  |
-| Egg                   | Seed `[0]..[3]`、TSV、TRV、Shiny Charm |
-| Main RNG Tool、ID     | GameVersion                            |
+| 工作区                | 档案切换时同步                                   |
+| --------------------- | ------------------------------------------------ |
+| Stationary、Wild、SOS | GameVersion、TSV、TRV、Tick、Offset、Shiny Charm |
+| Event                 | GameVersion、TSV、TRV、Tick、Offset              |
+| Egg                   | Seed `[0]..[3]`、TSV、TRV、Shiny Charm           |
+| Main RNG Tool、ID     | GameVersion；ID 时间反查同步 Tick、Offset        |
 
 同步只在档案 id 或 `updatedAt` 改变时发生。同步后用户可以继续手动修改表单，普通重渲染不会重复覆盖；Stationary、Event、ID 同时执行各自现有的版本派生默认值更新。
 
 ## 验证范围
 
-- Domain：字段边界、版本与 Seed 数量、Gen VII 类型守卫、JSON 往返、重复 id 和无效选择拒绝。
+- Domain：字段边界、版本与 Seed 数量、Gen VII 类型守卫、JSON 往返、重复 id 和无效选择拒绝；校准日期、回绕结果、任务上限和固定宽度编码。
 - Repository：IndexedDB 主路径、localStorage 回退、较新镜像恢复、清空失败保留状态。
 - UI：外部浏览器检查表格、移动端列表、编辑器焦点、导入导出、拖放与 Gen VII 档案同步；自动化结果仅作为工程证据。
 
