@@ -11,7 +11,7 @@ int main() {
     assert(gen6mainseed_api_version() == 1);
 
     const std::uint32_t twoWilds[] = {
-        0, 0, 0, 0, 0, 1, 6, 10, 15, 0, 14, 6, 18, 4, 0, 10, 21, 14, 11, 19, 13, 28,
+        0, 0, 0, 0, 0, 1, 6, 10, 15, 0, 14, 6, 18, 4, 0, 10, 7, 19, 12, 30, 28, 21,
     };
     assert(gen6mainseed_search(twoWilds) == 1);
     assert(gen6mainseed_processed_count() == 1);
@@ -24,7 +24,7 @@ int main() {
     assert(twoWildResults[4] == 8);
 
     const std::uint32_t oneWild[] = {
-        1, 0, 0, 0, 0, 1, 6, 0, 0, 3, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31,
+        1, 0, 0, 0, 0, 1, 6, 0, 0, 3, 14, 6, 18, 4, 0, 10, 14, 6, 18, 4, 0, 10,
     };
     assert(gen6mainseed_search(oneWild) == 1);
     assert(gen6mainseed_processed_count() == 1);

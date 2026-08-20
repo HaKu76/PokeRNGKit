@@ -52,12 +52,12 @@ Seed `00000000`、两只模式第一段 `1..6`、第二段 `10..15`：
 
 ```text
 IV1 = 14 6 18 4 0 10
-IV2 = 21 14 11 19 13 28
+IV2 = 7 19 12 30 28 21
 Frame1 = 1, Nature1 = 3
 Frame2 = 10, Nature2 = 8
 ```
 
-Seed `00000000`、单只模式帧 `1..6`、IV 范围 `0..31`、Nature `3`：
+Seed `00000000`、单只模式帧 `1..6`、IV 精确范围 `14 6 18 4 0 10`、Nature `3`：
 
 ```text
 Frame1 = 1, Nature1 = 3, Gender = 154
@@ -65,7 +65,7 @@ Frame1 = 1, Nature1 = 3, Gender = 154
 
 ## 验证状态
 
-当前已完成 TypeScript Domain、Worker Pool 与 UI 预览夹具代码，以及 C++ bridge、原生夹具、Worker/UI 接入和格式收尾准备。按仓库验证门槛，尚未运行 Vitest、TypeScript、原生夹具、Wasm 构建、Web 构建或外部浏览器回归；这些检查需在项目所有者明确授权具体命令或生产 URL 后执行。算法验收仍必须等待 GitHub Actions 部署并由项目所有者提供准确站点 URL。
+2026-08-20 复核发现原生夹具把 frame `15..20` 的第二只 IV 写进 `10..15` 范围，并在单只模式传入违反 `upper <= lower + 2` 的 `0..31` 区间，导致 bridge 按上游语义正确返回空结果。夹具改为 Seed `0` 在 frame `10..15` 的实际六项 `7 19 12 30 28 21`，单只模式使用 frame 1 的精确 IV；Wasm/Worker 算法未改变。定向原生夹具和完整 69 项原生 Core 验证已通过；生产页面算法验收仍必须等待 GitHub Actions 部署并由项目所有者提供准确站点 URL。
 
 ## 上游与许可
 

@@ -2,6 +2,8 @@
 
 ## 2026-08-20 统一 3DS/UI 验收与 Windows Actions 产物链（进行中）
 
+- 修复：Actions run `32363436005` 的前端完整验证通过后，69 个原生夹具只有 `gen6mainseed_native_parity` 失败；复核确认测试把 Seed `0` 的 frame `15..20` IV 错写为 frame `10..15` 目标，并在单只模式传入违反 `upper <= lower + 2` 的 `0..31` 区间。本轮改为真实第二只 IV 与 frame 1 精确范围，不修改生产算法。
+- 已通过：定向 `POKERNGKIT_WASM_MODULES=gen6mainseed npm run wasm:test:native`（1/1）及完整 `npm run wasm:test:native`（69/69）。
 - 修复：右下角工具 Rail 外壳恢复实体 `surface` 背景、安静中性边框和统一阴影；工具按钮、存档信息和研究工具仍保持原有互斥浮层行为。
 - 更新：GitHub Actions 将 Pages 使用的同一份 `production-dist` 上传为跨 job artifact，并新增 Windows portable job，生成自解压 `PokeRNGKit.exe` 与 ZIP 备份包；启动器只监听 `127.0.0.1`，不新增后端或运行时 CDN。
 - 排期：Gen IV `Gen4SeedFinder` / Voltorb Flip 与 Gen V DS 参数、Initial Seed、Entralink 深审按项目所有者要求暂缓；Swarm RNG 已完成并移出当前缺口。
