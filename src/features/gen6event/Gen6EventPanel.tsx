@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, FolderOpen, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -439,7 +440,7 @@ export function Gen6EventPanel({
               {!timeFinderMode && (
                 <label className="field">
                   <span>{t("version")}</span>
-                  <select
+                  <Select
                     disabled={status === "calculating"}
                     value={version}
                     onChange={(event) =>
@@ -450,7 +451,7 @@ export function Gen6EventPanel({
                     <option value="y">Y</option>
                     <option value="omega-ruby">Omega Ruby</option>
                     <option value="alpha-sapphire">Alpha Sapphire</option>
-                  </select>
+                  </Select>
                 </label>
               )}
               {!timeFinderMode && (
@@ -583,7 +584,7 @@ export function Gen6EventPanel({
             <div className="gen6event-grid">
               <label className="field">
                 <span>{t("species")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   value={settings.species}
                   onChange={(event) =>
@@ -595,11 +596,11 @@ export function Gen6EventPanel({
                       {value}: {name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("form")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   value={settings.form}
                   onChange={(event) =>
@@ -611,7 +612,7 @@ export function Gen6EventPanel({
                       {value}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("level")}</span>
@@ -645,7 +646,7 @@ export function Gen6EventPanel({
               </label>
               <label className="field">
                 <span>{t("gen6EventPidType")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   value={settings.pidType}
                   onChange={(event) =>
@@ -661,7 +662,7 @@ export function Gen6EventPanel({
                   <option value="specified">
                     {t("gen6EventPidSpecified")}
                   </option>
-                </select>
+                </Select>
               </label>
               <label className="checkbox-field gen6event-checkbox">
                 <input
@@ -710,7 +711,7 @@ export function Gen6EventPanel({
                   />
                   <span>{t("gen6EventAbilityLocked")}</span>
                 </span>
-                <select
+                <Select
                   disabled={!settings.abilityLocked || status === "calculating"}
                   value={settings.ability}
                   onChange={(event) =>
@@ -721,7 +722,7 @@ export function Gen6EventPanel({
                   <option value={1}>{t("abilityFirst")}</option>
                   <option value={2}>{t("abilitySecond")}</option>
                   <option value={3}>{t("gen6StationaryHiddenAbility")}</option>
-                </select>
+                </Select>
               </label>
               <label className="gen6event-lock-field">
                 <span className="checkbox-field">
@@ -735,7 +736,7 @@ export function Gen6EventPanel({
                   />
                   <span>{t("gen6EventNatureLocked")}</span>
                 </span>
-                <select
+                <Select
                   disabled={!settings.natureLocked || status === "calculating"}
                   value={settings.nature}
                   onChange={(event) =>
@@ -747,7 +748,7 @@ export function Gen6EventPanel({
                       {option.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="gen6event-lock-field">
                 <span className="checkbox-field">
@@ -761,7 +762,7 @@ export function Gen6EventPanel({
                   />
                   <span>{t("gen6EventGenderLocked")}</span>
                 </span>
-                <select
+                <Select
                   disabled={!settings.genderLocked || status === "calculating"}
                   value={settings.gender}
                   onChange={(event) =>
@@ -771,7 +772,7 @@ export function Gen6EventPanel({
                   <option value={0}>{t("genderless")}</option>
                   <option value={1}>{t("male")}</option>
                   <option value={2}>{t("female")}</option>
-                </select>
+                </Select>
               </label>
             </div>
           </section>
@@ -824,7 +825,7 @@ export function Gen6EventPanel({
               <div className="gen6event-grid disclosure-content">
                 <label className="field">
                   <span>{t("shiny")}</span>
-                  <select
+                  <Select
                     value={filters.shiny}
                     onChange={(event) =>
                       setFilters((current) => ({
@@ -836,11 +837,11 @@ export function Gen6EventPanel({
                     <option value="any">{t("any")}</option>
                     <option value="shiny">{t("shinyAny")}</option>
                     <option value="square">{t("shinySquare")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gender")}</span>
-                  <select
+                  <Select
                     value={filters.gender}
                     onChange={(event) =>
                       setFilters((current) => ({
@@ -854,11 +855,11 @@ export function Gen6EventPanel({
                     <option value="male">{t("male")}</option>
                     <option value="female">{t("female")}</option>
                     <option value="genderless">{t("genderless")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("ability")}</span>
-                  <select
+                  <Select
                     value={filters.ability}
                     onChange={(event) =>
                       setFilters((current) => ({
@@ -874,7 +875,7 @@ export function Gen6EventPanel({
                     <option value="hidden">
                       {t("gen6StationaryHiddenAbility")}
                     </option>
-                  </select>
+                  </Select>
                 </label>
                 <MultiCheckSelect
                   anyLabel={t("any")}

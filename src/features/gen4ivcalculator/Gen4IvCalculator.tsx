@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
@@ -207,7 +208,7 @@ export function IvCalculator({
           <div className="calculator-settings-grid">
             <label className="field">
               <span>{t("game")}</span>
-              <select
+              <Select
                 onChange={(event) => {
                   const nextGame = event.target.value as IvCalculatorDataSet;
                   const nextSpecies = getIvSpecies(i18n.language, nextGame)[0];
@@ -229,7 +230,7 @@ export function IvCalculator({
                     {t(option.label)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field calculator-pokemon-field">
               <span>{t("pokemon")}</span>
@@ -258,7 +259,7 @@ export function IvCalculator({
             {formCount > 1 && (
               <label className="field">
                 <span>{t("altForm")}</span>
-                <select
+                <Select
                   onChange={(event) => {
                     setForm(Number(event.target.value));
                     setResult(undefined);
@@ -270,12 +271,12 @@ export function IvCalculator({
                       {getIvSpeciesName(i18n.language, species, index)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             )}
             <label className="field">
               <span>{t("hiddenPower")}</span>
-              <select
+              <Select
                 onChange={(event) => setHiddenPower(Number(event.target.value))}
                 value={hiddenPower}
               >
@@ -285,11 +286,11 @@ export function IvCalculator({
                     {t(key)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("nature")}</span>
-              <select
+              <Select
                 onChange={(event) => setNature(Number(event.target.value))}
                 value={nature}
               >
@@ -299,12 +300,12 @@ export function IvCalculator({
                     {t(key)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             {game !== "gen3" && (
               <label className="field">
                 <span>{t("characteristic")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setCharacteristic(Number(event.target.value))
                   }
@@ -316,7 +317,7 @@ export function IvCalculator({
                       {label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             )}
           </div>

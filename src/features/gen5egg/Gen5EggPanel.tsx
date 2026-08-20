@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type FormEvent,
@@ -757,7 +758,7 @@ export function Gen5EggPanel({
       <div className="gen5egg-parent-options">
         <label className="gen5egg-field">
           <span>{t("ability")}</span>
-          <select
+          <Select
             onChange={(event) =>
               setParent((current) => ({
                 ...current,
@@ -769,11 +770,11 @@ export function Gen5EggPanel({
             <option value={0}>0</option>
             <option value={1}>1</option>
             <option value={2}>H</option>
-          </select>
+          </Select>
         </label>
         <label className="gen5egg-field">
           <span>{t("gender")}</span>
-          <select
+          <Select
             onChange={(event) =>
               setParent((current) => ({
                 ...current,
@@ -788,11 +789,11 @@ export function Gen5EggPanel({
             <option value="ditto">
               {getGen5EggSpeciesName(i18n.language, 132)}
             </option>
-          </select>
+          </Select>
         </label>
         <label className="gen5egg-field">
           <span>{chinese ? "道具" : "Item"}</span>
-          <select
+          <Select
             onChange={(event) =>
               setParent((current) => ({
                 ...current,
@@ -806,11 +807,11 @@ export function Gen5EggPanel({
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label className="gen5egg-field">
           <span>{t("nature")}</span>
-          <select
+          <Select
             onChange={(event) =>
               setParent((current) => ({
                 ...current,
@@ -824,7 +825,7 @@ export function Gen5EggPanel({
                 {t(key)}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
     </fieldset>
@@ -841,7 +842,7 @@ export function Gen5EggPanel({
         <label className="gen5egg-field gen5egg-profile-select">
           <span>{t("profile")}</span>
           <div className="gen5egg-profile-control">
-            <select
+            <Select
               disabled={busy || profiles.loading || profiles.busy}
               onChange={(event) =>
                 void profiles.selectProfile(event.target.value || null)
@@ -856,7 +857,7 @@ export function Gen5EggPanel({
                   {profile.name}
                 </option>
               ))}
-            </select>
+            </Select>
             <button
               className="gen5egg-secondary"
               disabled={busy}
@@ -1133,7 +1134,7 @@ export function Gen5EggPanel({
             <div className="gen5egg-filter-selects">
               <label className="gen5egg-field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setShiny(event.target.value as Gen5EggShinyFilter)
                   }
@@ -1144,11 +1145,11 @@ export function Gen5EggPanel({
                   <option value="star">{t("shinyStar")}</option>
                   <option value="square">{t("shinySquare")}</option>
                   <option value="starSquare">{t("shinyStarSquare")}</option>
-                </select>
+                </Select>
               </label>
               <label className="gen5egg-field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setGender(event.target.value as Gen5EggGenderFilter)
                   }
@@ -1158,11 +1159,11 @@ export function Gen5EggPanel({
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
                   <option value="genderless">{t("genderless")}</option>
-                </select>
+                </Select>
               </label>
               <label className="gen5egg-field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setAbility(event.target.value as Gen5EggAbilityFilter)
                   }
@@ -1172,7 +1173,7 @@ export function Gen5EggPanel({
                   <option value="first">0</option>
                   <option value="second">1</option>
                   <option value="hidden">H</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}

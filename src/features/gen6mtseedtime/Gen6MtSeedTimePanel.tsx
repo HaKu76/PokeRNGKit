@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -168,7 +169,7 @@ export function Gen6MtSeedTimePanel({
           <div className="gen6mtseedtime-grid">
             <label className="field">
               <span>{t("gen6MtSeedTimeGame")}</span>
-              <select
+              <Select
                 value={game}
                 onChange={(event) =>
                   setGame(event.target.value as Gen6MtSeedTimeGame)
@@ -176,7 +177,7 @@ export function Gen6MtSeedTimePanel({
               >
                 <option value="xy">XY</option>
                 <option value="oras">ORAS</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("gen6MtSeedTimeDate")}</span>

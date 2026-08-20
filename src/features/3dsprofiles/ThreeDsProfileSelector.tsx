@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { Settings2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { ThreeDsProfilesController } from "./useThreeDsProfiles";
@@ -19,7 +20,7 @@ export function ThreeDsProfileSelector({
       {controller.profiles.length > 0 && (
         <label>
           <span>{t("threeDsProfilesProfile")}</span>
-          <select
+          <Select
             aria-busy={controller.loading || controller.busy}
             disabled={controller.loading || controller.busy}
             onChange={(event) =>
@@ -33,7 +34,7 @@ export function ThreeDsProfileSelector({
                 {profile.name}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       )}
       <button

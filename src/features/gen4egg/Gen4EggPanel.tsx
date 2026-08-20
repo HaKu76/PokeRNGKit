@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type FormEvent,
@@ -638,7 +639,7 @@ export function Gen4EggPanel({
       <legend>{t(id === "a" ? "eggParentA" : "eggParentB")}</legend>
       <label className="field">
         <span>{t("gender")}</span>
-        <select
+        <Select
           onChange={(event) =>
             setParent((current) => ({
               ...current,
@@ -651,7 +652,7 @@ export function Gen4EggPanel({
           <option value="female">{t("female")}</option>
           <option value="genderless">{t("genderless")}</option>
           <option value="ditto">{t("gen4EggDitto")}</option>
-        </select>
+        </Select>
       </label>
       <div className="egg-parent-ivs">
         {ivKeys.map((key, index) => (
@@ -938,7 +939,7 @@ export function Gen4EggPanel({
             <div className="gen3-filter-selects">
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setShiny(event.target.value as Gen4EggShinyFilter)
                   }
@@ -949,11 +950,11 @@ export function Gen4EggPanel({
                   <option value="star">{t("shinyStar")}</option>
                   <option value="square">{t("shinySquare")}</option>
                   <option value="starSquare">{t("shinyStarSquare")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setGender(event.target.value as Gen4EggGenderFilter)
                   }
@@ -963,11 +964,11 @@ export function Gen4EggPanel({
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
                   <option value="genderless">{t("genderless")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setAbility(event.target.value as Gen4EggAbilityFilter)
                   }
@@ -976,7 +977,7 @@ export function Gen4EggPanel({
                   <option value="any">{t("any")}</option>
                   <option value="first">0</option>
                   <option value="second">1</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}

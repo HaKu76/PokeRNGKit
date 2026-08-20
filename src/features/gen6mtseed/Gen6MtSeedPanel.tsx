@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -338,7 +339,7 @@ export function Gen6MtSeedPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
             <div className="gen6mtseed-grid">
               <label className="field">
                 <span>{t("gen6MtSeedShiny")}</span>
-                <select
+                <Select
                   value={shinyType}
                   onChange={(event) => setShinyType(event.target.value)}
                 >
@@ -346,7 +347,7 @@ export function Gen6MtSeedPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                   <option value="1">{t("gen6MtSeedShinyStar")}</option>
                   <option value="2">{t("gen6MtSeedShinySquare")}</option>
                   <option value="3">{t("gen6MtSeedShinyBoth")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen6MtSeedPerfectIvs")}</span>
@@ -580,7 +581,7 @@ export function Gen6MtSeedPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
           </label>
           <label className="field">
             <span>{t("gen6MtSeedIvMode")}</span>
-            <select
+            <Select
               value={ivMode}
               onChange={(event) =>
                 setIvMode(event.target.value as typeof ivMode)
@@ -588,7 +589,7 @@ export function Gen6MtSeedPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
             >
               <option value="perfect">{t("gen6MtSeedPerfectMode")}</option>
               <option value="specific">{t("gen6MtSeedSpecificMode")}</option>
-            </select>
+            </Select>
           </label>
           {ivMode === "specific" && (
             <div className="gen6mtseed-checks">

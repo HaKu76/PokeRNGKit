@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type FormEvent,
@@ -526,7 +527,7 @@ export function Gen3EggPanel({
       <div className="egg-parent-meta">
         <label className="field">
           <span>{t("gender")}</span>
-          <select
+          <Select
             onChange={(event) =>
               updateParent(id, {
                 gender: event.target.value as Gen3EggParentGender,
@@ -540,13 +541,13 @@ export function Gen3EggPanel({
             <option value="ditto">
               {getGen3SpeciesName(i18n.language, 132)}
             </option>
-          </select>
+          </Select>
         </label>
         {game === "emerald" && (
           <>
             <label className="field">
               <span>{t("eggItem")}</span>
-              <select
+              <Select
                 onChange={(event) =>
                   updateParent(id, {
                     item: event.target.value as Gen3EggParentItem,
@@ -556,11 +557,11 @@ export function Gen3EggPanel({
               >
                 <option value="none">{t("none")}</option>
                 <option value="everstone">{t("eggEverstone")}</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("nature")}</span>
-              <select
+              <Select
                 onChange={(event) =>
                   updateParent(id, { nature: Number(event.target.value) })
                 }
@@ -571,7 +572,7 @@ export function Gen3EggPanel({
                     {t(key)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           </>
         )}
@@ -792,7 +793,7 @@ export function Gen3EggPanel({
             )}
             <label className="field">
               <span>{t("method")}</span>
-              <select
+              <Select
                 onChange={(event) =>
                   setMethod(event.target.value as Gen3EggMethod)
                 }
@@ -802,11 +803,11 @@ export function Gen3EggPanel({
                 <option value="split">Split</option>
                 <option value="alternate">Alternate</option>
                 {game === "rsfrlg" && <option value="mixed">Mixed</option>}
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("eggCompatibility")}</span>
-              <select
+              <Select
                 onChange={(event) =>
                   setCompatibility(Number(event.target.value) as 20 | 50 | 70)
                 }
@@ -815,7 +816,7 @@ export function Gen3EggPanel({
                 <option value={20}>{t("eggCompatibility20")}</option>
                 <option value={50}>{t("eggCompatibility50")}</option>
                 <option value={70}>{t("eggCompatibility70")}</option>
-              </select>
+              </Select>
             </label>
           </div>
           <div className="panel-actions">
@@ -883,7 +884,7 @@ export function Gen3EggPanel({
             <div className="gen3-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setAbility(event.target.value as Gen3EggAbilityFilter)
                   }
@@ -892,11 +893,11 @@ export function Gen3EggPanel({
                   <option value="any">{t("any")}</option>
                   <option value="first">0</option>
                   <option value="second">1</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setGender(event.target.value as Gen3EggGenderFilter)
                   }
@@ -905,7 +906,7 @@ export function Gen3EggPanel({
                   <option value="any">{t("any")}</option>
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -925,7 +926,7 @@ export function Gen3EggPanel({
               />
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setShiny(event.target.value as Gen3EggShinyFilter)
                   }
@@ -935,7 +936,7 @@ export function Gen3EggPanel({
                   <option value="star">{t("shinyStar")}</option>
                   <option value="square">{t("shinySquare")}</option>
                   <option value="star-square">{t("shinyStarSquare")}</option>
-                </select>
+                </Select>
               </label>
             </div>
             <div className="iv-filter">

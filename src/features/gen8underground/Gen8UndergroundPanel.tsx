@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Settings2, Square, Trash2 } from "lucide-react";
 import {
@@ -530,7 +531,7 @@ export function Gen8UndergroundPanel({
         </div>
         <label>
           <span>{t("profile")}</span>
-          <select
+          <Select
             value={selectedProfile.id}
             onChange={(event) =>
               void profiles.selectProfile(event.target.value)
@@ -545,7 +546,7 @@ export function Gen8UndergroundPanel({
             ) : (
               <option value={selectedProfile.id}>{selectedProfile.name}</option>
             )}
-          </select>
+          </Select>
         </label>
         <button
           className="gen8underground-icon-button"
@@ -643,7 +644,7 @@ export function Gen8UndergroundPanel({
           </label>
           <label>
             <span>{t("gen8UndergroundLead")}</span>
-            <select
+            <Select
               onChange={(event) => setLeadChoice(event.target.value)}
               value={leadChoice}
             >
@@ -681,7 +682,7 @@ export function Gen8UndergroundPanel({
                   </option>
                 ))}
               </optgroup>
-            </select>
+            </Select>
           </label>
           <div className="gen8underground-actions">
             <button className="primary" disabled={busy} type="submit">
@@ -727,7 +728,7 @@ export function Gen8UndergroundPanel({
               <div className="gen8underground-setting-grid">
                 <label>
                   <span>{t("gen8UndergroundStoryFlag")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setStoryFlag(Number(event.target.value))
                     }
@@ -738,11 +739,11 @@ export function Gen8UndergroundPanel({
                         {t(key)}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8UndergroundLevelFlag")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setLevelFlag(Number(event.target.value))
                     }
@@ -754,11 +755,11 @@ export function Gen8UndergroundPanel({
                         {GEN8_UNDERGROUND_LEVEL_RANGES[index].join("-")}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8UndergroundLocation")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setLocation(Number(event.target.value))
                     }
@@ -771,7 +772,7 @@ export function Gen8UndergroundPanel({
                         </option>
                       ),
                     )}
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8UndergroundLevel")}</span>
@@ -827,7 +828,7 @@ export function Gen8UndergroundPanel({
               <div className="gen8underground-filter-grid">
                 <label>
                   <span>{t("gen8UndergroundShiny")}</span>
-                  <select
+                  <Select
                     disabled={filtersDisabled}
                     onChange={(event) =>
                       setShiny(event.target.value as Gen8UndergroundShinyFilter)
@@ -840,11 +841,11 @@ export function Gen8UndergroundPanel({
                     <option value="starSquare">
                       {t("gen8UndergroundStarSquare")}
                     </option>
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8UndergroundGender")}</span>
-                  <select
+                  <Select
                     disabled={filtersDisabled}
                     onChange={(event) =>
                       setGender(
@@ -856,11 +857,11 @@ export function Gen8UndergroundPanel({
                     <option value="any">{t("gen8UndergroundAny")}</option>
                     <option value="male">♂</option>
                     <option value="female">♀</option>
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8UndergroundAbility")}</span>
-                  <select
+                  <Select
                     disabled={filtersDisabled}
                     onChange={(event) =>
                       setAbility(
@@ -872,7 +873,7 @@ export function Gen8UndergroundPanel({
                     <option value="any">{t("gen8UndergroundAny")}</option>
                     <option value="first">0</option>
                     <option value="second">1</option>
-                  </select>
+                  </Select>
                 </label>
               </div>
               <div className="gen8underground-filter-lists">

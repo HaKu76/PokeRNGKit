@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import {
   type ChangeEvent,
   type FormEvent,
@@ -299,7 +300,7 @@ export function Gen5Sha1CachePanel({
         <div className="gen5sha1cache-profile-control">
           <label className="gen5sha1cache-field">
             <span>{copy.profile}</span>
-            <select
+            <Select
               disabled={busy || profiles.loading || profiles.busy}
               onChange={(event) =>
                 void profiles.selectProfile(event.target.value || null)
@@ -312,7 +313,7 @@ export function Gen5Sha1CachePanel({
                   {entry.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <button
             className="secondary-action gen5sha1cache-manager"

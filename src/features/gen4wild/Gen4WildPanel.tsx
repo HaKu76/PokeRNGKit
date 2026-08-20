@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type FormEvent,
@@ -958,7 +959,7 @@ export function Gen4WildPanel({
             </div>
             <label className="field">
               <span>{t("wildLead")}</span>
-              <select
+              <Select
                 onChange={(event) => {
                   const value = event.target.value;
                   if (value.startsWith("synchronize-")) {
@@ -1017,7 +1018,7 @@ export function Gen4WildPanel({
                 ) : (
                   <option value="synchronize">{t("wildSynchronize")}</option>
                 )}
-              </select>
+              </Select>
             </label>
             {operation === "generator" ? (
               <>
@@ -1191,7 +1192,7 @@ export function Gen4WildPanel({
           <div className="static-form-stack gen4wild-settings-stack">
             <label className="field">
               <span>{t("wildEncounterType")}</span>
-              <select
+              <Select
                 onChange={(event) =>
                   setEncounter(event.target.value as Gen4WildEncounter)
                 }
@@ -1202,7 +1203,7 @@ export function Gen4WildPanel({
                     {t(encounterKeys[entry])}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("wildLocation")}</span>
@@ -1223,7 +1224,7 @@ export function Gen4WildPanel({
             </label>
             <label className="field">
               <span>{t("wildPokemon")}</span>
-              <select
+              <Select
                 onChange={(event) => selectSpecies(Number(event.target.value))}
                 value={selectedSpecies}
               >
@@ -1237,12 +1238,12 @@ export function Gen4WildPanel({
                     )}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             {timeAvailable && (
               <label className="field">
                 <span>{t("gen4WildTime")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     updateSettings({ time: event.target.value as Gen4WildTime })
                   }
@@ -1251,13 +1252,13 @@ export function Gen4WildPanel({
                   <option value="morning">{t("gen4WildMorning")}</option>
                   <option value="day">{t("gen4WildDay")}</option>
                   <option value="night">{t("gen4WildNight")}</option>
-                </select>
+                </Select>
               </label>
             )}
             {happinessAvailable && (
               <label className="field">
                 <span>{t("gen4WildHappiness")}</span>
-                <select
+                <Select
                   onChange={(event) => setHappiness(event.target.value)}
                   value={happiness}
                 >
@@ -1266,13 +1267,13 @@ export function Gen4WildPanel({
                       +{value}%
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             )}
             {dualSlotAvailable && (
               <label className="field gen4wild-option-field">
                 <span>{t("gen4WildDualSlot")}</span>
-                <select
+                <Select
                   onChange={(event) => {
                     const value = event.target.value as Gen4WildDualSlot;
                     if (value === "none") {
@@ -1289,7 +1290,7 @@ export function Gen4WildPanel({
                   <option value="firered">{t("gameFireRed")}</option>
                   <option value="leafgreen">{t("gameLeafGreen")}</option>
                   <option value="emerald">{t("gameEmerald")}</option>
-                </select>
+                </Select>
               </label>
             )}
             {radarAvailable && (
@@ -1328,7 +1329,7 @@ export function Gen4WildPanel({
             {radioAvailable && (
               <label className="field gen4wild-option-field">
                 <span>{t("gen4WildRadio")}</span>
-                <select
+                <Select
                   onChange={(event) => {
                     const value = event.target.value as Gen4WildRadio;
                     if (value === "none") updateSettings({ radio: "none" });
@@ -1342,7 +1343,7 @@ export function Gen4WildPanel({
                   <option value="mysterious">
                     {t("gen4WildMysteriousTransmission")}
                   </option>
-                </select>
+                </Select>
               </label>
             )}
             {swarmAvailable && (
@@ -1388,7 +1389,7 @@ export function Gen4WildPanel({
                           <span className="visually-hidden">
                             {t("gen4WildReplacement")} {index + 1}
                           </span>
-                          <select
+                          <Select
                             aria-label={`${t("gen4WildReplacement")} ${index + 1}`}
                             onChange={(event) => {
                               const replacement = [...settings.replacement] as [
@@ -1405,7 +1406,7 @@ export function Gen4WildPanel({
                                 {getGen4SpeciesName(i18n.language, species, 0)}
                               </option>
                             ))}
-                          </select>
+                          </Select>
                         </label>
                       ),
                     )}
@@ -1479,7 +1480,7 @@ export function Gen4WildPanel({
             <div className="gen3-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setAbility(event.target.value as Gen4WildAbility)
                   }
@@ -1488,7 +1489,7 @@ export function Gen4WildPanel({
                   <option value="any">{t("any")}</option>
                   <option value="first">0</option>
                   <option value="second">1</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -1500,7 +1501,7 @@ export function Gen4WildPanel({
               />
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setGender(event.target.value as Gen4WildGender)
                   }
@@ -1510,7 +1511,7 @@ export function Gen4WildPanel({
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
                   <option value="genderless">{t("genderless")}</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -1559,7 +1560,7 @@ export function Gen4WildPanel({
               />
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setShiny(event.target.value as Gen4WildShiny)
                   }
@@ -1568,7 +1569,7 @@ export function Gen4WildPanel({
                   <option value="any">{t("any")}</option>
                   <option value="notShiny">{t("shinyNone")}</option>
                   <option value="shiny">{t("shinyAny")}</option>
-                </select>
+                </Select>
               </label>
             </div>
             <div className="iv-filter">

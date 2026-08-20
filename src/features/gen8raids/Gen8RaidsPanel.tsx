@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Settings2, Square, Trash2 } from "lucide-react";
 import {
@@ -485,7 +486,7 @@ export function Gen8RaidsPanel({
         </div>
         <label>
           <span>{t("profile")}</span>
-          <select
+          <Select
             value={selectedProfile.id}
             onChange={(event) =>
               void profiles.selectProfile(event.target.value)
@@ -500,7 +501,7 @@ export function Gen8RaidsPanel({
             ) : (
               <option value={selectedProfile.id}>{selectedProfile.name}</option>
             )}
-          </select>
+          </Select>
         </label>
         <button
           className="gen8raids-icon-button"
@@ -624,7 +625,7 @@ export function Gen8RaidsPanel({
           <div className="gen8raids-two-col">
             <label>
               <span>{t("gen8RaidsDen")}</span>
-              <select
+              <Select
                 value={denIndex}
                 onChange={(event) => {
                   setDenIndex(Number(event.target.value));
@@ -636,11 +637,11 @@ export function Gen8RaidsPanel({
                     {entry.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               <span>{t("gen8RaidsRarity")}</span>
-              <select
+              <Select
                 disabled={location === 3}
                 value={rarity}
                 onChange={(event) => {
@@ -650,12 +651,12 @@ export function Gen8RaidsPanel({
               >
                 <option value={0}>{t("gen8RaidsNormal")}</option>
                 <option value={1}>{t("gen8RaidsRare")}</option>
-              </select>
+              </Select>
             </label>
           </div>
           <label>
             <span>{t("gen8RaidsSpecies")}</span>
-            <select
+            <Select
               value={speciesIndex}
               onChange={(event) => setSpeciesIndex(Number(event.target.value))}
             >
@@ -669,7 +670,7 @@ export function Gen8RaidsPanel({
                   {entry.gigantamax ? " G-Max" : ""}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         </fieldset>
         <fieldset>
@@ -730,7 +731,7 @@ export function Gen8RaidsPanel({
           <div className="gen8raids-filter-grid">
             <label>
               <span>{t("gen8RaidsShiny")}</span>
-              <select
+              <Select
                 disabled={filtersDisabled}
                 value={shiny}
                 onChange={(event) =>
@@ -741,11 +742,11 @@ export function Gen8RaidsPanel({
                 <option value="star">{t("gen8RaidsStar")}</option>
                 <option value="square">{t("gen8RaidsSquare")}</option>
                 <option value="starSquare">{t("gen8RaidsStarSquare")}</option>
-              </select>
+              </Select>
             </label>
             <label>
               <span>{t("gen8RaidsGender")}</span>
-              <select
+              <Select
                 disabled={filtersDisabled}
                 value={gender}
                 onChange={(event) =>
@@ -755,11 +756,11 @@ export function Gen8RaidsPanel({
                 <option value="any">{t("gen8RaidsAny")}</option>
                 <option value="male">♂</option>
                 <option value="female">♀</option>
-              </select>
+              </Select>
             </label>
             <label>
               <span>{t("gen8RaidsAbility")}</span>
-              <select
+              <Select
                 disabled={filtersDisabled}
                 value={ability}
                 onChange={(event) =>
@@ -770,7 +771,7 @@ export function Gen8RaidsPanel({
                 <option value="first">0</option>
                 <option value="second">1</option>
                 <option value="hidden">H</option>
-              </select>
+              </Select>
             </label>
           </div>
           <div className="gen8raids-natures">

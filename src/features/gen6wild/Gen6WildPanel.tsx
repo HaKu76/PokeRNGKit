@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -462,7 +463,7 @@ export function Gen6WildPanel({
             <div className="gen6wild-grid">
               <label className="field">
                 <span>{t("gen6GameVersion")}</span>
-                <select
+                <Select
                   value={version}
                   onChange={(event) =>
                     setVersion(event.target.value as Gen6WildVersion)
@@ -472,7 +473,7 @@ export function Gen6WildPanel({
                   <option value="y">Y</option>
                   <option value="omega-ruby">Omega Ruby</option>
                   <option value="alpha-sapphire">Alpha Sapphire</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("seed")}</span>
@@ -569,7 +570,7 @@ export function Gen6WildPanel({
             <div className="gen6wild-grid">
               <label className="field">
                 <span>{t("gen6WildEncounterType")}</span>
-                <select
+                <Select
                   value={encounterType}
                   onChange={(event) =>
                     setEncounterType(event.target.value as Gen6WildType)
@@ -582,11 +583,11 @@ export function Gen6WildPanel({
                       )}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen6WildLocation")}</span>
-                <select
+                <Select
                   value={selectedArea?.id ?? ""}
                   onChange={(event) => setAreaId(event.target.value)}
                 >
@@ -596,12 +597,12 @@ export function Gen6WildPanel({
                       {gen6WildLocationName(area, language)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               {encounterType === "horde" && (
                 <label className="field">
                   <span>{t("gen6WildHordeSlot")}</span>
-                  <select
+                  <Select
                     value={hordeSlot}
                     onChange={(event) => setHordeSlot(event.target.value)}
                   >
@@ -610,20 +611,20 @@ export function Gen6WildPanel({
                         {value}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
               )}
               {encounterType === "fishing" && (
                 <label className="field">
                   <span>{t("gen6WildRod")}</span>
-                  <select
+                  <Select
                     value={rod}
                     onChange={(event) => setRod(event.target.value)}
                   >
                     <option value="0">{t("gen6WildOldRod")}</option>
                     <option value="1">{t("gen6WildGoodRod")}</option>
                     <option value="2">{t("gen6WildSuperRod")}</option>
-                  </select>
+                  </Select>
                 </label>
               )}
               <label className="field">
@@ -713,7 +714,7 @@ export function Gen6WildPanel({
               </label>
               <label className="field">
                 <span>{t("gen6WildLead")}</span>
-                <select
+                <Select
                   value={lead}
                   onChange={(event) =>
                     setLead(event.target.value as Gen6WildLead)
@@ -724,12 +725,12 @@ export function Gen6WildPanel({
                       {entry.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               {lead === "synchronize" && (
                 <label className="field">
                   <span>{t("gen6WildSyncNature")}</span>
-                  <select
+                  <Select
                     value={syncNature}
                     onChange={(event) => setSyncNature(event.target.value)}
                   >
@@ -738,7 +739,7 @@ export function Gen6WildPanel({
                         {name}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
               )}
             </div>
@@ -769,7 +770,7 @@ export function Gen6WildPanel({
               </label>
               <label>
                 <span>{t("gen6WildFlute")}</span>
-                <select
+                <Select
                   value={flute}
                   onChange={(event) =>
                     setFlute(Number(event.target.value) as -1 | 0 | 1)
@@ -778,7 +779,7 @@ export function Gen6WildPanel({
                   <option value="0">-</option>
                   <option value="1">+</option>
                   <option value="-1">−</option>
-                </select>
+                </Select>
               </label>
             </div>
           </div>
@@ -787,7 +788,7 @@ export function Gen6WildPanel({
             <div className="gen6wild-grid">
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   value={filters.shiny}
                   onChange={(event) =>
                     updateFilter(
@@ -799,11 +800,11 @@ export function Gen6WildPanel({
                   <option value="any">{t("any")}</option>
                   <option value="shiny">{t("shiny")}</option>
                   <option value="square">{t("shinySquare")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   value={filters.gender}
                   onChange={(event) =>
                     updateFilter(
@@ -816,11 +817,11 @@ export function Gen6WildPanel({
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
                   <option value="genderless">{t("genderless")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   value={filters.ability}
                   onChange={(event) =>
                     updateFilter(
@@ -833,11 +834,11 @@ export function Gen6WildPanel({
                   <option value="first">1</option>
                   <option value="second">2</option>
                   <option value="hidden">H</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen6WildItem")}</span>
-                <select
+                <Select
                   value={filters.item}
                   onChange={(event) =>
                     updateFilter(
@@ -851,7 +852,7 @@ export function Gen6WildPanel({
                   <option value="rare">{t("gen6WildItemRare")}</option>
                   <option value="very-rare">{t("gen6WildItemVeryRare")}</option>
                   <option value="none">{t("none")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen6WildPerfectValue")}</span>

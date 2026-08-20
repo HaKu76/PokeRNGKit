@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import {
   type FormEvent,
   type MouseEvent,
@@ -429,7 +430,7 @@ export function Gen3GameCubePanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("category")}</span>
-              <select
+              <Select
                 value={activeCategory}
                 onChange={(event) => {
                   setCategory(event.target.value as GameCubeCategory);
@@ -439,11 +440,11 @@ export function Gen3GameCubePanel({
                 <option value="non-shadow">{t("nonShadowLocks")}</option>
                 <option value="channel">{t("channel")}</option>
                 <option value="shadow">{t("shadowLocks")}</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("pokemon")}</span>
-              <select
+              <Select
                 value={template.id}
                 onChange={(event) => setTemplateId(event.target.value)}
               >
@@ -453,7 +454,7 @@ export function Gen3GameCubePanel({
                       getGen3SpeciesName(i18n.language, entry.species)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <div className="static-encounter-meta">
               <div>
@@ -484,7 +485,7 @@ export function Gen3GameCubePanel({
             <div className="gen3-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   value={ability}
                   onChange={(event) =>
                     setAbility(event.target.value as GameCubeAbilityFilter)
@@ -493,11 +494,11 @@ export function Gen3GameCubePanel({
                   <option value="any">{t("any")}</option>
                   <option value="first">0</option>
                   <option value="second">1</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   value={gender}
                   onChange={(event) =>
                     setGender(event.target.value as GameCubeGenderFilter)
@@ -506,7 +507,7 @@ export function Gen3GameCubePanel({
                   <option value="any">{t("any")}</option>
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -526,7 +527,7 @@ export function Gen3GameCubePanel({
               />
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   value={shiny}
                   onChange={(event) =>
                     setShiny(event.target.value as GameCubeShinyFilter)
@@ -536,7 +537,7 @@ export function Gen3GameCubePanel({
                   <option value="star">{t("shinyStar")}</option>
                   <option value="square">{t("shinySquare")}</option>
                   <option value="star-square">{t("shinyStarSquare")}</option>
-                </select>
+                </Select>
               </label>
             </div>
             <div className="iv-filter">

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import type { TFunction } from "i18next";
 import {
   ArrowDown,
@@ -425,7 +426,7 @@ function ProfileEditor({
           </label>
           <label className="gen8profiles-field gen8profiles-span-2">
             <span>{labels.version}</span>
-            <select
+            <Select
               disabled={busy}
               onChange={(event) =>
                 update("version", event.target.value as Gen8GameVersion)
@@ -437,7 +438,7 @@ function ProfileEditor({
                   {labels.versions[version]}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="gen8profiles-field">
             <span>{labels.tid}</span>

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -223,7 +224,7 @@ export function Gen6TinyRockSmashPanel({
           <div className="gen6tinyrocksmash-grid">
             <label className="field">
               <span>{t("gen6TinyRockSmashVersion")}</span>
-              <select
+              <Select
                 value={version}
                 onChange={(event) =>
                   setVersion(event.target.value as Gen6TinyRockSmashVersion)
@@ -233,7 +234,7 @@ export function Gen6TinyRockSmashPanel({
                 <option value="y">Y</option>
                 <option value="omega-ruby">Omega Ruby</option>
                 <option value="alpha-sapphire">Alpha Sapphire</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("gen6TinyRockSmashLocation")}</span>
@@ -410,7 +411,7 @@ export function Gen6TinyRockSmashPanel({
           <div className="gen6tinyrocksmash-grid">
             <label className="field">
               <span>{t("gen6TinyRockSmashFlute")}</span>
-              <select
+              <Select
                 value={flute}
                 onChange={(event) => setFlute(event.target.value)}
               >
@@ -419,7 +420,7 @@ export function Gen6TinyRockSmashPanel({
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("gen6TinyRockSmashSlot")}</span>

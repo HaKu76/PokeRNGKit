@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -545,7 +546,7 @@ export function Gen4EventPanel({
           <div className="gen4event-control-stack">
             <label className="field">
               <span>{t("species")}</span>
-              <select
+              <Select
                 onChange={(event) => setSpecies(event.target.value)}
                 value={species}
               >
@@ -556,7 +557,7 @@ export function Gen4EventPanel({
                     </option>
                   ),
                 )}
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("level")}</span>
@@ -573,7 +574,7 @@ export function Gen4EventPanel({
             </label>
             <label className="field">
               <span>{t("nature")}</span>
-              <select
+              <Select
                 onChange={(event) => setNature(event.target.value)}
                 value={nature}
               >
@@ -582,7 +583,7 @@ export function Gen4EventPanel({
                     {t(key)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           </div>
         </section>

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   Download,
@@ -600,7 +601,7 @@ export function Gen7EggPanel({
       <div className="gen7egg-parent-controls">
         <label className="field">
           <span>{t("gen7EggAbility")}</span>
-          <select
+          <Select
             onChange={(event) =>
               setParent((current) => ({
                 ...current,
@@ -612,11 +613,11 @@ export function Gen7EggPanel({
             <option value={0}>1</option>
             <option value={1}>2</option>
             <option value={2}>H</option>
-          </select>
+          </Select>
         </label>
         <label className="field">
           <span>{t("gen7EggItem")}</span>
-          <select
+          <Select
             onChange={(event) =>
               setParent((current) => ({
                 ...current,
@@ -630,7 +631,7 @@ export function Gen7EggPanel({
                 {t(option.key)}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
       <div className="gen7egg-parent-ivs">
@@ -928,7 +929,7 @@ export function Gen7EggPanel({
             <div className="gen7egg-range-grid gen7egg-parent-options">
               <label className="field">
                 <span>{t("gen7EggGenderRatio")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     changeGenderRatio(event.target.value as Gen7EggGenderRatio)
                   }
@@ -939,7 +940,7 @@ export function Gen7EggPanel({
                       {t(option.key)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="checkbox-field">
                 <input
@@ -979,7 +980,7 @@ export function Gen7EggPanel({
               <div className="gen7egg-filter-grid">
                 <label className="field">
                   <span>{t("gen7EggShiny")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setShinyFilter(event.target.value as Gen7EggShinyFilter)
                     }
@@ -988,11 +989,11 @@ export function Gen7EggPanel({
                     <option value="any">{t("any")}</option>
                     <option value="shiny">{t("gen7EggShinyOnly")}</option>
                     <option value="square">◆</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gen7EggGender")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setGenderFilter(event.target.value as Gen7EggGenderFilter)
                     }
@@ -1001,11 +1002,11 @@ export function Gen7EggPanel({
                     <option value="any">{t("any")}</option>
                     <option value="male">♂</option>
                     <option value="female">♀</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gen7EggAbility")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setAbilityFilter(
                         event.target.value as Gen7EggAbilityFilter,
@@ -1017,11 +1018,11 @@ export function Gen7EggPanel({
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="hidden">H</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gen7EggBall")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setBallFilter(event.target.value as Gen7EggParentFilter)
                     }
@@ -1030,12 +1031,12 @@ export function Gen7EggPanel({
                     <option value="any">{t("any")}</option>
                     <option value="male">{t("gen7EggMaleParent")}</option>
                     <option value="female">{t("gen7EggFemaleParent")}</option>
-                  </select>
+                  </Select>
                 </label>
                 {hasEverstone ? (
                   <label className="field">
                     <span>{t("gen7EggNature")}</span>
-                    <select
+                    <Select
                       onChange={(event) =>
                         setNatureInheritanceFilter(
                           event.target.value as Gen7EggParentFilter,
@@ -1046,7 +1047,7 @@ export function Gen7EggPanel({
                       <option value="any">{t("any")}</option>
                       <option value="male">{t("gen7EggMaleParent")}</option>
                       <option value="female">{t("gen7EggFemaleParent")}</option>
-                    </select>
+                    </Select>
                   </label>
                 ) : (
                   <MultiCheckSelect

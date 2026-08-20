@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type CSSProperties,
@@ -375,7 +376,7 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
               .length > 1 && (
               <label className="field researcher-rng-select">
                 <span>{labels.rng}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     chooseRng(group, event.target.value as ResearcherRng)
@@ -389,7 +390,7 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                         {researcherRngLabels[value]}
                       </option>
                     ))}
-                </select>
+                </Select>
               </label>
             )}
             <div className="researcher-seed-grid">
@@ -515,7 +516,7 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
               </label>
               <label className="field">
                 <span>{labels.searchColumn}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setSearchOperand(Number(event.target.value))
                   }
@@ -526,7 +527,7 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                       {operandLabel(operand)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="researcher-hex-toggle">
                 <input
@@ -582,7 +583,7 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                   key={index}
                 >
                   <strong>{operandLabel(index + 13)}</strong>
-                  <select
+                  <Select
                     aria-label={`${operandLabel(index + 13)} left`}
                     disabled={status === "calculating"}
                     onChange={(event) =>
@@ -595,8 +596,8 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                         {operandLabel(operand)}
                       </option>
                     ))}
-                  </select>
-                  <select
+                  </Select>
+                  <Select
                     aria-label={`${operandLabel(index + 13)} operator`}
                     disabled={status === "calculating"}
                     onChange={(event) =>
@@ -612,7 +613,7 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                         {operator}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                   <input
                     aria-label={`${operandLabel(index + 13)} ${labels.rightValue}`}
                     autoComplete="off"
@@ -647,7 +648,7 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                       aria-hidden="true"
                     />
                   ) : (
-                    <select
+                    <Select
                       aria-label={`${operandLabel(index + 13)} ${labels.rightOperand}`}
                       disabled={status === "calculating"}
                       onChange={(event) =>
@@ -666,7 +667,7 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                           {operandLabel(operand)}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   )}
                 </div>
               );

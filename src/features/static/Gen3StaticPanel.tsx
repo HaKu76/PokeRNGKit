@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type FormEvent,
@@ -570,7 +571,7 @@ export function Gen3StaticPanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("method")}</span>
-              <select
+              <Select
                 onChange={(event) =>
                   setMethod(event.target.value as Gen3StaticMethod)
                 }
@@ -580,7 +581,7 @@ export function Gen3StaticPanel({
                 {!template.buggedRoamer && (
                   <option value="method4">{t("method4")}</option>
                 )}
-              </select>
+              </Select>
             </label>
             {operation === "generator" && (
               <>
@@ -687,7 +688,7 @@ export function Gen3StaticPanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("category")}</span>
-              <select
+              <Select
                 onChange={(event) =>
                   setCategory(event.target.value as Gen3StaticCategory)
                 }
@@ -698,11 +699,11 @@ export function Gen3StaticPanel({
                     {t(entry)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("pokemon")}</span>
-              <select
+              <Select
                 onChange={(event) => setTemplateId(event.target.value)}
                 value={template.id}
               >
@@ -715,7 +716,7 @@ export function Gen3StaticPanel({
                     )}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <div className="static-encounter-meta">
               <div>
@@ -748,7 +749,7 @@ export function Gen3StaticPanel({
             <div className="gen3-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setAbility(event.target.value as Gen3StaticAbilityFilter)
                   }
@@ -757,11 +758,11 @@ export function Gen3StaticPanel({
                   <option value="any">{t("any")}</option>
                   <option value="first">0</option>
                   <option value="second">1</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setGender(event.target.value as Gen3StaticGenderFilter)
                   }
@@ -770,7 +771,7 @@ export function Gen3StaticPanel({
                   <option value="any">{t("any")}</option>
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -790,7 +791,7 @@ export function Gen3StaticPanel({
               />
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setShiny(event.target.value as Gen3StaticShinyFilter)
                   }
@@ -800,7 +801,7 @@ export function Gen3StaticPanel({
                   <option value="star">{t("shinyStar")}</option>
                   <option value="square">{t("shinySquare")}</option>
                   <option value="star-square">{t("shinyStarSquare")}</option>
-                </select>
+                </Select>
               </label>
             </div>
             <div className="iv-filter">

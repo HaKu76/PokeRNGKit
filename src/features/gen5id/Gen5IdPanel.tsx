@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -348,7 +349,7 @@ export function Gen5IdPanel({
         <div className="gen5id-profile-control">
           <label className="gen5id-profile-select">
             <span>{text.profile}</span>
-            <select
+            <Select
               disabled={busy || profiles.loading || profiles.busy}
               onChange={(event) =>
                 void profiles.selectProfile(event.target.value || null)
@@ -361,7 +362,7 @@ export function Gen5IdPanel({
                   {entry.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <button
             className="secondary-action gen5id-profile-manager"

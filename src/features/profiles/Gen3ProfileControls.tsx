@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import {
   type ChangeEvent,
   type FormEvent,
@@ -99,7 +100,7 @@ function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
         </label>
         <label className="field">
           <span>{t("profileVersion")}</span>
-          <select
+          <Select
             onChange={(event) => {
               const nextVersion = event.target.value as Gen3GameVersion;
               setVersion(nextVersion);
@@ -112,7 +113,7 @@ function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
                 {t(versionKeys[entry])}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <div className="advance-row">
           <label className="field">
@@ -389,7 +390,7 @@ export function Gen3ProfileControls({
           <div className="profile-float-body">
             <label>
               <span>{t("profile")}</span>
-              <select
+              <Select
                 disabled={controller.loading}
                 onChange={(event) =>
                   void controller.selectProfile(
@@ -406,7 +407,7 @@ export function Gen3ProfileControls({
                     {profile.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <dl>
               <div>

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type FormEvent,
@@ -485,7 +486,7 @@ export function Gen5DreamRadarPanel({
           <div className="gen5dreamradar-profile-actions">
             <label className="field">
               <span>{labels.profile}</span>
-              <select
+              <Select
                 disabled={busy || profiles.loading || profiles.busy}
                 onChange={(event) =>
                   void profiles.selectProfile(event.target.value || null)
@@ -498,7 +499,7 @@ export function Gen5DreamRadarPanel({
                     {entry.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <button
               className="secondary-action"
@@ -665,7 +666,7 @@ export function Gen5DreamRadarPanel({
                     <span className="gen5dreamradar-slot-number">
                       Slot {index + 1}
                     </span>
-                    <select
+                    <Select
                       aria-label={`Slot ${index + 1} Pokemon`}
                       disabled={busy || !active}
                       onChange={(event) =>
@@ -687,8 +688,8 @@ export function Gen5DreamRadarPanel({
                           </option>
                         );
                       })}
-                    </select>
-                    <select
+                    </Select>
+                    <Select
                       aria-label={`Slot ${index + 1} Gender`}
                       disabled={busy || !active || slot.encounter < 0}
                       onChange={(event) =>
@@ -705,7 +706,7 @@ export function Gen5DreamRadarPanel({
                           {genderLabel(t, gender)}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
                 );
               })}

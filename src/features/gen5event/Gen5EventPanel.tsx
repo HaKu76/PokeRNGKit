@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type ChangeEvent,
@@ -679,7 +680,7 @@ export function Gen5EventPanel({
           <div className="gen5event-profile-actions">
             <label className="field">
               <span>{labels.profile}</span>
-              <select
+              <Select
                 disabled={busy || profiles.loading || profiles.busy}
                 onChange={(profileEvent) =>
                   void profiles.selectProfile(profileEvent.target.value || null)
@@ -692,7 +693,7 @@ export function Gen5EventPanel({
                     {entry.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <button
               className="secondary-action"
@@ -906,7 +907,7 @@ export function Gen5EventPanel({
             </label>
             <label className="field">
               <span>{labels.ability}</span>
-              <select
+              <Select
                 disabled={busy}
                 onChange={(inputEvent) =>
                   setEventSettings((current) => ({
@@ -922,11 +923,11 @@ export function Gen5EventPanel({
                 <option value={1}>1</option>
                 <option value={2}>H</option>
                 <option value={3}>0/1</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{labels.gender}</span>
-              <select
+              <Select
                 disabled={busy}
                 onChange={(inputEvent) =>
                   setEventSettings((current) => ({
@@ -941,11 +942,11 @@ export function Gen5EventPanel({
                 <option value={0}>{labels.maleOnly}</option>
                 <option value={1}>{labels.femaleOnly}</option>
                 <option value={2}>{labels.random}</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{labels.shiny}</span>
-              <select
+              <Select
                 disabled={busy}
                 onChange={(inputEvent) =>
                   setEventSettings((current) => ({
@@ -960,7 +961,7 @@ export function Gen5EventPanel({
                 <option value={0}>{labels.random}</option>
                 <option value={1}>{labels.never}</option>
                 <option value={2}>{labels.always}</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{labels.eventTid}</span>
@@ -1030,7 +1031,7 @@ export function Gen5EventPanel({
                   }
                   type="checkbox"
                 />
-                <select
+                <Select
                   disabled={busy || eventSettings.nature === 255}
                   onChange={(inputEvent) =>
                     setEventSettings((current) => ({
@@ -1047,7 +1048,7 @@ export function Gen5EventPanel({
                       {option.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </span>
             </label>
           </div>
@@ -1153,7 +1154,7 @@ export function Gen5EventPanel({
             <div className="gen5event-filter-selects">
               <label className="field">
                 <span>{labels.ability}</span>
-                <select
+                <Select
                   onChange={(inputEvent) =>
                     setAbilityFilter(
                       Number(inputEvent.target.value) as typeof abilityFilter,
@@ -1165,11 +1166,11 @@ export function Gen5EventPanel({
                   <option value={0}>0</option>
                   <option value={1}>1</option>
                   <option value={2}>H</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{labels.gender}</span>
-                <select
+                <Select
                   onChange={(inputEvent) =>
                     setGenderFilter(
                       Number(inputEvent.target.value) as typeof genderFilter,
@@ -1181,11 +1182,11 @@ export function Gen5EventPanel({
                   <option value={0}>{t("male")}</option>
                   <option value={1}>{t("female")}</option>
                   <option value={2}>{t("genderless")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{labels.shiny}</span>
-                <select
+                <Select
                   onChange={(inputEvent) =>
                     setShinyFilter(
                       Number(inputEvent.target.value) as typeof shinyFilter,
@@ -1199,7 +1200,7 @@ export function Gen5EventPanel({
                   <option value={3}>
                     {chinese ? "星星 + 方块" : "Star + Square"}
                   </option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={labels.any}

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -183,7 +184,7 @@ export function Gen7IdPanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("gen7GameVersion")}</span>
-              <select
+              <Select
                 value={version}
                 onChange={(event) => {
                   const next = event.target.value as Gen7GameVersion;
@@ -195,7 +196,7 @@ export function Gen7IdPanel({
                 <option value="moon">{t("gen7Moon")}</option>
                 <option value="ultra-sun">{t("gen7UltraSun")}</option>
                 <option value="ultra-moon">{t("gen7UltraMoon")}</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("seed")}</span>
@@ -291,7 +292,7 @@ export function Gen7IdPanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("gen7IdFilter")}</span>
-              <select
+              <Select
                 value={filterMode}
                 onChange={(event) =>
                   setFilterMode(event.target.value as Gen7IdFilterMode)
@@ -301,7 +302,7 @@ export function Gen7IdPanel({
                 <option value="sid">SID</option>
                 <option value="full">TID/SID</option>
                 <option value="g7tid">Gen7TID</option>
-              </select>
+              </Select>
             </label>
             <div className="gen7id-filter-lists">
               <label className="field gen7id-filter-list gen7id-id-list">

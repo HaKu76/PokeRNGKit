@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
@@ -124,7 +125,7 @@ function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
         </label>
         <label className="field">
           <span>{t("profileVersion")}</span>
-          <select
+          <Select
             onChange={(event) =>
               setVersion(event.target.value as Gen4GameVersion)
             }
@@ -135,7 +136,7 @@ function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
                 {t(versionKeys[entry])}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <div className="advance-row">
           <label className="field">
@@ -427,7 +428,7 @@ export function Gen4ProfileControls({
           <div className="profile-float-body">
             <label>
               <span>{t("profile")}</span>
-              <select
+              <Select
                 disabled={controller.loading}
                 onChange={(event) =>
                   void controller.selectProfile(
@@ -444,7 +445,7 @@ export function Gen4ProfileControls({
                     {profile.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <dl>
               <div>

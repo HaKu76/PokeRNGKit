@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type FormEvent,
@@ -766,7 +767,7 @@ export function Gen3WildPanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("method")}</span>
-              <select
+              <Select
                 value={method}
                 onChange={(event) =>
                   setMethod(event.target.value as Gen3WildMethod)
@@ -775,12 +776,12 @@ export function Gen3WildPanel({
                 <option value="method1">Wild 1</option>
                 <option value="method2">Wild 2</option>
                 <option value="method4">Wild 4</option>
-              </select>
+              </Select>
             </label>
             {leadAvailable && (
               <label className="field">
                 <span>{t("wildLead")}</span>
-                <select
+                <Select
                   value={leadValue}
                   onChange={(event) => {
                     const value = event.target.value;
@@ -821,7 +822,7 @@ export function Gen3WildPanel({
                   ) : (
                     <option value="synchronize">{t("wildSynchronize")}</option>
                   )}
-                </select>
+                </Select>
               </label>
             )}
             {operation === "generator" && (
@@ -929,7 +930,7 @@ export function Gen3WildPanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("wildEncounterType")}</span>
-              <select
+              <Select
                 value={encounter}
                 onChange={(event) =>
                   setEncounter(event.target.value as Gen3WildEncounter)
@@ -942,7 +943,7 @@ export function Gen3WildPanel({
                     </option>
                   ),
                 )}
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("wildLocation")}</span>
@@ -963,7 +964,7 @@ export function Gen3WildPanel({
             </label>
             <label className="field">
               <span>{t("wildPokemon")}</span>
-              <select
+              <Select
                 value={selectedSpecies}
                 onChange={(event) => selectSpecies(Number(event.target.value))}
               >
@@ -977,13 +978,13 @@ export function Gen3WildPanel({
                     )}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             {rockOptions && (
               <>
                 <label className="field">
                   <span>{t("wildItem")}</span>
-                  <select
+                  <Select
                     value={item}
                     onChange={(event) =>
                       setItem(event.target.value as Gen3WildItem)
@@ -993,7 +994,7 @@ export function Gen3WildPanel({
                     <option value="black-flute">Black Flute</option>
                     <option value="cleanse-tag">Cleanse Tag</option>
                     <option value="white-flute">White Flute</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="checkbox-field">
                   <input
@@ -1038,7 +1039,7 @@ export function Gen3WildPanel({
             <div className="gen3-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   value={ability}
                   onChange={(event) =>
                     setAbility(event.target.value as Gen3WildAbilityFilter)
@@ -1047,7 +1048,7 @@ export function Gen3WildPanel({
                   <option value="any">{t("any")}</option>
                   <option value="first">0</option>
                   <option value="second">1</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -1059,7 +1060,7 @@ export function Gen3WildPanel({
               />
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   value={gender}
                   onChange={(event) =>
                     setGender(event.target.value as Gen3WildGenderFilter)
@@ -1068,7 +1069,7 @@ export function Gen3WildPanel({
                   <option value="any">{t("any")}</option>
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -1117,7 +1118,7 @@ export function Gen3WildPanel({
               />
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   value={shiny}
                   onChange={(event) =>
                     setShiny(event.target.value as Gen3WildShinyFilter)
@@ -1127,7 +1128,7 @@ export function Gen3WildPanel({
                   <option value="star">{t("shinyStar")}</option>
                   <option value="square">{t("shinySquare")}</option>
                   <option value="star-square">{t("shinyStarSquare")}</option>
-                </select>
+                </Select>
               </label>
             </div>
             <div className="iv-filter">

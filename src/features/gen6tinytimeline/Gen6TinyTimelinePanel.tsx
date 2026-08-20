@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -400,7 +401,7 @@ export function Gen6TinyTimelinePanel({
                 </label>
                 <label className="field">
                   <span>{t("gen6TinyTimelineType")}</span>
-                  <select
+                  <Select
                     value={event.type}
                     onChange={(change) =>
                       setEvents((current) =>
@@ -438,7 +439,7 @@ export function Gen6TinyTimelinePanel({
                         }
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
               </div>
             ))}

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type FormEvent,
@@ -658,7 +659,7 @@ export function Gen4StaticPanel({
               <>
                 <label className="field">
                   <span>{t("lead")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setLead(event.target.value as Gen4StaticLead)
                     }
@@ -676,12 +677,12 @@ export function Gen4StaticPanel({
                         </option>
                       </>
                     )}
-                  </select>
+                  </Select>
                 </label>
                 {lead === "synchronize" && operation === "generator" && (
                   <label className="field">
                     <span>{t("nature")}</span>
-                    <select
+                    <Select
                       onChange={(event) => setSyncNature(event.target.value)}
                       value={syncNature}
                     >
@@ -690,7 +691,7 @@ export function Gen4StaticPanel({
                           {t(key)}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                 )}
               </>
@@ -867,7 +868,7 @@ export function Gen4StaticPanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("category")}</span>
-              <select
+              <Select
                 onChange={(event) =>
                   setCategory(event.target.value as Gen4StaticCategory)
                 }
@@ -878,11 +879,11 @@ export function Gen4StaticPanel({
                     {t(categoryKeys[entry])}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("pokemon")}</span>
-              <select
+              <Select
                 onChange={(event) => setTemplateId(event.target.value)}
                 value={template.id}
               >
@@ -895,7 +896,7 @@ export function Gen4StaticPanel({
                     )}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <div className="static-encounter-meta">
               <div>
@@ -928,7 +929,7 @@ export function Gen4StaticPanel({
             <div className="gen3-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setAbility(event.target.value as Gen4StaticAbility)
                   }
@@ -937,11 +938,11 @@ export function Gen4StaticPanel({
                   <option value="any">{t("any")}</option>
                   <option value="first">0</option>
                   <option value="second">1</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setGender(event.target.value as Gen4StaticGender)
                   }
@@ -951,7 +952,7 @@ export function Gen4StaticPanel({
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
                   <option value="genderless">{t("genderless")}</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -971,7 +972,7 @@ export function Gen4StaticPanel({
               />
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setShiny(event.target.value as Gen4StaticShiny)
                   }
@@ -980,7 +981,7 @@ export function Gen4StaticPanel({
                   <option value="any">{t("any")}</option>
                   <option value="notShiny">{t("shinyNone")}</option>
                   <option value="shiny">{t("shinyAny")}</option>
-                </select>
+                </Select>
               </label>
             </div>
             <div className="iv-filter">

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -41,7 +42,7 @@ export function Gen8DenMapPanel() {
         </div>
         <label className="gen8denmap-field">
           <span>{t("gen8DenMapLocation")}</span>
-          <select
+          <Select
             onChange={(event) => {
               setRegionId(event.target.value as Gen8DenMapRegionId);
               setLocalIndex(0);
@@ -53,11 +54,11 @@ export function Gen8DenMapPanel() {
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label className="gen8denmap-field">
           <span>{t("gen8DenMapDen")}</span>
-          <select
+          <Select
             onChange={(event) => setLocalIndex(Number(event.target.value))}
             value={localIndex}
           >
@@ -66,7 +67,7 @@ export function Gen8DenMapPanel() {
                 {option.localIndex + 1}: {option.locationName}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <dl className="gen8denmap-details">
           <div>

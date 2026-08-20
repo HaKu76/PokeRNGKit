@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import {
   type ChangeEvent,
   type FormEvent,
@@ -475,7 +476,7 @@ export function Gen3NgcSeedPanel({
             <div className="ngc-seed-form-grid">
               <label className="field">
                 <span>{t("ngcYourLead")}</span>
-                <select
+                <Select
                   value={playerIndex}
                   onChange={(event) =>
                     setPlayerIndex(Number(event.target.value))
@@ -486,7 +487,7 @@ export function Gen3NgcSeedPanel({
                       {getGen3SpeciesName(i18n.language, species)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("ngcTopLeftHp")}</span>
@@ -512,7 +513,7 @@ export function Gen3NgcSeedPanel({
               </label>
               <label className="field">
                 <span>{t("ngcEnemyLead")}</span>
-                <select
+                <Select
                   value={enemyIndex}
                   onChange={(event) =>
                     setEnemyIndex(Number(event.target.value))
@@ -523,7 +524,7 @@ export function Gen3NgcSeedPanel({
                       {getGen3SpeciesName(i18n.language, species)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("ngcBottomLeftHp")}</span>
@@ -553,7 +554,7 @@ export function Gen3NgcSeedPanel({
             <div className="ngc-seed-form-grid compact">
               <label className="field">
                 <span>{t("ngcTrainer")}</span>
-                <select
+                <Select
                   value={trainer}
                   onChange={(event) => setTrainer(Number(event.target.value))}
                 >
@@ -562,11 +563,11 @@ export function Gen3NgcSeedPanel({
                       {name}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("ngcPartyLead")}</span>
-                <select
+                <Select
                   value={partyLead}
                   onChange={(event) => setPartyLead(Number(event.target.value))}
                 >
@@ -575,7 +576,7 @@ export function Gen3NgcSeedPanel({
                       {getGen3SpeciesName(i18n.language, species)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             </div>
           )}

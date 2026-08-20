@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import {
   type ChangeEvent,
   type FormEvent,
@@ -527,7 +528,7 @@ function ProfileEditor({
           </label>
           <label className="gen5profiles-field">
             <span>{labels.version}</span>
-            <select
+            <Select
               onChange={(event) => {
                 const version = event.target.value as Gen5GameVersion;
                 setDraft((current) => ({
@@ -549,11 +550,11 @@ function ProfileEditor({
                   {gameLabel(value, chinese)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="gen5profiles-field">
             <span>{labels.language}</span>
-            <select
+            <Select
               onChange={(event) =>
                 update("language", event.target.value as Gen5Language)
               }
@@ -564,11 +565,11 @@ function ProfileEditor({
                   {LANGUAGE_LABELS[value]}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="gen5profiles-field">
             <span>{labels.dsType}</span>
-            <select
+            <Select
               onChange={(event) =>
                 update("dsType", event.target.value as Gen5DsType)
               }
@@ -579,7 +580,7 @@ function ProfileEditor({
                   {DS_LABELS[value]}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="gen5profiles-field">
             <span>{labels.tid}</span>
@@ -1295,7 +1296,7 @@ function Calibrator({
         <div className="gen5profiles-control-grid">
           <label className="gen5profiles-field">
             <span>{labels.version}</span>
-            <select
+            <Select
               onChange={(event) =>
                 updatePlatform("version", event.target.value as Gen5GameVersion)
               }
@@ -1306,11 +1307,11 @@ function Calibrator({
                   {gameLabel(value, chinese)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="gen5profiles-field">
             <span>{labels.language}</span>
-            <select
+            <Select
               onChange={(event) =>
                 update("language", event.target.value as Gen5Language)
               }
@@ -1321,11 +1322,11 @@ function Calibrator({
                   {LANGUAGE_LABELS[value]}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="gen5profiles-field">
             <span>{labels.dsType}</span>
-            <select
+            <Select
               onChange={(event) =>
                 updatePlatform("dsType", event.target.value as Gen5DsType)
               }
@@ -1336,7 +1337,7 @@ function Calibrator({
                   {DS_LABELS[value]}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="gen5profiles-field gen5profiles-span-2">
             <span>{labels.mac}</span>

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { CornerDownLeft, Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -251,7 +252,7 @@ export function Gen7BattleTreePanel({
             <div className="gen7battletree-field-grid">
               <label className="field">
                 <span>{t("gen7GameVersion")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     setVersion(event.target.value as Gen7BattleTreeVersion)
@@ -263,7 +264,7 @@ export function Gen7BattleTreePanel({
                       {t(option.label)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("seed")}</span>

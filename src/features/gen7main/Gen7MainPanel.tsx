@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ArrowLeft, Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -402,7 +403,7 @@ export function Gen7MainPanel({
             <div className="gen7main-field-grid">
               <label className="field">
                 <span>{t("gen7GameVersion")}</span>
-                <select
+                <Select
                   disabled={isCalculating}
                   onChange={(event) =>
                     setVersion(event.target.value as Gen7MainVersion)
@@ -414,7 +415,7 @@ export function Gen7MainPanel({
                       {t(option.label)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen7MainOffset")}</span>

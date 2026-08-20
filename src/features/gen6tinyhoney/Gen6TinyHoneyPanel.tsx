@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -258,7 +259,7 @@ export function Gen6TinyHoneyPanel({
           <div className="gen6tinyhoney-grid">
             <label className="field">
               <span>{t("gen6TinyHoneyVersion")}</span>
-              <select
+              <Select
                 value={version}
                 onChange={(event) =>
                   setVersion(event.target.value as Gen6TinyHoneyGame)
@@ -268,7 +269,7 @@ export function Gen6TinyHoneyPanel({
                 <option value="y">Y</option>
                 <option value="omega-ruby">Omega Ruby</option>
                 <option value="alpha-sapphire">Alpha Sapphire</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("gen6TinyHoneyLocation")}</span>
@@ -471,7 +472,7 @@ export function Gen6TinyHoneyPanel({
           <div className="gen6tinyhoney-grid">
             <label className="field">
               <span>{t("gen6TinyHoneyFlute")}</span>
-              <select
+              <Select
                 value={flute}
                 onChange={(event) => setFlute(event.target.value)}
               >
@@ -480,7 +481,7 @@ export function Gen6TinyHoneyPanel({
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("gen6TinyHoneySlot")}</span>

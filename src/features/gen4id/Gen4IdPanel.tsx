@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -323,7 +324,7 @@ export function Gen4IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
           <div className="static-form-stack">
             <label className="field">
               <span>{t("mode")}</span>
-              <select
+              <Select
                 onChange={(event) => {
                   setFilterMode(event.target.value as Gen4IdFilterMode);
                   setFilterText("");
@@ -337,7 +338,7 @@ export function Gen4IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                 <option value="pid">PID</option>
                 <option value="tidPid">TID/PID</option>
                 <option value="tsv">TSV</option>
-              </select>
+              </Select>
             </label>
             {filterMode !== "none" && (
               <label className="field gen4id-filter-values">

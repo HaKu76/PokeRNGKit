@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Calculator, Dices, FlaskConical, RotateCcw } from "lucide-react";
@@ -216,7 +217,7 @@ export function MiscRngPanel({
             <div className="misc-rng-grid">
               <label>
                 <span>{t("miscRngGeneration")}</span>
-                <select
+                <Select
                   value={generation}
                   onChange={(event) =>
                     setGeneration(Number(event.target.value) as MiscGeneration)
@@ -224,7 +225,7 @@ export function MiscRngPanel({
                 >
                   <option value="6">Gen VI / MT</option>
                   <option value="7">Gen VII / SFMT</option>
-                </select>
+                </Select>
               </label>
               <label>
                 <span>{t("miscRngCurrentHp")}</span>
@@ -266,7 +267,7 @@ export function MiscRngPanel({
               </label>
               <label>
                 <span>{t("miscRngStatus")}</span>
-                <select
+                <Select
                   value={statusBonus}
                   onChange={(event) => setStatusBonus(event.target.value)}
                 >
@@ -275,11 +276,11 @@ export function MiscRngPanel({
                       {label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label>
                 <span>{t("miscRngBall")}</span>
-                <select
+                <Select
                   value={ballBonus}
                   onChange={(event) => setBallBonus(event.target.value)}
                 >
@@ -288,11 +289,11 @@ export function MiscRngPanel({
                       {label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label>
                 <span>{t("miscRngDexCaught")}</span>
-                <select
+                <Select
                   value={dexBonus}
                   onChange={(event) => setDexBonus(event.target.value)}
                 >
@@ -301,11 +302,11 @@ export function MiscRngPanel({
                       {label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label>
                 <span>{t("miscRngOPower")}</span>
-                <select
+                <Select
                   value={oPowerBonus}
                   onChange={(event) => setOPowerBonus(event.target.value)}
                 >
@@ -314,7 +315,7 @@ export function MiscRngPanel({
                       x{value}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             </div>
             <label className="misc-rng-wide-field">
@@ -388,7 +389,7 @@ export function MiscRngPanel({
               </label>
               <label>
                 <span>{t("miscRngCompare")}</span>
-                <select
+                <Select
                   value={randomCompare}
                   onChange={(event) =>
                     setRandomCompare(event.target.value as RandomCompare)
@@ -397,7 +398,7 @@ export function MiscRngPanel({
                   <option value="less-than">&lt;</option>
                   <option value="greater-than">≥</option>
                   <option value="equal">=</option>
-                </select>
+                </Select>
               </label>
               <label>
                 <span>{t("miscRngTarget")}</span>

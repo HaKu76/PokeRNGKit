@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -542,7 +543,7 @@ export function Gen6StationaryPanel({
               )}
               <label className="field">
                 <span>{t("category")}</span>
-                <select
+                <Select
                   disabled={disabled}
                   onChange={(event) => setCategory(event.target.value)}
                   value={activeCategory}
@@ -552,11 +553,11 @@ export function Gen6StationaryPanel({
                       {categoryLabel(entry, t)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("pokemon")}</span>
-                <select
+                <Select
                   disabled={disabled}
                   onChange={(event) => setTemplateId(event.target.value)}
                   value={selectedTemplate.id}
@@ -566,7 +567,7 @@ export function Gen6StationaryPanel({
                       {gen6StationaryTemplateName(entry, language)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               {!timeFinderMode && (
                 <label className="field">
@@ -627,7 +628,7 @@ export function Gen6StationaryPanel({
               </label>
               <label className="field">
                 <span>{t("gen6StationarySynchronize")}</span>
-                <select
+                <Select
                   disabled={syncDisabled}
                   onChange={(event) => setSyncNature(event.target.value)}
                   value={syncNature}
@@ -638,7 +639,7 @@ export function Gen6StationaryPanel({
                       {GEN6_STATIONARY_NATURES[language][index] ?? t(key)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen6StationaryBankTarget")}</span>
@@ -745,7 +746,7 @@ export function Gen6StationaryPanel({
                 </label>
                 <label className="field">
                   <span>{t("gender")}</span>
-                  <select
+                  <Select
                     disabled={customDisabled}
                     onChange={(event) => setCustomGender(event.target.value)}
                     value={customGender}
@@ -761,11 +762,11 @@ export function Gen6StationaryPanel({
                               : entry.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("ability")}</span>
-                  <select
+                  <Select
                     disabled={customDisabled}
                     onChange={(event) => setCustomAbility(event.target.value)}
                     value={customAbility}
@@ -776,7 +777,7 @@ export function Gen6StationaryPanel({
                     <option value="3">
                       {t("gen6StationaryHiddenAbility")}
                     </option>
-                  </select>
+                  </Select>
                 </label>
               </div>
               <div className="gen6stationary-toggle-grid disclosure-content">
@@ -845,7 +846,7 @@ export function Gen6StationaryPanel({
               <div className="gen6stationary-grid disclosure-content">
                 <label className="field">
                   <span>{t("shiny")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setFilter(
                         "shiny",
@@ -857,11 +858,11 @@ export function Gen6StationaryPanel({
                     <option value="any">{t("any")}</option>
                     <option value="shiny">{t("shinyAny")}</option>
                     <option value="square">{t("shinySquare")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gender")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setFilter(
                         "gender",
@@ -874,11 +875,11 @@ export function Gen6StationaryPanel({
                     <option value="male">{t("male")}</option>
                     <option value="female">{t("female")}</option>
                     <option value="genderless">{t("genderless")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("ability")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setFilter(
                         "ability",
@@ -893,7 +894,7 @@ export function Gen6StationaryPanel({
                     <option value="hidden">
                       {t("gen6StationaryHiddenAbility")}
                     </option>
-                  </select>
+                  </Select>
                 </label>
                 <MultiCheckSelect
                   anyLabel={t("any")}

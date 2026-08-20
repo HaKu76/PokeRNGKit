@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   Download,
@@ -553,7 +554,7 @@ export function Gen8EventPanel({
         <label className="gen8event-field">
           <span>{t("profile")}</span>
           <span className="gen8event-profile-control">
-            <select
+            <Select
               disabled={busy || profiles.loading}
               onChange={(event) => {
                 const id = event.target.value;
@@ -570,7 +571,7 @@ export function Gen8EventPanel({
                   {profile.name}
                 </option>
               ))}
-            </select>
+            </Select>
             <button
               aria-label={t("manager")}
               className="gen8event-icon-button"
@@ -798,7 +799,7 @@ export function Gen8EventPanel({
                 </label>
                 <label className="gen8event-field">
                   <span>{t("gen8EventPidType")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setPidType(event.target.value as Gen8EventPidType)
                     }
@@ -809,11 +810,11 @@ export function Gen8EventPanel({
                     <option value="star">{t("gen8EventStar")}</option>
                     <option value="square">{t("gen8EventSquare")}</option>
                     <option value="static">{t("gen8EventStatic")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="gen8event-field">
                   <span>{t("gen8EventAbility")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setEventAbility(Number(event.target.value))
                     }
@@ -824,11 +825,11 @@ export function Gen8EventPanel({
                     <option value={2}>H</option>
                     <option value={3}>1/2</option>
                     <option value={4}>1/2/H</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="gen8event-field">
                   <span>{t("gen8EventGender")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setEventGender(Number(event.target.value))
                     }
@@ -837,7 +838,7 @@ export function Gen8EventPanel({
                     <option value={0}>♂</option>
                     <option value={1}>♀</option>
                     <option value={2}>-</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="gen8event-toggle gen8event-nature-lock">
                   <input
@@ -849,7 +850,7 @@ export function Gen8EventPanel({
                 </label>
                 <label className="gen8event-field">
                   <span>{t("gen8EventNature")}</span>
-                  <select
+                  <Select
                     disabled={!natureLocked}
                     onChange={(event) =>
                       setEventNature(Number(event.target.value))
@@ -861,7 +862,7 @@ export function Gen8EventPanel({
                         {t(key)}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label className="gen8event-field">
                   <span>TID</span>
@@ -962,7 +963,7 @@ export function Gen8EventPanel({
                 <div className="gen8event-filter-selects">
                   <label className="gen8event-field">
                     <span>{t("gen8EventShiny")}</span>
-                    <select
+                    <Select
                       onChange={(event) =>
                         setShiny(event.target.value as Gen8EventShinyFilter)
                       }
@@ -974,11 +975,11 @@ export function Gen8EventPanel({
                       <option value="starSquare">
                         {t("gen8EventStarSquare")}
                       </option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="gen8event-field">
                     <span>{t("gen8EventGender")}</span>
-                    <select
+                    <Select
                       onChange={(event) =>
                         setGender(event.target.value as Gen8EventGenderFilter)
                       }
@@ -987,11 +988,11 @@ export function Gen8EventPanel({
                       <option value="any">{t("gen8EventAny")}</option>
                       <option value="male">♂</option>
                       <option value="female">♀</option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="gen8event-field">
                     <span>{t("gen8EventAbility")}</span>
-                    <select
+                    <Select
                       onChange={(event) =>
                         setAbility(event.target.value as Gen8EventAbilityFilter)
                       }
@@ -1001,7 +1002,7 @@ export function Gen8EventPanel({
                       <option value="first">0</option>
                       <option value="second">1</option>
                       <option value="hidden">H</option>
-                    </select>
+                    </Select>
                   </label>
                   <MultiCheckSelect
                     anyLabel={t("gen8EventAny")}

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { type FormEvent, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
@@ -129,7 +130,7 @@ export function EncounterLookupPanel({
             </label>
             <label className="field">
               <span>{t("encounterLookupGame")}</span>
-              <select
+              <Select
                 onChange={(event) =>
                   changeGame(event.target.value as EncounterLookupGame)
                 }
@@ -140,7 +141,7 @@ export function EncounterLookupPanel({
                     {getEncounterLookupGameName(option.game, language)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <button
               className="primary-action encounter-lookup-submit"

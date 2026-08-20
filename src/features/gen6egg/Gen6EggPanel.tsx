@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -501,7 +502,7 @@ export function Gen6EggPanel({
             </label>
             <label className="field">
               <span>{t("gen6EggGenderRatio")}</span>
-              <select
+              <Select
                 value={genderRatio}
                 onChange={(event) =>
                   changeGenderRatio(event.target.value as Gen6EggGenderRatio)
@@ -512,7 +513,7 @@ export function Gen6EggPanel({
                     {t(option.key)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           </div>
           <div
@@ -542,7 +543,7 @@ export function Gen6EggPanel({
                 <legend>{t("gen6EggMaleParent")}</legend>
                 <label className="field">
                   <span>{t("gen6EggAbility")}</span>
-                  <select
+                  <Select
                     value={maleAbility}
                     onChange={(event) =>
                       setMaleAbility(Number(event.target.value) as 0 | 1 | 2)
@@ -551,11 +552,11 @@ export function Gen6EggPanel({
                     <option value={0}>1</option>
                     <option value={1}>2</option>
                     <option value={2}>H</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gen6EggItem")}</span>
-                  <select
+                  <Select
                     value={maleItem}
                     onChange={(event) =>
                       setMaleItem(event.target.value as Gen6EggItem)
@@ -566,7 +567,7 @@ export function Gen6EggPanel({
                         {t(option.key)}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label className="checkbox-field">
                   <input
@@ -591,7 +592,7 @@ export function Gen6EggPanel({
                 <legend>{t("gen6EggFemaleParent")}</legend>
                 <label className="field">
                   <span>{t("gen6EggAbility")}</span>
-                  <select
+                  <Select
                     value={femaleAbility}
                     onChange={(event) =>
                       setFemaleAbility(Number(event.target.value) as 0 | 1 | 2)
@@ -600,11 +601,11 @@ export function Gen6EggPanel({
                     <option value={0}>1</option>
                     <option value={1}>2</option>
                     <option value={2}>H</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gen6EggItem")}</span>
-                  <select
+                  <Select
                     value={femaleItem}
                     onChange={(event) =>
                       setFemaleItem(event.target.value as Gen6EggItem)
@@ -615,7 +616,7 @@ export function Gen6EggPanel({
                         {t(option.key)}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label className="checkbox-field">
                   <input
@@ -692,7 +693,7 @@ export function Gen6EggPanel({
               </label>
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   disabled={filtersDisabled}
                   value={shinyFilter}
                   onChange={(event) =>
@@ -702,11 +703,11 @@ export function Gen6EggPanel({
                   <option value="any">{t("any")}</option>
                   <option value="shiny">{t("shinyAny")}</option>
                   <option value="square">{t("shinySquare")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   disabled={filtersDisabled}
                   value={genderFilter}
                   onChange={(event) =>
@@ -717,11 +718,11 @@ export function Gen6EggPanel({
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
                   <option value="genderless">{t("genderless")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   disabled={filtersDisabled}
                   value={abilityFilter}
                   onChange={(event) =>
@@ -732,7 +733,7 @@ export function Gen6EggPanel({
                   <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="hidden">H</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -755,7 +756,7 @@ export function Gen6EggPanel({
               {(maleItem === "everstone" || femaleItem === "everstone") && (
                 <label className="field">
                   <span>{t("gen6EggNatureParent")}</span>
-                  <select
+                  <Select
                     disabled={filtersDisabled}
                     value={natureParent}
                     onChange={(event) =>
@@ -765,7 +766,7 @@ export function Gen6EggPanel({
                     <option value="any">{t("any")}</option>
                     <option value="male">{t("gen6EggMaleParent")}</option>
                     <option value="female">{t("gen6EggFemaleParent")}</option>
-                  </select>
+                  </Select>
                 </label>
               )}
             </div>

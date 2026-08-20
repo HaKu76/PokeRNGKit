@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -232,7 +233,7 @@ export function Gen7EggSeedFinderPanel({
                     <span>
                       {t("gen7EggSeedFinderEgg")} {index + 1}
                     </span>
-                    <select
+                    <Select
                       onChange={(event) =>
                         setNatures((current) =>
                           current.map((value, item) =>
@@ -248,7 +249,7 @@ export function Gen7EggSeedFinderPanel({
                         </option>
                       ))}
                       <option value={25}>25</option>
-                    </select>
+                    </Select>
                   </label>
                 ))}
               </div>

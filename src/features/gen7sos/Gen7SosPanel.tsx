@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, GitBranch, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -737,7 +738,7 @@ export function Gen7SosPanel({
               {mode === "pokemon" && (
                 <label className="field">
                   <span>{t("gen7GameVersion")}</span>
-                  <select
+                  <Select
                     value={version}
                     onChange={(event) =>
                       setVersion(event.target.value as Gen7WildGameVersion)
@@ -747,7 +748,7 @@ export function Gen7SosPanel({
                     <option value="moon">{t("gen7Moon")}</option>
                     <option value="ultra-sun">{t("gen7UltraSun")}</option>
                     <option value="ultra-moon">{t("gen7UltraMoon")}</option>
-                  </select>
+                  </Select>
                 </label>
               )}
               <label className="field">
@@ -840,7 +841,7 @@ export function Gen7SosPanel({
                 <div className="gen7sos-grid">
                   <label className="field">
                     <span>{t("gen7WildLocation")}</span>
-                    <select
+                    <Select
                       value={selectedArea?.id ?? ""}
                       onChange={(event) => setAreaId(event.target.value)}
                     >
@@ -849,11 +850,11 @@ export function Gen7SosPanel({
                           {gen7SosLocationName(area, language)}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{t("gen7WildTime")}</span>
-                    <select
+                    <Select
                       value={night ? "night" : "day"}
                       onChange={(event) =>
                         setNight(event.target.value === "night")
@@ -861,11 +862,11 @@ export function Gen7SosPanel({
                     >
                       <option value="day">{t("gen7WildDay")}</option>
                       <option value="night">{t("gen7WildNight")}</option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{t("gen7SosCaller")}</span>
-                    <select
+                    <Select
                       value={selectedCaller}
                       onChange={(event) =>
                         setCaller(Number(event.target.value))
@@ -876,11 +877,11 @@ export function Gen7SosPanel({
                           {gen7SosSpeciesName(value, language)}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{t("gen7SosWeather")}</span>
-                    <select
+                    <Select
                       value={weather}
                       onChange={(event) =>
                         setWeather(event.target.value as Gen7SosWeather)
@@ -890,7 +891,7 @@ export function Gen7SosPanel({
                       <option value="rain">Rain</option>
                       <option value="hail">Hail</option>
                       <option value="sand">Sandstorm</option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{t("gen7SosSeed")}</span>
@@ -969,7 +970,7 @@ export function Gen7SosPanel({
                   </label>
                   <label className="field">
                     <span>{t("gen7WildLead")}</span>
-                    <select
+                    <Select
                       value={lead}
                       onChange={(event) =>
                         setLead(event.target.value as Gen7SosLead)
@@ -980,12 +981,12 @@ export function Gen7SosPanel({
                           {entry.label}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   {lead === "synchronize" && (
                     <label className="field">
                       <span>{t("gen7StationarySyncNature")}</span>
-                      <select
+                      <Select
                         value={syncNature}
                         onChange={(event) => setSyncNature(event.target.value)}
                       >
@@ -995,7 +996,7 @@ export function Gen7SosPanel({
                             {entry.label}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     </label>
                   )}
                   <label className="field">
@@ -1036,7 +1037,7 @@ export function Gen7SosPanel({
                 <div className="gen7sos-grid">
                   <label className="field">
                     <span>Call Rate</span>
-                    <select
+                    <Select
                       value={callRate}
                       onChange={(event) => setCallRate(event.target.value)}
                     >
@@ -1045,18 +1046,18 @@ export function Gen7SosPanel({
                           {value}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>HP Bar Color</span>
-                    <select
+                    <Select
                       value={hpBonus}
                       onChange={(event) => setHpBonus(event.target.value)}
                     >
                       <option value="1">Green</option>
                       <option value="3">Yellow</option>
                       <option value="5">Red</option>
-                    </select>
+                    </Select>
                   </label>
                 </div>
                 <div className="gen7sos-toggle-grid">
@@ -1152,7 +1153,7 @@ export function Gen7SosPanel({
                 </label>
                 <label className="field">
                   <span>Call Rate</span>
-                  <select
+                  <Select
                     value={callRate}
                     onChange={(event) => setCallRate(event.target.value)}
                   >
@@ -1161,18 +1162,18 @@ export function Gen7SosPanel({
                         {value}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>HP Bar Color</span>
-                  <select
+                  <Select
                     value={hpBonus}
                     onChange={(event) => setHpBonus(event.target.value)}
                   >
                     <option value="1">Green</option>
                     <option value="3">Yellow</option>
                     <option value="5">Red</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gen7SosExistingIvs")}</span>
@@ -1257,7 +1258,7 @@ export function Gen7SosPanel({
                 <div className="gen7sos-grid">
                   <label className="field">
                     <span>{t("shiny")}</span>
-                    <select
+                    <Select
                       value={shinyFilter}
                       onChange={(event) =>
                         setShinyFilter(event.target.value as Gen7SosShinyFilter)
@@ -1266,11 +1267,11 @@ export function Gen7SosPanel({
                       <option value="any">{t("any")}</option>
                       <option value="shiny">{t("shiny")}</option>
                       <option value="square">{t("shinySquare")}</option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{t("gender")}</span>
-                    <select
+                    <Select
                       value={genderFilter}
                       onChange={(event) =>
                         setGenderFilter(
@@ -1281,11 +1282,11 @@ export function Gen7SosPanel({
                       <option value="any">{t("any")}</option>
                       <option value="male">{t("male")}</option>
                       <option value="female">{t("female")}</option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{t("ability")}</span>
-                    <select
+                    <Select
                       value={abilityFilter}
                       onChange={(event) =>
                         setAbilityFilter(
@@ -1299,11 +1300,11 @@ export function Gen7SosPanel({
                       <option value="hidden">
                         {t("gen7StationaryHiddenAbility")}
                       </option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{t("gen7WildMark")}</span>
-                    <select
+                    <Select
                       value={blinkFilter}
                       onChange={(event) =>
                         setBlinkFilter(event.target.value as Gen7SosBlinkFilter)
@@ -1312,7 +1313,7 @@ export function Gen7SosPanel({
                       <option value="any">{t("any")}</option>
                       <option value="blink">{t("gen7WildBlinkOnly")}</option>
                       <option value="safe">{t("gen7WildSafeOnly")}</option>
-                    </select>
+                    </Select>
                   </label>
                   <MultiCheckSelect
                     anyLabel={t("any")}

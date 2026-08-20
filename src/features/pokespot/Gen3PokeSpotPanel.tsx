@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import {
   type FormEvent,
   type MouseEvent,
@@ -435,7 +436,7 @@ export function Gen3PokeSpotPanel({
           <div className="static-form-stack">
             <label className="field">
               <span>{t("location")}</span>
-              <select
+              <Select
                 onChange={(event) => {
                   setLocation(Number(event.target.value) as 0 | 1 | 2);
                   setSelectedSpecies(0);
@@ -448,11 +449,11 @@ export function Gen3PokeSpotPanel({
                     {t(entry.nameKey)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("pokemon")}</span>
-              <select
+              <Select
                 onChange={(event) => selectSpecies(Number(event.target.value))}
                 value={selectedSpecies}
               >
@@ -462,7 +463,7 @@ export function Gen3PokeSpotPanel({
                     {getGen3SpeciesName(i18n.language, slot.species)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <div className="pokespot-slot-note">
               {activeLocation.slots
@@ -487,7 +488,7 @@ export function Gen3PokeSpotPanel({
             <div className="gen3-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setAbility(event.target.value as PokeSpotAbilityFilter)
                   }
@@ -496,7 +497,7 @@ export function Gen3PokeSpotPanel({
                   <option value="any">{t("any")}</option>
                   <option value="first">0</option>
                   <option value="second">1</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -511,7 +512,7 @@ export function Gen3PokeSpotPanel({
               />
               <label className="field">
                 <span>{t("gender")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setGender(event.target.value as PokeSpotGenderFilter)
                   }
@@ -520,7 +521,7 @@ export function Gen3PokeSpotPanel({
                   <option value="any">{t("any")}</option>
                   <option value="male">{t("male")}</option>
                   <option value="female">{t("female")}</option>
-                </select>
+                </Select>
               </label>
               <MultiCheckSelect
                 anyLabel={t("any")}
@@ -540,7 +541,7 @@ export function Gen3PokeSpotPanel({
               />
               <label className="field">
                 <span>{t("shiny")}</span>
-                <select
+                <Select
                   onChange={(event) =>
                     setShiny(event.target.value as PokeSpotShinyFilter)
                   }
@@ -550,7 +551,7 @@ export function Gen3PokeSpotPanel({
                   <option value="star">{t("shinyStar")}</option>
                   <option value="square">{t("shinySquare")}</option>
                   <option value="star-square">{t("shinyStarSquare")}</option>
-                </select>
+                </Select>
               </label>
             </div>
             <div className="iv-filter">

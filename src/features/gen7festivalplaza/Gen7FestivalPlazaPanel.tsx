@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   ArrowDown,
@@ -322,7 +323,7 @@ export function Gen7FestivalPlazaPanel({
             <div className="gen7festivalplaza-field-grid">
               <label className="field">
                 <span>Game</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     setVersion(event.target.value as Gen7FestivalPlazaVersion)
@@ -334,7 +335,7 @@ export function Gen7FestivalPlazaPanel({
                       {t(option.label)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("seed")}</span>
@@ -415,7 +416,7 @@ export function Gen7FestivalPlazaPanel({
               </label>
               <label className="field">
                 <span>{t("gen7FestivalPlazaRank")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) => setRank(Number(event.target.value))}
                   value={rank}
@@ -425,11 +426,11 @@ export function Gen7FestivalPlazaPanel({
                       {option}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>★</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     setStarFilter(Number(event.target.value))
@@ -442,11 +443,11 @@ export function Gen7FestivalPlazaPanel({
                       {star}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen7FestivalPlazaFacility")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     setFacilityFilter(Number(event.target.value))
@@ -459,11 +460,11 @@ export function Gen7FestivalPlazaPanel({
                       {GEN7_FESTIVAL_PLAZA_FACILITIES[facility]}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>NPC</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     setNpcTypeFilter(Number(event.target.value))
@@ -476,11 +477,11 @@ export function Gen7FestivalPlazaPanel({
                       {npcType}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen7FestivalPlazaColor")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     setColorFilter(Number(event.target.value))
@@ -493,7 +494,7 @@ export function Gen7FestivalPlazaPanel({
                       {color}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="gen7festivalplaza-checkbox-row">
                 <input

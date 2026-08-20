@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
@@ -256,7 +257,7 @@ export function Gen3IvToPidPanel({ uiPreviewMode }: Gen3IvToPidPanelProps) {
           <div className="ivtopid-meta-grid">
             <label className="field">
               <span>{t("ivToPidNature")}</span>
-              <select
+              <Select
                 onChange={(event) => setNature(event.target.value)}
                 value={nature}
               >
@@ -265,7 +266,7 @@ export function Gen3IvToPidPanel({ uiPreviewMode }: Gen3IvToPidPanelProps) {
                     {t(key)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>TID</span>

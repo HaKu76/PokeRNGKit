@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Settings2, Square, Trash2 } from "lucide-react";
 import {
@@ -572,7 +573,7 @@ export function Gen8WildPanel({
         </div>
         <label>
           <span>{t("profile")}</span>
-          <select
+          <Select
             value={selectedProfile.id}
             onChange={(event) =>
               void profiles.selectProfile(event.target.value)
@@ -587,7 +588,7 @@ export function Gen8WildPanel({
             ) : (
               <option value={selectedProfile.id}>{selectedProfile.name}</option>
             )}
-          </select>
+          </Select>
         </label>
         <button
           className="gen8wild-icon-button"
@@ -684,7 +685,7 @@ export function Gen8WildPanel({
           </label>
           <label>
             <span>{t("gen8WildLead")}</span>
-            <select
+            <Select
               onChange={(event) => setLeadChoice(event.target.value)}
               value={leadChoice}
             >
@@ -719,7 +720,7 @@ export function Gen8WildPanel({
                   </option>
                 ))}
               </optgroup>
-            </select>
+            </Select>
           </label>
           <div className="gen8wild-actions">
             <button
@@ -768,7 +769,7 @@ export function Gen8WildPanel({
               <div className="gen8wild-setting-grid">
                 <label>
                   <span>{t("gen8WildEncounter")}</span>
-                  <select
+                  <Select
                     value={encounter}
                     onChange={(event) =>
                       setEncounter(
@@ -783,11 +784,11 @@ export function Gen8WildPanel({
                     <option value="oldRod">{t("gen8WildOldRod")}</option>
                     <option value="goodRod">{t("gen8WildGoodRod")}</option>
                     <option value="superRod">{t("gen8WildSuperRod")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8WildLocation")}</span>
-                  <select
+                  <Select
                     value={location}
                     onChange={(event) =>
                       setLocation(Number(event.target.value))
@@ -798,11 +799,11 @@ export function Gen8WildPanel({
                         {locationName(i18n.language, value)}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8WildTime")}</span>
-                  <select
+                  <Select
                     value={time}
                     onChange={(event) =>
                       setTime(Number(event.target.value) as 0 | 1 | 2)
@@ -811,7 +812,7 @@ export function Gen8WildPanel({
                     <option value={0}>{t("gen8WildMorning")}</option>
                     <option value={1}>{t("gen8WildDay")}</option>
                     <option value={2}>{t("gen8WildNight")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8WildLevels")}</span>
@@ -858,7 +859,7 @@ export function Gen8WildPanel({
                 <div className="gen8wild-replacement-grid">
                   <label>
                     <span>{t("gen8WildReplacement")}</span>
-                    <select
+                    <Select
                       value={replacement0}
                       onChange={(event) =>
                         setReplacement0(Number(event.target.value))
@@ -870,12 +871,12 @@ export function Gen8WildPanel({
                           {getIvSpeciesName(i18n.language, species)}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   {location === 117 && (
                     <label>
                       <span>{t("gen8WildReplacement")}</span>
-                      <select
+                      <Select
                         value={replacement1}
                         onChange={(event) =>
                           setReplacement1(Number(event.target.value))
@@ -887,7 +888,7 @@ export function Gen8WildPanel({
                             {getIvSpeciesName(i18n.language, species)}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     </label>
                   )}
                 </div>
@@ -944,7 +945,7 @@ export function Gen8WildPanel({
               <div className="gen8wild-filter-grid">
                 <label>
                   <span>{t("gen8WildShiny")}</span>
-                  <select
+                  <Select
                     disabled={filtersDisabled}
                     value={shiny}
                     onChange={(event) =>
@@ -957,11 +958,11 @@ export function Gen8WildPanel({
                     <option value="starSquare">
                       {t("gen8WildStarSquare")}
                     </option>
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8WildGender")}</span>
-                  <select
+                  <Select
                     disabled={filtersDisabled}
                     value={gender}
                     onChange={(event) =>
@@ -971,11 +972,11 @@ export function Gen8WildPanel({
                     <option value="any">{t("gen8WildAny")}</option>
                     <option value="male">♂</option>
                     <option value="female">♀</option>
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8WildAbility")}</span>
-                  <select
+                  <Select
                     disabled={filtersDisabled}
                     value={ability}
                     onChange={(event) =>
@@ -985,7 +986,7 @@ export function Gen8WildPanel({
                     <option value="any">{t("gen8WildAny")}</option>
                     <option value="first">0</option>
                     <option value="second">1</option>
-                  </select>
+                  </Select>
                 </label>
                 <label>
                   <span>{t("gen8WildLevel")}</span>

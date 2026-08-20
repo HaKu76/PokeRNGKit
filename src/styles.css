@@ -3368,6 +3368,130 @@ h1 {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Shared HakuStyle select surface used by every module. */
+.haku-select {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.haku-select-trigger {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--control-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px 13px 10px 14px;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.haku-select-trigger > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.haku-select-trigger > svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+  transition: transform 160ms ease;
+}
+
+.haku-select-trigger > svg.rotated {
+  transform: rotate(180deg);
+}
+
+.haku-select-trigger:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--brand) 52%, var(--line-strong));
+  background: color-mix(in srgb, var(--surface) 92%, var(--teal-soft));
+}
+
+.haku-select-trigger:focus-visible {
+  border-color: var(--brand);
+  outline: 0;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 16%, transparent);
+}
+
+.haku-select-trigger:disabled {
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.haku-select-menu {
+  position: absolute;
+  z-index: 24;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  max-height: min(360px, calc(100vh - 220px));
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 12px 28px rgb(9 10 24 / 0.22);
+  padding: 4px;
+}
+
+.haku-select-menu button {
+  width: 100%;
+  min-height: var(--control-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  padding: 9px 10px;
+  text-align: left;
+}
+
+.haku-select-menu button > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.haku-select-menu button:hover:not(:disabled),
+.haku-select-menu button.active,
+.haku-select-menu button[aria-selected="true"] {
+  background: var(--teal-soft);
+  color: var(--brand-strong);
+}
+
+.haku-select-menu button[aria-selected="true"] {
+  font-weight: 600;
+}
+
+.haku-select-menu button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.haku-select-group-label {
+  color: var(--muted);
+  padding: 8px 10px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+}
 .encounter-lookup-submit {
   min-width: 88px;
   justify-content: center;

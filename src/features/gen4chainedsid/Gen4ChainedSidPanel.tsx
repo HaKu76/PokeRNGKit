@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
@@ -250,7 +251,7 @@ export function Gen4ChainedSidPanel({
           </label>
           <label className="field">
             <span>{copy.ability}</span>
-            <select
+            <Select
               onChange={(event) => setAbility(Number(event.target.value))}
               value={ability}
             >
@@ -259,11 +260,11 @@ export function Gen4ChainedSidPanel({
                   {entry.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="field">
             <span>{copy.gender}</span>
-            <select
+            <Select
               onChange={(event) => setGender(Number(event.target.value))}
               value={gender}
             >
@@ -272,11 +273,11 @@ export function Gen4ChainedSidPanel({
                   {value === 0 ? "♂" : value === 1 ? "♀" : "-"}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="field">
             <span>{copy.nature}</span>
-            <select
+            <Select
               onChange={(event) => setNature(Number(event.target.value))}
               value={nature}
             >
@@ -285,7 +286,7 @@ export function Gen4ChainedSidPanel({
                   {t(key)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="field">
             <span>{copy.tid}</span>

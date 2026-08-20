@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -211,7 +212,7 @@ export function Gen6TinyAmbushPanel({
           <div className="gen6tinyambush-grid">
             <label className="field">
               <span>{t("gen6TinyAmbushVersion")}</span>
-              <select
+              <Select
                 value={version}
                 onChange={(event) =>
                   setVersion(event.target.value as Gen6TinyAmbushVersion)
@@ -219,7 +220,7 @@ export function Gen6TinyAmbushPanel({
               >
                 <option value="x">X</option>
                 <option value="y">Y</option>
-              </select>
+              </Select>
             </label>
             <label className="field">
               <span>{t("gen6TinyAmbushLocation")}</span>

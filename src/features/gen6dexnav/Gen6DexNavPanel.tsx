@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
@@ -312,7 +313,7 @@ export function Gen6DexNavPanel({
             <div className="gen6dexnav-grid">
               <label className="field">
                 <span>{t("gen6WildEncounterType")}</span>
-                <select
+                <Select
                   value={encounterType}
                   onChange={(event) =>
                     setEncounterType(
@@ -323,7 +324,7 @@ export function Gen6DexNavPanel({
                   <option value="grass">Grass</option>
                   <option value="tall-grass">Tall Grass</option>
                   <option value="surf">Surf</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen6DexNavSearchLevel")}</span>
@@ -357,7 +358,7 @@ export function Gen6DexNavPanel({
               </label>
               <label className="field">
                 <span>{t("gen6WildFlute")}</span>
-                <select
+                <Select
                   value={flute}
                   onChange={(event) =>
                     setFlute(Number(event.target.value) as Gen6DexNavFlute)
@@ -366,7 +367,7 @@ export function Gen6DexNavPanel({
                   <option value="0">-</option>
                   <option value="1">+</option>
                   <option value="-1">−</option>
-                </select>
+                </Select>
               </label>
             </div>
             <div className="gen6dexnav-checks">

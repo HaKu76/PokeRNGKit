@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Square, Trash2 } from "lucide-react";
 import {
@@ -626,7 +627,7 @@ export function Gen7StationaryPanel({
             <div className="gen7stationary-field-grid">
               <label className="field">
                 <span>{t("gen7GameVersion")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     changeVersion(
@@ -639,7 +640,7 @@ export function Gen7StationaryPanel({
                   <option value="moon">{t("gen7Moon")}</option>
                   <option value="ultra-sun">{t("gen7UltraSun")}</option>
                   <option value="ultra-moon">{t("gen7UltraMoon")}</option>
-                </select>
+                </Select>
               </label>
               {timeFinderMode ? (
                 <>
@@ -786,7 +787,7 @@ export function Gen7StationaryPanel({
               <div className="gen7stationary-field-grid">
                 <label className="field">
                   <span>{t("category")}</span>
-                  <select
+                  <Select
                     disabled={status === "calculating"}
                     onChange={(event) => changeCategory(event.target.value)}
                     value={category}
@@ -796,11 +797,11 @@ export function Gen7StationaryPanel({
                         {categoryLabel(entry, t)}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("pokemon")}</span>
-                  <select
+                  <Select
                     disabled={status === "calculating"}
                     onChange={(event) => {
                       const template = categoryTemplates.find(
@@ -815,7 +816,7 @@ export function Gen7StationaryPanel({
                         {gen7StationaryTemplateName(entry, language)}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
               </div>
               <div className="gen7stationary-encounter-meta">
@@ -835,7 +836,7 @@ export function Gen7StationaryPanel({
               <div className="gen7stationary-field-grid compact">
                 <label className="field">
                   <span>{t("gen7StationarySyncNature")}</span>
-                  <select
+                  <Select
                     disabled={
                       status === "calculating" ||
                       !encounter.syncable ||
@@ -850,7 +851,7 @@ export function Gen7StationaryPanel({
                         {entry.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>NPC</span>
@@ -991,7 +992,7 @@ export function Gen7StationaryPanel({
                   </label>
                   <label className="field">
                     <span>{t("gender")}</span>
-                    <select
+                    <Select
                       disabled={status === "calculating"}
                       onChange={(event) => {
                         const setting = Number(event.target.value);
@@ -1014,11 +1015,11 @@ export function Gen7StationaryPanel({
                                 : entry.label}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{t("ability")}</span>
-                    <select
+                    <Select
                       disabled={status === "calculating"}
                       onChange={(event) =>
                         setEncounter((current) => ({
@@ -1034,7 +1035,7 @@ export function Gen7StationaryPanel({
                       <option value={3}>
                         {t("gen7StationaryHiddenAbility")}
                       </option>
-                    </select>
+                    </Select>
                   </label>
                 </div>
                 <div className="gen7stationary-toggle-grid disclosure-content">
@@ -1097,7 +1098,7 @@ export function Gen7StationaryPanel({
               <div className="gen7stationary-field-grid disclosure-content">
                 <label className="field">
                   <span>{t("shiny")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setShinyFilter(
                         event.target.value as Gen7StationaryShinyFilter,
@@ -1108,11 +1109,11 @@ export function Gen7StationaryPanel({
                     <option value="any">{t("any")}</option>
                     <option value="shiny">{t("shinyAny")}</option>
                     <option value="square">{t("shinySquare")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gender")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setGenderFilter(
                         event.target.value as Gen7StationaryGenderFilter,
@@ -1123,11 +1124,11 @@ export function Gen7StationaryPanel({
                     <option value="any">{t("any")}</option>
                     <option value="male">{t("male")}</option>
                     <option value="female">{t("female")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("ability")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setAbilityFilter(
                         event.target.value as Gen7StationaryAbilityFilter,
@@ -1141,11 +1142,11 @@ export function Gen7StationaryPanel({
                     <option value="hidden">
                       {t("gen7StationaryHiddenAbility")}
                     </option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>Blink</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setBlinkFilter(
                         event.target.value as Gen7StationaryBlinkFilter,
@@ -1160,7 +1161,7 @@ export function Gen7StationaryPanel({
                     {encounter.npc !== 0 && (
                       <option value="safe">Safe Frame</option>
                     )}
-                  </select>
+                  </Select>
                 </label>
                 <MultiCheckSelect
                   anyLabel={t("any")}

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Settings2, Square, Trash2 } from "lucide-react";
 import {
@@ -573,7 +574,7 @@ export function Gen8EggPanel({
       <div className="gen8egg-parent-attributes">
         <label className="gen8egg-field">
           <span>{t("ability")}</span>
-          <select
+          <Select
             disabled={busy}
             onChange={(event) =>
               setter((current) => ({
@@ -586,11 +587,11 @@ export function Gen8EggPanel({
             <option value={0}>0</option>
             <option value={1}>1</option>
             <option value={2}>H</option>
-          </select>
+          </Select>
         </label>
         <label className="gen8egg-field">
           <span>{t("gender")}</span>
-          <select
+          <Select
             disabled={busy}
             onChange={(event) =>
               setter((current) => ({
@@ -604,11 +605,11 @@ export function Gen8EggPanel({
             <option value="female">{t("female")}</option>
             <option value="genderless">{t("genderless")}</option>
             <option value="ditto">{t("gen4EggDitto")}</option>
-          </select>
+          </Select>
         </label>
         <label className="gen8egg-field">
           <span>{t("eggItem")}</span>
-          <select
+          <Select
             disabled={busy}
             onChange={(event) =>
               setter((current) => ({
@@ -621,11 +622,11 @@ export function Gen8EggPanel({
             <option value={0}>{t("none")}</option>
             <option value={1}>{t("eggEverstone")}</option>
             <option value={8}>{t("gen8EggDestinyKnot")}</option>
-          </select>
+          </Select>
         </label>
         <label className="gen8egg-field">
           <span>{t("nature")}</span>
-          <select
+          <Select
             disabled={busy}
             onChange={(event) =>
               setter((current) => ({
@@ -640,7 +641,7 @@ export function Gen8EggPanel({
                 {t(key)}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
     </fieldset>
@@ -652,7 +653,7 @@ export function Gen8EggPanel({
         <label className="gen8egg-field">
           <span>{t("profile")}</span>
           <span className="gen8egg-profile-control">
-            <select
+            <Select
               disabled={busy || profiles.loading}
               onChange={(event) => {
                 const id = event.target.value;
@@ -669,7 +670,7 @@ export function Gen8EggPanel({
                   {profile.name}
                 </option>
               ))}
-            </select>
+            </Select>
             <button
               aria-label={t("manager")}
               className="gen8egg-icon-button"
@@ -778,7 +779,7 @@ export function Gen8EggPanel({
             </label>
             <label className="gen8egg-field">
               <span>{t("eggCompatibility")}</span>
-              <select
+              <Select
                 disabled={busy}
                 onChange={(event) =>
                   setCompatibility(
@@ -790,7 +791,7 @@ export function Gen8EggPanel({
                 <option value={20}>{t("eggCompatibility20")}</option>
                 <option value={50}>{t("eggCompatibility50")}</option>
                 <option value={70}>{t("eggCompatibility70")}</option>
-              </select>
+              </Select>
             </label>
           </div>
           <div className="gen8egg-run-actions">
@@ -938,7 +939,7 @@ export function Gen8EggPanel({
                 <div className="gen8egg-filter-selects">
                   <label className="gen8egg-field">
                     <span>{t("shiny")}</span>
-                    <select
+                    <Select
                       onChange={(event) =>
                         setShiny(event.target.value as Gen8EggShinyFilter)
                       }
@@ -949,11 +950,11 @@ export function Gen8EggPanel({
                       <option value="star">{t("shinyStar")}</option>
                       <option value="square">{t("shinySquare")}</option>
                       <option value="starSquare">{t("shinyStarSquare")}</option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="gen8egg-field">
                     <span>{t("gender")}</span>
-                    <select
+                    <Select
                       onChange={(event) =>
                         setGender(event.target.value as Gen8EggGenderFilter)
                       }
@@ -963,11 +964,11 @@ export function Gen8EggPanel({
                       <option value="male">{t("male")}</option>
                       <option value="female">{t("female")}</option>
                       <option value="genderless">{t("genderless")}</option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="gen8egg-field">
                     <span>{t("ability")}</span>
-                    <select
+                    <Select
                       onChange={(event) =>
                         setAbility(event.target.value as Gen8EggAbilityFilter)
                       }
@@ -977,7 +978,7 @@ export function Gen8EggPanel({
                       <option value="first">0</option>
                       <option value="second">1</option>
                       <option value="hidden">H</option>
-                    </select>
+                    </Select>
                   </label>
                   <MultiCheckSelect
                     anyLabel={t("any")}

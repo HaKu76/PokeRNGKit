@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, FileUp, Play, Square, Trash2 } from "lucide-react";
 import {
@@ -547,7 +548,7 @@ export function Gen7EventPanel({
             <div className="gen7event-field-grid">
               <label className="field">
                 <span>{t("gen7GameVersion")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     changeVersion(event.target.value as Gen7EventGameVersion)
@@ -558,7 +559,7 @@ export function Gen7EventPanel({
                   <option value="moon">{t("gen7Moon")}</option>
                   <option value="ultra-sun">{t("gen7UltraSun")}</option>
                   <option value="ultra-moon">{t("gen7UltraMoon")}</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("seed")}</span>
@@ -716,7 +717,7 @@ export function Gen7EventPanel({
             <div className="gen7event-field-grid">
               <label className="field gen7event-span-two">
                 <span>{t("species")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     changeSpecies(Number(event.target.value))
@@ -732,11 +733,11 @@ export function Gen7EventPanel({
                           : `${species.toString().padStart(3, "0")} ${label}`}
                       </option>
                     ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("form")}</span>
-                <select
+                <Select
                   disabled={status === "calculating" || formCount <= 1}
                   onChange={(event) => {
                     const next = {
@@ -761,7 +762,7 @@ export function Gen7EventPanel({
                       {index}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("level")}</span>
@@ -777,7 +778,7 @@ export function Gen7EventPanel({
               </label>
               <label className="field">
                 <span>{t("gen7EventPidType")}</span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) => {
                     const pidType = event.target.value as Gen7EventPidType;
@@ -796,7 +797,7 @@ export function Gen7EventPanel({
                   <option value="specified">
                     {t("gen7EventPidSpecified")}
                   </option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{t("gen7EventRandomPerfectIvs")}</span>
@@ -831,7 +832,7 @@ export function Gen7EventPanel({
                   />
                   <span>{t("gen7EventAbilityLocked")}</span>
                 </span>
-                <select
+                <Select
                   disabled={status === "calculating"}
                   onChange={(event) =>
                     setSettings((current) => ({
@@ -856,7 +857,7 @@ export function Gen7EventPanel({
                       <option value={1}>1/2/H</option>
                     </>
                   )}
-                </select>
+                </Select>
               </label>
               <label className="gen7event-lock-field">
                 <span className="checkbox-field">
@@ -874,7 +875,7 @@ export function Gen7EventPanel({
                   />
                   <span>{t("gen7EventNatureLocked")}</span>
                 </span>
-                <select
+                <Select
                   disabled={status === "calculating" || !settings.natureLocked}
                   onChange={(event) =>
                     setSettings((current) => ({
@@ -889,7 +890,7 @@ export function Gen7EventPanel({
                       {entry.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="gen7event-lock-field">
                 <span className="checkbox-field">
@@ -907,7 +908,7 @@ export function Gen7EventPanel({
                   />
                   <span>{t("gen7EventGenderLocked")}</span>
                 </span>
-                <select
+                <Select
                   disabled={status === "calculating" || !settings.genderLocked}
                   onChange={(event) =>
                     setSettings((current) => ({
@@ -920,7 +921,7 @@ export function Gen7EventPanel({
                   <option value={0}>{t("genderless")}</option>
                   <option value={1}>{t("male")}</option>
                   <option value={2}>{t("female")}</option>
-                </select>
+                </Select>
               </label>
             </div>
 
@@ -1095,7 +1096,7 @@ export function Gen7EventPanel({
               <div className="gen7event-field-grid disclosure-content">
                 <label className="field">
                   <span>{t("shiny")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setShinyFilter(event.target.value as Gen7EventShinyFilter)
                     }
@@ -1104,11 +1105,11 @@ export function Gen7EventPanel({
                     <option value="any">{t("any")}</option>
                     <option value="shiny">{t("shinyAny")}</option>
                     <option value="square">{t("shinySquare")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("gender")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setGenderFilter(
                         event.target.value as Gen7EventGenderFilter,
@@ -1119,11 +1120,11 @@ export function Gen7EventPanel({
                     <option value="any">{t("any")}</option>
                     <option value="male">{t("male")}</option>
                     <option value="female">{t("female")}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>{t("ability")}</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setAbilityFilter(
                         event.target.value as Gen7EventAbilityFilter,
@@ -1137,11 +1138,11 @@ export function Gen7EventPanel({
                     <option value="hidden">
                       {t("gen7StationaryHiddenAbility")}
                     </option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field">
                   <span>Blink</span>
-                  <select
+                  <Select
                     onChange={(event) =>
                       setBlinkFilter(event.target.value as Gen7EventBlinkFilter)
                     }
@@ -1154,7 +1155,7 @@ export function Gen7EventPanel({
                     {parseGen7EventDecimal(npc) !== 0 && (
                       <option value="safe">Safe Frame</option>
                     )}
-                  </select>
+                  </Select>
                 </label>
                 <MultiCheckSelect
                   anyLabel={t("any")}

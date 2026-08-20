@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type ChangeEvent,
@@ -820,7 +821,7 @@ export function Gen5HiddenGrottoPanel({
           <div className="gen5hiddengrotto-profile-actions">
             <label className="field">
               <span>{labels.profile}</span>
-              <select
+              <Select
                 disabled={busy || profiles.loading || profiles.busy}
                 onChange={(event) => selectProfile(event.target.value)}
                 value={profile?.id ?? ""}
@@ -831,7 +832,7 @@ export function Gen5HiddenGrottoPanel({
                     {entry.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <button
               className="secondary-action"
@@ -1033,7 +1034,7 @@ export function Gen5HiddenGrottoPanel({
             <div className="gen5hiddengrotto-form-grid">
               <label className="field gen5hiddengrotto-wide-field">
                 <span>{labels.location}</span>
-                <select
+                <Select
                   disabled={busy}
                   onChange={(event) => updateArea(Number(event.target.value))}
                   value={areaIndex}
@@ -1046,13 +1047,13 @@ export function Gen5HiddenGrottoPanel({
                       )}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               {workflow === "slot" ? (
                 <>
                   <label className="field">
                     <span>{labels.grottoPower}</span>
-                    <select
+                    <Select
                       disabled={busy}
                       onChange={(event) =>
                         setGrottoPower(
@@ -1066,11 +1067,11 @@ export function Gen5HiddenGrottoPanel({
                       <option value="level2">Level 2</option>
                       <option value="level3">Level 3</option>
                       <option value="levelS">Level S</option>
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{labels.pokemon}</span>
-                    <select
+                    <Select
                       disabled={busy}
                       onChange={(event) =>
                         updateQuickMasks(
@@ -1088,11 +1089,11 @@ export function Gen5HiddenGrottoPanel({
                           {getGen5HiddenGrottoSpeciesName(language, species)}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{labels.items}</span>
-                    <select
+                    <Select
                       disabled={busy}
                       onChange={(event) =>
                         updateQuickMasks(
@@ -1110,7 +1111,7 @@ export function Gen5HiddenGrottoPanel({
                           {getGen5HiddenGrottoItemName(language, item)}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   <MultiCheckSelect
                     anyLabel={labels.any}
@@ -1141,7 +1142,7 @@ export function Gen5HiddenGrottoPanel({
                 <>
                   <label className="field">
                     <span>{labels.group}</span>
-                    <select
+                    <Select
                       disabled={busy}
                       onChange={(event) =>
                         updatePokemonSelection(
@@ -1156,11 +1157,11 @@ export function Gen5HiddenGrottoPanel({
                           {option.label}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{labels.pokemon}</span>
-                    <select
+                    <Select
                       disabled={busy}
                       onChange={(event) =>
                         updatePokemonSelection(
@@ -1183,11 +1184,11 @@ export function Gen5HiddenGrottoPanel({
                           </option>
                         );
                       })}
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{labels.gender}</span>
-                    <select
+                    <Select
                       disabled={busy}
                       onChange={(event) =>
                         setPokemonGender(
@@ -1205,11 +1206,11 @@ export function Gen5HiddenGrottoPanel({
                               : t("genderless")}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                   <label className="field">
                     <span>{labels.lead}</span>
-                    <select
+                    <Select
                       disabled={busy}
                       onChange={(event) =>
                         setLeadType(
@@ -1220,12 +1221,12 @@ export function Gen5HiddenGrottoPanel({
                     >
                       <option value="none">{labels.none}</option>
                       <option value="synchronize">{labels.synchronize}</option>
-                    </select>
+                    </Select>
                   </label>
                   {leadType === "synchronize" && (
                     <label className="field gen5hiddengrotto-wide-field">
                       <span>{t("nature")}</span>
-                      <select
+                      <Select
                         disabled={busy}
                         onChange={(event) =>
                           setLeadNature(Number(event.target.value))
@@ -1237,7 +1238,7 @@ export function Gen5HiddenGrottoPanel({
                             {option.label}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     </label>
                   )}
                 </>

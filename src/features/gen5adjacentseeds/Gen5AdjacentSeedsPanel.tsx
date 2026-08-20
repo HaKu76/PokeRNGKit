@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -370,7 +371,7 @@ export function Gen5AdjacentSeedsPanel({
           <div className="gen5adjacent-profile-actions">
             <label className="field gen5adjacent-profile-select">
               <span>{copy.profile}</span>
-              <select
+              <Select
                 disabled={
                   profiles.loading || profiles.busy || status === "running"
                 }
@@ -391,7 +392,7 @@ export function Gen5AdjacentSeedsPanel({
                     {profile.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <button
               className="secondary-action"
@@ -507,7 +508,7 @@ export function Gen5AdjacentSeedsPanel({
           </label>
           <label className="field">
             <span>{copy.encounter}</span>
-            <select
+            <Select
               disabled={status === "running"}
               onChange={(event) =>
                 setEncounter(
@@ -518,7 +519,7 @@ export function Gen5AdjacentSeedsPanel({
             >
               <option value="standard">Wild / Static / Grotto</option>
               <option value="roamer">Roamer</option>
-            </select>
+            </Select>
           </label>
           <label className="field">
             <span>Initial IV Advances</span>
@@ -734,7 +735,7 @@ export function Gen5AdjacentSeedsPanel({
         <div className="gen5adjacent-preview">
           <label className="field">
             <span className="sr-only">Preview Mode</span>
-            <select
+            <Select
               disabled={selectedIndex === undefined || status === "running"}
               onChange={(event) => {
                 const mode =
@@ -750,7 +751,7 @@ export function Gen5AdjacentSeedsPanel({
             >
               <option value="chatot">Chatot Pitches</option>
               <option value="needles">Save Needles</option>
-            </select>
+            </Select>
           </label>
           <input
             aria-label={

@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Settings2, Square, Trash2 } from "lucide-react";
 import {
@@ -467,7 +468,7 @@ export function Gen8StaticPanel({
         </div>
         <label>
           <span>{t("profile")}</span>
-          <select
+          <Select
             value={selectedProfile.id}
             onChange={(event) =>
               void profiles.selectProfile(event.target.value)
@@ -482,7 +483,7 @@ export function Gen8StaticPanel({
             ) : (
               <option value={selectedProfile.id}>{selectedProfile.name}</option>
             )}
-          </select>
+          </Select>
         </label>
         <button
           className="gen8static-icon-button"
@@ -580,7 +581,7 @@ export function Gen8StaticPanel({
           </label>
           <label>
             <span>{t("gen8StaticLead")}</span>
-            <select
+            <Select
               onChange={(event) => setLead(Number(event.target.value))}
               value={lead}
             >
@@ -598,7 +599,7 @@ export function Gen8StaticPanel({
                   </option>
                 ))}
               </optgroup>
-            </select>
+            </Select>
           </label>
           <div className="gen8static-actions">
             <button
@@ -625,7 +626,7 @@ export function Gen8StaticPanel({
           <legend>{t("gen8StaticSettings")}</legend>
           <label>
             <span>{t("gen8StaticCategory")}</span>
-            <select
+            <Select
               onChange={(event) => {
                 setCategoryIndex(Number(event.target.value));
                 setEncounterIndex(0);
@@ -637,11 +638,11 @@ export function Gen8StaticPanel({
                   {t(CATEGORY_LABEL_KEYS[entry.id] as never)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label>
             <span>{t("gen8StaticPokemon")}</span>
-            <select
+            <Select
               onChange={(event) =>
                 setEncounterIndex(Number(event.target.value))
               }
@@ -652,7 +653,7 @@ export function Gen8StaticPanel({
                   {getIvSpeciesName(i18n.language, entry.species, entry.form)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <div className="gen8static-template-grid">
             <label>
@@ -687,7 +688,7 @@ export function Gen8StaticPanel({
           <div className="gen8static-filter-grid">
             <label>
               <span>{t("gen8StaticShiny")}</span>
-              <select
+              <Select
                 disabled={filtersDisabled}
                 onChange={(event) =>
                   setShiny(event.target.value as Gen8StaticShinyFilter)
@@ -698,11 +699,11 @@ export function Gen8StaticPanel({
                 <option value="star">{t("gen8StaticStar")}</option>
                 <option value="square">{t("gen8StaticSquare")}</option>
                 <option value="starSquare">{t("gen8StaticStarSquare")}</option>
-              </select>
+              </Select>
             </label>
             <label>
               <span>{t("gen8StaticGender")}</span>
-              <select
+              <Select
                 disabled={filtersDisabled}
                 onChange={(event) =>
                   setGender(event.target.value as Gen8StaticGenderFilter)
@@ -712,11 +713,11 @@ export function Gen8StaticPanel({
                 <option value="any">{t("gen8StaticAny")}</option>
                 <option value="male">♂</option>
                 <option value="female">♀</option>
-              </select>
+              </Select>
             </label>
             <label>
               <span>{t("gen8StaticAbility")}</span>
-              <select
+              <Select
                 disabled={filtersDisabled}
                 onChange={(event) =>
                   setAbility(event.target.value as Gen8StaticAbilityFilter)
@@ -727,7 +728,7 @@ export function Gen8StaticPanel({
                 <option value="first">1</option>
                 <option value="second">2</option>
                 <option value="hidden">H</option>
-              </select>
+              </Select>
             </label>
           </div>
           <div className="gen8static-nature-heading">

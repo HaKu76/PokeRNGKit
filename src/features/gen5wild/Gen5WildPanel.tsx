@@ -1,3 +1,4 @@
+import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type ChangeEvent,
@@ -879,7 +880,7 @@ export function Gen5WildPanel({
           <div className="gen5wild-profile-actions">
             <label className="field">
               <span>{labels.profile}</span>
-              <select
+              <Select
                 disabled={busy || profiles.loading || profiles.busy}
                 onChange={(event) => selectProfile(event.target.value)}
                 value={profiles.selectedProfileId ?? ""}
@@ -890,7 +891,7 @@ export function Gen5WildPanel({
                     {entry.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <button
               className="secondary-action"
@@ -1062,7 +1063,7 @@ export function Gen5WildPanel({
             <div className="gen5wild-form-grid">
               <label className="field">
                 <span>{labels.encounter}</span>
-                <select
+                <Select
                   disabled={busy || !profile}
                   onChange={(event) =>
                     changeEncounter(event.target.value as Gen5WildEncounter)
@@ -1074,11 +1075,11 @@ export function Gen5WildPanel({
                       {encounterLabel(chinese, entry)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{labels.season}</span>
-                <select
+                <Select
                   disabled={busy || !profile}
                   onChange={(event) =>
                     changeSeason(Number(event.target.value) as Gen5WildSeason)
@@ -1094,11 +1095,11 @@ export function Gen5WildPanel({
                       </option>
                     ),
                   )}
-                </select>
+                </Select>
               </label>
               <label className="field gen5wild-wide-field">
                 <span>{labels.location}</span>
-                <select
+                <Select
                   disabled={busy || !area}
                   onChange={(event) =>
                     changeLocation(Number(event.target.value))
@@ -1114,11 +1115,11 @@ export function Gen5WildPanel({
                       )}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field gen5wild-wide-field">
                 <span>{labels.pokemon}</span>
-                <select
+                <Select
                   disabled={busy || !area}
                   onChange={(event) => changeSpecies(event.target.value)}
                   value={
@@ -1144,11 +1145,11 @@ export function Gen5WildPanel({
                       )}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field gen5wild-wide-field">
                 <span>{labels.lead}</span>
-                <select
+                <Select
                   disabled={busy}
                   onChange={(event) =>
                     setLead(leadFromValue(event.target.value))
@@ -1178,13 +1179,13 @@ export function Gen5WildPanel({
                       </option>
                     ))}
                   </optgroup>
-                </select>
+                </Select>
               </label>
               {(profile?.version === "black2" ||
                 profile?.version === "white2") && (
                 <label className="field">
                   <span>{labels.luckyPower}</span>
-                  <select
+                  <Select
                     disabled={busy}
                     onChange={(event) =>
                       setLuckyPower(event.target.value as Gen5WildLuckyPower)
@@ -1195,7 +1196,7 @@ export function Gen5WildPanel({
                     <option value="level1">1</option>
                     <option value="level2">2</option>
                     <option value="level3">3/S</option>
-                  </select>
+                  </Select>
                 </label>
               )}
             </div>
@@ -1312,7 +1313,7 @@ export function Gen5WildPanel({
               />
               <label className="field">
                 <span>{labels.ability}</span>
-                <select
+                <Select
                   disabled={busy || (mode === "generator" && filtersDisabled)}
                   onChange={(event) =>
                     setAbility(Number(event.target.value) as 0 | 1 | 255)
@@ -1322,11 +1323,11 @@ export function Gen5WildPanel({
                   <option value={255}>{labels.any}</option>
                   <option value={0}>0</option>
                   <option value={1}>1</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{labels.gender}</span>
-                <select
+                <Select
                   disabled={busy || (mode === "generator" && filtersDisabled)}
                   onChange={(event) =>
                     setGender(Number(event.target.value) as 0 | 1 | 255)
@@ -1336,11 +1337,11 @@ export function Gen5WildPanel({
                   <option value={255}>{labels.any}</option>
                   <option value={0}>♂</option>
                   <option value={1}>♀</option>
-                </select>
+                </Select>
               </label>
               <label className="field">
                 <span>{labels.shiny}</span>
-                <select
+                <Select
                   disabled={busy || (mode === "generator" && filtersDisabled)}
                   onChange={(event) =>
                     setShiny(Number(event.target.value) as 1 | 2 | 3 | 255)
@@ -1353,7 +1354,7 @@ export function Gen5WildPanel({
                   <option value={3}>
                     {chinese ? "星星/方块" : "Star/Square"}
                   </option>
-                </select>
+                </Select>
               </label>
               <div className="gen5wild-level-range">
                 <span>{labels.levels}</span>
