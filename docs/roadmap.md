@@ -16,13 +16,13 @@
 | ------ | ------------------------------------------------- | ------ | --------------------------------------------------------------------------------- | ------------------------------------------- |
 | P0     | Gen VII TF3 Stationary Initial Seed / Time Finder | 已完成 | `PokemonRNGGuides` 的 Gen VII 初始 Seed 教程；`3DSTimeFinder` StationarySearcher7 | 已提交推送；生产算法仍待部署 URL 与人工验收 |
 | P0     | Gen VII TF4 Event Initial Seed / Time Finder      | 已完成 | 与 TF3 同一时间枚举流程，复用 `gen7event`                                         | 已完成工程验证，待提交推送                  |
-| P0     | Gen VII TF5 Wild / TF6 ID                         | 进行中 | TF5 已完成工程验证；TF6 复用 `gen7timefinder` / `gen7id` Wasm 实现时间反查        | TF6 外部页面回归后进入 Gen VI TF1/TF2       |
-| P1     | Gen VI TF1/TF2 Stationary/Event                   | 进行中 | TF1 已实现；TF2 复用 Gen VI Event 时间入口                                        | 实现 TF2 并完成工程验证                     |
+| P0     | Gen VII TF5 Wild / TF6 ID                         | 已完成 | TF5/TF6 工程验证完成，生产算法仍待部署 URL 与人工验收                             | 统一 UI 验收后进入后续辅助缺口              |
+| P1     | Gen VI TF1/TF2 Stationary/Event                   | 已完成 | TF1/TF2 工程验证完成，生产算法仍待部署 URL 与人工验收                             | 统一 UI 验收后进入后续辅助缺口              |
 | P2     | 公共 TSV List                                     | 已完成 | Gen VII Egg 教程要求编辑 TSV List                                                 | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具    |
 | P2     | IV Range / IV Template                            | 已完成 | 3DSRNGTool `IVRange.cs`、`IVTemplate.cs`                                          | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具    |
 | P3     | Gen IV Gen4SeedFinder、Voltorb Flip、Swarm 辅助   | 计划   | 教程复核确认的真实辅助缺口                                                        | P0-P2 完成后评估                            |
 | P4     | Gen V DS 参数、Initial Seed、Entralink 缺口       | 计划   | 教程中的 DS 参数和时间流程                                                        | 仅补确认存在的缺口                          |
-| P5     | TinyFinder 独有扩展                               | 计划   | Rock Smash、Honey Wild、Ambush、Victory Road、MT Seed/Time                        | 主线闭环完成后                              |
+| P5     | TinyFinder 独有扩展                               | 已完成 | T1-T14 已落地；Ambush 覆盖 Victory Road Swooping，MT Seed/Time 独立成模块         | 进入全范围 UI 验收准备                      |
 | 持续   | 按教程共有主线审查入口、侧栏和真实功能缺口        | 进行中 | 全世代 165 篇正文指南人工复核结论                                                 | 每个模块落地时同步调整，避免重复开发        |
 | 最后   | EXE 适配                                          | 计划   | 用户明确要求，优先级最后                                                          | 核心模块与部署稳定后                        |
 | 排除   | NTR Helper                                        | 排除   | 原始 NTR/TCP 访问超出静态浏览器架构                                               | 不开发                                      |
