@@ -738,6 +738,7 @@ export function Gen6MtSeedPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
                         <span>{result.psv}</span>
                         <span>{result.flags}</span>
                         <span>{result.aux}</span>
+                        <span>{result.hordeHa}</span>
                         <span>{result.hordeSpecies}</span>
                         {result.hordeJumps.map((jump, index) => (
                           <span key={index}>{jump}</span>

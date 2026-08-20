@@ -69,6 +69,7 @@ describe("Gen VI MT Seed domain", () => {
       ivs: [31, 0, 0, 0, 0, 0],
       ivs2: [30, 0, 0, 0, 0, 0],
       hordeJumps: [7, 0, 0, 0, 0],
+      hordeHa: 0,
     });
   });
 });

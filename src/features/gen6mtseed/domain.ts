@@ -60,6 +60,7 @@ export interface Gen6MtSeedResult {
   aux: number;
   hordeJumps: [number, number, number, number, number];
   hordeSpecies: number;
+  hordeHa: number;
 }
 
 const UINT32_MAX = 0xffff_ffff;
@@ -210,6 +211,7 @@ export function decodeGen6MtSeedResults(buffer: ArrayBuffer) {
           words[offset + 26],
         ],
         hordeSpecies: words[offset + 27],
+        hordeHa: words[offset + 28],
       } satisfies Gen6MtSeedResult;
     },
   );

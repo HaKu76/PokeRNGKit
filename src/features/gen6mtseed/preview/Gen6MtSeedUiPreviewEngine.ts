@@ -33,6 +33,7 @@ function previewResult(
     aux: 0,
     hordeJumps: [0, 0, 0, 0, 0],
     hordeSpecies: 0,
+    hordeHa: 0,
   };
 }
 
