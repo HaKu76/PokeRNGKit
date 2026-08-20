@@ -1,0 +1,6 @@
+;!@Install@!UTF-8!
+RunProgram="powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Normal -File launch.ps1"
+InstallPath="%TEMP%\PokeRNGKit"
+OverwriteMode="1"
+GUIMode="2"
+;!@InstallEnd@!

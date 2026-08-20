@@ -74,12 +74,75 @@ jobs:
         with:
           path: dist
 
-      - name: Upload portable deployment artifact
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.CLOUDFLARE_PROJECT_NAME != ''
+      - name: Upload production dist artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: production-dist
           path: dist
+          if-no-files-found: error
+
+  windows-portable:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download production dist
+        uses: actions/download-artifact@v4
+        with:
+          name: production-dist
+          path: dist
+
+      - name: Build portable Windows package
+        shell: pwsh
+        run: |
+          $staging = Join-Path $env:RUNNER_TEMP "PokeRNGKit-portable"
+          $archive = Join-Path $env:RUNNER_TEMP "PokeRNGKit.7z"
+          $exe = Join-Path $env:GITHUB_WORKSPACE "PokeRNGKit.exe"
+          $zip = Join-Path $env:GITHUB_WORKSPACE "PokeRNGKit-windows-portable.zip"
+          $sevenZip = (Get-Command 7z.exe -ErrorAction SilentlyContinue).Source
+          $sfx = Join-Path $env:ProgramFiles "7-Zip\7z.sfx"
+
+          if (-not $sevenZip -or -not (Test-Path -LiteralPath $sfx)) {
+            throw "7-Zip and its 7z.sfx module are required on the Windows runner."
+          }
+
+          Remove-Item -LiteralPath $staging, $archive, $exe, $zip -Force -Recurse -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $staging | Out-Null
+          Copy-Item -Path (Join-Path $env:GITHUB_WORKSPACE "dist\*") -Destination $staging -Recurse -Force
+          Copy-Item -LiteralPath (Join-Path $env:GITHUB_WORKSPACE "scripts\windows-launcher.ps1") -Destination (Join-Path $staging "launch.ps1") -Force
+          Copy-Item -LiteralPath (Join-Path $env:GITHUB_WORKSPACE "scripts\windows-sfx-config.txt") -Destination (Join-Path $env:RUNNER_TEMP "sfx-config.txt") -Force
+
+          & $sevenZip a -t7z -mx=9 $archive "$staging\*"
+          if ($LASTEXITCODE -ne 0) {
+            throw "7-Zip archive creation failed with exit code $LASTEXITCODE."
+          }
+
+          $output = [IO.File]::Open($exe, [IO.FileMode]::Create, [IO.FileAccess]::Write)
+          try {
+            foreach ($part in @($sfx, (Join-Path $env:RUNNER_TEMP "sfx-config.txt"), $archive)) {
+              $bytes = [IO.File]::ReadAllBytes($part)
+              $output.Write($bytes, 0, $bytes.Length)
+            }
+          } finally {
+            $output.Dispose()
+          }
+
+          Compress-Archive -Path "$staging\*" -DestinationPath $zip -CompressionLevel Optimal
+          Get-Item -LiteralPath $exe, $zip | Format-Table Name, Length
+
+      - name: Upload Windows portable artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-portable
+          path: |
+            PokeRNGKit.exe
+            PokeRNGKit-windows-portable.zip
           if-no-files-found: error
 
   deploy:

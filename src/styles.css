@@ -4738,11 +4738,11 @@ textarea:disabled {
   display: grid;
   justify-items: end;
   gap: 10px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--floating-shadow);
+  padding: 6px;
 }
 
 .floating-tool-actions {

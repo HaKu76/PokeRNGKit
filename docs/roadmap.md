@@ -8,6 +8,7 @@
 | 进行中 | 当前正在实现，尚未完成该模块的验证与提交     |
 | 计划   | 已确认范围，等待前置模块或排期               |
 | 复核   | 已有代码，需要按上游教程、字段或 UI 重新核对 |
+| 暂缓   | 已明确不在当前开发窗口，保留需求记录但不执行 |
 | 排除   | 明确不进入产品范围                           |
 
 ## 当前需求池
@@ -20,11 +21,13 @@
 | P1     | Gen VI TF1/TF2 Stationary/Event                   | 已完成 | TF1/TF2 工程验证完成，生产算法仍待部署 URL 与人工验收                             | 统一 UI 验收后进入后续辅助缺口              |
 | P2     | 公共 TSV List                                     | 已完成 | Gen VII Egg 教程要求编辑 TSV List                                                 | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具    |
 | P2     | IV Range / IV Template                            | 已完成 | 3DSRNGTool `IVRange.cs`、`IVTemplate.cs`                                          | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具    |
-| P3     | Gen IV Gen4SeedFinder、Voltorb Flip、Swarm 辅助   | 计划   | 教程复核确认的真实辅助缺口                                                        | P0-P2 完成后评估                            |
-| P4     | Gen V DS 参数、Initial Seed、Entralink 缺口       | 计划   | 教程中的 DS 参数和时间流程                                                        | 仅补确认存在的缺口                          |
+| P3     | Gen IV Gen4SeedFinder、Voltorb Flip               | 暂缓   | 项目所有者明确要求暂不计划；Swarm 已单独落地                                      | 后续重新排期                                |
+| P4     | Gen V DS 参数、Initial Seed、Entralink 深审       | 暂缓   | 项目所有者明确要求暂不计划                                                        | 后续重新排期                                |
 | P5     | TinyFinder 独有扩展                               | 已完成 | T1-T14 已落地；Ambush 覆盖 Victory Road Swooping，MT Seed/Time 独立成模块         | 进入全范围 UI 验收准备                      |
-| 持续   | 按教程共有主线审查入口、侧栏和真实功能缺口        | 进行中 | 全世代 165 篇正文指南人工复核结论                                                 | 每个模块落地时同步调整，避免重复开发        |
-| 最后   | EXE 适配                                          | 计划   | 用户明确要求，优先级最后                                                          | 核心模块与部署稳定后                        |
+| P6     | 统一 3DS/UI 生产验收                              | 进行中 | 八项 UI 清单已完成源码收口，等待新 Pages 产物与外部浏览器复核                     | 先完成 Pages 部署，再逐项记录验收证据       |
+| P7     | GitHub Pages 生产回归                             | 进行中 | 生产算法回归必须使用 Actions 部署后的准确 URL                                     | 等待部署完成和项目所有者提供 URL            |
+| 持续   | 按教程共有主线审查入口、侧栏和真实功能缺口        | 复核   | 全世代 165 篇正文指南人工复核结论                                                 | 仅补真实缺口，避免重复开发                  |
+| 最后   | Windows EXE 适配                                  | 进行中 | GitHub Actions 使用同一份 `dist/` 生成 Windows 自解压可执行包                     | Actions 产物完成后再做 Windows 实机验收     |
 | 排除   | NTR Helper                                        | 排除   | 原始 NTR/TCP 访问超出静态浏览器架构                                               | 不开发                                      |
 | 排除   | Gen II、Legends Arceus                            | 排除   | 不属于 PokeFinder 4.3.2 / 3DSRNGTool 产品范围                                     | 不开发                                      |
 

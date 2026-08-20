@@ -1,5 +1,16 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-20 统一 3DS/UI 验收与 Windows Actions 产物链（进行中）
+
+- 修复：右下角工具 Rail 外壳恢复实体 `surface` 背景、安静中性边框和统一阴影；工具按钮、存档信息和研究工具仍保持原有互斥浮层行为。
+- 更新：GitHub Actions 将 Pages 使用的同一份 `production-dist` 上传为跨 job artifact，并新增 Windows portable job，生成自解压 `PokeRNGKit.exe` 与 ZIP 备份包；启动器只监听 `127.0.0.1`，不新增后端或运行时 CDN。
+- 排期：Gen IV `Gen4SeedFinder` / Voltorb Flip 与 Gen V DS 参数、Initial Seed、Entralink 深审按项目所有者要求暂缓；Swarm RNG 已完成并移出当前缺口。
+- 当前状态：Gen VII Stationary 已具备左侧乱数信息、中间设置、右侧筛选、下方结果的源码布局；Gen VII Wild 已具备筛选宽度约束。Pages 生产回归仍需新部署后的准确 URL 和外部 Chrome/Edge 会话。
+- 已通过：`npm run verify`（176 个测试文件、612 项测试、TypeScript、ESLint、Vite/PWA 生产构建）；另通过 `npm run format:check`、`git diff --check` 和 Windows 启动器 PowerShell 语法解析。
+- 旧生产基线：外部 Chrome 打开 `https://haku76.github.io/PokeRNGKit/`，当前资源仍为 `index-C0iXIKgu.js` / `index-BYpSXk4U.css`；控制台无 error/warn，但 Rail 外壳仍透明，Gen VII Stationary 仍为旧的设置/结果左右布局。该页面明显早于当前源码，不作为本轮验收通过证据。
+- 未运行：本轮尚未运行 Windows Actions、新提交对应的生产页面回归或项目所有者最终验收；Windows 自解压包仍待 Actions 首次产出后在 Windows 实机打开验证。
+- 下一步：提交推送后等待 Actions 完成；随后使用项目所有者提供的生产 URL 按八项 UI 清单逐项记录证据。
+
 ## 2026-08-20 Gen IV Swarm RNG（已完成工程验证）
 
 - 新增：右下角浮动 `Swarm RNG` 工具，覆盖 D/P、Pt、HG、SS 的遭遇表和地点选择；不新增侧边栏核心工作区。
@@ -10,7 +21,7 @@
 - 已通过：`npm test -- src/features/gen4swarm`（1 个文件、3 项）、`npm run format:check`、`git diff --check`、完整 `npm run verify`（176 个测试文件、612 项测试、2312 个生产模块和 236 项 PWA 预缓存）。
 - 已通过：`POKERNGKIT_WASM_MODULES=gen4swarm npm run wasm:test:native`（1/1）与激活 Emscripten 6.0.6 后的定向 `npm run wasm:build`；生成 `gen4swarm.mjs`（7360 bytes）和 `gen4swarm.wasm`（6286 bytes），产物按仓库规则保持忽略、不提交。
 - 未运行：外部 Chrome/Edge、生产页面回归和项目所有者最终验收；按全部 3DS 模块完成后的统一门槛执行。
-- 下一步：提交并推送 Swarm 后，进入 PokemonRNGGuides 全世代教程工作流复核；Gen IV `Gen4SeedFinder` 与 Voltorb Flip 排在其后。
+- 下一步：Swarm 已完成；Gen IV `Gen4SeedFinder` / Voltorb Flip 与 Gen V DS 深审按当前排期暂缓，进入统一 3DS/UI 与 Pages 生产验收。
 
 ## 2026-08-20 3DSTimeFinder TF7/TF8 Profile 收口（已完成工程验证）
 

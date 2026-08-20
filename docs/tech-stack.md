@@ -1024,6 +1024,8 @@ checkout
   -> configure Pages
   -> upload dist artifact
   -> deploy GitHub Pages
+  -> Windows job 下载同一 dist
+  -> 生成 PokeRNGKit.exe 自解压包与 ZIP 备份
 ```
 
 Pull request 不执行 configure/upload/deploy。主分支部署 job 不重新编译，只部署 build job 上传的 artifact。
@@ -1045,6 +1047,7 @@ Actions 使用 `actions/configure-pages` 的 `enablement: true` 尝试启用 Pag
 - Actions 在固定 Node、npm、Emscripten、CMake/Ninja 入口中生成 Wasm 和 Web 产物。
 - `public/wasm/`、`wasm/build/` 和 `dist/` 不提交，避免二进制漂移和无法追溯的本机构建。
 - Pages 与未来 Cloudflare 使用同一 build job 产生的完整 `dist/`，不拼接不同构建批次的 JS 与 Wasm。
+- Windows portable job 使用同一份 `production-dist`，通过 7-Zip SFX 包装静态文件和仅监听回环地址的 PowerShell 启动器；不引入 Electron、后端或额外在线服务。
 
 本地完整编译是开发和应急备选，不是默认发布方式。CI 暂时不可用时，可以在锁定工具链中运行 `npm run verify:full` 和带相对 `BASE_PATH` 的 `npm run build`，再整体上传 `dist/`；不得只上传本地 `.wasm`。GitHub Pages 当前不维护 `gh-pages` 分支发布方式，工作流故障应优先修复。
 
