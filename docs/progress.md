@@ -1,5 +1,14 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-20 侧边栏 Seed/ID 顺序调整
+
+- 调整：Gen III、Gen IV、Gen V、Gen VI、Gen VII 侧边栏恢复 `ID -> Seed/Time Finder`
+  顺序；Gen VIII 继续保持 ID 入口在前。
+- 保留：Gen V / Gen VIII 存档信息管理继续由右下角浮动工具打开，不恢复侧边栏档案入口。
+- 主要文件：`src/App.tsx`。
+- 已通过：任务文件格式化、`npm run format:check`、`git diff --check`。
+- 未运行：完整测试、构建、外部 Chrome/Edge UI 检查和 GitHub Pages 生产回归；这些仍按统一验收门槛执行。
+
 ## 2026-08-20 侧边栏 Seed/ID 顺序与野生中文收口（已完成工程验证）
 
 - 调整：按 `存档信息/ID -> Seed 相关 -> 定点 -> 野生 -> 蛋 -> 事件` 主线，
