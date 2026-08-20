@@ -1,5 +1,12 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-20 第三世代侧栏中文标签补齐
+
+- 调整：按 `PokeFinder_zh.ts` 已核对译文，将第三世代 `Seed to Time`、`Static` 和
+  `Wild` 侧栏标签改为“第三世代Seed查询时间”“第三世代定点乱数”“野生乱数”。
+- 已通过：任务文件格式化、`npm run format:check`、`git diff --check`。
+- 未运行：完整测试、构建、外部 Chrome/Edge UI 检查和 GitHub Pages 生产回归；这些仍按统一验收门槛执行。
+
 ## 2026-08-20 侧边栏 Seed/ID 顺序调整
 
 - 调整：Gen III、Gen IV、Gen V、Gen VI、Gen VII 侧边栏恢复 `ID -> Seed/Time Finder`
