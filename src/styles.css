@@ -810,7 +810,7 @@ h1 {
   transform: translate(-50%, -50%);
   overflow: hidden;
   border: 1px solid var(--line);
-  border-top: 1px solid var(--brand);
+  border-top: 1px solid var(--line);
   border-radius: 18px;
   background: var(--surface);
   box-shadow: var(--floating-shadow);
@@ -835,10 +835,10 @@ h1 {
   transition: none;
 }
 .floating-tool-panel[data-tone="teal"] {
-  border-top-color: var(--teal);
+  border-top-color: var(--line);
 }
 .floating-tool-panel[data-tone="amber"] {
-  border-top-color: var(--amber);
+  border-top-color: var(--line);
 }
 .floating-tool-panel-heading {
   min-height: 56px;
@@ -3380,9 +3380,9 @@ h1 {
 }
 .encounter-lookup-table {
   width: 100%;
-  min-width: 620px;
+  min-width: 0;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
 }
 .encounter-lookup-table th,
 .encounter-lookup-table td {
@@ -3402,11 +3402,10 @@ h1 {
   font-weight: 600;
   text-transform: uppercase;
 }
-.encounter-lookup-table th:first-child {
-  width: 52%;
-}
-.encounter-lookup-table th:nth-child(2) {
-  width: 28%;
+.encounter-lookup-table th,
+.encounter-lookup-table td {
+  max-width: 22rem;
+  overflow-wrap: anywhere;
 }
 .encounter-lookup-table tbody tr:hover {
   background: var(--teal-soft);
@@ -4194,6 +4193,21 @@ select:not([multiple]) {
 }
 
 .module-navigation::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.module-rail,
+.module-navigation,
+.module-nav-group-items {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.module-rail::-webkit-scrollbar,
+.module-navigation::-webkit-scrollbar,
+.module-nav-group-items::-webkit-scrollbar {
   width: 0;
   height: 0;
   display: none;

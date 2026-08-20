@@ -88,6 +88,22 @@
   gap: 9px;
 }
 
+.gen7wild-grid > .field,
+.gen7wild-grid > .multi-check-field,
+.gen7wild-filter-content,
+.gen7wild-filter-content .gen7wild-grid {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.gen7wild-panel .field input,
+.gen7wild-panel .field select,
+.gen7wild-panel .multi-check-trigger {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .gen7wild-grid.compact {
   margin-top: 10px;
 }

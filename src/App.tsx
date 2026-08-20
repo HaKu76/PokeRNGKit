@@ -929,6 +929,8 @@ function App() {
     activeModule === "gen6egg" ||
     activeModule === "gen6id" ||
     activeModule === "gen6mainseed" ||
+    activeModule === "gen6mtseed" ||
+    activeModule === "gen6mtseedtime" ||
     activeModule === "gen6tinytimeline" ||
     activeModule === "gen6tinyindex" ||
     activeModule === "gen6tinyrocksmash" ||
@@ -987,6 +989,8 @@ function App() {
     activeModule !== "gen6egg" &&
     activeModule !== "gen6id" &&
     activeModule !== "gen6mainseed" &&
+    activeModule !== "gen6mtseed" &&
+    activeModule !== "gen6mtseedtime" &&
     activeModule !== "gen6tinytimeline" &&
     activeModule !== "gen6tinyindex" &&
     activeModule !== "gen6tinyrocksmash" &&

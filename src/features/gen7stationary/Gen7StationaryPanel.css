@@ -5,7 +5,7 @@
 .gen7stationary-workspace {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(410px, 0.78fr) minmax(620px, 1.22fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
 }
@@ -13,12 +13,50 @@
 .gen7stationary-controls,
 .gen7stationary-results {
   min-width: 0;
-  height: calc(100vh - 184px);
-  min-height: 620px;
+  min-height: 0;
   overflow: hidden;
 }
 
 .gen7stationary-controls {
+  height: calc(100vh - 184px);
+  min-height: 620px;
+}
+
+.gen7stationary-results {
+  height: calc(100vh - 184px);
+  min-height: 620px;
+}
+
+.gen7stationary-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.15fr) minmax(0, 1fr);
+  align-content: start;
+}
+
+.gen7stationary-control-heading,
+.gen7stationary-run-actions {
+  grid-column: 1 / -1;
+}
+
+.gen7stationary-rng-section {
+  grid-column: 1;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.gen7stationary-settings-column {
+  grid-column: 2;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.gen7stationary-filter-section {
+  grid-column: 3;
+  min-width: 0;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -431,17 +469,24 @@
 }
 
 @media (max-width: 1180px) {
-  .gen7stationary-workspace {
-    grid-template-columns: 1fr;
+  .gen7stationary-controls {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .gen7stationary-controls,
-  .gen7stationary-results {
+  .gen7stationary-rng-section,
+  .gen7stationary-settings-column,
+  .gen7stationary-filter-section {
+    grid-column: 1;
+  }
+
+  .gen7stationary-controls {
     height: auto;
     min-height: 0;
   }
 
-  .gen7stationary-controls {
+  .gen7stationary-rng-section,
+  .gen7stationary-settings-column,
+  .gen7stationary-filter-section {
     overflow: visible;
   }
 

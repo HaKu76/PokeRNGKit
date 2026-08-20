@@ -1,5 +1,16 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-20 UI 验收清单收口（已完成工程验证）
+
+- 修复：浮动工具面板和 Encounter Lookup 移除顶部有色强调线，恢复实体背景与静默中性边框；Encounter Lookup 结果列改为内容自适应，长地点名称可换行。
+- 优化：Gen VII Stationary 控制区改为左侧乱数信息、中间设置、右侧筛选，结果表独占下方；窄屏自动恢复单列，避免控件互相遮挡。
+- 优化：Gen VII Wild 筛选字段、候选控件和输入补充 `min-width: 0` / 最大宽度约束，防止等级、槽位等筛选项撑出左侧列。
+- 修复：Gen VI TinyFinder MT Seed / MT Seed Time 纳入 Gen VI 顶部上下文与档案工具判断，避免新模块显示错误的世代标题或工具状态。
+- 优化：侧边栏导航及分组内容统一隐藏滚动条，同时保留必要的内容滚动；模块长标题和分组标题保持单行省略号与完整 `title` 提示。
+- 已通过：任务文件格式化、`npm run format:check`、`git diff --check`、`npm run lint`、`npm run typecheck`。
+- 已通过：完整 `npm run verify`（174 个测试文件、606 项测试及生产 Web/PWA 构建）。
+- 未运行：外部 Chrome/Edge UI 与生产页面算法回归；继续按全部 3DS 模块完成后的统一门槛执行。
+
 ## 2026-08-20 TinyFinder T10 Ambush Encounter（已完成工程实现与本地验证）
 
 - 新增独立 `gen6tinyambush` TinyMT Wasm、Dedicated Worker、XY Victory Road Outside

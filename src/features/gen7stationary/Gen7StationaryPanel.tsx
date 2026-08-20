@@ -614,7 +614,7 @@ export function Gen7StationaryPanel({
             </span>
           </div>
 
-          <section className="gen7stationary-control-section">
+          <section className="gen7stationary-control-section gen7stationary-rng-section">
             <h3>{t("rngInfo")}</h3>
             <div className="gen7stationary-field-grid">
               <label className="field">
@@ -773,308 +773,315 @@ export function Gen7StationaryPanel({
             </div>
           </section>
 
-          <section className="gen7stationary-control-section">
-            <h3>{t("pokemon")}</h3>
-            <div className="gen7stationary-field-grid">
-              <label className="field">
-                <span>{t("category")}</span>
-                <select
-                  disabled={status === "calculating"}
-                  onChange={(event) => changeCategory(event.target.value)}
-                  value={category}
-                >
-                  {categories.map((entry) => (
-                    <option key={entry} value={entry}>
-                      {categoryLabel(entry, t)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field">
-                <span>{t("pokemon")}</span>
-                <select
-                  disabled={status === "calculating"}
-                  onChange={(event) => {
-                    const template = categoryTemplates.find(
-                      (entry) => entry.id === event.target.value,
-                    );
-                    if (template) applyTemplate(template);
-                  }}
-                  value={templateId}
-                >
-                  {categoryTemplates.map((entry) => (
-                    <option key={entry.id} value={entry.id}>
-                      {gen7StationaryTemplateName(entry, language)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <div className="gen7stationary-encounter-meta">
-              <span>
-                {t("species")} <strong>{encounter.species}</strong>
-              </span>
-              <span>
-                {t("level")} <strong>{encounter.level}</strong>
-              </span>
-              <span>
-                NPC <strong>{encounter.npc}</strong>
-              </span>
-              <span>
-                {t("delay")} <strong>{delayText || "-"}</strong>
-              </span>
-            </div>
-            <div className="gen7stationary-field-grid compact">
-              <label className="field">
-                <span>{t("gen7StationarySyncNature")}</span>
-                <select
-                  disabled={
-                    status === "calculating" ||
-                    !encounter.syncable ||
-                    encounter.nature < 25
-                  }
-                  onChange={(event) => setSyncNature(event.target.value)}
-                  value={syncNature}
-                >
-                  <option value="">{t("none")}</option>
-                  {natureOptions.map((entry) => (
-                    <option key={entry.value} value={entry.value}>
-                      {entry.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field">
-                <span>NPC</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={100}
-                  onChange={(event) =>
-                    changeNpc(normalizeDecimalInput(event.target.value, 100, 3))
-                  }
-                  value={encounter.npc}
-                />
-              </label>
-              <label className="field">
-                <span>{t("delay")}</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={4000}
-                  min={minimumDelay}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    if (/^-?\d*$/.test(value)) setDelayText(value);
-                  }}
-                  value={delayText}
-                />
-              </label>
-              {encounter.pelago && (
+          <div className="gen7stationary-settings-column">
+            <section className="gen7stationary-control-section">
+              <h3>{t("pokemon")}</h3>
+              <div className="gen7stationary-field-grid">
                 <label className="field">
-                  <span>Poke Pelago Shift</span>
-                  <input
-                    disabled={status === "calculating"}
-                    inputMode="numeric"
-                    max={GEN7_STATIONARY_PELAGO_MAX_SHIFT}
-                    onChange={(event) =>
-                      setPelagoShift(
-                        normalizeDecimalInput(
-                          event.target.value,
-                          GEN7_STATIONARY_PELAGO_MAX_SHIFT,
-                          3,
-                        ),
-                      )
-                    }
-                    value={pelagoShift}
-                  />
-                </label>
-              )}
-            </div>
-            <div className="gen7stationary-toggle-grid">
-              <label className="checkbox-field">
-                <input
-                  checked={shinyCharm}
-                  disabled={status === "calculating"}
-                  onChange={(event) => setShinyCharm(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>{t("gen7StationaryShinyCharm")}</span>
-              </label>
-              <label className="checkbox-field">
-                <input
-                  checked={considerDelay}
-                  disabled={status === "calculating"}
-                  onChange={(event) => setConsiderDelay(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>Consider Delay</span>
-              </label>
-              <label className="checkbox-field">
-                <input
-                  checked={encounter.raining}
-                  disabled={
-                    status === "calculating" ||
-                    (!encounter.conceptual && !selectedTemplate.raining)
-                  }
-                  onChange={(event) =>
-                    setEncounter((current) => ({
-                      ...current,
-                      raining: event.target.checked,
-                    }))
-                  }
-                  type="checkbox"
-                />
-                <span>Raining</span>
-              </label>
-              {encounter.ultraWormhole && (
-                <label className="checkbox-field">
-                  <input
-                    checked={forcedShiny}
-                    disabled={status === "calculating"}
-                    onChange={(event) => setForcedShiny(event.target.checked)}
-                    type="checkbox"
-                  />
-                  <span>Forced Shiny</span>
-                </label>
-              )}
-            </div>
-          </section>
-
-          {encounter.conceptual && (
-            <details className="gen7stationary-disclosure">
-              <summary>{t("gen7StationaryCustomEncounter")}</summary>
-              <div className="gen7stationary-field-grid disclosure-content">
-                <label className="field">
-                  <span>{t("species")}</span>
-                  <input
-                    disabled={status === "calculating"}
-                    inputMode="numeric"
-                    max={807}
-                    onChange={(event) =>
-                      setEncounter((current) => ({
-                        ...current,
-                        species: parseGen7StationaryDecimal(
-                          normalizeDecimalInput(event.target.value, 807, 3),
-                        ),
-                      }))
-                    }
-                    value={encounter.species}
-                  />
-                </label>
-                <label className="field">
-                  <span>{t("level")}</span>
-                  <input
-                    disabled={status === "calculating"}
-                    inputMode="numeric"
-                    max={100}
-                    onChange={(event) =>
-                      setEncounter((current) => ({
-                        ...current,
-                        level: parseGen7StationaryDecimal(
-                          normalizeDecimalInput(event.target.value, 100, 3),
-                        ),
-                      }))
-                    }
-                    value={encounter.level}
-                  />
-                </label>
-                <label className="field">
-                  <span>{t("gender")}</span>
+                  <span>{t("category")}</span>
                   <select
                     disabled={status === "calculating"}
-                    onChange={(event) => {
-                      const setting = Number(event.target.value);
-                      setEncounter((current) => ({
-                        ...current,
-                        gender: setting,
-                        randomGender: setting > 2,
-                      }));
-                    }}
-                    value={encounter.gender}
+                    onChange={(event) => changeCategory(event.target.value)}
+                    value={category}
                   >
-                    {GEN7_STATIONARY_GENDER_RATIOS.map((entry) => (
-                      <option key={entry.setting} value={entry.setting}>
-                        {entry.setting === 0
-                          ? t("genderless")
-                          : entry.setting === 1
-                            ? t("male")
-                            : entry.setting === 2
-                              ? t("female")
-                              : entry.label}
+                    {categories.map((entry) => (
+                      <option key={entry} value={entry}>
+                        {categoryLabel(entry, t)}
                       </option>
                     ))}
                   </select>
                 </label>
                 <label className="field">
-                  <span>{t("ability")}</span>
+                  <span>{t("pokemon")}</span>
                   <select
                     disabled={status === "calculating"}
-                    onChange={(event) =>
-                      setEncounter((current) => ({
-                        ...current,
-                        ability: Number(event.target.value),
-                      }))
-                    }
-                    value={encounter.ability}
+                    onChange={(event) => {
+                      const template = categoryTemplates.find(
+                        (entry) => entry.id === event.target.value,
+                      );
+                      if (template) applyTemplate(template);
+                    }}
+                    value={templateId}
                   >
-                    <option value={0}>{t("any")}</option>
-                    <option value={1}>{t("abilityFirst")}</option>
-                    <option value={2}>{t("abilitySecond")}</option>
-                    <option value={3}>
-                      {t("gen7StationaryHiddenAbility")}
-                    </option>
+                    {categoryTemplates.map((entry) => (
+                      <option key={entry.id} value={entry.id}>
+                        {gen7StationaryTemplateName(entry, language)}
+                      </option>
+                    ))}
                   </select>
                 </label>
               </div>
-              <div className="gen7stationary-toggle-grid disclosure-content">
-                <label className="checkbox-field">
-                  <input
-                    checked={encounter.fixedThreeIv}
-                    disabled={status === "calculating"}
-                    onChange={(event) =>
-                      setEncounter((current) => ({
-                        ...current,
-                        fixedThreeIv: event.target.checked,
-                      }))
-                    }
-                    type="checkbox"
-                  />
-                  <span>3 Perfect IVs</span>
-                </label>
-                <label className="checkbox-field">
-                  <input
-                    checked={encounter.alwaysSync}
-                    disabled={status === "calculating"}
-                    onChange={(event) =>
-                      setEncounter((current) => ({
-                        ...current,
-                        alwaysSync: event.target.checked,
-                      }))
-                    }
-                    type="checkbox"
-                  />
-                  <span>Always Synchronize</span>
-                </label>
-                <label className="checkbox-field">
-                  <input
-                    checked={encounter.shinyLocked}
-                    disabled={status === "calculating"}
-                    onChange={(event) =>
-                      setEncounter((current) => ({
-                        ...current,
-                        shinyLocked: event.target.checked,
-                      }))
-                    }
-                    type="checkbox"
-                  />
-                  <span>Shiny Lock</span>
-                </label>
+              <div className="gen7stationary-encounter-meta">
+                <span>
+                  {t("species")} <strong>{encounter.species}</strong>
+                </span>
+                <span>
+                  {t("level")} <strong>{encounter.level}</strong>
+                </span>
+                <span>
+                  NPC <strong>{encounter.npc}</strong>
+                </span>
+                <span>
+                  {t("delay")} <strong>{delayText || "-"}</strong>
+                </span>
               </div>
-            </details>
-          )}
+              <div className="gen7stationary-field-grid compact">
+                <label className="field">
+                  <span>{t("gen7StationarySyncNature")}</span>
+                  <select
+                    disabled={
+                      status === "calculating" ||
+                      !encounter.syncable ||
+                      encounter.nature < 25
+                    }
+                    onChange={(event) => setSyncNature(event.target.value)}
+                    value={syncNature}
+                  >
+                    <option value="">{t("none")}</option>
+                    {natureOptions.map((entry) => (
+                      <option key={entry.value} value={entry.value}>
+                        {entry.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field">
+                  <span>NPC</span>
+                  <input
+                    disabled={status === "calculating"}
+                    inputMode="numeric"
+                    max={100}
+                    onChange={(event) =>
+                      changeNpc(
+                        normalizeDecimalInput(event.target.value, 100, 3),
+                      )
+                    }
+                    value={encounter.npc}
+                  />
+                </label>
+                <label className="field">
+                  <span>{t("delay")}</span>
+                  <input
+                    disabled={status === "calculating"}
+                    inputMode="numeric"
+                    max={4000}
+                    min={minimumDelay}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      if (/^-?\d*$/.test(value)) setDelayText(value);
+                    }}
+                    value={delayText}
+                  />
+                </label>
+                {encounter.pelago && (
+                  <label className="field">
+                    <span>Poke Pelago Shift</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="numeric"
+                      max={GEN7_STATIONARY_PELAGO_MAX_SHIFT}
+                      onChange={(event) =>
+                        setPelagoShift(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            GEN7_STATIONARY_PELAGO_MAX_SHIFT,
+                            3,
+                          ),
+                        )
+                      }
+                      value={pelagoShift}
+                    />
+                  </label>
+                )}
+              </div>
+              <div className="gen7stationary-toggle-grid">
+                <label className="checkbox-field">
+                  <input
+                    checked={shinyCharm}
+                    disabled={status === "calculating"}
+                    onChange={(event) => setShinyCharm(event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>{t("gen7StationaryShinyCharm")}</span>
+                </label>
+                <label className="checkbox-field">
+                  <input
+                    checked={considerDelay}
+                    disabled={status === "calculating"}
+                    onChange={(event) => setConsiderDelay(event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>Consider Delay</span>
+                </label>
+                <label className="checkbox-field">
+                  <input
+                    checked={encounter.raining}
+                    disabled={
+                      status === "calculating" ||
+                      (!encounter.conceptual && !selectedTemplate.raining)
+                    }
+                    onChange={(event) =>
+                      setEncounter((current) => ({
+                        ...current,
+                        raining: event.target.checked,
+                      }))
+                    }
+                    type="checkbox"
+                  />
+                  <span>Raining</span>
+                </label>
+                {encounter.ultraWormhole && (
+                  <label className="checkbox-field">
+                    <input
+                      checked={forcedShiny}
+                      disabled={status === "calculating"}
+                      onChange={(event) => setForcedShiny(event.target.checked)}
+                      type="checkbox"
+                    />
+                    <span>Forced Shiny</span>
+                  </label>
+                )}
+              </div>
+            </section>
 
-          <details className="gen7stationary-disclosure" open>
+            {encounter.conceptual && (
+              <details className="gen7stationary-disclosure">
+                <summary>{t("gen7StationaryCustomEncounter")}</summary>
+                <div className="gen7stationary-field-grid disclosure-content">
+                  <label className="field">
+                    <span>{t("species")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="numeric"
+                      max={807}
+                      onChange={(event) =>
+                        setEncounter((current) => ({
+                          ...current,
+                          species: parseGen7StationaryDecimal(
+                            normalizeDecimalInput(event.target.value, 807, 3),
+                          ),
+                        }))
+                      }
+                      value={encounter.species}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("level")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="numeric"
+                      max={100}
+                      onChange={(event) =>
+                        setEncounter((current) => ({
+                          ...current,
+                          level: parseGen7StationaryDecimal(
+                            normalizeDecimalInput(event.target.value, 100, 3),
+                          ),
+                        }))
+                      }
+                      value={encounter.level}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("gender")}</span>
+                    <select
+                      disabled={status === "calculating"}
+                      onChange={(event) => {
+                        const setting = Number(event.target.value);
+                        setEncounter((current) => ({
+                          ...current,
+                          gender: setting,
+                          randomGender: setting > 2,
+                        }));
+                      }}
+                      value={encounter.gender}
+                    >
+                      {GEN7_STATIONARY_GENDER_RATIOS.map((entry) => (
+                        <option key={entry.setting} value={entry.setting}>
+                          {entry.setting === 0
+                            ? t("genderless")
+                            : entry.setting === 1
+                              ? t("male")
+                              : entry.setting === 2
+                                ? t("female")
+                                : entry.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="field">
+                    <span>{t("ability")}</span>
+                    <select
+                      disabled={status === "calculating"}
+                      onChange={(event) =>
+                        setEncounter((current) => ({
+                          ...current,
+                          ability: Number(event.target.value),
+                        }))
+                      }
+                      value={encounter.ability}
+                    >
+                      <option value={0}>{t("any")}</option>
+                      <option value={1}>{t("abilityFirst")}</option>
+                      <option value={2}>{t("abilitySecond")}</option>
+                      <option value={3}>
+                        {t("gen7StationaryHiddenAbility")}
+                      </option>
+                    </select>
+                  </label>
+                </div>
+                <div className="gen7stationary-toggle-grid disclosure-content">
+                  <label className="checkbox-field">
+                    <input
+                      checked={encounter.fixedThreeIv}
+                      disabled={status === "calculating"}
+                      onChange={(event) =>
+                        setEncounter((current) => ({
+                          ...current,
+                          fixedThreeIv: event.target.checked,
+                        }))
+                      }
+                      type="checkbox"
+                    />
+                    <span>3 Perfect IVs</span>
+                  </label>
+                  <label className="checkbox-field">
+                    <input
+                      checked={encounter.alwaysSync}
+                      disabled={status === "calculating"}
+                      onChange={(event) =>
+                        setEncounter((current) => ({
+                          ...current,
+                          alwaysSync: event.target.checked,
+                        }))
+                      }
+                      type="checkbox"
+                    />
+                    <span>Always Synchronize</span>
+                  </label>
+                  <label className="checkbox-field">
+                    <input
+                      checked={encounter.shinyLocked}
+                      disabled={status === "calculating"}
+                      onChange={(event) =>
+                        setEncounter((current) => ({
+                          ...current,
+                          shinyLocked: event.target.checked,
+                        }))
+                      }
+                      type="checkbox"
+                    />
+                    <span>Shiny Lock</span>
+                  </label>
+                </div>
+              </details>
+            )}
+          </div>
+
+          <details
+            className="gen7stationary-disclosure gen7stationary-filter-section"
+            open
+          >
             <summary>{t("filters")}</summary>
             <fieldset
               className="gen7stationary-filter-controls"
