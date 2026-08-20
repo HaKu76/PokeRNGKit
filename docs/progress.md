@@ -45,10 +45,18 @@
 
 # 当前目标：完成 3DSRNGTool 全范围后统一 UI 验收
 
-- 当前主线：继续处理 TinyFinder T14 MT 初始 Seed / Time Finder。
+## 2026-08-20 TinyFinder T14 MT 初始 Seed / Time Finder（已完成工程实现与本地验证）
+
+- 新增：独立 `gen6mtseedtime` MT19937 Wasm、Dedicated Worker、目标时间与目标日期两种检索模式；保留 `FindSavePar`、XY/ORAS Save Frame 偏移、`Seed + 1000` 秒推进和 200,000 帧日期扫描。
+- 接入：第六世代侧栏、三语文案、10-word 请求 / 8-word 结果 ABI、分步 Worker、秒数与结果上限保护、虚拟结果表、CSV、模块文档和原生夹具。
+- 已通过：任务文件格式化、`npm run format:check`、`git diff --check`、模块 ESLint、`npm run typecheck`、`npx vitest run src/features/gen6mtseedtime/domain.test.ts --pool=threads --maxWorkers=2`（3 项）、`POKERNGKIT_WASM_MODULES=gen6mtseedtime npm run wasm:test:native`（1/1）以及完整 `npm run verify`（174 个测试文件、606 项测试及生产 Web/PWA 构建）。
+- 未运行：Emscripten 生产构建（当前环境未提供 `emcc`）、外部 Chrome/Edge UI 和生产页面算法回归；这些检查按全部 3DS 模块完成后的统一验收门槛执行。
+
+- 当前主线：TinyFinder T1-T14 已落地，进入 3DSRNGTool 全范围收口与统一 UI 验收准备。
 - 验收门槛：上述范围全部完成并部署后，按项目所有者确认的八项清单完成外部 Chrome/Edge 生产页面验收；在此之前不宣称 3DS 功能或 UI 已最终完成。
 - 当前状态：TF5、TF6、公共 TSV List、IV Range / IV Template、TinyFinder T10 Ambush、
-  T12 Swooping 范围审查与 T13 MT Seed Searcher 已完成；外部页面回归保留到全部 3DS 模块完成后统一执行。
+  T12 Swooping 范围审查、T13 MT Seed Searcher 与 T14 MT 初始 Seed / Time Finder 已完成；
+  外部页面回归保留到全部 3DS 模块完成后统一执行。
 
 ## 2026-08-20 TinyFinder T6 Rock Smash（已完成工程实现与本地验证）
 

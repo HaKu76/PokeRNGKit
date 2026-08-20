@@ -1,0 +1,88 @@
+.gen6mtseedtime-workspace {
+  display: grid;
+  gap: 16px;
+}
+.gen6mtseedtime-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.gen6mtseedtime-panel {
+  min-width: 0;
+  padding: 24px;
+}
+.gen6mtseedtime-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.gen6mtseedtime-mode {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.gen6mtseedtime-mode label {
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.gen6mtseedtime-mode label.active {
+  border-color: var(--brand);
+  background: var(--surface);
+  color: var(--brand-strong);
+}
+.gen6mtseedtime-mode input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.gen6mtseedtime-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.gen6mtseedtime-checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.gen6mtseedtime-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+.gen6mtseedtime-table-shell {
+  min-height: 280px;
+}
+.gen6mtseedtime-table {
+  min-width: 780px;
+}
+.gen6mtseedtime-table .table-header,
+.gen6mtseedtime-table .table-row {
+  grid-template-columns: 1.25fr 1fr 0.75fr 0.8fr 0.8fr 0.7fr;
+}
+@media (max-width: 900px) {
+  .gen6mtseedtime-controls {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 620px) {
+  .gen6mtseedtime-grid {
+    grid-template-columns: 1fr;
+  }
+  .gen6mtseedtime-panel {
+    padding: 18px;
+  }
+}

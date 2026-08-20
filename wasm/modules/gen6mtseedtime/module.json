@@ -1,0 +1,13 @@
+{
+  "id": "gen6mtseedtime",
+  "generation": 6,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen6mtseedtime",
+  "operations": ["searcher"],
+  "artifacts": {
+    "loader": "gen6mtseedtime.mjs",
+    "wasm": "gen6mtseedtime.wasm"
+  },
+  "source": "TinyFinder Subforms/MT/Core.cs and Utils/Calculate.cs"
+}
