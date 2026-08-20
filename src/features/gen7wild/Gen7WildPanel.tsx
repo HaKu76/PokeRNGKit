@@ -124,27 +124,82 @@ const CATEGORIES: readonly Gen7WildCategory[] = [
   "misc",
   "berry",
 ];
-const CATEGORY_LABELS: Record<Gen7WildCategory, string> = {
-  normal: "Normal Wild",
-  ub: "UB",
-  "island-scan": "Island Scan",
-  fishing: "Fishing",
-  misc: "Ambush Encounters",
-  berry: "Berry Tree",
+const CATEGORY_LABELS: Record<
+  Gen7WildLanguage,
+  Record<Gen7WildCategory, string>
+> = {
+  en: {
+    normal: "Normal Wild",
+    ub: "UB",
+    "island-scan": "Island Scan",
+    fishing: "Fishing",
+    misc: "Ambush Encounters",
+    berry: "Berry Tree",
+  },
+  ja: {
+    normal: "Normal Wild",
+    ub: "UB",
+    "island-scan": "Island Scan",
+    fishing: "Fishing",
+    misc: "Ambush Encounters",
+    berry: "Berry Tree",
+  },
+  zh: {
+    normal: "普通野外",
+    ub: "UB",
+    "island-scan": "岛屿扫描",
+    fishing: "钓鱼",
+    misc: "摇草/摇树/阴影/沙尘",
+    berry: "果树",
+  },
 };
-const LEADS: readonly { value: Gen7WildLead; label: string }[] = [
-  { value: "none", label: "-" },
-  { value: "synchronize", label: "Synchronize" },
-  { value: "cute-charm-male", label: "Cute Charm ♂" },
-  { value: "cute-charm-female", label: "Cute Charm ♀" },
-  { value: "static", label: "Static" },
-  { value: "magnet-pull", label: "Magnet Pull" },
-  { value: "compound-eyes", label: "Compound Eyes" },
-  { value: "suction-cups", label: "Suction Cups | Sticky Hold" },
-  { value: "level-modifier", label: "Pressure | Hustle | Vital Spirit" },
-  { value: "black-flute", label: "黑色玻璃哨" },
-  { value: "white-flute", label: "白色玻璃哨" },
-];
+const LEAD_LABELS: Record<Gen7WildLanguage, Record<Gen7WildLead, string>> = {
+  en: {
+    none: "-",
+    synchronize: "Synchronize",
+    "cute-charm-male": "Cute Charm ♂",
+    "cute-charm-female": "Cute Charm ♀",
+    static: "Static",
+    "magnet-pull": "Magnet Pull",
+    "compound-eyes": "Compound Eyes",
+    "suction-cups": "Suction Cups | Sticky Hold",
+    "level-modifier": "Pressure | Hustle | Vital Spirit",
+    "black-flute": "黑色玻璃哨",
+    "white-flute": "白色玻璃哨",
+  },
+  ja: {
+    none: "-",
+    synchronize: "Synchronize",
+    "cute-charm-male": "Cute Charm ♂",
+    "cute-charm-female": "Cute Charm ♀",
+    static: "Static",
+    "magnet-pull": "Magnet Pull",
+    "compound-eyes": "Compound Eyes",
+    "suction-cups": "Suction Cups | Sticky Hold",
+    "level-modifier": "Pressure | Hustle | Vital Spirit",
+    "black-flute": "黑色玻璃哨",
+    "white-flute": "白色玻璃哨",
+  },
+  zh: {
+    none: "-",
+    synchronize: "同步",
+    "cute-charm-male": "迷人之躯♂",
+    "cute-charm-female": "迷人之躯♀",
+    static: "静电",
+    "magnet-pull": "磁力",
+    "compound-eyes": "复眼",
+    "suction-cups": "吸盘 | 黏着",
+    "level-modifier": "压迫感 | 活力 | 干劲",
+    "black-flute": "黑色玻璃哨",
+    "white-flute": "白色玻璃哨",
+  },
+};
+
+function leadOptions(language: Gen7WildLanguage) {
+  return (Object.keys(LEAD_LABELS[language]) as Gen7WildLead[]).map(
+    (value) => ({ value, label: LEAD_LABELS[language][value] }),
+  );
+}
 const ALL_NATURES = 0x1ff_ffff;
 const ALL_HIDDEN_POWERS = 0xffff;
 
@@ -667,7 +722,7 @@ export function Gen7WildPanel({
                 >
                   {CATEGORIES.map((value) => (
                     <option key={value} value={value}>
-                      {CATEGORY_LABELS[value]}
+                      {CATEGORY_LABELS[language][value]}
                     </option>
                   ))}
                 </select>
@@ -881,7 +936,7 @@ export function Gen7WildPanel({
                     if (next !== "synchronize") setSyncNature("");
                   }}
                 >
-                  {LEADS.map((entry) => (
+                  {leadOptions(language).map((entry) => (
                     <option key={entry.value} value={entry.value}>
                       {entry.label}
                     </option>

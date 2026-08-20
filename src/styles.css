@@ -4822,6 +4822,27 @@ textarea:disabled {
   width: min(1080px, calc(100vw - 48px));
 }
 
+.gen5-profile-float-panel,
+.gen8-profile-float-panel {
+  width: min(1280px, calc(100vw - 48px));
+}
+
+.gen5-profile-float-panel > .gen5profiles-panel,
+.gen8-profile-float-panel > .gen8profiles-panel {
+  max-height: calc(100vh - 98px);
+  overflow: auto;
+  padding: 16px;
+}
+
+.gen5-profile-float-panel .gen5profiles-header > div:first-child,
+.gen8-profile-float-panel .gen8profiles-header {
+  display: none;
+}
+
+.gen5-profile-float-panel .gen5profiles-header {
+  justify-content: flex-end;
+}
+
 .three-ds-profile-float-panel > .threedsprofiles-panel {
   max-height: calc(100vh - 98px);
   overflow: auto;

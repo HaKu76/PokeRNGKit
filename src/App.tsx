@@ -277,10 +277,10 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
     label: "GEN III",
     marker: "3",
     items: [
-      { id: "id", label: "idModule" },
       { id: "initialseed", label: "initialSeedModule" },
       { id: "ngcseed", label: "ngcSeedModule" },
       { id: "seedtotime", label: "seedToTimeModule" },
+      { id: "id", label: "idModule" },
       { id: "static", label: "staticModule" },
       { id: "wild", label: "wildModule" },
       { id: "ivtopid", label: "ivToPidModule" },
@@ -302,8 +302,8 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
     label: "GEN IV",
     marker: "4",
     items: [
-      { id: "gen4id", label: "gen4IdModule" },
       { id: "gen4seedtotime", label: "gen4SeedToTimeModule" },
+      { id: "gen4id", label: "gen4IdModule" },
       { id: "gen4static", label: "gen4StaticModule" },
       { id: "gen4wild", label: "gen4WildModule" },
       { id: "gen4egg", label: "gen4EggModule" },
@@ -322,9 +322,8 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
     label: "GEN V",
     marker: "5",
     items: [
-      { id: "gen5profiles", label: "gen5ProfilesModule" },
-      { id: "gen5id", label: "gen5IdModule" },
       { id: "gen5adjacentseeds", label: "gen5AdjacentSeedsModule" },
+      { id: "gen5id", label: "gen5IdModule" },
       { id: "gen5ivcache", label: "gen5IvCacheModule" },
       { id: "gen5sha1cache", label: "gen5Sha1CacheModule" },
       { id: "gen5dreamradar", label: "gen5DreamRadarModule" },
@@ -340,6 +339,10 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
     label: "GEN VI",
     marker: "6",
     items: [
+      { id: "gen6mainseed", label: "gen6MainSeedModule" },
+      { id: "gen6mtseed", label: "gen6MtSeedModule" },
+      { id: "gen6mtseedtime", label: "gen6MtSeedTimeModule" },
+      { id: "gen6id", label: "gen6IdModule" },
       { id: "gen6stationary", label: "gen6StationaryModule" },
       { id: "gen6timefinder", label: "gen6StationaryTimeModule" },
       { id: "gen6bank", label: "gen6BankModule" },
@@ -349,10 +352,6 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
       { id: "gen6dexnav", label: "gen6DexNavModule" },
       { id: "gen6pokeradar", label: "gen6PokeRadarModule" },
       { id: "gen6egg", label: "gen6EggModule" },
-      { id: "gen6id", label: "gen6IdModule" },
-      { id: "gen6mainseed", label: "gen6MainSeedModule" },
-      { id: "gen6mtseed", label: "gen6MtSeedModule" },
-      { id: "gen6mtseedtime", label: "gen6MtSeedTimeModule" },
       { id: "gen6tinytimeline", label: "gen6TinyTimelineModule" },
       { id: "gen6tinyindex", label: "gen6TinyIndexModule" },
       { id: "gen6tinyrocksmash", label: "gen6TinyRockSmashModule" },
@@ -365,12 +364,12 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
     label: "GEN VII",
     marker: "7",
     items: [
-      { id: "gen7id", label: "gen7IdModule" },
+      { id: "gen7main", label: "gen7MainModule" },
       { id: "gen7timefinder", label: "gen7StationaryTimeModule" },
       { id: "gen7eventtimefinder", label: "gen7EventTimeModule" },
       { id: "gen7wildtimefinder", label: "gen7WildTimeModule" },
       { id: "gen7idtimefinder", label: "gen7IdTimeModule" },
-      { id: "gen7main", label: "gen7MainModule" },
+      { id: "gen7id", label: "gen7IdModule" },
       { id: "gen7stationary", label: "gen7StationaryModule" },
       { id: "gen7wild", label: "gen7WildModule" },
       { id: "gen7sos", label: "gen7SosModule" },
@@ -392,7 +391,6 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
     label: "GEN VIII",
     marker: "8",
     items: [
-      { id: "gen8profiles", label: "gen8ProfilesModule" },
       { id: "gen8id", label: "gen8IdModule" },
       { id: "gen8egg", label: "gen8EggModule" },
       { id: "gen8event", label: "gen8EventModule" },
@@ -580,6 +578,7 @@ function App() {
   const [tsvListExpanded, setTsvListExpanded] = useState(false);
   const [ivToolsExpanded, setIvToolsExpanded] = useState(false);
   const [gen4SwarmExpanded, setGen4SwarmExpanded] = useState(false);
+  const [modernProfilesExpanded, setModernProfilesExpanded] = useState(false);
   const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
     useState<Gen5AdjacentSeedsInitialContext>();
@@ -768,6 +767,7 @@ function App() {
     persistGen3ProfilePanelExpanded(false);
     setGen4ProfileExpanded(false);
     persistGen4ProfilePanelExpanded(false);
+    setModernProfilesExpanded(false);
   };
 
   const changeProfileExpanded = (expanded: boolean) => {
@@ -785,6 +785,17 @@ function App() {
   const changeGen4ProfileExpanded = (expanded: boolean) => {
     setGen4ProfileExpanded(expanded);
     persistGen4ProfilePanelExpanded(expanded);
+    if (expanded) {
+      setModuleRailOpen(false);
+      setIvCalculatorExpanded(false);
+      setEncounterLookupExpanded(false);
+      setContributionsExpanded(false);
+      setSponsorshipExpanded(false);
+    }
+  };
+
+  const changeModernProfilesExpanded = (expanded: boolean) => {
+    setModernProfilesExpanded(expanded);
     if (expanded) {
       setModuleRailOpen(false);
       setIvCalculatorExpanded(false);
@@ -968,63 +979,53 @@ function App() {
     activeModule === "gen8denmap";
   const researcherModule = activeModule === "researcher";
   const pokerusModule = activeModule === "pokerusfinder";
-  const profileTools =
-    activeModule !== "gen4chainedsid" &&
-    activeModule !== "gen4advance" &&
-    activeModule !== "gen5profiles" &&
-    activeModule !== "gen5id" &&
-    activeModule !== "gen5adjacentseeds" &&
-    activeModule !== "gen5ivcache" &&
-    activeModule !== "gen5sha1cache" &&
-    activeModule !== "gen5dreamradar" &&
-    activeModule !== "gen5static" &&
-    activeModule !== "gen5wild" &&
-    activeModule !== "gen5hiddengrotto" &&
-    activeModule !== "gen5egg" &&
-    activeModule !== "gen5event" &&
-    activeModule !== "gen6stationary" &&
-    activeModule !== "gen6timefinder" &&
-    activeModule !== "gen6bank" &&
-    activeModule !== "gen6event" &&
-    activeModule !== "gen6eventtimefinder" &&
-    activeModule !== "gen6wild" &&
-    activeModule !== "gen6dexnav" &&
-    activeModule !== "gen6pokeradar" &&
-    activeModule !== "gen6egg" &&
-    activeModule !== "gen6id" &&
-    activeModule !== "gen6mainseed" &&
-    activeModule !== "gen6mtseed" &&
-    activeModule !== "gen6mtseedtime" &&
-    activeModule !== "gen6tinytimeline" &&
-    activeModule !== "gen6tinyindex" &&
-    activeModule !== "gen6tinyrocksmash" &&
-    activeModule !== "gen6tinyhoney" &&
-    activeModule !== "gen6tinyambush" &&
-    activeModule !== "gen7timefinder" &&
-    activeModule !== "gen7eventtimefinder" &&
-    activeModule !== "gen7wildtimefinder" &&
-    activeModule !== "gen7idtimefinder" &&
-    activeModule !== "gen7stationary" &&
-    activeModule !== "gen7wild" &&
-    activeModule !== "gen7sos" &&
-    activeModule !== "gen7egg" &&
-    activeModule !== "gen7battletree" &&
-    activeModule !== "gen7event" &&
-    activeModule !== "gen7main" &&
-    activeModule !== "gen7eggseedfinder" &&
-    activeModule !== "gen7festivalplaza" &&
-    activeModule !== "gen7id" &&
-    activeModule !== "threedsprofiles" &&
-    activeModule !== "gen8profiles" &&
-    activeModule !== "gen8id" &&
-    activeModule !== "gen8egg" &&
-    activeModule !== "gen8event" &&
-    activeModule !== "gen8raids" &&
-    activeModule !== "gen8static" &&
-    activeModule !== "gen8underground" &&
-    activeModule !== "gen8wild" &&
-    activeModule !== "gen8denmap" &&
-    activeModule !== "researcher";
+  const profileGeneration =
+    gen4Tools && activeModule !== "gen4advance"
+      ? "gen4"
+      : gen5Module
+        ? "gen5"
+        : gen8Module
+          ? "gen8"
+          : !gen4Module &&
+              !gen6Module &&
+              !gen7Module &&
+              !threeDsProfilesModule &&
+              !researcherModule &&
+              !pokerusModule &&
+              activeModule !== "gen4swarm"
+            ? "gen3"
+            : undefined;
+  const profileTools = profileGeneration !== undefined;
+  const profileToolExpanded =
+    profileGeneration === "gen4"
+      ? gen4ProfileExpanded
+      : profileGeneration === "gen5" || profileGeneration === "gen8"
+        ? modernProfilesExpanded
+        : profileGeneration === "gen3"
+          ? profileExpanded
+          : false;
+  const profilePanelId =
+    profileGeneration === "gen4"
+      ? "gen4-profile-panel"
+      : profileGeneration === "gen5"
+        ? "gen5-profile-panel"
+        : profileGeneration === "gen8"
+          ? "gen8-profile-panel"
+          : "gen3-profile-panel";
+  const profileTriggerId =
+    profileGeneration === "gen4"
+      ? "gen4-profile-trigger"
+      : profileGeneration === "gen5"
+        ? "gen5-profile-trigger"
+        : profileGeneration === "gen8"
+          ? "gen8-profile-trigger"
+          : "gen3-profile-trigger";
+  const profileLabel =
+    profileGeneration === "gen5"
+      ? t("gen5ProfilesModule")
+      : profileGeneration === "gen8"
+        ? t("gen8ProfilesModule")
+        : t("profile");
   const activeFloatingTool = sponsorshipExpanded
     ? "sponsorship"
     : contributionsExpanded
@@ -1047,13 +1048,9 @@ function App() {
                       ? "tsvList"
                       : ivToolsExpanded
                         ? "ivTools"
-                        : profileTools && gen4Tools
-                          ? gen4ProfileExpanded
-                            ? "profile"
-                            : undefined
-                          : profileTools && profileExpanded
-                            ? "profile"
-                            : undefined;
+                        : profileTools && profileToolExpanded
+                          ? "profile"
+                          : undefined;
 
   const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
@@ -1067,11 +1064,9 @@ function App() {
     setMiscRngExpanded(false);
     setTsvListExpanded(false);
     setIvToolsExpanded(false);
-    if (gen4Tools) {
-      changeGen4ProfileExpanded(false);
-    } else {
-      changeProfileExpanded(false);
-    }
+    changeGen4ProfileExpanded(false);
+    changeProfileExpanded(false);
+    changeModernProfilesExpanded(false);
   };
 
   const toolRailUsesHover = () =>
@@ -1092,6 +1087,7 @@ function App() {
   };
 
   const selectModule = (group: string, item: ModuleNavigationItem) => {
+    closeFloatingTools();
     if (item.pokerusMode) setPokerusInitialMode(item.pokerusMode);
     setActiveModule(item.id);
     setModuleRailOpen(false);
@@ -1129,8 +1125,15 @@ function App() {
     else if (tool === "tsvList") setTsvListExpanded(true);
     else if (tool === "ivTools") setIvToolsExpanded(true);
     else if (tool === "threeDsProfile") setThreeDsProfilesExpanded(true);
-    else if (gen4Tools) changeGen4ProfileExpanded(true);
+    else if (profileGeneration === "gen4") changeGen4ProfileExpanded(true);
+    else if (profileGeneration === "gen5" || profileGeneration === "gen8")
+      changeModernProfilesExpanded(true);
     else changeProfileExpanded(true);
+  };
+
+  const openProfileManager = () => {
+    if (activeFloatingTool === "profile") return;
+    toggleFloatingTool("profile");
   };
 
   return (
@@ -3477,56 +3480,56 @@ function App() {
             <Gen5ProfilesPanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "gen5id" ? (
             <Gen5IdPanel
-              onOpenProfileManager={() => setActiveModule("gen5profiles")}
+              onOpenProfileManager={openProfileManager}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen5adjacentseeds" ? (
             <Gen5AdjacentSeedsPanel
               initialContext={gen5AdjacentSeedsContext}
               onOpenIvCalculator={openIvCalculator}
-              onOpenProfileManager={() => setActiveModule("gen5profiles")}
+              onOpenProfileManager={openProfileManager}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen5ivcache" ? (
             <Gen5IvCachePanel uiPreviewMode={uiPreviewMode} />
           ) : activeModule === "gen5sha1cache" ? (
             <Gen5Sha1CachePanel
-              onOpenProfileManager={() => setActiveModule("gen5profiles")}
+              onOpenProfileManager={openProfileManager}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen5dreamradar" ? (
             <Gen5DreamRadarPanel
-              onOpenProfileManager={() => setActiveModule("gen5profiles")}
+              onOpenProfileManager={openProfileManager}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen5static" ? (
             <Gen5StaticPanel
               onOpenAdjacentSeeds={openGen5AdjacentSeeds}
-              onOpenProfileManager={() => setActiveModule("gen5profiles")}
+              onOpenProfileManager={openProfileManager}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen5wild" ? (
             <Gen5WildPanel
               onOpenAdjacentSeeds={openGen5AdjacentSeeds}
-              onOpenProfileManager={() => setActiveModule("gen5profiles")}
+              onOpenProfileManager={openProfileManager}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen5hiddengrotto" ? (
             <Gen5HiddenGrottoPanel
               onOpenAdjacentSeeds={openGen5AdjacentSeeds}
-              onOpenProfileManager={() => setActiveModule("gen5profiles")}
+              onOpenProfileManager={openProfileManager}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen5egg" ? (
             <Gen5EggPanel
               onOpenAdjacentSeeds={openGen5AdjacentSeeds}
               onOpenIvCalculator={openIvCalculator}
-              onOpenProfileManager={() => setActiveModule("gen5profiles")}
+              onOpenProfileManager={openProfileManager}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen5event" ? (
             <Gen5EventPanel
-              onOpenProfileManager={() => setActiveModule("gen5profiles")}
+              onOpenProfileManager={openProfileManager}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "researcher" ? (
@@ -3662,21 +3665,21 @@ function App() {
           ) : activeModule === "gen8egg" ? (
             <Gen8EggPanel
               onOpenIvCalculator={openGen4IvCalculator}
-              onOpenProfileManager={() => setActiveModule("gen8profiles")}
+              onOpenProfileManager={openProfileManager}
               profiles={gen8Profiles}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen8event" ? (
             <Gen8EventPanel
               onOpenIvCalculator={openGen4IvCalculator}
-              onOpenProfileManager={() => setActiveModule("gen8profiles")}
+              onOpenProfileManager={openProfileManager}
               profiles={gen8Profiles}
               uiPreviewMode={uiPreviewMode}
             />
           ) : activeModule === "gen8raids" ? (
             <Suspense fallback={null}>
               <Gen8RaidsPanel
-                onOpenProfileManager={() => setActiveModule("gen8profiles")}
+                onOpenProfileManager={openProfileManager}
                 profiles={gen8Profiles}
                 uiPreviewMode={uiPreviewMode}
               />
@@ -3684,7 +3687,7 @@ function App() {
           ) : activeModule === "gen8static" ? (
             <Suspense fallback={null}>
               <Gen8StaticPanel
-                onOpenProfileManager={() => setActiveModule("gen8profiles")}
+                onOpenProfileManager={openProfileManager}
                 profiles={gen8Profiles}
                 uiPreviewMode={uiPreviewMode}
               />
@@ -3692,7 +3695,7 @@ function App() {
           ) : activeModule === "gen8underground" ? (
             <Suspense fallback={null}>
               <Gen8UndergroundPanel
-                onOpenProfileManager={() => setActiveModule("gen8profiles")}
+                onOpenProfileManager={openProfileManager}
                 profiles={gen8Profiles}
                 uiPreviewMode={uiPreviewMode}
               />
@@ -3700,7 +3703,7 @@ function App() {
           ) : activeModule === "gen8wild" ? (
             <Suspense fallback={null}>
               <Gen8WildPanel
-                onOpenProfileManager={() => setActiveModule("gen8profiles")}
+                onOpenProfileManager={openProfileManager}
                 profiles={gen8Profiles}
                 uiPreviewMode={uiPreviewMode}
               />
@@ -3929,13 +3932,13 @@ function App() {
             }
           }}
         />
-        {profileTools && gen4Tools ? (
+        {profileGeneration === "gen4" ? (
           <Gen4ProfileControls
             controller={gen4Profiles}
             expanded={activeFloatingTool === "profile"}
             onExpandedChange={changeGen4ProfileExpanded}
           />
-        ) : profileTools ? (
+        ) : profileGeneration === "gen3" ? (
           <Gen3ProfileControls
             compatibleVersions={
               activeModule === "static" ||
@@ -3952,6 +3955,23 @@ function App() {
             expanded={activeFloatingTool === "profile"}
             onExpandedChange={changeProfileExpanded}
           />
+        ) : profileGeneration === "gen5" || profileGeneration === "gen8" ? (
+          <FloatingToolPanel
+            className={`${profileGeneration}-profile-float-panel`}
+            closeLabel={t("collapse")}
+            expanded={activeFloatingTool === "profile"}
+            id={profilePanelId}
+            label={profileLabel}
+            onExpandedChange={changeModernProfilesExpanded}
+            tone="brand"
+            triggerId={profileTriggerId}
+          >
+            {profileGeneration === "gen5" ? (
+              <Gen5ProfilesPanel uiPreviewMode={uiPreviewMode} />
+            ) : (
+              <Gen8ProfilesPanel controller={gen8Profiles} />
+            )}
+          </FloatingToolPanel>
         ) : null}
         <div
           aria-label={t("tools")}
@@ -4044,22 +4064,20 @@ function App() {
             </button>
             {profileTools && (
               <button
-                aria-controls={
-                  gen4Tools ? "gen4-profile-panel" : "gen3-profile-panel"
-                }
+                aria-controls={profilePanelId}
                 aria-expanded={activeFloatingTool === "profile"}
                 aria-haspopup="dialog"
-                aria-label={t("profile")}
+                aria-label={profileLabel}
                 className={
                   activeFloatingTool === "profile" ? "active" : undefined
                 }
                 data-tone="brand"
-                id={gen4Tools ? "gen4-profile-trigger" : "gen3-profile-trigger"}
+                id={profileTriggerId}
                 onClick={() => {
                   if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
                   toggleFloatingTool("profile");
                 }}
-                title={t("profile")}
+                title={profileLabel}
                 type="button"
               >
                 <UserRound aria-hidden="true" size={19} />

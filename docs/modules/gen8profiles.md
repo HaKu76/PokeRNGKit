@@ -4,6 +4,8 @@
 
 本模块只管理本地档案，不执行 RNG，不使用 Wasm、Worker、后端、账号、遥测或运行时 CDN。后续第八世代算法模块按 SwSh 或 BDSP 版本组读取已选档案。
 
+Profile Manager 由当前 Gen VIII 工作区的右下角存档信息按钮打开，不再占用侧边栏模块入口；管理器与当前 RNG 面板复用 App 级 controller，编辑、排序和选择会即时同步。
+
 ## 1. 上游范围
 
 - 核心档案：`Core/Gen8/Profile8.*`、`Core/Parents/Profile.*`。

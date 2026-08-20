@@ -4290,7 +4290,7 @@ const resources = {
       gen8WildCuteCharm: "迷人身躯",
       gen8WildMaleLead: "♂ 队首",
       gen8WildFemaleLead: "♀ 队首",
-      gen8WildSlotModifier: "Encounter Slot Modifier",
+      gen8WildSlotModifier: "遭遇种类修正",
       gen8WildHarvest: "收获",
       gen8WildFlashFire: "引火",
       gen8WildMagnetPull: "磁力",

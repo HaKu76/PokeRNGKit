@@ -1,4 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  createElement,
+  type PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   createGen5Profile,
   EMPTY_GEN5_PROFILE_STATE,
@@ -44,7 +54,11 @@ export interface Gen5ProfilesController {
   exportState(): Gen5ProfileState;
 }
 
-export function useGen5Profiles(): Gen5ProfilesController {
+const Gen5ProfilesContext = createContext<Gen5ProfilesController | undefined>(
+  undefined,
+);
+
+function useGen5ProfilesController(): Gen5ProfilesController {
   const [state, setState] = useState<Gen5ProfileState>({
     ...EMPTY_GEN5_PROFILE_STATE,
     profiles: [],
@@ -241,4 +255,21 @@ export function useGen5Profiles(): Gen5ProfilesController {
     },
     exportState: () => stateRef.current,
   };
+}
+
+export function Gen5ProfilesProvider({ children }: PropsWithChildren) {
+  const controller = useGen5ProfilesController();
+  return createElement(
+    Gen5ProfilesContext.Provider,
+    { value: controller },
+    children,
+  );
+}
+
+export function useGen5Profiles(): Gen5ProfilesController {
+  const controller = useContext(Gen5ProfilesContext);
+  if (!controller) {
+    throw new Error("useGen5Profiles must be used within Gen5ProfilesProvider");
+  }
+  return controller;
 }

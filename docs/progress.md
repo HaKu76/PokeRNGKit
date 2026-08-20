@@ -1,5 +1,26 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-20 侧边栏 Seed/ID 顺序与野生中文收口（已完成工程验证）
+
+- 调整：按 `存档信息/ID -> Seed 相关 -> 定点 -> 野生 -> 蛋 -> 事件` 主线，
+  将 Gen III、Gen IV、Gen V、Gen VI、Gen VII 侧边栏的 Seed、Time Finder 或
+  Adjacent Seeds 入口置于对应 ID 入口之前；Gen VIII 无独立 Seed 入口，保持 ID 在前。
+- 补齐：Gen VII Wild 简体中文的分类和队首能力标签；`gen8WildSlotModifier`
+  遵循上游无简中词条时保留英文源标签，避免英文资源混入中文。
+- 保留：Gen V / Gen VIII 存档信息管理继续由右下角浮动工具打开，应用级 controller
+  共享选择、编辑和校准状态，不恢复侧边栏档案入口。
+- 主要文件：`src/App.tsx`、`src/features/gen7wild/Gen7WildPanel.tsx`、
+  `src/i18n.ts`、Gen V/Gen VIII Profile 浮窗及其文档。
+- 已通过：任务文件格式化、`npm run format:check`、`git diff --check`、
+  `npm run verify`（176 个测试文件、612 项测试、TypeScript、ESLint、Vite/PWA
+  生产构建 2312 个模块和 238 项预缓存资源）。
+- 未运行：Emscripten 原生/Wasm 检查、外部 Chrome/Edge UI、GitHub Pages 生产回归和
+  项目所有者最终验收；这些仍按全部 3DSRNGTool 模块完成后的统一门槛执行。
+- 当前 Git：`main` 工作区包含本条目及同一开发链的待提交修改，提交后需推送并等待
+  Actions；推送完成前不宣称生产页面已更新。
+- 下一步：提交并推送本轮已验证修改，随后等待部署结果，再按项目所有者提供的准确
+  Pages URL 与外部 Chrome/Edge 会话执行共同验收。
+
 ## 2026-08-20 统一 3DS/UI 验收与 Windows Actions 产物链（进行中）
 
 - 修复：Actions run `32363436005` 的前端完整验证通过后，69 个原生夹具只有 `gen6mainseed_native_parity` 失败；复核确认测试把 Seed `0` 的 frame `15..20` IV 错写为 frame `10..15` 目标，并在单只模式传入违反 `upper <= lower + 2` 的 `0..31` 区间。本轮改为真实第二只 IV 与 frame 1 精确范围，不修改生产算法。

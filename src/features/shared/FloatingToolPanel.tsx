@@ -111,7 +111,9 @@ export function FloatingToolPanel({
       if (event.key !== "Escape" || event.defaultPrevented) return;
       if (
         event.target instanceof Element &&
-        event.target.closest(".modal-backdrop, .threedsprofiles-overlay")
+        event.target.closest(
+          ".modal-backdrop, .threedsprofiles-overlay, .gen5profiles-overlay, .gen8profiles-overlay",
+        )
       ) {
         return;
       }
@@ -126,7 +128,7 @@ export function FloatingToolPanel({
         document.getElementById(triggerId)?.contains(target) ||
         (target instanceof Element &&
           target.closest(
-            ".floating-tool-rail, .legal-footer-action, .modal-backdrop, .threedsprofiles-overlay",
+            ".floating-tool-rail, .legal-footer-action, .modal-backdrop, .threedsprofiles-overlay, .gen5profiles-overlay, .gen8profiles-overlay",
           ))
       ) {
         return;
@@ -155,7 +157,7 @@ export function FloatingToolPanel({
       if (
         document.activeElement instanceof Element &&
         document.activeElement.closest(
-          ".modal-backdrop, .threedsprofiles-overlay",
+          ".modal-backdrop, .threedsprofiles-overlay, .gen5profiles-overlay, .gen8profiles-overlay",
         )
       ) {
         return;

@@ -9,6 +9,7 @@
 - 平台：Black、White、Black 2、White 2；DS Original/Lite、DSi/DSi XL、3DS；ENG、SPA、FRE、ITA、DEU、JPN、KOR。
 - BW2 专属设置：`Memory Link`、`N's Pokémon released`、`Shiny Charm`。BW/BW2 之外的设置不会写入对应 profile 的有效状态。
 - 浏览器保持静态和本地优先：IndexedDB 为主存储，独立 localStorage 镜像用于恢复；不使用后端、账号、遥测或云端资料。
+- Profile Manager / Calibrator 由当前 Gen V 工作区的右下角存档信息按钮打开，不再占用侧边栏模块入口；应用级 Provider 让悬浮管理器与当前 RNG 面板共享同一个 controller，编辑和选择会即时同步。
 
 ## Profile 输入边界
 
