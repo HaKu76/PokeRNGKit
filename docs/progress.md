@@ -1,13 +1,22 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-21 Windows portable EXE 交付收口（配置已完成）
+
+- 移除：Windows `nsis` 安装器目标及其配置，避免一次构建生成安装 EXE 和便携 EXE 两套产物。
+- 收口：electron-builder 仅构建 Windows x64 `portable` 目标，最终文件名固定为 `PokeRNGKit.exe`；Actions 只上传该单一 EXE。
+- 保留：桌面应用继续使用 Electron 原生壳、静态 `dist` 资源和本地 Worker/Wasm，不新增安装器、后端或运行时 CDN。
+- 已通过：定向 `npm run format:files`、`npm run format:check`、`git diff --check`、`npm run typecheck` 和 package 配置断言；确认唯一构建目标为 `portable/x64`，没有 `nsis` 配置。
+- 未通过（环境限制）：`npm run desktop:package` 已读取新配置并进入 Electron Windows x64 打包，但在 Electron 运行时目录重命名阶段返回 `EPERM`，未生成 EXE；这与源码和目标配置无关，Actions 仍需重新构建确认产物。
+- 未运行：本轮配置变更后的 Windows Actions 构建、EXE 启动和生产页面回归，等待提交后的 Actions 结果与项目所有者共同验收。
+
 ## 2026-08-21 全局 Select 与侧栏命名统一（已完成工程验证）
 
 - 统一：将 `src/features` 中全部 59 个原生 `<select>` 迁移为共享 HakuStyle `Select`，保留 `value`、`defaultValue`、`onChange(event.target.value)`、分组、禁用项和键盘操作兼容；源码已无原生 `<select>` 标签。
 - 统一：侧边栏核心入口按世代前缀规范命名，第三世代为“第三世代 ID/野生/孵化乱数”，第四至第七世代同样使用“第 N 世代”前缀，避免同一导航层级混用简称和世代全称。
-- 新增：Windows 原生桌面壳配置，Electron 应用从独立 `desktop` 目录通过受限 `app://` 协议加载静态站点，并在 Actions 生成 NSIS 安装程序和 portable EXE；不新增后端，继续复用浏览器端 Worker/Wasm。
+- 新增：Windows 原生桌面壳配置，Electron 应用从独立 `desktop` 目录通过受限 `app://` 协议加载静态站点，并在 Actions 生成 portable EXE；不新增后端，继续复用浏览器端 Worker/Wasm。
 - 新增：`npm run desktop:package` 在缺少 `dist/index.html` 时使用 `BASE_PATH=./` 完整构建桌面资源；Actions 复用已下载的生产 `dist`，避免丢失 Wasm 文件。
 - 已通过：任务文件格式化、`git diff --check`、`node --check desktop/main.mjs` 和完整 `npm run verify`（Prettier、ESLint、TypeScript、177 个测试文件共 615 项测试、2317 个生产模块和 239 项 PWA 预缓存资源）。
-- 本地打包：electron-builder 已完成配置解析、Electron 运行时下载和应用目录初始化；当前 Windows 工作区在解压 Electron 运行时阶段长时间无产物，已中止，不将该环境阻塞误判为应用代码失败。完整 NSIS/portable 产物交由 Windows Actions 生成，当前工作区未留下 `release` 产物。
+- 本地打包：electron-builder 已完成配置解析、Electron 运行时下载和应用目录初始化；当前 Windows 工作区在解压 Electron 运行时阶段长时间无产物，已中止，不将该环境阻塞误判为应用代码失败。portable EXE 交由 Windows Actions 生成，当前工作区未留下 `release` 产物。
 - 修复：首次 Actions run `32400111335` 在依赖安装阶段失败；本地使用同一 `npm ci --engine-strict` 已通过，锁文件新增依赖的 `resolved` 地址已统一为官方 npm registry，避免 runner 继续依赖不可用镜像。
 - 已通过：Actions run `32401120273` 的 `build`、GitHub Pages `deploy`、`windows-desktop` 和依赖安装；`windows-desktop` artifact 已上传，大小约 218 MB，包含 NSIS 安装 EXE 与 portable EXE。生产地址为 `https://haku76.github.io/PokeRNGKit/`。
 - 未运行：外部 Chrome/Edge UI 验收、生产算法回归和 Windows 实机 EXE 启动验收；这些需要项目所有者在对应外部环境中共同确认，不能用 Actions 结果替代。
@@ -24,8 +33,8 @@
 ## 2026-08-20 Windows EXE 交付定义修正
 
 - 决策：Windows 最终交付改为类似 PokeFinder / 3DSRNGTool 的直接桌面原生可执行程序；不是把静态站点和 PowerShell 启动器封装成自解压 portable 包。
-- 保留：现有 portable Actions job 仅作为临时开发验收和资源打包手段，不宣称为最终 EXE 方案。
-- 排期：原生桌面壳、安装/便携策略、Worker/Wasm 资源加载和 GitHub Actions 构建链顺延到全部功能与 Pages 生产回归之后。
+- 更新：最终交付采用 Electron 原生壳的单一 Windows x64 portable EXE，不提供 NSIS 安装器；Worker/Wasm 资源继续随桌面应用本地加载。
+- 排期：原生桌面壳、便携 EXE、Worker/Wasm 资源加载和 GitHub Actions 构建链顺延到全部功能与 Pages 生产回归之后。
 
 ## 2026-08-20 第三世代侧栏中文标签补齐
 

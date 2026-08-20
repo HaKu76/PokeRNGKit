@@ -118,9 +118,8 @@ jobs:
       - name: Upload Windows desktop artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: windows-desktop
-          path: |
-            release/*.exe
+          name: windows-portable-exe
+          path: release/PokeRNGKit.exe
           if-no-files-found: error
 
   deploy:
