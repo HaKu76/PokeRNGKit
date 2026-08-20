@@ -1,0 +1,13 @@
+{
+  "id": "gen4swarm",
+  "generation": 4,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen4swarm",
+  "operations": ["searcher"],
+  "artifacts": {
+    "loader": "gen4swarm.mjs",
+    "wasm": "gen4swarm.wasm"
+  },
+  "source": "PokemonRNGGuides Gen 4 Swarm RNG; Real96 Gen4SwarmDailyEncounterRNGTool; PokeFinder MT/ARNG"
+}

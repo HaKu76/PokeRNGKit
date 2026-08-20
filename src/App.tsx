@@ -26,6 +26,7 @@ import {
   Search,
   SlidersHorizontal,
   Sun,
+  RadioTower,
   UserRound,
   X,
 } from "lucide-react";
@@ -123,6 +124,7 @@ import { Gen4EventPanel } from "./features/gen4event/Gen4EventPanel";
 import { Gen4IdPanel } from "./features/gen4id/Gen4IdPanel";
 import { Gen4SeedToTimePanel } from "./features/gen4seedtotime/Gen4SeedToTimePanel";
 import { Gen4ChainedSidPanel } from "./features/gen4chainedsid/Gen4ChainedSidPanel";
+import { Gen4SwarmPanel } from "./features/gen4swarm/Gen4SwarmPanel";
 import { Gen5ProfilesPanel } from "./features/gen5profiles/Gen5ProfilesPanel";
 import { Gen5IdPanel } from "./features/gen5id/Gen5IdPanel";
 import { Gen5AdjacentSeedsPanel } from "./features/gen5adjacentseeds/Gen5AdjacentSeedsPanel";
@@ -198,6 +200,7 @@ type ActiveModule =
   | "gen4event"
   | "gen4chainedsid"
   | "gen4advance"
+  | "gen4swarm"
   | "gen5profiles"
   | "gen5id"
   | "gen5adjacentseeds"
@@ -576,6 +579,7 @@ function App() {
   const [miscRngExpanded, setMiscRngExpanded] = useState(false);
   const [tsvListExpanded, setTsvListExpanded] = useState(false);
   const [ivToolsExpanded, setIvToolsExpanded] = useState(false);
+  const [gen4SwarmExpanded, setGen4SwarmExpanded] = useState(false);
   const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
     useState<Gen5AdjacentSeedsInitialContext>();
@@ -1033,21 +1037,23 @@ function App() {
             ? "threeDsProfile"
             : researcherExpanded
               ? "researcher"
-              : keyBvExpanded
-                ? "keybv"
-                : miscRngExpanded
-                  ? "miscRng"
-                  : tsvListExpanded
-                    ? "tsvList"
-                    : ivToolsExpanded
-                      ? "ivTools"
-                      : profileTools && gen4Tools
-                        ? gen4ProfileExpanded
-                          ? "profile"
-                          : undefined
-                        : profileTools && profileExpanded
-                          ? "profile"
-                          : undefined;
+              : gen4SwarmExpanded
+                ? "gen4Swarm"
+                : keyBvExpanded
+                  ? "keybv"
+                  : miscRngExpanded
+                    ? "miscRng"
+                    : tsvListExpanded
+                      ? "tsvList"
+                      : ivToolsExpanded
+                        ? "ivTools"
+                        : profileTools && gen4Tools
+                          ? gen4ProfileExpanded
+                            ? "profile"
+                            : undefined
+                          : profileTools && profileExpanded
+                            ? "profile"
+                            : undefined;
 
   const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
@@ -1056,6 +1062,7 @@ function App() {
     setSponsorshipExpanded(false);
     setThreeDsProfilesExpanded(false);
     setResearcherExpanded(false);
+    setGen4SwarmExpanded(false);
     setKeyBvExpanded(false);
     setMiscRngExpanded(false);
     setTsvListExpanded(false);
@@ -1099,6 +1106,7 @@ function App() {
       | "iv"
       | "profile"
       | "researcher"
+      | "gen4Swarm"
       | "keybv"
       | "miscRng"
       | "tsvList"
@@ -1115,6 +1123,7 @@ function App() {
     else if (tool === "encounter") setEncounterLookupExpanded(true);
     else if (tool === "iv") setIvCalculatorExpanded(true);
     else if (tool === "researcher") setResearcherExpanded(true);
+    else if (tool === "gen4Swarm") setGen4SwarmExpanded(true);
     else if (tool === "keybv") setKeyBvExpanded(true);
     else if (tool === "miscRng") setMiscRngExpanded(true);
     else if (tool === "tsvList") setTsvListExpanded(true);
@@ -3795,6 +3804,27 @@ function App() {
             }
           }}
         />
+        <Gen4SwarmPanel
+          expanded={activeFloatingTool === "gen4Swarm"}
+          onExpandedChange={(expanded) => {
+            setGen4SwarmExpanded(expanded);
+            if (expanded) {
+              setModuleRailOpen(false);
+              setIvCalculatorExpanded(false);
+              setEncounterLookupExpanded(false);
+              setContributionsExpanded(false);
+              setSponsorshipExpanded(false);
+              setThreeDsProfilesExpanded(false);
+              setResearcherExpanded(false);
+              setKeyBvExpanded(false);
+              setMiscRngExpanded(false);
+              setTsvListExpanded(false);
+              setIvToolsExpanded(false);
+              if (gen4Tools) changeGen4ProfileExpanded(false);
+              else changeProfileExpanded(false);
+            }
+          }}
+        />
         <FloatingToolPanel
           className="three-ds-profile-float-panel"
           closeLabel={t("collapse")}
@@ -3938,6 +3968,25 @@ function App() {
             className="floating-tool-actions"
             id="floating-tool-actions"
           >
+            <button
+              aria-controls="gen4-swarm-panel"
+              aria-expanded={activeFloatingTool === "gen4Swarm"}
+              aria-haspopup="dialog"
+              aria-label={t("gen4SwarmModule")}
+              className={
+                activeFloatingTool === "gen4Swarm" ? "active" : undefined
+              }
+              data-tone="amber"
+              id="gen4-swarm-trigger"
+              onClick={() => {
+                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                toggleFloatingTool("gen4Swarm");
+              }}
+              title={t("gen4SwarmModule")}
+              type="button"
+            >
+              <RadioTower aria-hidden="true" size={19} />
+            </button>
             <button
               aria-controls="iv-tools-panel"
               aria-expanded={activeFloatingTool === "ivTools"}

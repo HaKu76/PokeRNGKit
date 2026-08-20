@@ -1,5 +1,17 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-20 Gen IV Swarm RNG（已完成工程验证）
+
+- 新增：右下角浮动 `Swarm RNG` 工具，覆盖 D/P、Pt、HG、SS 的遭遇表和地点选择；不新增侧边栏核心工作区。
+- 新增：`Find advances` 按已知 MT Seed 和推进范围筛选目标 Swarm；`Find encounter seed` 按 Real96 工具的高字节、Hour、Delay 与 MT Advances 顺序返回第一个每日 Encounter Seed。
+- 算法：在独立 C++/Wasm bridge 中实现 Gen IV MT19937、双 ARNG 和版本遭遇表取模；Dedicated Worker 负责握手、范围校验、结果复制和取消重建。
+- 交互：结果可选中为目标帧，支持 `+1` 和 HGSS Youngster Joey `+2` 推进记录；游戏与遭遇选择复用 `AutoCompleteComboBox`。
+- 来源：PokemonRNGGuides Gen 4 Swarm、Real96 `Gen4SwarmDailyEncounterRNGTool` revision `6bc5623008b8fbf87c4450ecdab55946b01815f7`、PokeFinder MT/ARNG；许可与输入边界见 `docs/modules/gen4swarm.md`。
+- 已通过：`npm test -- src/features/gen4swarm`（1 个文件、3 项）、`npm run format:check`、`git diff --check`、完整 `npm run verify`（176 个测试文件、612 项测试、2312 个生产模块和 236 项 PWA 预缓存）。
+- 已通过：`POKERNGKIT_WASM_MODULES=gen4swarm npm run wasm:test:native`（1/1）与激活 Emscripten 6.0.6 后的定向 `npm run wasm:build`；生成 `gen4swarm.mjs`（7360 bytes）和 `gen4swarm.wasm`（6286 bytes），产物按仓库规则保持忽略、不提交。
+- 未运行：外部 Chrome/Edge、生产页面回归和项目所有者最终验收；按全部 3DS 模块完成后的统一门槛执行。
+- 下一步：提交并推送 Swarm 后，进入 PokemonRNGGuides 全世代教程工作流复核；Gen IV `Gen4SeedFinder` 与 Voltorb Flip 排在其后。
+
 ## 2026-08-20 3DSTimeFinder TF7/TF8 Profile 收口（已完成工程验证）
 
 - 新增：3DS 存档信息悬浮工具加入 Profile Manager / Gen VII Profile Calibrator 模式切换；

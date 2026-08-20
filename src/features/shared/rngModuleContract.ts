@@ -87,6 +87,12 @@ export const GEN4_MODULE_RESERVATIONS = [
     operations: ["searcher"],
     status: "reserved",
   },
+  {
+    id: "gen4swarm",
+    generation: 4,
+    operations: ["searcher"],
+    status: "reserved",
+  },
 ] as const satisfies readonly RngModuleReservation[];
 
 export type Gen4ModuleId = (typeof GEN4_MODULE_RESERVATIONS)[number]["id"];

@@ -1,0 +1,155 @@
+.gen4swarm-display {
+  width: min(720px, calc(100vw - 24px));
+}
+
+.gen4swarm-body {
+  display: grid;
+  gap: 14px;
+  max-height: min(720px, calc(100vh - 120px));
+  overflow: auto;
+  padding: 16px;
+}
+
+.gen4swarm-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.gen4swarm-tabs button {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--control-bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+}
+
+.gen4swarm-tabs button.active {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.gen4swarm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.gen4swarm-grid .field {
+  min-width: 0;
+}
+
+.gen4swarm-grid .autocomplete-combobox,
+.gen4swarm-grid input {
+  width: 100%;
+  min-height: 44px;
+}
+
+.gen4swarm-actions {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.gen4swarm-results {
+  min-height: 160px;
+}
+
+.gen4swarm-result-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 10px;
+}
+
+.gen4swarm-result-heading span,
+.gen4swarm-results td,
+.gen4swarm-results th {
+  font-variant-numeric: tabular-nums;
+}
+
+.gen4swarm-results table {
+  width: 100%;
+  min-width: 420px;
+  border-collapse: collapse;
+}
+
+.gen4swarm-results th,
+.gen4swarm-results td {
+  height: 44px;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.gen4swarm-results tbody tr {
+  cursor: pointer;
+}
+
+.gen4swarm-results tbody tr:hover,
+.gen4swarm-results tbody tr.selected {
+  background: var(--teal-soft);
+}
+
+.gen4swarm-results th:last-child,
+.gen4swarm-results td:last-child {
+  width: 44px;
+  padding: 4px;
+  text-align: center;
+}
+
+.gen4swarm-tracker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 14px;
+}
+
+.gen4swarm-tracker > div:not(.gen4swarm-tracker-actions) {
+  display: grid;
+  gap: 2px;
+}
+
+.gen4swarm-tracker span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.gen4swarm-tracker strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.gen4swarm-tracker-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gen4swarm-results th {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gen4swarm-results .mono {
+  font-family: ui-monospace, monospace;
+}
+
+@media (max-width: 560px) {
+  .gen4swarm-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen4swarm-actions > button {
+    flex: 1 1 100%;
+  }
+
+  .gen4swarm-tracker {
+    grid-template-columns: 1fr;
+  }
+}
