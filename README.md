@@ -5,12 +5,12 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 ## 项目状态
 
-**当前里程碑：3DSRNGTool 功能进入统一 UI 与 GitHub Pages 生产验收，并由 GitHub Actions 生成 Windows portable 产物。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder、TinyMT Timeline、TinyMT Index 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
+**当前里程碑：3DSRNGTool 功能进入统一 UI 与 GitHub Pages 生产验收，并规划 Windows 原生桌面可执行程序。** PokeFinder 4.3.2 的第三、第四、第五和第八世代模块已经进入仓库；3DSRNGTool 第七世代、Gen VI Stationary、Pokemon Link / Transporter、Event、Wild、DexNav、Poke Radar、Egg、ID、Main Seed Finder、TinyMT Timeline、TinyMT Index 与独立 Profile Manager 已实现。3DSRNGTool 除 `NTR Helper` 外全部保留在开发范围内。
 
 - 当前范围：完整 PokeFinder 4.3.2，以及除 `NTR Helper` 外的全部 3DSRNGTool 功能
 - 已完成范围：PokeFinder Gen III、Gen IV、Gen V、全局工具、Gen VIII Profiles / IDs / Eggs / Event / Raids / Static / Underground / Wild / Den Map，以及 3DSRNGTool Gen VI Stationary / Pokemon Link / Transporter / Event / Wild / DexNav / Poke Radar / Egg / ID / Main Seed Finder / TinyMT Timeline、Gen VII Stationary / Wild / SOS / Egg / ID / Battle Tree / Event / Main RNG Tool / Egg Seed Finder / Festival Plaza Facility RNG 与 Profile Manager
-- 当前工作：统一 3DS/UI 验收、GitHub Pages 生产回归与 Windows portable EXE Actions 产物
-- 暂缓开发：Gen IV `Gen4SeedFinder` / Voltorb Flip；Gen V DS 参数、Initial Seed、Entralink 深审
+- 当前工作：统一 3DS/UI 验收、GitHub Pages 生产回归；Windows 原生桌面 EXE 适配顺延到最后
+- 当前排期：Gen IV `Voltorb Flip`；Gen4SeedFinder 已完成工程验证。Gen V DS 参数、Initial Seed、Entralink 深审暂缓
 - 新增模块文档：[Gen 6 Stationary](docs/modules/gen6stationary.md) / [Gen 6 Pokemon Link / Transporter](docs/modules/gen6bank.md) / [Gen 6 Event](docs/modules/gen6event.md) / [Gen 6 Wild](docs/modules/gen6wild.md) / [Gen 6 DexNav](docs/modules/gen6dexnav.md) / [Gen 6 Poke Radar](docs/modules/gen6pokeradar.md) / [Gen 6 Egg](docs/modules/gen6egg.md) / [Gen 6 ID](docs/modules/gen6id.md) / [Gen 6 Main Seed Finder](docs/modules/gen6mainseed.md) / [Gen 6 TinyMT Timeline](docs/modules/gen6tinytimeline.md) / [Gen 6 TinyMT Index](docs/modules/gen6tinyindex.md)
 - 明确排除：仅 3DSRNGTool `NTR Helper`
 - 上游核验基线：PokeFinder 4.3.2
@@ -563,7 +563,7 @@ CI/CD 使用 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：
 1. 在固定 Node、npm 与 Emscripten 版本下安装依赖；CMake/Ninja 由 `npm ci` 安装。
 2. 执行格式检查、lint、类型检查、TypeScript 单元测试、原生 Core 一致性测试和生产构建。
 3. 上传同一份 `dist/`，由独立 job 部署到 GitHub Pages。
-4. 主分支额外上传同一份 `production-dist`，由 Windows job 生成 `PokeRNGKit.exe` 自解压包和 ZIP 备份包。
+4. 主分支额外上传同一份 `production-dist`，临时 portable 包仅用于开发验收；最终 Windows 交付必须改为直接构建的桌面原生 EXE。
 5. 配置 Cloudflare Secrets 与项目变量后，可将同一份 `dist/` 部署到 Cloudflare Pages；后续绑定 `hakuhiro.top` 下的正式域名。
 
 当前首要目标是 GitHub Pages 测试部署。Codex 按本轮授权逐模块提交并推送 `main` 后，Actions 会尝试启用 Pages、构建 Wasm 和站点，并部署到预计地址 <https://haku76.github.io/PokeRNGKit/>。如果仓库策略阻止自动启用，在 GitHub `Settings -> Pages -> Build and deployment` 中将 Source 设为 `GitHub Actions`，再重新运行工作流。

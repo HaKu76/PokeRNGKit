@@ -1,5 +1,20 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-20 Gen IV Gen4SeedFinder（已完成工程验证）
+
+- 新增：Gen IV `Gen4SeedFinder` 主工作区，覆盖 DPPt Coin Flip 与 HGSS Elm Call 两条教程路径；按 PokemonRNGGuides 的日期/秒数/Delay 枚举和连续序列筛选语义生成 Seed、时间、Delay 与序列结果。
+- 新增：独立 `gen4seedfinder` C++/Wasm bridge、Dedicated Worker、固定 10-word 结果协议、React domain 校验、中文文案、Gen IV 侧栏入口、模块文档和原生夹具。
+- 输入保护：日期合法性、秒数跨分钟推进、Delay 范围上限、序列长度/字符集和 100,000 条结果上限均在 domain 与 Wasm 双重校验。
+- 已通过：任务文件格式化、`npm run format:check`、`git diff --check`、`npm run typecheck`、`npx vitest run src/features/gen4seedfinder/domain.test.ts --pool=threads --maxWorkers=2`（1 个文件、3 项测试）、`POKERNGKIT_WASM_MODULES=gen4seedfinder npm run wasm:test:native`（1/1）和完整 `npm run verify`（177 个测试文件、615 项测试、2316 个生产模块、239 项 PWA 预缓存）。
+- 未运行：Emscripten 浏览器 Wasm 产物构建、外部 Chrome/Edge UI 检查和 GitHub Pages 生产回归；这些仍按全部 3DS 模块完成后的统一门槛执行。
+- 下一步：继续实现 P3 的 Voltorb Flip Seed / Board Generator；随后再进入统一 3DS/UI 与 Pages 生产验收。Gen V DS 深审仍按排期暂缓。
+
+## 2026-08-20 Windows EXE 交付定义修正
+
+- 决策：Windows 最终交付改为类似 PokeFinder / 3DSRNGTool 的直接桌面原生可执行程序；不是把静态站点和 PowerShell 启动器封装成自解压 portable 包。
+- 保留：现有 portable Actions job 仅作为临时开发验收和资源打包手段，不宣称为最终 EXE 方案。
+- 排期：原生桌面壳、安装/便携策略、Worker/Wasm 资源加载和 GitHub Actions 构建链顺延到全部功能与 Pages 生产回归之后。
+
 ## 2026-08-20 第三世代侧栏中文标签补齐
 
 - 调整：按 `PokeFinder_zh.ts` 已核对译文，将第三世代 `Seed to Time`、`Static` 和

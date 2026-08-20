@@ -1,0 +1,107 @@
+.gen4-seed-finder {
+  display: grid;
+  gap: 12px;
+}
+.gen4-seed-finder-tabs {
+  width: min(100%, 360px);
+  margin-bottom: 0;
+}
+.gen4-seed-finder-form {
+  display: grid;
+  grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.35fr);
+  gap: 14px;
+}
+.gen4-seed-finder-form .panel {
+  min-height: 0;
+  padding: 20px;
+}
+.gen4-seed-finder-date-grid {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0 12px;
+}
+.gen4-seed-finder-range-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.gen4-seed-finder .field {
+  margin-top: 12px;
+}
+.gen4-seed-finder .field input {
+  min-width: 0;
+}
+.range-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+}
+.range-fields > span {
+  color: var(--muted);
+  text-align: center;
+}
+.gen4-seed-finder-results-panel {
+  overflow: hidden;
+}
+.gen4-seed-finder-results {
+  max-height: min(560px, calc(100vh - 330px));
+  overflow: auto;
+  margin-top: 14px;
+}
+.gen4-seed-finder-results table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+.gen4-seed-finder-results th,
+.gen4-seed-finder-results td {
+  height: 44px;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 8px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+.gen4-seed-finder-results th {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.gen4-seed-finder-results .mono {
+  font-family: ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.gen4-seed-finder-results tbody tr:hover {
+  background: var(--brand-soft);
+}
+.gen4-seed-finder .panel-note {
+  font-variant-numeric: tabular-nums;
+}
+.gen4-seed-finder .status-badge {
+  color: var(--muted);
+  font-size: 13px;
+}
+.gen4-seed-finder .empty-state {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .gen4-seed-finder-form {
+    grid-template-columns: 1fr;
+  }
+  .gen4-seed-finder-results {
+    max-height: 420px;
+  }
+}
+@media (max-width: 620px) {
+  .gen4-seed-finder-date-grid,
+  .gen4-seed-finder-range-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gen4-seed-finder-date-grid .field:first-child {
+    grid-column: 1 / -1;
+  }
+}

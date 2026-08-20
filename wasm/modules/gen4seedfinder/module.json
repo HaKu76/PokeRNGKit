@@ -1,0 +1,13 @@
+{
+  "id": "gen4seedfinder",
+  "generation": 4,
+  "contractVersion": 1,
+  "apiVersion": 1,
+  "target": "gen4seedfinder",
+  "operations": ["searcher"],
+  "artifacts": {
+    "loader": "gen4seedfinder.mjs",
+    "wasm": "gen4seedfinder.wasm"
+  },
+  "source": "PokemonRNGGuides Gen 4 Seed Finder; PokeFinder Gen IV MT/LCRNG"
+}

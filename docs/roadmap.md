@@ -13,23 +13,23 @@
 
 ## 当前需求池
 
-| 优先级 | 需求                                              | 状态   | 依据 / 说明                                                                       | 下一步                                      |
-| ------ | ------------------------------------------------- | ------ | --------------------------------------------------------------------------------- | ------------------------------------------- |
-| P0     | Gen VII TF3 Stationary Initial Seed / Time Finder | 已完成 | `PokemonRNGGuides` 的 Gen VII 初始 Seed 教程；`3DSTimeFinder` StationarySearcher7 | 已提交推送；生产算法仍待部署 URL 与人工验收 |
-| P0     | Gen VII TF4 Event Initial Seed / Time Finder      | 已完成 | 与 TF3 同一时间枚举流程，复用 `gen7event`                                         | 已完成工程验证，待提交推送                  |
-| P0     | Gen VII TF5 Wild / TF6 ID                         | 已完成 | TF5/TF6 工程验证完成，生产算法仍待部署 URL 与人工验收                             | 统一 UI 验收后进入后续辅助缺口              |
-| P1     | Gen VI TF1/TF2 Stationary/Event                   | 已完成 | TF1/TF2 工程验证完成，生产算法仍待部署 URL 与人工验收                             | 统一 UI 验收后进入后续辅助缺口              |
-| P2     | 公共 TSV List                                     | 已完成 | Gen VII Egg 教程要求编辑 TSV List                                                 | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具    |
-| P2     | IV Range / IV Template                            | 已完成 | 3DSRNGTool `IVRange.cs`、`IVTemplate.cs`                                          | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具    |
-| P3     | Gen IV Gen4SeedFinder、Voltorb Flip               | 暂缓   | 项目所有者明确要求暂不计划；Swarm 已单独落地                                      | 后续重新排期                                |
-| P4     | Gen V DS 参数、Initial Seed、Entralink 深审       | 暂缓   | 项目所有者明确要求暂不计划                                                        | 后续重新排期                                |
-| P5     | TinyFinder 独有扩展                               | 已完成 | T1-T14 已落地；Ambush 覆盖 Victory Road Swooping，MT Seed/Time 独立成模块         | 进入全范围 UI 验收准备                      |
-| P6     | 统一 3DS/UI 生产验收                              | 进行中 | 八项 UI 清单已完成源码收口，等待新 Pages 产物与外部浏览器复核                     | 先完成 Pages 部署，再逐项记录验收证据       |
-| P7     | GitHub Pages 生产回归                             | 进行中 | 生产算法回归必须使用 Actions 部署后的准确 URL                                     | 等待部署完成和项目所有者提供 URL            |
-| 持续   | 按教程共有主线审查入口、侧栏和真实功能缺口        | 复核   | 全世代 165 篇正文指南人工复核结论                                                 | 仅补真实缺口，避免重复开发                  |
-| 最后   | Windows EXE 适配                                  | 进行中 | GitHub Actions 使用同一份 `dist/` 生成 Windows 自解压可执行包                     | Actions 产物完成后再做 Windows 实机验收     |
-| 排除   | NTR Helper                                        | 排除   | 原始 NTR/TCP 访问超出静态浏览器架构                                               | 不开发                                      |
-| 排除   | Gen II、Legends Arceus                            | 排除   | 不属于 PokeFinder 4.3.2 / 3DSRNGTool 产品范围                                     | 不开发                                      |
+| 优先级 | 需求                                              | 状态   | 依据 / 说明                                                                           | 下一步                                               |
+| ------ | ------------------------------------------------- | ------ | ------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| P0     | Gen VII TF3 Stationary Initial Seed / Time Finder | 已完成 | `PokemonRNGGuides` 的 Gen VII 初始 Seed 教程；`3DSTimeFinder` StationarySearcher7     | 已提交推送；生产算法仍待部署 URL 与人工验收          |
+| P0     | Gen VII TF4 Event Initial Seed / Time Finder      | 已完成 | 与 TF3 同一时间枚举流程，复用 `gen7event`                                             | 已完成工程验证，待提交推送                           |
+| P0     | Gen VII TF5 Wild / TF6 ID                         | 已完成 | TF5/TF6 工程验证完成，生产算法仍待部署 URL 与人工验收                                 | 统一 UI 验收后进入后续辅助缺口                       |
+| P1     | Gen VI TF1/TF2 Stationary/Event                   | 已完成 | TF1/TF2 工程验证完成，生产算法仍待部署 URL 与人工验收                                 | 统一 UI 验收后进入后续辅助缺口                       |
+| P2     | 公共 TSV List                                     | 已完成 | Gen VII Egg 教程要求编辑 TSV List                                                     | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具             |
+| P2     | IV Range / IV Template                            | 已完成 | 3DSRNGTool `IVRange.cs`、`IVTemplate.cs`                                              | 已接入 Gen VI/Gen VII Egg 与全局悬浮工具             |
+| P3     | Gen IV Gen4SeedFinder、Voltorb Flip               | 进行中 | Gen4SeedFinder 已完成工程验证；Voltorb Flip 仍待实现                                  | 先完成 Voltorb Flip，再进入统一验收                  |
+| P4     | Gen V DS 参数、Initial Seed、Entralink 深审       | 暂缓   | 项目所有者明确要求暂不计划                                                            | 后续重新排期                                         |
+| P5     | TinyFinder 独有扩展                               | 已完成 | T1-T14 已落地；Ambush 覆盖 Victory Road Swooping，MT Seed/Time 独立成模块             | 进入全范围 UI 验收准备                               |
+| P6     | 统一 3DS/UI 生产验收                              | 进行中 | 八项 UI 清单已完成源码收口，等待新 Pages 产物与外部浏览器复核                         | 先完成 Pages 部署，再逐项记录验收证据                |
+| P7     | GitHub Pages 生产回归                             | 进行中 | 生产算法回归必须使用 Actions 部署后的准确 URL                                         | 等待部署完成和项目所有者提供 URL                     |
+| 持续   | 按教程共有主线审查入口、侧栏和真实功能缺口        | 复核   | 全世代 165 篇正文指南人工复核结论                                                     | 仅补真实缺口，避免重复开发                           |
+| 最后   | Windows 原生桌面 EXE 适配                         | 待开始 | 当前 portable 启动器不作为最终交付；需建立类似 PokeFinder/3DSRNGTool 的直接桌面构建链 | 原生桌面壳、安装/便携策略和 Actions 产物确定后再验收 |
+| 排除   | NTR Helper                                        | 排除   | 原始 NTR/TCP 访问超出静态浏览器架构                                                   | 不开发                                               |
+| 排除   | Gen II、Legends Arceus                            | 排除   | 不属于 PokeFinder 4.3.2 / 3DSRNGTool 产品范围                                         | 不开发                                               |
 
 ## 共用教程主线
 
