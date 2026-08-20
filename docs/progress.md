@@ -8,6 +8,7 @@
 - 新增：`npm run desktop:package` 在缺少 `dist/index.html` 时使用 `BASE_PATH=./` 完整构建桌面资源；Actions 复用已下载的生产 `dist`，避免丢失 Wasm 文件。
 - 已通过：任务文件格式化、`git diff --check`、`node --check desktop/main.mjs` 和完整 `npm run verify`（Prettier、ESLint、TypeScript、177 个测试文件共 615 项测试、2317 个生产模块和 239 项 PWA 预缓存资源）。
 - 本地打包：electron-builder 已完成配置解析、Electron 运行时下载和应用目录初始化；当前 Windows 工作区在解压 Electron 运行时阶段长时间无产物，已中止，不将该环境阻塞误判为应用代码失败。完整 NSIS/portable 产物交由 Windows Actions 生成，当前工作区未留下 `release` 产物。
+- 修复：首次 Actions run `32400111335` 在依赖安装阶段失败；本地使用同一 `npm ci --engine-strict` 已通过，锁文件新增依赖的 `resolved` 地址已统一为官方 npm registry，避免 runner 继续依赖不可用镜像。
 - 未运行：本轮对应新提交的 GitHub Pages 部署、外部 Chrome/Edge UI 验收、生产算法回归和 Windows 实机 EXE 启动验收；这些需要 Actions 产物和项目所有者共同确认。
 
 ## 2026-08-20 Gen IV Gen4SeedFinder（已完成工程验证）
