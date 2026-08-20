@@ -1,0 +1,9 @@
+{
+  "name": "pokerngkit-desktop",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Native Windows desktop shell for PokeRNGKit.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "main": "main.mjs"
+}

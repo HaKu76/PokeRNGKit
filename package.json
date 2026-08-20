@@ -17,6 +17,7 @@
     "build": "npm run wasm:build && npm run build:web",
     "build:ui": "tsc -b && vite build --mode ui",
     "build:web": "tsc -b && vite build",
+    "desktop:package": "node scripts/build-desktop.mjs",
     "preview": "vite preview",
     "preview:ui": "npm run build:ui && vite preview --host 127.0.0.1 --port 4173 --strictPort",
     "test": "vitest run",
@@ -49,6 +50,8 @@
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
     "cmake-runtime": "4.3.1",
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3",
     "eslint": "^10.8.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.4",
@@ -59,5 +62,53 @@
     "vite": "^8.2.1",
     "vite-plugin-pwa": "^1.3.0",
     "vitest": "4.1.10"
+  },
+  "build": {
+    "appId": "com.hakuhiro.pokerngkit",
+    "productName": "PokeRNGKit",
+    "asar": true,
+    "files": [
+      "main.mjs",
+      "package.json"
+    ],
+    "directories": {
+      "app": "desktop",
+      "output": "release"
+    },
+    "extraResources": [
+      {
+        "from": "dist",
+        "to": "dist",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "PokeRNGKit-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "PokeRNGKit"
+    },
+    "portable": {
+      "artifactName": "PokeRNGKit-${version}-portable.${ext}"
+    }
   }
 }

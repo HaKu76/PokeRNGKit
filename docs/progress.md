@@ -1,5 +1,15 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-21 全局 Select 与侧栏命名统一（已完成工程验证）
+
+- 统一：将 `src/features` 中全部 59 个原生 `<select>` 迁移为共享 HakuStyle `Select`，保留 `value`、`defaultValue`、`onChange(event.target.value)`、分组、禁用项和键盘操作兼容；源码已无原生 `<select>` 标签。
+- 统一：侧边栏核心入口按世代前缀规范命名，第三世代为“第三世代 ID/野生/孵化乱数”，第四至第七世代同样使用“第 N 世代”前缀，避免同一导航层级混用简称和世代全称。
+- 新增：Windows 原生桌面壳配置，Electron 应用从独立 `desktop` 目录通过受限 `app://` 协议加载静态站点，并在 Actions 生成 NSIS 安装程序和 portable EXE；不新增后端，继续复用浏览器端 Worker/Wasm。
+- 新增：`npm run desktop:package` 在缺少 `dist/index.html` 时使用 `BASE_PATH=./` 完整构建桌面资源；Actions 复用已下载的生产 `dist`，避免丢失 Wasm 文件。
+- 已通过：任务文件格式化、`git diff --check`、`node --check desktop/main.mjs` 和完整 `npm run verify`（Prettier、ESLint、TypeScript、177 个测试文件共 615 项测试、2317 个生产模块和 239 项 PWA 预缓存资源）。
+- 本地打包：electron-builder 已完成配置解析、Electron 运行时下载和应用目录初始化；当前 Windows 工作区在解压 Electron 运行时阶段长时间无产物，已中止，不将该环境阻塞误判为应用代码失败。完整 NSIS/portable 产物交由 Windows Actions 生成，当前工作区未留下 `release` 产物。
+- 未运行：本轮对应新提交的 GitHub Pages 部署、外部 Chrome/Edge UI 验收、生产算法回归和 Windows 实机 EXE 启动验收；这些需要 Actions 产物和项目所有者共同确认。
+
 ## 2026-08-20 Gen IV Gen4SeedFinder（已完成工程验证）
 
 - 新增：Gen IV `Gen4SeedFinder` 主工作区，覆盖 DPPt Coin Flip 与 HGSS Elm Call 两条教程路径；按 PokemonRNGGuides 的日期/秒数/Delay 枚举和连续序列筛选语义生成 Seed、时间、Delay 与序列结果。
