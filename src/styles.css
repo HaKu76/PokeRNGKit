@@ -2438,8 +2438,9 @@ h1 {
   z-index: 8;
   top: calc(100% + 6px);
   left: 0;
-  width: max(100%, min(320px, calc(100vw - 24px)));
-  max-width: calc(100vw - 24px);
+  width: max-content;
+  min-width: 100%;
+  max-width: min(360px, calc(100vw - 24px));
   max-height: 250px;
   overflow: auto;
   border: 1px solid var(--line);
@@ -3346,8 +3347,9 @@ h1 {
   z-index: 4;
   top: calc(100% + 6px);
   left: 0;
-  width: max(100%, min(320px, calc(100vw - 24px)));
-  max-width: calc(100vw - 24px);
+  width: max-content;
+  min-width: 100%;
+  max-width: min(360px, calc(100vw - 24px));
   max-height: min(320px, calc(100vh - 230px));
   overflow-y: auto;
   border: 1px solid var(--line);
@@ -3460,8 +3462,9 @@ h1 {
   z-index: 24;
   top: calc(100% + 6px);
   left: 0;
-  width: max(100%, min(320px, calc(100vw - 24px)));
-  max-width: calc(100vw - 24px);
+  width: max-content;
+  min-width: 100%;
+  max-width: min(360px, calc(100vw - 24px));
   max-height: min(360px, calc(100vh - 220px));
   overflow-y: auto;
   border: 1px solid var(--line);

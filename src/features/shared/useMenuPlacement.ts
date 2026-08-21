@@ -32,7 +32,7 @@ export function useMenuPlacement(
       const availableAbove = rect.top - 12;
       const requiredHeight = Math.min(estimatedHeight, 360);
       const requiredWidth = Math.min(
-        320,
+        280,
         Math.max(0, window.innerWidth - VIEWPORT_GUTTER * 2),
       );
       const canAlignEnd = rect.right - requiredWidth >= VIEWPORT_GUTTER;
