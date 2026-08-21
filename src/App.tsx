@@ -407,6 +407,12 @@ function readModuleRailCollapsed() {
   return localStorage.getItem("pokerngkit-module-rail-collapsed") === "true";
 }
 
+function normalizeModuleNavigationLabel(label: string) {
+  return label
+    .replace(/^(?:第(?:三|四|五|六|七|八)世代|[3-8]代|Gen\s*[3-8])\s*/iu, "")
+    .trim();
+}
+
 function ModuleNavigation({
   activeModule,
   collapsed,
@@ -431,9 +437,14 @@ function ModuleNavigation({
   const visibleGroups = moduleNavigationGroups
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) =>
-        t(item.label).toLocaleLowerCase().includes(normalizedQuery),
-      ),
+      items: group.items.filter((item) => {
+        const translatedLabel = t(item.label);
+        const navigationLabel = normalizeModuleNavigationLabel(translatedLabel);
+        return (
+          translatedLabel.toLocaleLowerCase().includes(normalizedQuery) ||
+          navigationLabel.toLocaleLowerCase().includes(normalizedQuery)
+        );
+      }),
     }))
     .filter((group) => group.items.length > 0);
   const searching = normalizedQuery.length > 0;
@@ -495,16 +506,19 @@ function ModuleNavigation({
                       item.id === activeModule &&
                       (!item.pokerusMode ||
                         item.pokerusMode === pokerusInitialMode);
+                    const translatedLabel = t(item.label);
+                    const navigationLabel =
+                      normalizeModuleNavigationLabel(translatedLabel);
                     return (
                       <button
                         aria-current={selected ? "page" : undefined}
                         className={`module-entry${selected ? " active" : ""}`}
                         key={`${group.id}-${item.id}-${item.pokerusMode ?? ""}`}
                         onClick={() => onSelect(group.id, item)}
-                        title={t(item.label)}
+                        title={translatedLabel}
                         type="button"
                       >
-                        <strong>{t(item.label)}</strong>
+                        <strong>{navigationLabel}</strong>
                       </button>
                     );
                   })}

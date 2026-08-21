@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { useMenuPlacement } from "./useMenuPlacement";
 
 interface MultiCheckSelectProps {
   anyLabel: string;
@@ -23,6 +24,11 @@ export function MultiCheckSelect({
   const menuId = useId();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuPlacement = useMenuPlacement(
+    rootRef,
+    open && !disabled,
+    options.length * 44 + 8,
+  );
   const fullMask = options.reduce(
     (value, option) => value | (1 << option.value),
     0,
@@ -78,7 +84,12 @@ export function MultiCheckSelect({
           />
         </button>
         {open && (
-          <div aria-label={label} className="multi-check-menu" id={menuId}>
+          <div
+            aria-label={label}
+            className="multi-check-menu"
+            data-placement={menuPlacement}
+            id={menuId}
+          >
             {options.map((option) => (
               <label key={option.value}>
                 <input

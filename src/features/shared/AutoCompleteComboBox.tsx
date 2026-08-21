@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { Check, ChevronDown } from "lucide-react";
+import { useMenuPlacement } from "./useMenuPlacement";
 
 export interface AutoCompleteOption<T extends string | number> {
   readonly label: string;
@@ -49,6 +50,11 @@ export function AutoCompleteComboBox<T extends string | number>({
           )
         : options,
     [normalizedFilter, options],
+  );
+  const menuPlacement = useMenuPlacement(
+    rootRef,
+    open && !disabled,
+    filteredOptions.length * 44 + 8,
   );
   const selectedIndex = filteredOptions.findIndex(
     (option) => option.value === value,
@@ -195,6 +201,7 @@ export function AutoCompleteComboBox<T extends string | number>({
       {open && !disabled && filteredOptions.length > 0 && (
         <div
           className="autocomplete-combobox-menu"
+          data-placement={menuPlacement}
           id={listboxId}
           role="listbox"
         >

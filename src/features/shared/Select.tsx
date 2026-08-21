@@ -12,6 +12,7 @@ import {
   useState,
 } from "react";
 import { Check, ChevronDown } from "lucide-react";
+import { useMenuPlacement } from "./useMenuPlacement";
 
 type SelectProps = Omit<
   React.SelectHTMLAttributes<HTMLSelectElement>,
@@ -93,6 +94,11 @@ export function Select({
   const [uncontrolledValue, setUncontrolledValue] = useState(initialValue);
   const selectedValue = controlledValue ?? uncontrolledValue;
   const [open, setOpen] = useState(false);
+  const menuPlacement = useMenuPlacement(
+    rootRef,
+    open && !disabled,
+    options.length * 44 + 8,
+  );
   const selectedIndex = Math.max(
     options.findIndex((option) => option.value === selectedValue),
     0,
@@ -220,6 +226,7 @@ export function Select({
         <div
           aria-label={title}
           className="haku-select-menu"
+          data-placement={menuPlacement}
           id={listboxId}
           role="listbox"
         >

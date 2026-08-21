@@ -1,5 +1,5 @@
 .misc-rng-display {
-  width: min(620px, calc(100vw - 32px));
+  width: min(720px, calc(100vw - 32px));
 }
 
 .misc-rng-body {
@@ -70,23 +70,10 @@
 
 .misc-rng-grid input,
 .misc-rng-grid select,
+.misc-rng-grid .haku-select,
 .misc-rng-wide-field input,
 .misc-rng-wide-field textarea {
   width: 100%;
-  min-width: 0;
-}
-
-.misc-rng-grid input[inputmode="numeric"] {
-  max-width: 164px;
-  justify-self: start;
-}
-
-.misc-rng-grid input:not([inputmode="numeric"]) {
-  max-width: 260px;
-  justify-self: start;
-}
-
-.misc-rng-grid .haku-select {
   min-width: 0;
 }
 
@@ -181,7 +168,7 @@
 
   .misc-rng-grid input[inputmode="numeric"],
   .misc-rng-grid input:not([inputmode="numeric"]) {
-    max-width: none;
+    max-width: 100%;
   }
 
   .misc-rng-clear,

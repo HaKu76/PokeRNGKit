@@ -5155,6 +5155,80 @@ textarea:disabled {
   appearance: none;
 }
 
+/* Shared popovers must escape every feature panel that owns a clipped surface. */
+#root .main-content [class*="-panel"]:has(.haku-select[data-open="true"]),
+#root
+  .main-content
+  [class*="-panel"]:has(.autocomplete-combobox[data-open="true"]),
+#root .main-content [class*="-panel"]:has(.multi-check-field[data-open="true"]),
+#root .floating-tool-panel:has(.haku-select[data-open="true"]),
+#root .floating-tool-panel:has(.autocomplete-combobox[data-open="true"]),
+#root .floating-tool-panel:has(.multi-check-field[data-open="true"]) {
+  position: relative;
+  z-index: 20;
+  overflow: visible;
+}
+
+#root .main-content .haku-select-menu,
+#root .main-content .autocomplete-combobox-menu,
+#root .main-content .multi-check-menu,
+#root .floating-tool-panel .haku-select-menu,
+#root .floating-tool-panel .autocomplete-combobox-menu,
+#root .floating-tool-panel .multi-check-menu {
+  z-index: 100;
+  max-height: min(360px, calc(100dvh - 180px));
+}
+
+#root .main-content .haku-select-menu[data-placement="top"],
+#root .main-content .autocomplete-combobox-menu[data-placement="top"],
+#root .main-content .multi-check-menu[data-placement="top"],
+#root .floating-tool-panel .haku-select-menu[data-placement="top"],
+#root .floating-tool-panel .autocomplete-combobox-menu[data-placement="top"],
+#root .floating-tool-panel .multi-check-menu[data-placement="top"] {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+/* Keep labels, controls, and paired values on one predictable baseline. */
+#root .main-content .field > span,
+#root .floating-tool-panel .field > span,
+#root .main-content .misc-rng-grid label > span,
+#root .floating-tool-panel .misc-rng-grid label > span {
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  line-height: 22px;
+}
+
+#root .main-content .compact-field-row,
+#root .main-content .gen3-filter-selects,
+#root .main-content .filter-tool-row,
+#root .floating-tool-panel .compact-field-row,
+#root .floating-tool-panel .gen3-filter-selects,
+#root .floating-tool-panel .filter-tool-row {
+  align-items: start;
+}
+
+/* A result surface follows its controls with the same separation everywhere. */
+#root .main-content > form + .results-panel,
+#root .main-content > .control-grid + .results-panel,
+#root .main-content > [class*="-control-grid"] + .results-panel,
+#root .main-content > [class*="-control-grid"] + [class*="-results"] {
+  margin-top: 16px;
+}
+
+/* Preserve adaptive columns without allowing a long label to widen a panel. */
+#root .main-content > form[class*="-control-grid"],
+#root .main-content > [class*="-control-grid"],
+#root .main-content > form[class*="-workspace"] {
+  min-width: 0;
+}
+
+#root .main-content > form[class*="-control-grid"] > .panel,
+#root .main-content > [class*="-control-grid"] > .panel {
+  min-width: 0;
+}
+
 .calculator-observations {
   overflow: auto;
 }
