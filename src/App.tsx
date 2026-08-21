@@ -139,6 +139,7 @@ import { MiscRngPanel } from "./features/miscrng/MiscRngPanel";
 import { TsvListPanel } from "./features/tsvlist/TsvListPanel";
 import { IvToolsPanel } from "./features/ivtools/IvToolsPanel";
 import { FloatingToolPanel } from "./features/shared/FloatingToolPanel";
+import { useOverlayScrollLock } from "./features/shared/useOverlayScrollLock";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
 
@@ -647,6 +648,8 @@ function App() {
   const moduleRailRef = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  useOverlayScrollLock(moduleRailOpen && !wideViewport, moduleRailRef);
+
   useEffect(() => () => searchEngine.dispose(), [searchEngine]);
   useEffect(() => {
     document.documentElement.lang =
@@ -667,7 +670,6 @@ function App() {
 
     const rail = moduleRailRef.current;
     const menuButton = moduleMenuButtonRef.current;
-    const previousBodyOverflow = document.body.style.overflow;
     const getFocusableElements = () =>
       rail
         ? Array.from(
@@ -677,7 +679,6 @@ function App() {
           ).filter((element) => element.offsetParent !== null)
         : [];
 
-    document.body.style.overflow = "hidden";
     const focusFrame = window.requestAnimationFrame(() => {
       const activeEntry = rail?.querySelector<HTMLElement>(
         ".module-entry.active",
@@ -712,7 +713,6 @@ function App() {
     return () => {
       window.cancelAnimationFrame(focusFrame);
       window.removeEventListener("keydown", handleDrawerKeyDown);
-      document.body.style.overflow = previousBodyOverflow;
       if (!window.matchMedia("(min-width: 901px)").matches) {
         menuButton?.focus();
       }

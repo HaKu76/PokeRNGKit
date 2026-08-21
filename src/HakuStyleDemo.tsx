@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "./theme";
 import type { ThemePreference } from "./theme";
+import { useOverlayScrollLock } from "./features/shared/useOverlayScrollLock";
 import "./hakuStyleDemo.css";
 
 type DemoModule = {
@@ -287,6 +288,8 @@ export default function HakuStyleDemo() {
   });
   const [floatingDragging, setFloatingDragging] = useState(false);
   const floatingPanelRef = useRef<HTMLElement>(null);
+
+  useOverlayScrollLock(Boolean(activeTool), floatingPanelRef);
   const floatingDragRef = useRef<FloatingDragState | null>(null);
   const toolTriggerRefs = useRef<Record<DemoTool, HTMLButtonElement | null>>({
     encounter: null,
@@ -536,8 +539,6 @@ export default function HakuStyleDemo() {
       event.preventDefault();
       closeToolPanel();
     };
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     document.addEventListener("keydown", closeOnEscape);
     const containFocus = (event: KeyboardEvent) => {
       if (event.key !== "Tab") return;
@@ -569,7 +570,6 @@ export default function HakuStyleDemo() {
     document.addEventListener("keydown", containFocus);
     return () => {
       cancelAnimationFrame(frame);
-      document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", closeOnEscape);
       document.removeEventListener("keydown", containFocus);
     };

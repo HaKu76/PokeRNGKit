@@ -37,6 +37,7 @@ import {
   type Gen8ProfileDraft,
 } from "./domain";
 import type { Gen8ProfilesController } from "./useGen8Profiles";
+import { useOverlayScrollLock } from "../shared/useOverlayScrollLock";
 import "./Gen8ProfilesPanel.css";
 
 interface Labels {
@@ -308,6 +309,8 @@ function ProfileEditor({
   const busyRef = useRef(busy);
   const onCancelRef = useRef(onCancel);
 
+  useOverlayScrollLock(true, dialogRef);
+
   useEffect(() => {
     busyRef.current = busy;
   }, [busy]);
@@ -321,8 +324,6 @@ function ProfileEditor({
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const focusTimer = window.setTimeout(() => {
       dialogRef.current?.querySelector<HTMLInputElement>("input")?.focus();
     }, 0);
@@ -353,7 +354,6 @@ function ProfileEditor({
     return () => {
       window.clearTimeout(focusTimer);
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = previousOverflow;
       previousFocus?.focus();
     };
   }, []);

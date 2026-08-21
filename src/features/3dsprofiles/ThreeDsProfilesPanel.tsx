@@ -53,6 +53,7 @@ import {
   type AutoCompleteOption,
 } from "../shared/AutoCompleteComboBox";
 import type { ThreeDsProfilesController } from "./useThreeDsProfiles";
+import { useOverlayScrollLock } from "../shared/useOverlayScrollLock";
 import "./ThreeDsProfilesPanel.css";
 
 function normalizeDecimal(value: string, maximum: number, digits: number) {
@@ -192,6 +193,8 @@ function ProfileEditor({
   const busyRef = useRef(busy);
   const onCancelRef = useRef(onCancel);
 
+  useOverlayScrollLock(true, dialogRef);
+
   useEffect(() => {
     busyRef.current = busy;
   }, [busy]);
@@ -205,8 +208,6 @@ function ProfileEditor({
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const focusTimer = window.setTimeout(() => {
       dialogRef.current?.querySelector<HTMLInputElement>("input")?.focus();
     }, 0);
@@ -237,7 +238,6 @@ function ProfileEditor({
     return () => {
       window.clearTimeout(focusTimer);
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = previousOverflow;
       previousFocus?.focus();
     };
   }, []);

@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useOverlayScrollLock } from "./useOverlayScrollLock";
 
 interface FloatingToolPanelProps extends PropsWithChildren {
   readonly className?: string;
@@ -60,6 +61,8 @@ export function FloatingToolPanel({
   const [position, setPosition] = useState<PanelPosition>();
   const [dragging, setDragging] = useState(false);
   const headingId = `${id}-heading`;
+
+  useOverlayScrollLock(expanded, panelRef);
 
   const restoreTriggerFocus = useCallback(() => {
     requestAnimationFrame(() => document.getElementById(triggerId)?.focus());
@@ -139,21 +142,9 @@ export function FloatingToolPanel({
 
     document.addEventListener("keydown", closeOnEscape);
     document.addEventListener("pointerdown", closeOnOutsidePointer);
-    const previousOverflow = document.body.style.overflow;
-    const previousPaddingRight = document.body.style.paddingRight;
-    const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = "hidden";
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = previousPaddingRight
-        ? `calc(${previousPaddingRight} + ${scrollbarWidth}px)`
-        : `${scrollbarWidth}px`;
-    }
     return () => {
       document.removeEventListener("keydown", closeOnEscape);
       document.removeEventListener("pointerdown", closeOnOutsidePointer);
-      document.body.style.overflow = previousOverflow;
-      document.body.style.paddingRight = previousPaddingRight;
     };
   }, [expanded, onExpandedChange, restoreTriggerFocus, triggerId]);
 

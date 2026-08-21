@@ -92,6 +92,9 @@ html {
   overflow-y: scroll;
   scrollbar-gutter: stable;
 }
+html[data-overlay-scroll-lock="true"] {
+  overscroll-behavior: none;
+}
 [hidden] {
   display: none !important;
 }

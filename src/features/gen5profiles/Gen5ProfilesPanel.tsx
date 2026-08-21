@@ -36,6 +36,7 @@ import {
   useGen5Profiles,
   type Gen5ProfilesController,
 } from "./useGen5Profiles";
+import { useOverlayScrollLock } from "../shared/useOverlayScrollLock";
 
 const GAME_LABELS: Record<Gen5GameVersion, string> = {
   black: "Black",
@@ -400,13 +401,13 @@ function ProfileEditor({
   const [error, setError] = useState("");
   const dialogRef = useRef<HTMLFormElement>(null);
 
+  useOverlayScrollLock(true, dialogRef);
+
   useEffect(() => {
     const previousFocus =
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const focusTimer = window.setTimeout(() => {
       dialogRef.current
         ?.querySelector<HTMLElement>(
@@ -441,7 +442,6 @@ function ProfileEditor({
     return () => {
       window.clearTimeout(focusTimer);
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
       previousFocus?.focus();
     };
   }, [onCancel]);
