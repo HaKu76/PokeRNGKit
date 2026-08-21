@@ -901,12 +901,6 @@ export function Gen3StaticPanel({
             </button>
           </div>
         </div>
-        <div
-          className="progress-track"
-          aria-label={`${progress.percent.toFixed(1)}%`}
-        >
-          <span style={{ width: `${Math.min(100, progress.percent)}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("processed")} <strong>{String(progress.processedStates)}</strong>

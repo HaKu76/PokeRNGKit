@@ -220,7 +220,7 @@
 
 .gen5dreamradar-iv-range {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 10px minmax(0, 1fr);
+  grid-template-columns: max-content minmax(56px, 1fr) 12px minmax(56px, 1fr);
   align-items: center;
   gap: 5px;
   color: var(--muted);

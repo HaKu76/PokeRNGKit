@@ -370,12 +370,6 @@ export function Gen3InitialSeedPanel({
             </button>
           </div>
         </div>
-        <div
-          aria-label={`${progress.percent.toFixed(1)}%`}
-          className="progress-track"
-        >
-          <span style={{ width: `${Math.min(100, progress.percent)}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("processed")} <strong>{String(progress.processedStates)}</strong>

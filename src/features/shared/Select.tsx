@@ -183,7 +183,11 @@ export function Select({
   };
 
   return (
-    <div className={`haku-select ${className ?? ""}`.trim()} ref={rootRef}>
+    <div
+      className={`haku-select ${className ?? ""}`.trim()}
+      data-open={open && !disabled ? "true" : undefined}
+      ref={rootRef}
+    >
       <button
         aria-controls={listboxId}
         aria-expanded={open}

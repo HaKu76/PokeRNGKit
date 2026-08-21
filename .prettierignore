@@ -12,4 +12,5 @@ wasm/modules/gen8static/bridge/personal_data.inc
 wasm/modules/gen8underground/bridge/underground_data.inc
 wasm/modules/gen8wild/bridge/wild_data.inc
 wasm/modules/gen6event/bridge/gen6_event_personal.inc
+ui-audit-*/
 .tools/

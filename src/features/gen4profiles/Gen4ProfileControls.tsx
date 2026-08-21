@@ -224,10 +224,15 @@ function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
 
 interface ProfileManagerProps {
   controller: Gen4ProfilesController;
-  onClose(): void;
+  embedded?: boolean;
+  onClose?(): void;
 }
 
-function ProfileManager({ controller, onClose }: ProfileManagerProps) {
+export function Gen4ProfileManager({
+  controller,
+  embedded = false,
+  onClose,
+}: ProfileManagerProps) {
   const { t } = useTranslation();
   const [editing, setEditing] = useState<Gen4Profile | "new">();
   const [selectedId, setSelectedId] = useState<string>();
@@ -268,130 +273,142 @@ function ProfileManager({ controller, onClose }: ProfileManagerProps) {
     }
   };
 
-  return (
-    <div className="modal-backdrop">
-      <section
-        aria-labelledby="gen4-profile-manager-title"
-        className="profile-modal profile-manager"
-        role="dialog"
-      >
-        <div className="modal-heading">
-          <h2 id="gen4-profile-manager-title">{t("profileManager4")}</h2>
-          <span>{t(`storage_${controller.storageMode}`)}</span>
-        </div>
-        <div className="profile-table-wrap">
-          <table className="profile-table">
-            <thead>
-              <tr>
-                <th>{t("profileName")}</th>
-                <th>{t("profileVersion")}</th>
-                <th>{t("tid")}</th>
-                <th>{t("sid")}</th>
-                <th>{t("nationalDex")}</th>
+  const manager = (
+    <section
+      aria-labelledby="gen4-profile-manager-title"
+      className="profile-modal profile-manager"
+      role="dialog"
+    >
+      <div className="modal-heading">
+        <h2 id="gen4-profile-manager-title">{t("profileManager4")}</h2>
+        <span>{t(`storage_${controller.storageMode}`)}</span>
+      </div>
+      <div className="profile-table-wrap">
+        <table className="profile-table">
+          <thead>
+            <tr>
+              <th>{t("profileName")}</th>
+              <th>{t("profileVersion")}</th>
+              <th>{t("tid")}</th>
+              <th>{t("sid")}</th>
+              <th>{t("nationalDex")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {controller.profiles.map((profile) => (
+              <tr
+                className={selectedId === profile.id ? "selected" : ""}
+                key={profile.id}
+                onClick={() => setSelectedId(profile.id)}
+              >
+                <td>{profile.name}</td>
+                <td>{t(versionKeys[profile.version])}</td>
+                <td>{profile.tid}</td>
+                <td>{profile.sid}</td>
+                <td>{t(profile.nationalDex ? "yes" : "no")}</td>
               </tr>
-            </thead>
-            <tbody>
-              {controller.profiles.map((profile) => (
-                <tr
-                  className={selectedId === profile.id ? "selected" : ""}
-                  key={profile.id}
-                  onClick={() => setSelectedId(profile.id)}
-                >
-                  <td>{profile.name}</td>
-                  <td>{t(versionKeys[profile.version])}</td>
-                  <td>{profile.tid}</td>
-                  <td>{profile.sid}</td>
-                  <td>{t(profile.nationalDex ? "yes" : "no")}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {controller.profiles.length === 0 && (
-            <div className="empty-state compact">{t("noProfiles")}</div>
-          )}
-        </div>
-        {notice && <div className="profile-notice">{notice}</div>}
-        {controller.error && (
-          <div className="error-message">{controller.error}</div>
+            ))}
+          </tbody>
+        </table>
+        {controller.profiles.length === 0 && (
+          <div className="empty-state compact">{t("noProfiles")}</div>
         )}
-        <div className="profile-actions">
-          <button onClick={() => setEditing("new")} type="button">
-            {t("newProfile")}
-          </button>
-          <button
-            onClick={() => {
-              const profile = requireSelected();
-              if (profile) setEditing(profile);
-            }}
-            type="button"
-          >
-            {t("editProfile")}
-          </button>
-          <button
-            onClick={() => {
-              const profile = requireSelected();
-              if (profile) void controller.duplicateProfile(profile);
-            }}
-            type="button"
-          >
-            {t("duplicateProfile")}
-          </button>
-          <button
-            onClick={() => {
-              const profile = requireSelected();
-              if (profile && window.confirm(t("confirmDeleteProfile"))) {
-                void controller.deleteProfile(profile);
+      </div>
+      {notice && <div className="profile-notice">{notice}</div>}
+      {controller.error && (
+        <div className="error-message">{controller.error}</div>
+      )}
+      <div className="profile-actions">
+        <button onClick={() => setEditing("new")} type="button">
+          {t("newProfile")}
+        </button>
+        <button
+          onClick={() => {
+            const profile = requireSelected();
+            if (profile) setEditing(profile);
+          }}
+          type="button"
+        >
+          {t("editProfile")}
+        </button>
+        <button
+          onClick={() => {
+            const profile = requireSelected();
+            if (profile) void controller.duplicateProfile(profile);
+          }}
+          type="button"
+        >
+          {t("duplicateProfile")}
+        </button>
+        <button
+          onClick={() => {
+            const profile = requireSelected();
+            if (profile && window.confirm(t("confirmDeleteProfile"))) {
+              void controller.deleteProfile(profile);
+              setSelectedId(undefined);
+            }
+          }}
+          type="button"
+        >
+          {t("deleteProfile")}
+        </button>
+        <button onClick={() => fileInput.current?.click()} type="button">
+          {t("importProfiles")}
+        </button>
+        <button onClick={exportBackup} type="button">
+          {t("exportProfiles")}
+        </button>
+        <button
+          className="danger-action"
+          disabled={controller.profiles.length === 0}
+          onClick={() => {
+            if (window.confirm(t("confirmClearGen4Profiles"))) {
+              void controller.clearProfiles().then(() => {
                 setSelectedId(undefined);
-              }
-            }}
-            type="button"
-          >
-            {t("deleteProfile")}
-          </button>
-          <button onClick={() => fileInput.current?.click()} type="button">
-            {t("importProfiles")}
-          </button>
-          <button onClick={exportBackup} type="button">
-            {t("exportProfiles")}
-          </button>
-          <button
-            className="danger-action"
-            disabled={controller.profiles.length === 0}
-            onClick={() => {
-              if (window.confirm(t("confirmClearGen4Profiles"))) {
-                void controller.clearProfiles().then(() => {
-                  setSelectedId(undefined);
-                  setNotice(t("gen4ProfilesCleared"));
-                });
-              }
-            }}
-            type="button"
-          >
-            {t("clearProfiles")}
-          </button>
-          <input
-            accept="application/json,.json"
-            className="visually-hidden"
-            onChange={(event) => void importBackup(event)}
-            ref={fileInput}
-            type="file"
-          />
+                setNotice(t("gen4ProfilesCleared"));
+              });
+            }
+          }}
+          type="button"
+        >
+          {t("clearProfiles")}
+        </button>
+        <input
+          accept="application/json,.json"
+          className="visually-hidden"
+          onChange={(event) => void importBackup(event)}
+          ref={fileInput}
+          type="file"
+        />
+        {!embedded && (
           <button className="primary-action" onClick={onClose} type="button">
             {t("done")}
           </button>
-        </div>
-      </section>
-      {editing && (
-        <ProfileEditor
-          onCancel={() => setEditing(undefined)}
-          onSave={async (draft) => {
-            if (editing === "new") await controller.createProfile(draft);
-            else await controller.updateProfile(editing, draft);
-            setEditing(undefined);
-          }}
-          original={editing === "new" ? undefined : editing}
-        />
-      )}
+        )}
+      </div>
+    </section>
+  );
+  const editor = editing && (
+    <ProfileEditor
+      onCancel={() => setEditing(undefined)}
+      onSave={async (draft) => {
+        if (editing === "new") await controller.createProfile(draft);
+        else await controller.updateProfile(editing, draft);
+        setEditing(undefined);
+      }}
+      original={editing === "new" ? undefined : editing}
+    />
+  );
+
+  return embedded ? (
+    <>
+      {manager}
+      {editor}
+    </>
+  ) : (
+    <div className="modal-backdrop">
+      {manager}
+      {editor}
     </div>
   );
 }
@@ -472,7 +489,7 @@ export function Gen4ProfileControls({
         )}
       </FloatingToolPanel>
       {managerOpen && (
-        <ProfileManager
+        <Gen4ProfileManager
           controller={controller}
           onClose={() => setManagerOpen(false)}
         />

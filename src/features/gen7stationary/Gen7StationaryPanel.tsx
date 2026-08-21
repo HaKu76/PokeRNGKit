@@ -1309,9 +1309,6 @@ export function Gen7StationaryPanel({
               </button>
             </div>
           </div>
-          <div className="progress-track" aria-label={`${progress.percent}%`}>
-            <span style={{ width: `${progress.percent}%` }} />
-          </div>
           <div className="metrics-row gen7stationary-metrics">
             <span>
               {t("gen7StationaryFrames")}{" "}

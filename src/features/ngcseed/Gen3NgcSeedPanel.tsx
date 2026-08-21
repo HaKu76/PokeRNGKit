@@ -670,12 +670,6 @@ export function Gen3NgcSeedPanel({
           </div>
         </section>
       </form>
-      <div
-        aria-label={`${progress.percent.toFixed(1)}%`}
-        className="progress-track ngc-seed-progress"
-      >
-        <span style={{ width: `${Math.min(100, progress.percent)}%` }} />
-      </div>
       <section className="panel results-panel ngc-seed-results-panel">
         <div className="results-heading">
           <div className="panel-heading compact">

@@ -428,9 +428,6 @@ export function Gen7BattleTreePanel({
               </button>
             </div>
           </div>
-          <div className="progress-track" aria-label={`${progress.percent}%`}>
-            <span style={{ width: `${progress.percent}%` }} />
-          </div>
           <div className="metrics-row gen7battletree-metrics">
             <span>
               {t("gen7BattleTreeFrames")}{" "}

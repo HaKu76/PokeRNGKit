@@ -46,52 +46,58 @@ export function MultiCheckSelect({
   }, [open]);
 
   return (
-    <div className="field multi-check-field" ref={rootRef}>
+    <div
+      className="field multi-check-field"
+      data-open={open && !disabled ? "true" : undefined}
+      ref={rootRef}
+    >
       <span>{label}</span>
-      <button
-        aria-controls={menuId}
-        aria-expanded={open}
-        aria-haspopup="true"
-        className="multi-check-trigger"
-        disabled={disabled}
-        onClick={(event) => {
-          if (event.ctrlKey) {
-            onChange(0);
-            setOpen(false);
-            return;
-          }
-          setOpen((current) => !current);
-        }}
-        title={resetHint}
-        type="button"
-      >
-        <span>{summary}</span>
-        <ChevronDown
-          aria-hidden="true"
-          className={open ? "rotated" : undefined}
-          size={17}
-        />
-      </button>
-      {open && (
-        <div aria-label={label} className="multi-check-menu" id={menuId}>
-          {options.map((option) => (
-            <label key={option.value}>
-              <input
-                checked={(mask & (1 << option.value)) !== 0}
-                onChange={(event) =>
-                  onChange(
-                    event.target.checked
-                      ? mask | (1 << option.value)
-                      : mask & ~(1 << option.value),
-                  )
-                }
-                type="checkbox"
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
-        </div>
-      )}
+      <div className="multi-check-control">
+        <button
+          aria-controls={menuId}
+          aria-expanded={open}
+          aria-haspopup="true"
+          className="multi-check-trigger"
+          disabled={disabled}
+          onClick={(event) => {
+            if (event.ctrlKey) {
+              onChange(0);
+              setOpen(false);
+              return;
+            }
+            setOpen((current) => !current);
+          }}
+          title={resetHint}
+          type="button"
+        >
+          <span>{summary}</span>
+          <ChevronDown
+            aria-hidden="true"
+            className={open ? "rotated" : undefined}
+            size={17}
+          />
+        </button>
+        {open && (
+          <div aria-label={label} className="multi-check-menu" id={menuId}>
+            {options.map((option) => (
+              <label key={option.value}>
+                <input
+                  checked={(mask & (1 << option.value)) !== 0}
+                  onChange={(event) =>
+                    onChange(
+                      event.target.checked
+                        ? mask | (1 << option.value)
+                        : mask & ~(1 << option.value),
+                    )
+                  }
+                  type="checkbox"
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -390,9 +390,6 @@ export function Gen7IdPanel({
             </button>
           </div>
         </div>
-        <div className="progress-track" aria-label={`${progress.percent}%`}>
-          <span style={{ width: `${progress.percent}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("results")} <strong>{progress.resultCount}</strong>

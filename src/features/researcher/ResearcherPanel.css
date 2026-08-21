@@ -425,8 +425,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .researcher-rng-tabs button,
-  .researcher-results-panel .progress-track span {
+  .researcher-rng-tabs button {
     transition: none;
   }
 }

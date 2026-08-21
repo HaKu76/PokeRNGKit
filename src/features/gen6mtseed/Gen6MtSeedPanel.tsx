@@ -635,15 +635,6 @@ export function Gen6MtSeedPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
             <Trash2 size={16} />
           </button>
         </div>
-        <div
-          className="progress-track"
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.min(100, progress.percent)}
-        >
-          <span style={{ width: `${Math.min(100, progress.percent)}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("processed")}{" "}

@@ -121,7 +121,6 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
   const [status, setStatus] = useState<ResearcherStatus>("ready");
   const [error, setError] = useState("");
   const [processed, setProcessed] = useState(0);
-  const [total, setTotal] = useState(0);
   const [searchHex, setSearchHex] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchOperand, setSearchOperand] = useState(2);
@@ -149,7 +148,6 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
     setResultRequest(undefined);
     setSummary(undefined);
     setProcessed(0);
-    setTotal(0);
     setSelectedIndex(undefined);
     setSearchNotice("");
     setError("");
@@ -264,19 +262,16 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
     setSearchNotice("");
     setError("");
     setProcessed(0);
-    setTotal(request.maxAdvances);
     setStatus("calculating");
     try {
       const next = await engine.generate(request, {
         onBatch: (batch) => setResults((current) => current.concat(batch)),
-        onProgress: (nextProcessed, nextTotal) => {
+        onProgress: (nextProcessed) => {
           setProcessed(nextProcessed);
-          setTotal(nextTotal);
         },
       });
       setResults(next.rows);
       setProcessed(next.processedStates);
-      setTotal(next.totalStates);
       setSummary(next);
       setStatus(next.cancelled ? "cancelled" : "completed");
     } catch (cause) {
@@ -314,7 +309,6 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
     );
   };
 
-  const progress = total === 0 ? 0 : Math.min(100, (processed / total) * 100);
   const rng64 = isResearcher64Bit(resultRequest?.rng ?? rng);
   const customFormats = resultRequest?.customs ?? customs;
   const tableColumns = rng64
@@ -699,16 +693,6 @@ export function ResearcherPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
               ×
             </button>
           </div>
-        </div>
-        <div
-          aria-label={`${progress.toFixed(0)}%`}
-          aria-valuemax={100}
-          aria-valuemin={0}
-          aria-valuenow={Math.round(progress)}
-          className="progress-track"
-          role="progressbar"
-        >
-          <span style={{ width: `${progress}%` }} />
         </div>
         <div className="metrics-row">
           <span>

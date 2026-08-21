@@ -333,12 +333,6 @@ export function Gen3IvToPidPanel({ uiPreviewMode }: Gen3IvToPidPanelProps) {
             </button>
           </div>
         </div>
-        <div
-          className="progress-track"
-          aria-label={`${progress.percent.toFixed(1)}%`}
-        >
-          <span style={{ width: `${progress.percent}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("results")} <strong>{String(progress.resultCount)}</strong>

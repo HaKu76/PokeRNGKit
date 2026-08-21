@@ -1062,9 +1062,6 @@ export function Gen6StationaryPanel({
               </button>
             </div>
           </div>
-          <div className="progress-track">
-            <span style={{ width: `${progress.percent}%` }} />
-          </div>
           {error && <div className="alert error">{error}</div>}
           <div
             className="table-shell gen6stationary-table-shell"

@@ -631,12 +631,6 @@ export function Gen3PokeSpotPanel({
           </div>
           <span className="result-count">{states.length}</span>
         </div>
-        <div
-          className="progress-track"
-          aria-label={`${progress.percent.toFixed(1)}%`}
-        >
-          <span style={{ width: `${Math.min(100, progress.percent)}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("processed")} <strong>{progress.processedStates}</strong>

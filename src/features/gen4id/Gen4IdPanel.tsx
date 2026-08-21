@@ -384,9 +384,6 @@ export function Gen4IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
             </button>
           </div>
         </div>
-        <div className="progress-track" aria-label={`${progress.percent}%`}>
-          <span style={{ width: `${progress.percent}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("processed")} <strong>{progress.processedStates}</strong>

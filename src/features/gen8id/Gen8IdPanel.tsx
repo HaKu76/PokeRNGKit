@@ -362,16 +362,6 @@ export function Gen8IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
             </button>
           </div>
         </div>
-        <div
-          aria-label={`${progress.percent}%`}
-          aria-valuemax={100}
-          aria-valuemin={0}
-          aria-valuenow={Math.min(100, Math.max(0, progress.percent))}
-          className="progress-track"
-          role="progressbar"
-        >
-          <span style={{ width: `${progress.percent}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("results")} <strong>{progress.resultCount}</strong>

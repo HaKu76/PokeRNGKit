@@ -130,7 +130,11 @@ export function AutoCompleteComboBox<T extends string | number>({
   };
 
   return (
-    <div className="autocomplete-combobox" ref={rootRef}>
+    <div
+      className="autocomplete-combobox"
+      data-open={open && !disabled ? "true" : undefined}
+      ref={rootRef}
+    >
       <input
         aria-activedescendant={
           open && activeOption ? optionId(visibleActiveIndex) : undefined

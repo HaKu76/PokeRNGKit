@@ -1112,9 +1112,6 @@ export function Gen6EventPanel({
               </button>
             </div>
           </div>
-          <div className="progress-track" aria-label={`${progress.percent}%`}>
-            <span style={{ width: `${progress.percent}%` }} />
-          </div>
           <div className="metrics-row gen6event-metrics">
             <span>
               {t("gen6StationaryFrames")}{" "}

@@ -1,13 +1,16 @@
 .misc-rng-display {
-  width: min(680px, calc(100vw - 48px));
+  width: min(620px, calc(100vw - 32px));
 }
 
 .misc-rng-body {
   display: grid;
   gap: 16px;
   max-height: calc(100vh - 87px);
-  overflow: auto;
+  max-height: calc(100dvh - 87px);
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 16px;
+  scrollbar-gutter: stable;
 }
 
 .misc-rng-tabs {
@@ -73,6 +76,25 @@
   min-width: 0;
 }
 
+.misc-rng-grid input[inputmode="numeric"] {
+  max-width: 164px;
+  justify-self: start;
+}
+
+.misc-rng-grid input:not([inputmode="numeric"]) {
+  max-width: 260px;
+  justify-self: start;
+}
+
+.misc-rng-grid .haku-select {
+  min-width: 0;
+}
+
+.misc-rng-grid .haku-select-trigger {
+  width: 100%;
+  min-width: 0;
+}
+
 .misc-rng-wide-field {
   grid-column: 1 / -1;
 }
@@ -84,7 +106,7 @@
 
 .misc-rng-results {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
   gap: 8px;
 }
 
@@ -144,6 +166,7 @@
 
   .misc-rng-body {
     max-height: calc(100vh - 139px);
+    max-height: calc(100dvh - 139px);
     padding: 14px;
   }
 
@@ -154,6 +177,11 @@
   .misc-rng-grid,
   .misc-rng-results {
     grid-template-columns: 1fr;
+  }
+
+  .misc-rng-grid input[inputmode="numeric"],
+  .misc-rng-grid input:not([inputmode="numeric"]) {
+    max-width: none;
   }
 
   .misc-rng-clear,

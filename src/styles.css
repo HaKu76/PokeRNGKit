@@ -88,6 +88,10 @@
 * {
   box-sizing: border-box;
 }
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
 [hidden] {
   display: none !important;
 }
@@ -506,6 +510,15 @@ h1 {
   border-color: var(--line-strong);
   box-shadow: none;
 }
+.panel:has(.haku-select[data-open="true"]),
+.panel:has(.autocomplete-combobox[data-open="true"]),
+.panel:has(.multi-check-field[data-open="true"]),
+.floating-tool-panel:has(.haku-select[data-open="true"]),
+.floating-tool-panel:has(.autocomplete-combobox[data-open="true"]),
+.floating-tool-panel:has(.multi-check-field[data-open="true"]) {
+  z-index: 20;
+  overflow: visible;
+}
 .panel::after {
   display: none;
 }
@@ -806,7 +819,7 @@ h1 {
   top: 50%;
   left: 50%;
   width: min(800px, calc(100vw - 48px));
-  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
   transform: translate(-50%, -50%);
   overflow: hidden;
   border: 1px solid var(--line);
@@ -1063,7 +1076,7 @@ h1 {
   }
 }
 .iv-calculator-body {
-  max-height: calc(100vh - 87px);
+  max-height: calc(100dvh - 87px);
   display: grid;
   gap: 14px;
   overflow: auto;
@@ -1383,11 +1396,15 @@ h1 {
   margin-bottom: 8px;
 }
 .gen3static-control-grid {
+  align-items: stretch;
   grid-template-columns:
-    minmax(230px, 260px) minmax(230px, 260px)
-    minmax(430px, 1fr);
+    minmax(220px, 0.82fr) minmax(250px, 0.95fr)
+    minmax(360px, 1.23fr);
   gap: 6px;
   margin-bottom: 6px;
+}
+.gen3static-control-grid > .static-panel {
+  width: 100%;
 }
 .pokespot-control-grid {
   grid-template-columns:
@@ -1568,10 +1585,11 @@ h1 {
   text-transform: uppercase;
 }
 .ngc-seed-tabs {
+  display: grid;
   width: min(100%, 660px);
-  grid-template-columns: repeat(3, minmax(150px, 1fr));
-  grid-auto-flow: column;
-  overflow-x: auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: initial;
+  overflow-x: hidden;
 }
 .ngc-seed-control-grid {
   display: grid;
@@ -1656,10 +1674,6 @@ h1 {
 }
 .ngc-seed-results-panel {
   max-width: 900px;
-}
-.ngc-seed-progress {
-  max-width: 900px;
-  margin-bottom: 8px;
 }
 .ngc-seed-table-shell {
   max-height: min(52vh, 520px);
@@ -2171,7 +2185,8 @@ h1 {
 }
 
 .id-searcher-form {
-  max-width: 620px;
+  width: 100%;
+  max-width: none;
   margin-bottom: 14px;
 }
 .id-searcher-mode {
@@ -2368,7 +2383,15 @@ h1 {
 .multi-check-field {
   position: relative;
 }
+.multi-check-control {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
 .multi-check-trigger {
+  min-height: var(--control-height);
+  display: flex;
+  width: 100%;
   min-height: var(--control-height);
   display: flex;
   align-items: center;
@@ -2411,8 +2434,9 @@ h1 {
   position: absolute;
   z-index: 8;
   top: calc(100% + 6px);
-  right: 0;
   left: 0;
+  width: 100%;
+  min-width: 0;
   max-height: 250px;
   overflow: auto;
   border: 1px solid var(--line);
@@ -2535,8 +2559,9 @@ h1 {
 .iv-filter-header,
 .iv-filter-row {
   display: grid;
-  grid-template-columns: minmax(72px, 1fr) 52px 52px;
+  grid-template-columns: minmax(58px, 80px) 48px 48px;
   align-items: center;
+  justify-content: start;
   gap: 5px;
   min-height: 44px;
   padding: 3px 6px;
@@ -2547,6 +2572,11 @@ h1 {
   font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+.iv-filter-header > span,
+.iv-filter-row > .iv-shortcut {
+  min-width: 0;
+  text-align: center;
 }
 .iv-filter-row {
   border-top: 1px solid var(--line-soft);
@@ -2938,16 +2968,6 @@ h1 {
   border-color: var(--amber);
   color: var(--amber);
 }
-.progress-track {
-  height: 3px;
-  background: var(--surface-3);
-}
-.progress-track span {
-  display: block;
-  height: 100%;
-  background: var(--teal);
-  transition: width 0.15s linear;
-}
 .metrics-row {
   justify-content: flex-start;
   gap: 18px;
@@ -3272,7 +3292,7 @@ h1 {
   overflow: hidden;
 }
 .encounter-lookup-body {
-  max-height: calc(100vh - 87px);
+  max-height: calc(100dvh - 87px);
   overflow: auto;
 }
 .encounter-lookup-form {
@@ -3324,6 +3344,7 @@ h1 {
   top: calc(100% + 6px);
   left: 0;
   width: 100%;
+  min-width: min(220px, 100%);
   max-height: min(320px, calc(100vh - 230px));
   overflow-y: auto;
   border: 1px solid var(--line);
@@ -3437,6 +3458,7 @@ h1 {
   top: calc(100% + 6px);
   left: 0;
   width: 100%;
+  min-width: min(220px, 100%);
   max-height: min(360px, calc(100vh - 220px));
   overflow-y: auto;
   border: 1px solid var(--line);
@@ -4000,7 +4022,6 @@ h1 {
   .floating-tool-panel {
     animation: none;
   }
-  .progress-track span,
   .gen8id-filter-modes label {
     transition: none;
   }
@@ -4768,19 +4789,6 @@ textarea:disabled {
   flex-wrap: wrap;
 }
 
-.progress-track {
-  height: 6px;
-  overflow: hidden;
-  margin: 0 22px;
-  border-radius: 999px;
-  background: var(--surface-3);
-}
-
-.progress-track span {
-  border-radius: inherit;
-  background: var(--brand);
-}
-
 .metrics-row {
   flex-wrap: wrap;
   gap: 8px 22px;
@@ -4977,6 +4985,204 @@ textarea:disabled {
   display: none;
 }
 
+.unified-profile-float-panel {
+  width: min(1360px, calc(100vw - 48px));
+}
+
+.unified-profile-panel {
+  display: grid;
+  min-width: 0;
+  max-height: calc(100vh - 98px);
+  overflow: auto;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  scrollbar-gutter: stable;
+}
+
+.unified-profile-tabs {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.unified-profile-tabs button {
+  min-width: 0;
+  min-height: 44px;
+  overflow: hidden;
+  border: 0;
+  border-right: 1px solid var(--line);
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unified-profile-tabs button:last-child {
+  border-right: 0;
+}
+
+.unified-profile-tabs button:hover,
+.unified-profile-tabs button.selected {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+.unified-profile-tabs button.selected {
+  box-shadow: inset 0 -2px 0 var(--brand);
+}
+
+.unified-profile-tabs button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.unified-profile-content {
+  min-width: 0;
+}
+
+.unified-profile-content > .profile-modal {
+  width: 100%;
+  max-height: none;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.unified-profile-content > .profile-modal .profile-table-wrap {
+  max-height: min(48vh, 520px);
+}
+
+.unified-profile-content > .gen5profiles-panel,
+.unified-profile-content > .gen8profiles-panel,
+.unified-profile-content > .threedsprofiles-panel {
+  min-width: 0;
+}
+
+.unified-profile-content > .gen5profiles-panel .gen5profiles-header,
+.unified-profile-content > .gen8profiles-panel .gen8profiles-header,
+.unified-profile-content > .threedsprofiles-panel .threedsprofiles-header {
+  display: none;
+}
+
+/* Keep popovers above the final opaque panel surface. */
+.panel:has(.haku-select[data-open="true"]),
+.panel:has(.autocomplete-combobox[data-open="true"]),
+.panel:has(.multi-check-field[data-open="true"]),
+.floating-tool-panel:has(.haku-select[data-open="true"]),
+.floating-tool-panel:has(.autocomplete-combobox[data-open="true"]),
+.floating-tool-panel:has(.multi-check-field[data-open="true"]) {
+  overflow: visible;
+}
+
+/* Static workspaces use unequal columns, but every section in the row shares
+   the height of the tallest section so controls keep one bottom baseline. */
+.gen3static-control-grid {
+  align-items: stretch;
+  grid-template-columns:
+    minmax(220px, 0.82fr) minmax(250px, 0.95fr)
+    minmax(360px, 1.23fr);
+  gap: 12px;
+}
+
+.gen3static-control-grid > .static-panel {
+  align-self: stretch;
+  height: 100%;
+}
+
+.ngc-seed-tabs {
+  width: 100%;
+  max-width: none;
+}
+
+.ngc-seed-control-grid {
+  width: 100%;
+  max-width: none;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.ngc-seed-results-panel {
+  width: 100%;
+  max-width: none;
+  margin-top: 12px;
+}
+
+.jirachi-control-grid {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.jirachi-results-panel {
+  margin-top: 12px;
+}
+
+.iv-filter-header,
+.iv-filter-row {
+  grid-template-columns: minmax(70px, 1fr) minmax(58px, 0.78fr) minmax(
+      58px,
+      0.78fr
+    );
+}
+
+#root .main-content .iv-filter-row input,
+#root .floating-tool-panel .iv-filter-row input {
+  min-width: 56px;
+  padding: 4px;
+  appearance: textfield;
+}
+
+#root .main-content .iv-filter-row input::-webkit-inner-spin-button,
+#root .main-content .iv-filter-row input::-webkit-outer-spin-button,
+#root .floating-tool-panel .iv-filter-row input::-webkit-inner-spin-button,
+#root .floating-tool-panel .iv-filter-row input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.calculator-observations {
+  overflow: auto;
+}
+
+.calculator-row {
+  grid-template-columns: repeat(7, minmax(62px, 1fr));
+  min-width: 434px;
+}
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  .gen3static-control-grid {
+    grid-template-columns:
+      minmax(200px, 0.82fr) minmax(220px, 0.95fr)
+      minmax(300px, 1.23fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .gen3static-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .gen3static-control-grid > .static-panel {
+    height: auto;
+  }
+}
+
 .researcher-float-panel {
   width: min(1280px, calc(100vw - 48px));
 }
@@ -5130,7 +5336,6 @@ textarea:disabled {
     padding-inline: 18px;
   }
 
-  .progress-track,
   .alert {
     margin-inline: 18px;
   }
@@ -5143,4 +5348,221 @@ textarea:disabled {
   .filter-panel {
     padding: 20px;
   }
+}
+
+/* Final control pass: keep every workspace on the same HakuStyle surface. */
+#root
+  .main-content
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+#root .main-content textarea,
+#root .main-content select,
+#root
+  .floating-tool-panel
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+#root .floating-tool-panel textarea,
+#root .floating-tool-panel select,
+#root .profile-display select {
+  min-height: var(--control-height);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px 14px;
+  outline: 0;
+  font-size: 15px;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+#root
+  .main-content
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover:not(
+    :disabled
+  ):not([readonly]),
+#root .main-content textarea:hover:not(:disabled):not([readonly]),
+#root .main-content select:hover:not(:disabled),
+#root
+  .floating-tool-panel
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover:not(
+    :disabled
+  ):not([readonly]),
+#root .floating-tool-panel textarea:hover:not(:disabled):not([readonly]),
+#root .floating-tool-panel select:hover:not(:disabled),
+#root .profile-display select:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--brand) 52%, var(--line-strong));
+}
+
+#root
+  .main-content
+  input:not([type="checkbox"]):not([type="radio"]):not(
+    [type="file"]
+  ):focus-visible,
+#root .main-content textarea:focus-visible,
+#root .main-content select:focus-visible,
+#root
+  .floating-tool-panel
+  input:not([type="checkbox"]):not([type="radio"]):not(
+    [type="file"]
+  ):focus-visible,
+#root .floating-tool-panel textarea:focus-visible,
+#root .floating-tool-panel select:focus-visible,
+#root .profile-display select:focus-visible {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+#root
+  .main-content
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):disabled,
+#root .main-content textarea:disabled,
+#root .main-content select:disabled,
+#root
+  .floating-tool-panel
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):disabled,
+#root .floating-tool-panel textarea:disabled,
+#root .floating-tool-panel select:disabled,
+#root .profile-display select:disabled {
+  background: var(--surface-2);
+  color: var(--muted);
+  opacity: 0.72;
+}
+
+#root .main-content .haku-select-trigger,
+#root .floating-tool-panel .haku-select-trigger {
+  min-height: var(--control-height);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px 13px 10px 14px;
+}
+
+#root .main-content .haku-select-trigger:hover:not(:disabled),
+#root .floating-tool-panel .haku-select-trigger:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--brand) 52%, var(--line-strong));
+}
+
+#root .main-content .haku-select-trigger:focus-visible,
+#root .floating-tool-panel .haku-select-trigger:focus-visible {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+/* Composite controls own the border on their wrapper, not on the child input. */
+#root .main-content .prefixed-input,
+#root .floating-tool-panel .prefixed-input {
+  min-height: var(--control-height);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+#root .main-content .prefixed-input:focus-within,
+#root .floating-tool-panel .prefixed-input:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+#root
+  .main-content
+  .prefixed-input
+  > input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+#root
+  .floating-tool-panel
+  .prefixed-input
+  > input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+  min-height: calc(var(--control-height) - 2px);
+  border: 0;
+  border-radius: 0 9px 9px 0;
+  background: transparent;
+  padding: 10px 12px 10px 6px;
+  box-shadow: none;
+}
+
+#root
+  .main-content
+  .calculator-row
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+#root
+  .floating-tool-panel
+  .calculator-row
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+  min-height: 42px;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  padding: 8px 4px;
+  box-shadow: none;
+}
+
+#root
+  .main-content
+  .calculator-row
+  input:not([type="checkbox"]):not([type="radio"]):not(
+    [type="file"]
+  ):focus-visible,
+#root
+  .floating-tool-panel
+  .calculator-row
+  input:not([type="checkbox"]):not([type="radio"]):not(
+    [type="file"]
+  ):focus-visible {
+  border: 0;
+  box-shadow: inset 0 0 0 2px var(--focus-ring);
+}
+
+.floating-tool-panel > :not(.floating-tool-panel-heading) {
+  scrollbar-gutter: stable;
+}
+
+.floating-tool-panel > :not(.floating-tool-panel-heading)::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.floating-tool-panel
+  > :not(.floating-tool-panel-heading)::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--line-strong);
+  background-clip: padding-box;
+}
+
+@media (max-width: 700px) {
+  #root
+    .main-content
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  #root .main-content textarea,
+  #root .main-content select,
+  #root
+    .floating-tool-panel
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  #root .floating-tool-panel textarea,
+  #root .floating-tool-panel select,
+  #root .profile-display select {
+    font-size: 16px;
+  }
+}
+
+/* IV range cells are intentionally compact, but their values must remain
+   readable after the global control pass. */
+#root .main-content .iv-filter-row input,
+#root .floating-tool-panel .iv-filter-row input {
+  min-height: 40px;
+  min-width: 56px;
+  padding: 4px;
+  appearance: textfield;
+}
+
+#root .main-content .iv-filter-row input::-webkit-inner-spin-button,
+#root .main-content .iv-filter-row input::-webkit-outer-spin-button,
+#root .floating-tool-panel .iv-filter-row input::-webkit-inner-spin-button,
+#root .floating-tool-panel .iv-filter-row input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
 }

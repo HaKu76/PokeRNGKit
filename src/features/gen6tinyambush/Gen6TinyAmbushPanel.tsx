@@ -415,15 +415,6 @@ export function Gen6TinyAmbushPanel({
             </button>
           </div>
         </div>
-        <div
-          className="progress-track"
-          aria-valuemax={100}
-          aria-valuemin={0}
-          aria-valuenow={Math.min(100, progress.percent)}
-          role="progressbar"
-        >
-          <span style={{ width: `${Math.min(100, progress.percent)}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("processed")}{" "}

@@ -285,7 +285,7 @@
 .gen5hiddengrotto-iv-range > div {
   display: grid;
   min-width: 0;
-  grid-template-columns: 36px minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: max-content minmax(56px, 1fr) 12px minmax(56px, 1fr);
   align-items: center;
   gap: 6px;
 }
@@ -298,7 +298,7 @@
 
 .gen5hiddengrotto-level-range {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: minmax(56px, 1fr) 12px minmax(56px, 1fr);
   align-items: center;
   gap: 6px;
 }

@@ -616,16 +616,6 @@ export function Gen6TinyTimelinePanel({
             </button>
           </div>
         </div>
-        <div
-          aria-label={`${progress.percent.toFixed(1)}%`}
-          aria-valuemax={100}
-          aria-valuemin={0}
-          aria-valuenow={Math.min(100, progress.percent)}
-          className="progress-track"
-          role="progressbar"
-        >
-          <span style={{ width: `${Math.min(100, progress.percent)}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("processed")}{" "}

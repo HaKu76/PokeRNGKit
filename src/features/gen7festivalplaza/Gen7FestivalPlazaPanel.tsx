@@ -562,16 +562,6 @@ export function Gen7FestivalPlazaPanel({
               </button>
             </div>
           </div>
-          <div
-            aria-label={`${progress.percent}%`}
-            aria-valuemax={100}
-            aria-valuemin={0}
-            aria-valuenow={progress.percent}
-            className="progress-track"
-            role="progressbar"
-          >
-            <span style={{ width: `${progress.percent}%` }} />
-          </div>
           <div className="metrics-row gen7festivalplaza-metrics">
             <span>
               {t("gen7FestivalPlazaFrames")}{" "}

@@ -308,16 +308,6 @@ export function Gen7EggSeedFinderPanel({
               </button>
             </div>
           </div>
-          <div
-            className="progress-track"
-            aria-label={`${progress.percent.toFixed(2)}%`}
-            aria-valuemax={100}
-            aria-valuemin={0}
-            aria-valuenow={progress.percent}
-            role="progressbar"
-          >
-            <span style={{ width: `${progress.percent}%` }} />
-          </div>
           <div className="metrics-row">
             <span>
               {t("processed")} <strong>{progress.processedStates}</strong> /{" "}

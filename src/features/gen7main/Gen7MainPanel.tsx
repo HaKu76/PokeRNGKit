@@ -355,8 +355,6 @@ export function Gen7MainPanel({
         ? t("gen7MainIdMode")
         : t("gen7MainQrMode");
   const currentResultCount = mode === "qr" ? qrResults.length : results.length;
-  const progressPercent =
-    mode === "qr" ? (qrResults.length > 0 ? 100 : 0) : progress.percent;
 
   return (
     <div className="gen7main-panel">
@@ -744,9 +742,6 @@ export function Gen7MainPanel({
                 <Trash2 aria-hidden="true" size={17} />
               </button>
             </div>
-          </div>
-          <div className="progress-track" aria-label={`${progressPercent}%`}>
-            <span style={{ width: `${progressPercent}%` }} />
           </div>
           <div className="metrics-row gen7main-metrics">
             <span>

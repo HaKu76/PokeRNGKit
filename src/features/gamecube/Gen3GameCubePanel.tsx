@@ -626,9 +626,6 @@ export function Gen3GameCubePanel({
           </div>
           <span className="result-count">{states.length}</span>
         </div>
-        <div className="progress-track">
-          <span style={{ width: `${Math.min(100, progress.percent)}%` }} />
-        </div>
         <div className="metrics-row">
           <span>
             {t("processed")} <strong>{progress.processedStates}</strong>
