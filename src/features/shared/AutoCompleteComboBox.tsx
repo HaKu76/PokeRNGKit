@@ -201,7 +201,8 @@ export function AutoCompleteComboBox<T extends string | number>({
       {open && !disabled && filteredOptions.length > 0 && (
         <div
           className="autocomplete-combobox-menu"
-          data-placement={menuPlacement}
+          data-align={menuPlacement.horizontal}
+          data-placement={menuPlacement.vertical}
           id={listboxId}
           role="listbox"
         >

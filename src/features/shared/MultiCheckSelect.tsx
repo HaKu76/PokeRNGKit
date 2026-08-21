@@ -87,7 +87,8 @@ export function MultiCheckSelect({
           <div
             aria-label={label}
             className="multi-check-menu"
-            data-placement={menuPlacement}
+            data-align={menuPlacement.horizontal}
+            data-placement={menuPlacement.vertical}
             id={menuId}
           >
             {options.map((option) => (

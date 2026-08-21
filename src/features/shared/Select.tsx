@@ -226,7 +226,8 @@ export function Select({
         <div
           aria-label={title}
           className="haku-select-menu"
-          data-placement={menuPlacement}
+          data-align={menuPlacement.horizontal}
+          data-placement={menuPlacement.vertical}
           id={listboxId}
           role="listbox"
         >

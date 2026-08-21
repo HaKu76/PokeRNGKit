@@ -1,6 +1,14 @@
 import { useEffect, useState, type RefObject } from "react";
 
-export type MenuPlacement = "bottom" | "top";
+const VIEWPORT_GUTTER = 12;
+
+export type MenuVerticalPlacement = "bottom" | "top";
+export type MenuHorizontalPlacement = "start" | "end";
+
+export interface MenuPlacement {
+  readonly horizontal: MenuHorizontalPlacement;
+  readonly vertical: MenuVerticalPlacement;
+}
 
 /** Keep shared option menus inside the viewport when their anchor is near an edge. */
 export function useMenuPlacement(
@@ -8,7 +16,10 @@ export function useMenuPlacement(
   open: boolean,
   estimatedHeight: number,
 ): MenuPlacement {
-  const [placement, setPlacement] = useState<MenuPlacement>("bottom");
+  const [placement, setPlacement] = useState<MenuPlacement>({
+    horizontal: "start",
+    vertical: "bottom",
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -20,11 +31,21 @@ export function useMenuPlacement(
       const availableBelow = window.innerHeight - rect.bottom - 12;
       const availableAbove = rect.top - 12;
       const requiredHeight = Math.min(estimatedHeight, 360);
-      setPlacement(
+      const requiredWidth = Math.min(
+        320,
+        Math.max(0, window.innerWidth - VIEWPORT_GUTTER * 2),
+      );
+      const canAlignEnd = rect.right - requiredWidth >= VIEWPORT_GUTTER;
+      const horizontal =
+        rect.left + requiredWidth > window.innerWidth - VIEWPORT_GUTTER &&
+        canAlignEnd
+          ? "end"
+          : "start";
+      const vertical =
         availableBelow < requiredHeight && availableAbove > availableBelow
           ? "top"
-          : "bottom",
-      );
+          : "bottom";
+      setPlacement({ horizontal, vertical });
     };
 
     updatePlacement();
@@ -36,5 +57,5 @@ export function useMenuPlacement(
     };
   }, [anchorRef, estimatedHeight, open]);
 
-  return open ? placement : "bottom";
+  return open ? placement : { horizontal: "start", vertical: "bottom" };
 }

@@ -2435,8 +2435,8 @@ h1 {
   z-index: 8;
   top: calc(100% + 6px);
   left: 0;
-  width: 100%;
-  min-width: 0;
+  width: max(100%, min(320px, calc(100vw - 24px)));
+  max-width: calc(100vw - 24px);
   max-height: 250px;
   overflow: auto;
   border: 1px solid var(--line);
@@ -3343,8 +3343,8 @@ h1 {
   z-index: 4;
   top: calc(100% + 6px);
   left: 0;
-  width: 100%;
-  min-width: min(220px, 100%);
+  width: max(100%, min(320px, calc(100vw - 24px)));
+  max-width: calc(100vw - 24px);
   max-height: min(320px, calc(100vh - 230px));
   overflow-y: auto;
   border: 1px solid var(--line);
@@ -3457,8 +3457,8 @@ h1 {
   z-index: 24;
   top: calc(100% + 6px);
   left: 0;
-  width: 100%;
-  min-width: min(220px, 100%);
+  width: max(100%, min(320px, calc(100vw - 24px)));
+  max-width: calc(100vw - 24px);
   max-height: min(360px, calc(100vh - 220px));
   overflow-y: auto;
   border: 1px solid var(--line);
@@ -5116,6 +5116,7 @@ textarea:disabled {
 
 /* Icon-only actions share one touch target and one visual center. */
 #root .main-content button.icon,
+#root .main-content button.icon-action,
 #root .main-content button[class*="-icon"],
 #root .floating-tool-panel button.icon,
 #root .floating-tool-panel button[class*="-icon"] {
@@ -5269,6 +5270,16 @@ textarea:disabled {
   max-height: min(360px, calc(100dvh - 180px));
 }
 
+#root .main-content .haku-select-menu[data-align="end"],
+#root .main-content .autocomplete-combobox-menu[data-align="end"],
+#root .main-content .multi-check-menu[data-align="end"],
+#root .floating-tool-panel .haku-select-menu[data-align="end"],
+#root .floating-tool-panel .autocomplete-combobox-menu[data-align="end"],
+#root .floating-tool-panel .multi-check-menu[data-align="end"] {
+  right: 0;
+  left: auto;
+}
+
 #root .main-content .haku-select-menu[data-placement="top"],
 #root .main-content .autocomplete-combobox-menu[data-placement="top"],
 #root .main-content .multi-check-menu[data-placement="top"],
@@ -5288,6 +5299,38 @@ textarea:disabled {
   display: flex;
   align-items: center;
   line-height: 22px;
+}
+
+#root
+  .main-content
+  .field
+  > input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+#root .main-content .field > textarea,
+#root .main-content .field > .haku-select,
+#root .main-content .field > .autocomplete-combobox,
+#root .main-content .field > .multi-check-control,
+#root .main-content .field > .prefixed-input,
+#root
+  .floating-tool-panel
+  .field
+  > input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+#root .floating-tool-panel .field > textarea,
+#root .floating-tool-panel .field > .haku-select,
+#root .floating-tool-panel .field > .autocomplete-combobox,
+#root .floating-tool-panel .field > .multi-check-control,
+#root .floating-tool-panel .field > .prefixed-input {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+#root .main-content .gen3static-control-grid .gen3-filter-selects .field,
+#root
+  .floating-tool-panel
+  .gen3static-control-grid
+  .gen3-filter-selects
+  .field {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
 }
 
 #root .main-content .compact-field-row,
@@ -5680,8 +5723,20 @@ textarea:disabled {
   box-shadow: inset 0 0 0 2px var(--focus-ring);
 }
 
+#root .floating-tool-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .floating-tool-panel > :not(.floating-tool-panel-heading) {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   scrollbar-gutter: stable;
+}
+
+.floating-tool-panel > :not(.floating-tool-panel-heading):last-child {
+  flex: 1 1 auto;
 }
 
 .floating-tool-panel > :not(.floating-tool-panel-heading)::-webkit-scrollbar {

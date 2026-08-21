@@ -876,19 +876,6 @@ function App() {
     cancelled: t("cancelled"),
     failed: t("failed"),
   }[status];
-  const gen4Tools =
-    activeModule === "gen4id" ||
-    activeModule === "gen4seedfinder" ||
-    activeModule === "gen4seedtotime" ||
-    activeModule === "gen4static" ||
-    activeModule === "gen4wild" ||
-    activeModule === "gen4egg" ||
-    activeModule === "gen4event" ||
-    activeModule === "gen4advance";
-  const gen4Module =
-    gen4Tools ||
-    activeModule === "gen4chainedsid" ||
-    activeModule === "gen4swarm";
   const gen5Module =
     activeModule === "gen5profiles" ||
     activeModule === "gen5id" ||
@@ -1117,21 +1104,6 @@ function App() {
             </div>
             <div>
               <div className="brand-name">{t("brand")}</div>
-              <div className="brand-subtitle">
-                {t(
-                  gen4Module
-                    ? "subtitleGen4"
-                    : gen5Module
-                      ? "subtitleGen5"
-                      : gen6Module
-                        ? "subtitleGen6"
-                        : gen7Module
-                          ? "subtitleGen7"
-                          : gen8Module
-                            ? "subtitleGen8"
-                            : "subtitle",
-                )}
-              </div>
             </div>
           </div>
         </div>
