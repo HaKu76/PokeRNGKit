@@ -4076,6 +4076,27 @@ h1 {
   --control-height: 44px;
   --row-height: 46px;
   --content-max-width: 1540px;
+  /* Compatibility aliases for modules migrated from the earlier token set. */
+  --accent-border: var(--line);
+  --accent-soft: var(--teal-soft);
+  --accent-strong: var(--brand-strong);
+  --border: var(--line);
+  --border-subtle: var(--line-soft);
+  --brand-soft: var(--teal-soft);
+  --danger: var(--red);
+  --danger-border: var(--red-deep);
+  --danger-soft: color-mix(in srgb, var(--red) 8%, var(--surface));
+  --danger-text: var(--red-deep);
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --surface-hover: var(--surface-3);
+  --surface-panel: var(--surface);
+  --surface-raised: var(--surface);
+  --surface-strong: var(--surface-3);
+  --surface-subtle: var(--surface-2);
+  --text-muted: var(--muted);
+  --text-primary: var(--text);
+  --text-soft: var(--muted);
+  --warning-text: var(--amber);
 }
 
 :root[data-theme="dark"] {
@@ -4112,6 +4133,26 @@ h1 {
   --panel-shadow: none;
   --floating-shadow: 0 18px 36px rgb(0 0 0 / 0.36);
   --focus-ring: rgb(145 190 255 / 0.28);
+  --accent-border: var(--line);
+  --accent-soft: var(--teal-soft);
+  --accent-strong: var(--brand-strong);
+  --border: var(--line);
+  --border-subtle: var(--line-soft);
+  --brand-soft: var(--teal-soft);
+  --danger: var(--red);
+  --danger-border: var(--red-deep);
+  --danger-soft: color-mix(in srgb, var(--red) 12%, var(--surface));
+  --danger-text: var(--red);
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --surface-hover: var(--surface-3);
+  --surface-panel: var(--surface);
+  --surface-raised: var(--surface);
+  --surface-strong: var(--surface-3);
+  --surface-subtle: var(--surface-2);
+  --text-muted: var(--muted);
+  --text-primary: var(--text);
+  --text-soft: var(--muted);
+  --warning-text: var(--amber);
 }
 
 body {
@@ -4511,6 +4552,7 @@ select:not([multiple]) {
 }
 
 .main-content {
+  container: pokerngkit-content / inline-size;
   padding: 32px clamp(20px, 4vw, 48px) 48px;
   animation-duration: 260ms;
 }
@@ -5070,6 +5112,54 @@ textarea:disabled {
 .unified-profile-content > .gen8profiles-panel,
 .unified-profile-content > .threedsprofiles-panel {
   min-width: 0;
+}
+
+/* Icon-only actions share one touch target and one visual center. */
+#root .main-content button.icon,
+#root .main-content button[class*="-icon"],
+#root .floating-tool-panel button.icon,
+#root .floating-tool-panel button[class*="-icon"] {
+  width: var(--control-height);
+  min-width: var(--control-height);
+  height: var(--control-height);
+  min-height: var(--control-height);
+  display: inline-grid;
+  place-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+}
+
+/* The available content width is smaller than the viewport when the rail is
+   expanded. Stack dense workspaces before fixed minimum tracks can clip them. */
+@container pokerngkit-content (max-width: 1080px) {
+  #root .main-content [class*="-workspace"],
+  #root .main-content [class*="-control-grid"],
+  #root .main-content > .control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root .main-content [class*="-workspace"] > *,
+  #root .main-content [class*="-control-grid"] > *,
+  #root .main-content > .control-grid > * {
+    min-width: 0;
+  }
+}
+
+/* Sibling sections in a workspace keep a shared top and bottom baseline. */
+#root .main-content [class*="-workspace"],
+#root .main-content [class*="-control-grid"],
+#root .main-content > .control-grid {
+  align-items: stretch;
+}
+
+@container pokerngkit-content (max-width: 720px) {
+  #root .main-content [class*="-form-grid"],
+  #root .main-content [class*="-filter-grid"],
+  #root .main-content [class*="-settings-grid"],
+  #root .main-content [class*="-input-grid"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .unified-profile-content > .gen5profiles-panel .gen5profiles-header,
