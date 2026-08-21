@@ -5197,6 +5197,25 @@ textarea:disabled {
   height: 100%;
 }
 
+/* PokeSpot's two values share one label. Reserve both number fields before
+   the workspace can distribute surplus width to the larger filter panel. */
+.pokespot-control-grid {
+  grid-template-columns:
+    minmax(300px, 0.95fr) minmax(230px, 0.75fr)
+    minmax(340px, 1.2fr);
+}
+
+@media (max-width: 900px) {
+  .pokespot-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pokespot-paired-field > input {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+}
+
 .ngc-seed-tabs {
   width: 100%;
   max-width: none;
@@ -5247,6 +5266,61 @@ textarea:disabled {
 #root .floating-tool-panel .iv-filter-row input::-webkit-outer-spin-button {
   margin: 0;
   appearance: none;
+}
+
+/* Six IV values are two digits at most. Keep their repeated result columns
+   compact so the table gives meaningful fields more room before scrolling. */
+.static-virtual-table,
+.static-table-header,
+.static-table-row {
+  min-width: 1198px;
+}
+
+.static-table-header,
+.static-table-row {
+  grid-template-columns:
+    100px 108px 76px 92px 160px repeat(6, 62px)
+    110px 88px 92px;
+}
+
+.wild-virtual-table,
+.wild-table-header,
+.wild-table-row {
+  min-width: 1506px;
+}
+
+.wild-table-header,
+.wild-table-row {
+  grid-template-columns:
+    100px 200px 72px 112px 90px 110px 170px repeat(6, 62px) 110px 80px
+    90px;
+}
+
+.gen4static-table.generator.dppt,
+.gen4static-table.generator.dppt .static-table-header,
+.gen4static-table.generator.dppt .static-table-row {
+  grid-template-columns:
+    90px 82px 108px 76px 92px 160px repeat(6, 62px) 110px 88px 92px
+    160px;
+  min-width: 1430px;
+}
+
+.gen4static-table.generator.hgss,
+.gen4static-table.generator.hgss .static-table-header,
+.gen4static-table.generator.hgss .static-table-row {
+  grid-template-columns:
+    90px 68px 82px 108px 76px 92px 160px repeat(6, 62px) 110px 88px 92px
+    160px;
+  min-width: 1498px;
+}
+
+.gen4static-table.searcher,
+.gen4static-table.searcher .static-table-header,
+.gen4static-table.searcher .static-table-row {
+  grid-template-columns:
+    100px 80px 72px 90px 108px 76px 92px 160px repeat(6, 62px) 110px 88px
+    92px 160px;
+  min-width: 1600px;
 }
 
 /* Shared popovers must escape every feature panel that owns a clipped surface. */
