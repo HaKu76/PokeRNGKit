@@ -5139,12 +5139,18 @@ textarea:disabled {
 @container pokerngkit-content (max-width: 1080px) {
   #root .main-content [class*="-workspace"],
   #root .main-content [class*="-control-grid"],
+  #root .main-content [class*="-control-row"],
+  #root .main-content .gen4event-controls,
+  #root .main-content .gen7stationary-controls,
   #root .main-content > .control-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
   #root .main-content [class*="-workspace"] > *,
   #root .main-content [class*="-control-grid"] > *,
+  #root .main-content [class*="-control-row"] > *,
+  #root .main-content .gen4event-controls > *,
+  #root .main-content .gen7stationary-controls > *,
   #root .main-content > .control-grid > * {
     min-width: 0;
   }

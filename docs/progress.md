@@ -1,5 +1,13 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-22 第八世代控制行容器断点复查（待项目所有者视觉验收）
+
+- 修复：第八世代配信与孵化面板的顶层 `control-row`、第四世代配信的 `gen4event-controls` 和第七世代定点的 `gen7stationary-controls` 纳入主内容容器的 `1080px` 响应式断点；侧栏和浮动 Rail 占用空间后，控制区会在实际内容宽度不足时切换为单列，避免固定最小列造成裁剪或横向挤压。
+- 修复：上述控制行和三栏控制区的直接子 section 在收窄时允许 `min-width: 0`，与现有 workspace、control-grid 的收拢规则保持一致。
+- 已通过：`npm run format:files -- src/styles.css`、`npm run format:check`、`git diff --check`；源码横查确认其余顶层控制布局已由 workspace/control-grid 断点覆盖。
+- 未运行：测试、构建、外部 Chrome/Edge 视觉验收和生产页面回归；当前规则仍需项目所有者在第八世代配信/孵化面板的桌面、中等宽度和窄视口共同确认。
+- 当前：本轮仅修改 `src/styles.css` 与本交接记录；提交后保持未推送，既有 `release/`、`ui-audit-2026-08-21/` 和 `ui-audit-current.png` 未跟踪产物保持不变。
+
 ## 2026-08-22 第五世代结果区高度收敛（待项目所有者视觉验收）
 
 - 优化：第五世代静态和野生结果面板取消 `780px`/`600px` 固定最小高度，改由结果表滚动区使用视口相关的 `clamp` 高度，减少无结果时的底部空白。
