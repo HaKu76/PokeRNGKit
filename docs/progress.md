@@ -1,12 +1,19 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-22 工程验证与 Git 同步
+
+- 更新：修正顶部交接记录，确认 `a519b1d docs: 更新 UI 验证记录` 已同步至 `origin/main`。
+- 已通过：`npm run format:files -- docs/progress.md`、`npm run format:check`、`git diff --check` 和完整 `npm run verify`；Vitest 为 177 个测试文件、615 项测试，Web 生产构建和 PWA 预缓存成功。
+- 当前：`main` 将包含本次文档修正并推送至 `origin/main`；未跟踪的 `release/`、`ui-audit-2026-08-21/` 和 `ui-audit-current.png` 保留，不纳入提交。
+- 未运行：外部 Chrome/Edge 视觉验收、GitHub Pages 生产页面算法回归和 Windows EXE 实机验收；这些仍需项目所有者在对应外部环境中共同确认。
+
 ## 2026-08-22 高频 UI 自检第三轮（工程修复完成，待项目所有者视觉验收）
 
 - 修复：共享 Select、自动完成和多选菜单改为通过 Portal 挂载到 `document.body`，按触发器实时计算视口内的固定位置、宽度和最大高度，避免被面板、section 或浮窗内容裁剪。
 - 修复：浮窗内容滚动层不再因下拉打开切换为 `overflow: visible`，滚动条轨道保持稳定；浮窗外点关闭、滚轮和触摸锁定均识别 Portal 菜单。
 - 修复：Select 和多选触发器的长中文标签允许换行，自动完成选项不再省略文本；浮窗键盘焦点陷阱跳过 Portal 菜单。
 - 工程验证：`npm run format:check`、`npm run lint`、`npm run typecheck`、`npm test`（177 个文件、615 项测试）和 `npm run build:web` 均已通过；构建仅保留既有 chunk 大小提示。
-- 已提交并推送 UI 修复：`6c5273e style: 修复共享菜单与浮窗滚动布局`；交接记录提交 `75afe00 docs: 更新 UI 验证记录` 已生成但受当前 GitHub HTTPS 网络故障影响尚未推送。
+- 已提交并推送 UI 修复：`6c5273e style: 修复共享菜单与浮窗滚动布局`；交接记录已合并为 `a519b1d docs: 更新 UI 验证记录` 并同步至 `origin/main`。
 - 待验收：外部 Chrome/Edge 当前未连接，尚未进行实际视口截图和下拉展开验收。
 
 ## 2026-08-22 高频 UI 自检第二轮（待工程验证与项目所有者视觉验收）
