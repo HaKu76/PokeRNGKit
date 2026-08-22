@@ -139,6 +139,7 @@ import { MiscRngPanel } from "./features/miscrng/MiscRngPanel";
 import { TsvListPanel } from "./features/tsvlist/TsvListPanel";
 import { IvToolsPanel } from "./features/ivtools/IvToolsPanel";
 import { FloatingToolPanel } from "./features/shared/FloatingToolPanel";
+import { ProfileSelector } from "./features/shared/ProfileSelector";
 import { useOverlayScrollLock } from "./features/shared/useOverlayScrollLock";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
 import { useTheme } from "./theme";
@@ -933,6 +934,38 @@ function App() {
     activeModule === "gen8underground" ||
     activeModule === "gen8wild" ||
     activeModule === "gen8denmap";
+  const gen3ProfileScope =
+    activeModule === "static" ||
+    activeModule === "wild" ||
+    activeModule === "egg"
+      ? "handheld"
+      : activeModule === "gamecube"
+        ? "gamecube"
+        : activeModule === "pokespot"
+          ? "xd"
+          : undefined;
+  const gen3ProfileOptions = profiles.profiles.filter((profile) =>
+    gen3ProfileScope === "handheld"
+      ? profile.version !== "xd" && profile.version !== "colosseum"
+      : gen3ProfileScope === "gamecube"
+        ? profile.version === "xd" || profile.version === "colosseum"
+        : gen3ProfileScope === "xd"
+          ? profile.version === "xd"
+          : false,
+  );
+  const gen3SelectedProfileId = gen3ProfileOptions.some(
+    (profile) => profile.id === profiles.selectedProfileId,
+  )
+    ? profiles.selectedProfileId
+    : null;
+  const gen4ProfileModule =
+    activeModule === "gen4static" ||
+    activeModule === "gen4wild" ||
+    activeModule === "gen4egg" ||
+    activeModule === "gen4event";
+  const gen4SelectedProfileId = gen4ProfileModule
+    ? gen4Profiles.selectedProfileId
+    : null;
   const researcherModule = activeModule === "researcher";
   const pokerusModule = activeModule === "pokerusfinder";
   const profileTools = true;
@@ -2716,6 +2749,32 @@ function App() {
               </h1>
             </div>
             <div className="page-heading-tools">
+              {gen3ProfileScope && (
+                <ProfileSelector
+                  disabled={profiles.loading}
+                  label={t("profile")}
+                  managerLabel={t("profileManager3")}
+                  onOpenProfileManager={() => toggleFloatingTool("profile")}
+                  onSelect={(profileId) =>
+                    void profiles.selectProfile(profileId)
+                  }
+                  options={gen3ProfileOptions}
+                  selectedProfileId={gen3SelectedProfileId}
+                />
+              )}
+              {gen4ProfileModule && (
+                <ProfileSelector
+                  disabled={gen4Profiles.loading}
+                  label={t("profile")}
+                  managerLabel={t("profileManager4")}
+                  onOpenProfileManager={() => toggleFloatingTool("profile")}
+                  onSelect={(profileId) =>
+                    void gen4Profiles.selectProfile(profileId)
+                  }
+                  options={gen4Profiles.profiles}
+                  selectedProfileId={gen4SelectedProfileId}
+                />
+              )}
               {(gen6Module || gen7Module) &&
                 activeModule !== "gen6id" &&
                 activeModule !== "gen6mainseed" &&

@@ -1,0 +1,82 @@
+.page-profile-selector,
+.page-profile-selector label {
+  display: flex;
+  align-items: center;
+}
+
+.page-profile-selector {
+  min-width: 0;
+  gap: 6px;
+}
+
+.page-profile-selector label {
+  min-width: 0;
+  gap: 8px;
+}
+
+.page-profile-selector label > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.page-profile-selector .haku-select {
+  width: min(220px, 32vw);
+  min-width: 140px;
+}
+
+.page-profile-selector > button {
+  display: grid;
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--control-bg);
+  color: var(--muted);
+  transition:
+    border-color var(--motion-fast) var(--ease-out),
+    background-color var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
+}
+
+.page-profile-selector > button:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.page-profile-selector > button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .page-profile-selector {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .page-profile-selector label {
+    flex: 1 1 auto;
+  }
+
+  .page-profile-selector .haku-select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 460px) {
+  .page-profile-selector label > span {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-profile-selector > button {
+    transition: none;
+  }
+}
