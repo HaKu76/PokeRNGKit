@@ -50,8 +50,9 @@
 
 .misc-rng-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(132px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 220px));
   gap: 10px 12px;
+  justify-content: start;
 }
 
 .misc-rng-grid label,

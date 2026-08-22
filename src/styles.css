@@ -5256,6 +5256,12 @@ textarea:disabled {
     );
 }
 
+.iv-filter-header > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #root .main-content .iv-filter-row input,
 #root .floating-tool-panel .iv-filter-row input {
   min-width: 56px;
@@ -5830,6 +5836,94 @@ textarea:disabled {
   border-radius: 999px;
   background: var(--line-strong);
   background-clip: padding-box;
+}
+
+/* Final geometry pass: keep compact numeric controls and repeated IV columns
+   from absorbing width that belongs to labels and meaningful result fields. */
+#root .main-content input[type="number"],
+#root .main-content input[inputmode="numeric"],
+#root .main-content input[inputmode="decimal"],
+#root .floating-tool-panel input[type="number"],
+#root .floating-tool-panel input[inputmode="numeric"],
+#root .floating-tool-panel input[inputmode="decimal"] {
+  width: 100%;
+  max-width: 220px;
+  justify-self: start;
+}
+
+#root .main-content .wild-level-filter,
+#root .floating-tool-panel .wild-level-filter {
+  grid-template-columns: minmax(0, 1fr) 56px 56px;
+  gap: 6px;
+}
+
+#root .main-content .wild-level-filter input,
+#root .floating-tool-panel .wild-level-filter input {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.static-virtual-table {
+  min-width: 1162px;
+}
+
+.static-table-header,
+.static-table-row {
+  grid-template-columns:
+    100px 108px 76px 92px 160px repeat(6, 56px)
+    110px 88px 92px;
+  min-width: 1162px;
+}
+
+.wild-virtual-table {
+  min-width: 1470px;
+}
+
+.wild-table-header,
+.wild-table-row {
+  grid-template-columns:
+    100px 200px 72px 112px 90px 110px 170px repeat(6, 56px) 110px 80px
+    90px;
+  min-width: 1470px;
+}
+
+.gen4static-table.generator.dppt,
+.gen4static-table.generator.dppt .static-table-header,
+.gen4static-table.generator.dppt .static-table-row {
+  grid-template-columns:
+    90px 82px 108px 76px 92px 160px repeat(6, 56px) 110px 88px 92px
+    160px;
+  min-width: 1394px;
+}
+
+.gen4static-table.generator.hgss,
+.gen4static-table.generator.hgss .static-table-header,
+.gen4static-table.generator.hgss .static-table-row {
+  grid-template-columns:
+    90px 68px 82px 108px 76px 92px 160px repeat(6, 56px) 110px 88px 92px
+    160px;
+  min-width: 1462px;
+}
+
+.gen4static-table.searcher,
+.gen4static-table.searcher .static-table-header,
+.gen4static-table.searcher .static-table-row {
+  grid-template-columns:
+    100px 80px 72px 90px 108px 76px 92px 160px repeat(6, 56px) 110px 88px
+    92px 160px;
+  min-width: 1564px;
+}
+
+@media (max-width: 700px) {
+  #root .main-content input[type="number"],
+  #root .main-content input[inputmode="numeric"],
+  #root .main-content input[inputmode="decimal"],
+  #root .floating-tool-panel input[type="number"],
+  #root .floating-tool-panel input[inputmode="numeric"],
+  #root .floating-tool-panel input[inputmode="decimal"] {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 700px) {
