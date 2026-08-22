@@ -3491,9 +3491,10 @@ h1 {
 
 .haku-select-menu button > span {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  flex: 1 1 auto;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 22px;
 }
 
 .haku-select-menu button:hover:not(:disabled),
@@ -5866,7 +5867,55 @@ textarea:disabled {
 #root .floating-tool-panel input[inputmode="decimal"] {
   width: 100%;
   max-width: 220px;
-  justify-self: start;
+  justify-self: stretch;
+}
+
+/* Keep option text readable when a trigger lives in a narrow section. */
+#root .main-content .haku-select-menu,
+#root .floating-tool-panel .haku-select-menu,
+#root .main-content .autocomplete-combobox-menu,
+#root .floating-tool-panel .autocomplete-combobox-menu {
+  width: min(360px, calc(100vw - 24px));
+}
+
+#root .main-content .multi-check-menu,
+#root .floating-tool-panel .multi-check-menu {
+  width: min(360px, calc(100vw - 24px));
+}
+
+#root .main-content .autocomplete-combobox-menu button > span,
+#root .floating-tool-panel .autocomplete-combobox-menu button > span {
+  flex: 1 1 auto;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 22px;
+}
+
+/* NGC uses one workspace width for tabs, controls and results. */
+#root .main-content .ngc-seed-tabs,
+#root .main-content .ngc-seed-control-grid,
+#root .main-content .ngc-seed-results-panel {
+  width: min(100%, 900px);
+  max-width: 900px;
+}
+
+#root .main-content .ngc-seed-control-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Range inputs need one stable readable track in every IV filter. */
+#root .main-content .iv-filter-header,
+#root .main-content .iv-filter-row,
+#root .floating-tool-panel .iv-filter-header,
+#root .floating-tool-panel .iv-filter-row {
+  grid-template-columns: minmax(0, 1fr) 64px 64px;
+}
+
+#root .main-content .iv-filter-row input,
+#root .floating-tool-panel .iv-filter-row input {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
 }
 
 #root .main-content .wild-level-filter,
