@@ -50,7 +50,8 @@
 
 .misc-rng-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 220px));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 480px;
   gap: 10px 12px;
   justify-content: start;
 }

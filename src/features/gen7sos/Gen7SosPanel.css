@@ -449,11 +449,11 @@
   }
 
   .gen7sos-results {
-    min-height: 620px;
+    min-height: 0;
   }
 
   .gen7sos-table {
-    height: 520px;
+    height: clamp(280px, 52vh, 520px);
     flex: none;
   }
 }

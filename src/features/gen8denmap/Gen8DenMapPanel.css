@@ -127,7 +127,7 @@
   }
 
   .gen8denmap-map-panel {
-    min-height: 560px;
+    min-height: clamp(360px, 56vh, 560px);
   }
 }
 

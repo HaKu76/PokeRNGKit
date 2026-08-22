@@ -518,7 +518,7 @@ h1 {
 }
 .input-panel,
 .filter-panel {
-  min-height: 408px;
+  min-height: 0;
   padding: 20px;
 }
 .panel-heading {
@@ -2130,7 +2130,7 @@ h1 {
   background: var(--teal-soft);
 }
 .pokespot-table-shell {
-  height: 560px;
+  height: clamp(300px, 52vh, 560px);
 }
 .pokespot-result-table {
   min-width: 1570px;
@@ -2607,13 +2607,13 @@ h1 {
   margin-top: 0;
 }
 .static-table-shell {
-  height: 560px;
+  height: clamp(300px, 52vh, 560px);
 }
 .initial-seed-table-shell {
-  height: 420px;
+  height: clamp(280px, 44vh, 420px);
 }
 .ivtopid-table-shell {
-  height: 420px;
+  height: clamp(280px, 44vh, 420px);
 }
 .ivtopid-table {
   width: 100%;
@@ -2996,7 +2996,8 @@ h1 {
 }
 .table-shell {
   position: relative;
-  height: 520px;
+  height: clamp(300px, 52vh, 520px);
+  min-height: 0;
   overflow: auto;
   border-top: 1px solid var(--line-soft);
   background: var(--table-bg);
@@ -5839,13 +5840,15 @@ textarea:disabled {
 
 .floating-tool-panel > :not(.floating-tool-panel-heading) {
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
+  overflow: visible;
 }
 
 .floating-tool-panel > :not(.floating-tool-panel-heading):last-child {
   flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable both-edges;
 }
 
 .floating-tool-panel > :not(.floating-tool-panel-heading)::-webkit-scrollbar {

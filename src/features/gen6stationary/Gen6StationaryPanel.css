@@ -13,8 +13,8 @@
 .gen6stationary-controls,
 .gen6stationary-results {
   min-width: 0;
-  height: calc(100vh - 184px);
-  min-height: 620px;
+  height: clamp(460px, calc(100dvh - 184px), 760px);
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -420,11 +420,11 @@
   }
 
   .gen6stationary-results {
-    min-height: 620px;
+    min-height: 0;
   }
 
   .gen6stationary-table-shell {
-    height: 520px;
+    height: clamp(280px, 52vh, 520px);
     flex: none;
   }
 }

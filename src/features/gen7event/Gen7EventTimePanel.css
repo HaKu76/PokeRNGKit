@@ -7,8 +7,8 @@
 .gen7event-time-workspace {
   display: grid;
   min-width: 0;
-  min-height: 720px;
-  height: calc(100vh - 184px);
+  min-height: 0;
+  height: clamp(460px, calc(100dvh - 184px), 760px);
   grid-template-rows: minmax(0, auto) 52px minmax(0, 1fr);
   gap: 12px;
 }
@@ -452,11 +452,11 @@
   }
 
   .gen7event-time-results {
-    min-height: 560px;
+    min-height: 0;
   }
 
   .gen7event-time-table-shell {
-    height: 520px;
+    height: clamp(280px, 52vh, 520px);
     flex: none;
   }
 }

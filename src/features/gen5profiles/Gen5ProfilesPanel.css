@@ -521,7 +521,7 @@
 
 .gen5profiles-results {
   display: flex;
-  min-height: 560px;
+  min-height: 0;
   flex-direction: column;
 }
 
@@ -634,7 +634,7 @@
   }
 
   .gen5profiles-results {
-    min-height: 480px;
+    min-height: 0;
   }
 }
 

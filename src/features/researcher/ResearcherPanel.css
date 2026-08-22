@@ -264,7 +264,7 @@
 }
 
 .researcher-table-shell {
-  height: 540px;
+  height: clamp(300px, 52vh, 540px);
 }
 
 .researcher-virtual-table {

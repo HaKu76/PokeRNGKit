@@ -13,8 +13,8 @@
 .gen7festivalplaza-controls,
 .gen7festivalplaza-results {
   min-width: 0;
-  height: calc(100vh - 184px);
-  min-height: 560px;
+  height: clamp(460px, calc(100dvh - 184px), 760px);
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -308,11 +308,11 @@
   }
 
   .gen7festivalplaza-results {
-    min-height: 560px;
+    min-height: 0;
   }
 
   .gen7festivalplaza-table-shell {
-    height: 480px;
+    height: clamp(280px, 50vh, 480px);
     flex: none;
   }
 }

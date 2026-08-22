@@ -264,7 +264,7 @@
   }
 
   .gen6wild-results {
-    flex-basis: 520px;
-    min-height: 520px;
+    flex-basis: clamp(280px, 52vh, 520px);
+    min-height: 0;
   }
 }

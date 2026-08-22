@@ -244,7 +244,7 @@
 
 .gen5dreamradar-results {
   display: flex;
-  min-height: 700px;
+  min-height: 0;
   flex-direction: column;
 }
 
@@ -267,7 +267,7 @@
 
 .gen5dreamradar-table-shell {
   position: relative;
-  min-height: 480px;
+  min-height: clamp(260px, 48vh, 480px);
   overflow: auto;
   flex: 1;
   margin-top: 12px;
@@ -366,7 +366,7 @@
   }
 
   .gen5dreamradar-results {
-    min-height: 580px;
+    min-height: 0;
   }
 }
 

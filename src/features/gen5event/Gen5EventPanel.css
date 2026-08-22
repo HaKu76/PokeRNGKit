@@ -335,7 +335,7 @@
 
 .gen5event-results {
   display: flex;
-  min-height: 560px;
+  min-height: 0;
   flex-direction: column;
 }
 
@@ -429,7 +429,7 @@
 
 .gen5event-table-shell {
   position: relative;
-  min-height: 420px;
+  min-height: clamp(240px, 48vh, 420px);
   overflow: auto;
   flex: 1;
   margin-top: 12px;

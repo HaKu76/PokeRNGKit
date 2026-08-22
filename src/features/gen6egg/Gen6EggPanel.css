@@ -248,7 +248,7 @@
   }
 
   .gen6egg-table-shell {
-    height: 520px;
+    height: clamp(280px, 52vh, 520px);
     flex: 0 0 auto;
   }
 }

@@ -1,7 +1,7 @@
 .gen8event-panel {
   display: grid;
-  height: calc(100dvh - 214px);
-  min-height: 680px;
+  height: clamp(460px, calc(100dvh - 214px), 820px);
+  min-height: 0;
   min-width: 0;
   grid-template-rows: auto auto minmax(240px, 1fr);
   gap: 10px;
