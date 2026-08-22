@@ -131,7 +131,7 @@ export function FloatingToolPanel({
         document.getElementById(triggerId)?.contains(target) ||
         (target instanceof Element &&
           target.closest(
-            ".floating-tool-rail, .legal-footer-action, .modal-backdrop, .threedsprofiles-overlay, .gen5profiles-overlay, .gen8profiles-overlay",
+            '.floating-tool-rail, [data-menu-portal="true"], .legal-footer-action, .modal-backdrop, .threedsprofiles-overlay, .gen5profiles-overlay, .gen8profiles-overlay',
           ))
       ) {
         return;
@@ -156,9 +156,10 @@ export function FloatingToolPanel({
       if (!panel) return;
       if (
         document.activeElement instanceof Element &&
-        document.activeElement.closest(
+        (document.activeElement.closest(
           ".modal-backdrop, .threedsprofiles-overlay, .gen5profiles-overlay, .gen8profiles-overlay",
-        )
+        ) ||
+          document.activeElement.closest('[data-menu-portal="true"]'))
       ) {
         return;
       }

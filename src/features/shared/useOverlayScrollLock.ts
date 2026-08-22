@@ -40,7 +40,18 @@ function canScroll(element: HTMLElement, deltaY: number) {
 
 function preventBackgroundWheel(event: WheelEvent) {
   const root = currentLockRoot();
-  if (!root || !root.contains(event.target as Node)) {
+  const target = event.target as Node;
+  const menu =
+    target instanceof Element
+      ? target.closest<HTMLElement>('[data-menu-portal="true"]')
+      : null;
+  if (menu) {
+    if (!isScrollable(menu) || !canScroll(menu, event.deltaY)) {
+      event.preventDefault();
+    }
+    return;
+  }
+  if (!root || !root.contains(target)) {
     event.preventDefault();
     return;
   }
@@ -61,11 +72,22 @@ function clearTouchPosition() {
 function preventBackgroundTouchScroll(event: TouchEvent) {
   const touch = event.touches.item(0);
   const root = currentLockRoot();
+  const target = event.target as Node;
+  const menu =
+    target instanceof Element
+      ? target.closest<HTMLElement>('[data-menu-portal="true"]')
+      : null;
   const touchY = touch?.clientY;
   const deltaY =
     lastTouchY === undefined || touchY === undefined ? 0 : lastTouchY - touchY;
   lastTouchY = touchY;
-  if (!root || !root.contains(event.target as Node)) {
+  if (menu) {
+    if (!isScrollable(menu) || !canScroll(menu, deltaY)) {
+      event.preventDefault();
+    }
+    return;
+  }
+  if (!root || !root.contains(target)) {
     event.preventDefault();
     return;
   }

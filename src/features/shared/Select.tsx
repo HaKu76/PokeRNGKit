@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown } from "lucide-react";
 import { useMenuPlacement } from "./useMenuPlacement";
 
@@ -86,6 +87,7 @@ export function Select({
   ...ariaAndDataProps
 }: SelectProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listboxId = useId();
   const options = useMemo(() => collectOptions(children), [children]);
@@ -117,7 +119,12 @@ export function Select({
   useEffect(() => {
     if (!open) return;
     const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      if (
+        !rootRef.current?.contains(event.target as Node) &&
+        !menuRef.current?.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
     };
     document.addEventListener("pointerdown", closeOnOutsidePointer);
     return () =>
@@ -222,40 +229,54 @@ export function Select({
           size={17}
         />
       </button>
-      {open && !disabled && (
-        <div
-          aria-label={title}
-          className="haku-select-menu"
-          data-align={menuPlacement.horizontal}
-          data-placement={menuPlacement.vertical}
-          id={listboxId}
-          role="listbox"
-        >
-          {options.map((option, index) => (
-            <div key={`${option.group ?? "root"}-${option.value}-${index}`}>
-              {option.group &&
-                (index === 0 || options[index - 1]?.group !== option.group) && (
-                  <div className="haku-select-group-label">{option.group}</div>
-                )}
-              <button
-                aria-selected={option.value === selectedValue}
-                className={index === activeIndex ? "active" : undefined}
-                disabled={option.disabled}
-                id={`${listboxId}-option-${index}`}
-                onClick={() => choose(index)}
-                onMouseEnter={() => setActiveIndex(index)}
-                role="option"
-                type="button"
-              >
-                <span>{option.label}</span>
-                {option.value === selectedValue && (
-                  <Check aria-hidden="true" size={15} />
-                )}
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      {open &&
+        !disabled &&
+        createPortal(
+          <div
+            aria-label={title}
+            className="haku-select-menu"
+            data-align={menuPlacement.horizontal}
+            data-menu-portal="true"
+            data-placement={menuPlacement.vertical}
+            id={listboxId}
+            ref={menuRef}
+            role="listbox"
+            style={{
+              left: `${menuPlacement.left}px`,
+              maxHeight: `${menuPlacement.maxHeight}px`,
+              top: `${menuPlacement.top}px`,
+              width: `${menuPlacement.width}px`,
+            }}
+          >
+            {options.map((option, index) => (
+              <div key={`${option.group ?? "root"}-${option.value}-${index}`}>
+                {option.group &&
+                  (index === 0 ||
+                    options[index - 1]?.group !== option.group) && (
+                    <div className="haku-select-group-label">
+                      {option.group}
+                    </div>
+                  )}
+                <button
+                  aria-selected={option.value === selectedValue}
+                  className={index === activeIndex ? "active" : undefined}
+                  disabled={option.disabled}
+                  id={`${listboxId}-option-${index}`}
+                  onClick={() => choose(index)}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  role="option"
+                  type="button"
+                >
+                  <span>{option.label}</span>
+                  {option.value === selectedValue && (
+                    <Check aria-hidden="true" size={15} />
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

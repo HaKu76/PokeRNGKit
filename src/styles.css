@@ -513,15 +513,6 @@ h1 {
   border-color: var(--line-strong);
   box-shadow: none;
 }
-.panel:has(.haku-select[data-open="true"]),
-.panel:has(.autocomplete-combobox[data-open="true"]),
-.panel:has(.multi-check-field[data-open="true"]),
-.floating-tool-panel:has(.haku-select[data-open="true"]),
-.floating-tool-panel:has(.autocomplete-combobox[data-open="true"]),
-.floating-tool-panel:has(.multi-check-field[data-open="true"]) {
-  z-index: 20;
-  overflow: visible;
-}
 .panel::after {
   display: none;
 }
@@ -2413,9 +2404,10 @@ h1 {
     box-shadow 160ms ease;
 }
 .multi-check-trigger > span:first-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 22px;
 }
 .multi-check-trigger > svg {
   flex: 0 0 auto;
@@ -3424,9 +3416,9 @@ h1 {
 
 .haku-select-trigger > span {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 22px;
 }
 
 .haku-select-trigger > svg {
@@ -5176,16 +5168,6 @@ textarea:disabled {
   display: none;
 }
 
-/* Keep popovers above the final opaque panel surface. */
-.panel:has(.haku-select[data-open="true"]),
-.panel:has(.autocomplete-combobox[data-open="true"]),
-.panel:has(.multi-check-field[data-open="true"]),
-.floating-tool-panel:has(.haku-select[data-open="true"]),
-.floating-tool-panel:has(.autocomplete-combobox[data-open="true"]),
-.floating-tool-panel:has(.multi-check-field[data-open="true"]) {
-  overflow: visible;
-}
-
 /* Static workspaces use unequal columns, but every section in the row shares
    the height of the tallest section so controls keep one bottom baseline. */
 .gen3static-control-grid {
@@ -5339,20 +5321,6 @@ textarea:disabled {
     100px 80px 72px 90px 108px 76px 92px 160px repeat(6, 62px) 110px 88px
     92px 160px;
   min-width: 1600px;
-}
-
-/* Shared popovers must escape every feature panel that owns a clipped surface. */
-#root .main-content [class*="-panel"]:has(.haku-select[data-open="true"]),
-#root
-  .main-content
-  [class*="-panel"]:has(.autocomplete-combobox[data-open="true"]),
-#root .main-content [class*="-panel"]:has(.multi-check-field[data-open="true"]),
-#root .floating-tool-panel:has(.haku-select[data-open="true"]),
-#root .floating-tool-panel:has(.autocomplete-combobox[data-open="true"]),
-#root .floating-tool-panel:has(.multi-check-field[data-open="true"]) {
-  position: relative;
-  z-index: 20;
-  overflow: visible;
 }
 
 #root .main-content .haku-select-menu,
@@ -5834,16 +5802,6 @@ textarea:disabled {
   flex: 1 1 auto;
 }
 
-/* A menu must escape the content scroller that owns its trigger while open. */
-.floating-tool-panel
-  > :not(.floating-tool-panel-heading):has(
-    .haku-select[data-open="true"],
-    .autocomplete-combobox[data-open="true"],
-    .multi-check-field[data-open="true"]
-  ) {
-  overflow: visible;
-}
-
 .floating-tool-panel > :not(.floating-tool-panel-heading)::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -5916,6 +5874,38 @@ textarea:disabled {
   width: 100%;
   max-width: none;
   min-width: 0;
+}
+
+/* Shared menus render in the document layer so clipped panels and floating
+   drawers cannot hide their options or change the drawer scrollbar. */
+.haku-select-menu[data-menu-portal="true"],
+.autocomplete-combobox-menu[data-menu-portal="true"],
+.multi-check-menu[data-menu-portal="true"] {
+  position: fixed;
+  z-index: 1000;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  min-width: 0;
+  max-width: calc(100vw - 24px);
+  max-height: min(360px, calc(100dvh - 24px));
+}
+
+.haku-select-menu[data-menu-portal="true"][data-align="end"],
+.autocomplete-combobox-menu[data-menu-portal="true"][data-align="end"],
+.multi-check-menu[data-menu-portal="true"][data-align="end"] {
+  right: auto;
+}
+
+.autocomplete-combobox-menu[data-menu-portal="true"] button > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+  line-height: 22px;
 }
 
 #root .main-content .wild-level-filter,

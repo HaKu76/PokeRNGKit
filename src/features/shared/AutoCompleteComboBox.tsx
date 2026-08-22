@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown } from "lucide-react";
 import { useMenuPlacement } from "./useMenuPlacement";
 
@@ -36,6 +37,7 @@ export function AutoCompleteComboBox<T extends string | number>({
   value,
 }: AutoCompleteComboBoxProps<T>) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listboxId = useId();
   const [open, setOpen] = useState(false);
@@ -75,7 +77,10 @@ export function AutoCompleteComboBox<T extends string | number>({
   useEffect(() => {
     if (!open || disabled) return;
     const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
+      if (
+        !rootRef.current?.contains(event.target as Node) &&
+        !menuRef.current?.contains(event.target as Node)
+      ) {
         restoreSelection();
       }
     };
@@ -198,31 +203,45 @@ export function AutoCompleteComboBox<T extends string | number>({
           size={17}
         />
       </button>
-      {open && !disabled && filteredOptions.length > 0 && (
-        <div
-          className="autocomplete-combobox-menu"
-          data-align={menuPlacement.horizontal}
-          data-placement={menuPlacement.vertical}
-          id={listboxId}
-          role="listbox"
-        >
-          {filteredOptions.map((option, index) => (
-            <button
-              aria-selected={option.value === value}
-              className={index === visibleActiveIndex ? "active" : undefined}
-              id={optionId(index)}
-              key={`${String(option.value)}-${option.label}`}
-              onClick={() => selectOption(option)}
-              onMouseDown={(event) => event.preventDefault()}
-              role="option"
-              type="button"
-            >
-              <span>{option.label}</span>
-              {option.value === value && <Check aria-hidden="true" size={15} />}
-            </button>
-          ))}
-        </div>
-      )}
+      {open &&
+        !disabled &&
+        filteredOptions.length > 0 &&
+        createPortal(
+          <div
+            className="autocomplete-combobox-menu"
+            data-align={menuPlacement.horizontal}
+            data-menu-portal="true"
+            data-placement={menuPlacement.vertical}
+            id={listboxId}
+            ref={menuRef}
+            role="listbox"
+            style={{
+              left: `${menuPlacement.left}px`,
+              maxHeight: `${menuPlacement.maxHeight}px`,
+              top: `${menuPlacement.top}px`,
+              width: `${menuPlacement.width}px`,
+            }}
+          >
+            {filteredOptions.map((option, index) => (
+              <button
+                aria-selected={option.value === value}
+                className={index === visibleActiveIndex ? "active" : undefined}
+                id={optionId(index)}
+                key={`${String(option.value)}-${option.label}`}
+                onClick={() => selectOption(option)}
+                onMouseDown={(event) => event.preventDefault()}
+                role="option"
+                type="button"
+              >
+                <span>{option.label}</span>
+                {option.value === value && (
+                  <Check aria-hidden="true" size={15} />
+                )}
+              </button>
+            ))}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

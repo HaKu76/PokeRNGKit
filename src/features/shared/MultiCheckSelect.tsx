@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useMenuPlacement } from "./useMenuPlacement";
@@ -24,6 +25,7 @@ export function MultiCheckSelect({
   const menuId = useId();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const menuPlacement = useMenuPlacement(
     rootRef,
     open && !disabled,
@@ -44,7 +46,12 @@ export function MultiCheckSelect({
   useEffect(() => {
     if (!open) return;
     const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      if (
+        !rootRef.current?.contains(event.target as Node) &&
+        !menuRef.current?.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
     };
     document.addEventListener("pointerdown", closeOnOutsidePointer);
     return () =>
@@ -83,32 +90,42 @@ export function MultiCheckSelect({
             size={17}
           />
         </button>
-        {open && (
-          <div
-            aria-label={label}
-            className="multi-check-menu"
-            data-align={menuPlacement.horizontal}
-            data-placement={menuPlacement.vertical}
-            id={menuId}
-          >
-            {options.map((option) => (
-              <label key={option.value}>
-                <input
-                  checked={(mask & (1 << option.value)) !== 0}
-                  onChange={(event) =>
-                    onChange(
-                      event.target.checked
-                        ? mask | (1 << option.value)
-                        : mask & ~(1 << option.value),
-                    )
-                  }
-                  type="checkbox"
-                />
-                <span>{option.label}</span>
-              </label>
-            ))}
-          </div>
-        )}
+        {open &&
+          createPortal(
+            <div
+              aria-label={label}
+              className="multi-check-menu"
+              data-align={menuPlacement.horizontal}
+              data-menu-portal="true"
+              data-placement={menuPlacement.vertical}
+              id={menuId}
+              ref={menuRef}
+              style={{
+                left: `${menuPlacement.left}px`,
+                maxHeight: `${menuPlacement.maxHeight}px`,
+                top: `${menuPlacement.top}px`,
+                width: `${menuPlacement.width}px`,
+              }}
+            >
+              {options.map((option) => (
+                <label key={option.value}>
+                  <input
+                    checked={(mask & (1 << option.value)) !== 0}
+                    onChange={(event) =>
+                      onChange(
+                        event.target.checked
+                          ? mask | (1 << option.value)
+                          : mask & ~(1 << option.value),
+                      )
+                    }
+                    type="checkbox"
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>,
+            document.body,
+          )}
       </div>
     </div>
   );
