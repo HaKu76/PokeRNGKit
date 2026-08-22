@@ -5,7 +5,8 @@
 - 修复：共享 Select、自动完成和多选菜单改为通过 Portal 挂载到 `document.body`，按触发器实时计算视口内的固定位置、宽度和最大高度，避免被面板、section 或浮窗内容裁剪。
 - 修复：浮窗内容滚动层不再因下拉打开切换为 `overflow: visible`，滚动条轨道保持稳定；浮窗外点关闭、滚轮和触摸锁定均识别 Portal 菜单。
 - 修复：Select 和多选触发器的长中文标签允许换行，自动完成选项不再省略文本；浮窗键盘焦点陷阱跳过 Portal 菜单。
-- 工程验证：Portal 化后已通过 `npm run typecheck`；完整 `npm run verify` 待本轮样式收尾后执行。
+- 工程验证：`npm run format:check`、`npm run lint`、`npm run typecheck`、`npm test`（177 个文件、615 项测试）和 `npm run build:web` 均已通过；构建仅保留既有 chunk 大小提示。
+- 已提交并推送 UI 修复：`6c5273e style: 修复共享菜单与浮窗滚动布局`；交接记录提交 `75afe00 docs: 更新 UI 验证记录` 已生成但受当前 GitHub HTTPS 网络故障影响尚未推送。
 - 待验收：外部 Chrome/Edge 当前未连接，尚未进行实际视口截图和下拉展开验收。
 
 ## 2026-08-22 高频 UI 自检第二轮（待工程验证与项目所有者视觉验收）
