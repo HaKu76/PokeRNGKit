@@ -55,4 +55,11 @@ Desktop.ini
 .tmp/
 tmp/
 
+# UI audit screenshots and manifests
+/ui-audit-*/
+/ui-audit-current.png
+
+# Local release artifacts
+/release/
+
 # Do not ignore third_party/: GPL-covered source used for a release must ship.

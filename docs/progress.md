@@ -1,5 +1,13 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-22 临时图片产物清理
+
+- 移除：删除未跟踪的 `ui-audit-2026-08-21/` 审计目录，其中包含 75 张 UI 截图和 1 个审计 JSON；删除根目录 `ui-audit-current.png` 临时截图。
+- 保留：`public/favicon.ico`、第四世代漫游宝可梦、七世代时钟、八世代地图、Spinda 和赞助信息等产品运行所需图片资源未改动。
+- 更新：`.gitignore` 新增 `ui-audit-*`、`ui-audit-current.png` 和本地 `release/` 忽略规则；`release/` 目录仅忽略，未删除。
+- 已通过：本轮文件格式化、`npm run format:check` 和 `git diff --check`。
+- 未运行：测试、构建、浏览器验收和生产回归；本轮仅处理仓库清理与忽略规则。
+
 ## 2026-08-22 浮窗滚动槽与档案弹窗描边复查（待项目所有者视觉验收）
 
 - 修复：普通 `profile-modal` 移除品牌色顶部描边，保留中性 `1px` 边框，避免与固定 UI 契约中的普通面板样式冲突。
