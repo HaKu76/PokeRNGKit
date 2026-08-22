@@ -1197,7 +1197,6 @@ h1 {
   max-height: calc(100vh - 40px);
   overflow: auto;
   border: 1px solid var(--line);
-  border-top: 1px solid var(--brand);
   border-radius: 18px;
   padding: 20px;
   background: var(--surface);
@@ -5853,7 +5852,7 @@ textarea:disabled {
   flex: 1 1 auto;
   min-height: 0;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: scroll;
   scrollbar-gutter: stable both-edges;
 }
 
