@@ -43,6 +43,7 @@ export default defineConfig(({ mode }) => ({
       ? []
       : [
           VitePWA({
+            injectRegister: false,
             registerType: "autoUpdate",
             includeAssets: ["favicon.ico"],
             manifest: {
@@ -62,6 +63,7 @@ export default defineConfig(({ mode }) => ({
               ],
             },
             workbox: {
+              importScripts: ["sw-update.js"],
               navigateFallback: "index.html",
               globPatterns: ["**/*.{js,css,html,ico,mjs,wasm,txt,md,png,jpg}"],
               maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,

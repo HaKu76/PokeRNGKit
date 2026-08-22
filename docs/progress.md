@@ -1,5 +1,15 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-23 PWA 版本更新与旧缓存修复
+
+- 修复：移除 `vite-plugin-pwa` 的简单自动注入注册脚本，改为应用启动时显式注册 Service Worker；新 Service Worker 接管已有页面后自动刷新，避免用户继续停留在旧版 JS/CSS。
+- 迁移：新增 Service Worker 激活桥，在已有旧 Service Worker 控制的窗口中主动导航到新入口，覆盖旧用户第一次回访时仍先命中旧预缓存的场景。
+- 防护：Service Worker 注册使用 `updateViaCache: "none"`，检查更新时跳过浏览器 HTTP 缓存。
+- 更新：用户切回页面时立即检查更新，已打开页面每 5 分钟主动检查一次；入口 `index.html`、`sw.js` 和 Web Manifest 在 Cloudflare Pages 使用重新验证缓存头。
+- 保留：继续使用 Workbox 的 `skipWaiting`、`clientsClaim`、预缓存和离线回退，不清理用户 IndexedDB/localStorage 存档数据。
+- 已通过：本轮触及文件格式化和 `git diff --check`。
+- 未运行：测试、Lint、TypeScript、构建、浏览器缓存迁移验收和生产回归；需要部署后在已有 Service Worker 的浏览器中确认自动刷新行为。
+
 ## 2026-08-23 第三、四世代顶部存档选择兜底
 
 - 新增：在第三世代静态、野生、孵化、GameCube、PokeSpot，以及第四世代定点、野生、孵化、配信模块的页面标题区域恢复轻量存档选择。
