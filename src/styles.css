@@ -5277,6 +5277,14 @@ textarea:disabled {
   appearance: none;
 }
 
+/* Keep paired IV values readable without letting a wide panel stretch them. */
+#root .main-content .iv-filter-header,
+#root .main-content .iv-filter-row,
+#root .floating-tool-panel .iv-filter-header,
+#root .floating-tool-panel .iv-filter-row {
+  grid-template-columns: minmax(0, 1fr) 60px 60px;
+}
+
 /* Six IV values are two digits at most. Keep their repeated result columns
    compact so the table gives meaningful fields more room before scrolling. */
 .static-virtual-table,
@@ -5825,6 +5833,16 @@ textarea:disabled {
   flex: 1 1 auto;
 }
 
+/* A menu must escape the content scroller that owns its trigger while open. */
+.floating-tool-panel
+  > :not(.floating-tool-panel-heading):has(
+    .haku-select[data-open="true"],
+    .autocomplete-combobox[data-open="true"],
+    .multi-check-field[data-open="true"]
+  ) {
+  overflow: visible;
+}
+
 .floating-tool-panel > :not(.floating-tool-panel-heading)::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -5853,7 +5871,19 @@ textarea:disabled {
 
 #root .main-content .wild-level-filter,
 #root .floating-tool-panel .wild-level-filter {
-  grid-template-columns: minmax(0, 1fr) 56px 56px;
+  --level-input-width: 56px;
+  grid-template-columns: minmax(0, 1fr) var(--level-input-width) var(
+      --level-input-width
+    );
+  gap: 6px;
+}
+
+#root .main-content .wild-level-display,
+#root .floating-tool-panel .wild-level-display {
+  --level-input-width: 56px;
+  grid-template-columns: minmax(0, 1fr) var(--level-input-width) var(
+      --level-input-width
+    );
   gap: 6px;
 }
 

@@ -2,9 +2,13 @@
   display: grid;
   gap: 16px;
 }
+.gen6tinytimeline-controls {
+  min-width: 0;
+}
 .gen6tinytimeline-panel {
   min-width: 0;
-  padding: 24px;
+  width: min(100%, 960px);
+  padding: 20px;
 }
 .gen6tinytimeline-state-grid,
 .gen6tinytimeline-frame-grid,
@@ -75,16 +79,13 @@
   min-height: 260px;
 }
 .gen6tinytimeline-virtual-table {
-  min-width: 1390px;
+  min-width: 1140px;
 }
 .gen6tinytimeline-virtual-table .table-header,
 .gen6tinytimeline-virtual-table .table-row {
   grid-template-columns:
-    130px 70px 70px 120px 58px 70px 58px 110px 110px 58px 58px minmax(
-      300px,
-      1fr
-    )
-    140px;
+    110px 60px 55px 110px 52px 64px 52px 84px 84px 52px 52px minmax(240px, 1fr)
+    120px;
 }
 .gen6tinytimeline-virtual-table span:nth-child(1),
 .gen6tinytimeline-virtual-table span:nth-child(4),
@@ -102,7 +103,8 @@
 }
 @media (max-width: 720px) {
   .gen6tinytimeline-panel {
-    padding: 20px;
+    width: 100%;
+    padding: 16px;
   }
   .gen6tinytimeline-frame-grid,
   .gen6tinytimeline-option-grid {
