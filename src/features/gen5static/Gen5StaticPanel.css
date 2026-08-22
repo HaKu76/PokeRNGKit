@@ -294,7 +294,7 @@
 
 .gen5static-results {
   display: flex;
-  min-height: 780px;
+  min-height: 0;
   flex-direction: column;
 }
 
@@ -372,7 +372,7 @@
 
 .gen5static-table-shell {
   position: relative;
-  min-height: 520px;
+  min-height: clamp(360px, 52vh, 520px);
   overflow: auto;
   flex: 1;
   margin-top: 12px;
@@ -496,7 +496,7 @@
   }
 
   .gen5static-results {
-    min-height: 600px;
+    min-height: 0;
   }
 }
 
