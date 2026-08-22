@@ -18,13 +18,13 @@
 }
 
 .gen7stationary-controls {
-  height: calc(100vh - 184px);
-  min-height: 620px;
+  height: auto;
+  min-height: 0;
 }
 
 .gen7stationary-results {
-  height: calc(100vh - 184px);
-  min-height: 620px;
+  height: clamp(360px, 56vh, 620px);
+  min-height: 360px;
 }
 
 .gen7stationary-controls {
@@ -496,7 +496,8 @@
   }
 
   .gen7stationary-results {
-    min-height: 620px;
+    height: auto;
+    min-height: 360px;
   }
 
   .gen7stationary-table-shell {

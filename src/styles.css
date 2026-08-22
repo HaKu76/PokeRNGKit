@@ -5056,7 +5056,9 @@ textarea:disabled {
 .unified-profile-tabs button {
   min-width: 0;
   min-height: 44px;
-  overflow: hidden;
+  display: grid;
+  place-items: center;
+  overflow: visible;
   border: 0;
   border-right: 1px solid var(--line);
   padding: 8px 12px;
@@ -5065,8 +5067,9 @@ textarea:disabled {
   font: inherit;
   font-size: 14px;
   font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 20px;
+  text-align: center;
+  white-space: normal;
 }
 
 .unified-profile-tabs button:last-child {
@@ -5197,6 +5200,16 @@ textarea:disabled {
   }
 }
 
+@media (max-width: 760px) {
+  .unified-profile-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .unified-profile-tabs button {
+    min-height: 52px;
+  }
+}
+
 .pokespot-paired-field > input {
   border: 1px solid var(--line-strong);
   background: var(--surface);
@@ -5258,6 +5271,39 @@ textarea:disabled {
 #root .floating-tool-panel .iv-filter-row input::-webkit-outer-spin-button {
   margin: 0;
   appearance: none;
+}
+
+/* Keep the fixed utility Rail outside the active workspace's click area. */
+@media (min-width: 901px) {
+  #root .main-content {
+    padding-right: max(
+      112px,
+      calc(clamp(20px, 4vw, 48px) + env(safe-area-inset-right))
+    );
+  }
+}
+
+@media (max-width: 900px) {
+  #root .main-content {
+    padding-bottom: calc(
+      56px + var(--control-height) + env(safe-area-inset-bottom)
+    );
+  }
+}
+
+/* The module rail reduces the content container below the viewport width.
+   Switch dense Gen VIII controls before their desktop minimums overflow. */
+@container pokerngkit-content (max-width: 1280px) {
+  #root .main-content .gen8raids-control-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #root .main-content .gen8static-control-grid {
+    grid-template-columns: minmax(220px, 0.9fr) minmax(260px, 0.95fr) minmax(
+        420px,
+        1.5fr
+      );
+  }
 }
 
 /* Keep paired IV values readable without letting a wide panel stretch them. */
