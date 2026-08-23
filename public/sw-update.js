@@ -1,3 +1,5 @@
+/* global self */
+
 let isUpdate = false;
 
 self.addEventListener("install", () => {

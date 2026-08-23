@@ -1,5 +1,12 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-24 Actions #172 ESLint 修复
+
+- 定位：GitHub Actions `32652282635` 在 `npm run verify -> npm run lint` 检查 `public/sw-update.js` 时因 Service Worker 全局 `self` 缺少声明而失败，Windows EXE、Pages 和生产部署步骤因此被跳过。
+- 修复：为 `public/sw-update.js` 增加 ESLint `/* global self */` 声明，不改变 Service Worker 的安装、激活、接管和旧页面刷新逻辑。
+- 已通过：本地 `npm run verify`；Prettier、ESLint、TypeScript、177 个 Vitest 文件共 615 项测试、Vite 生产构建和 PWA 预缓存均成功。构建保留既有大 chunk 非阻断提示。
+- 当前：修复尚未提交或推送，等待项目所有者确认后再进入 GitHub Actions 重跑；外部 Chrome/Edge UI 验收和生产页面算法回归未运行。
+
 ## 2026-08-24 模块会话状态缓存与贡献记录
 
 - 修复：应用按模块键缓存本页面会话中已访问的工作区；从定点乱数切换到野生乱数再返回时，表单输入、检索结果、排序和操作上下文不再因组件卸载而重置。
