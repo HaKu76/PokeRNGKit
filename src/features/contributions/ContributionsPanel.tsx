@@ -5,6 +5,7 @@ interface ContributionRecord {
   readonly amount: number;
   readonly contributor: string;
   readonly currency: "RMB";
+  readonly date?: string;
   readonly purpose: string;
 }
 
@@ -13,6 +14,13 @@ const contributions: readonly ContributionRecord[] = [
     amount: 50,
     contributor: "差生文具多",
     currency: "RMB",
+    purpose: "AI Token",
+  },
+  {
+    amount: 50,
+    contributor: "**然",
+    currency: "RMB",
+    date: "2026-08-23",
     purpose: "AI Token",
   },
 ];
@@ -45,6 +53,7 @@ export function ContributionsPanel({
             <tr>
               <th scope="col">{t("contributionContributor")}</th>
               <th scope="col">{t("contributionPurpose")}</th>
+              <th scope="col">{t("contributionDate")}</th>
               <th scope="col">{t("contributionAmount")}</th>
             </tr>
           </thead>
@@ -62,6 +71,9 @@ export function ContributionsPanel({
                   </span>
                 </td>
                 <td>{contribution.purpose}</td>
+                <td className="contribution-date">
+                  {contribution.date ?? "-"}
+                </td>
                 <td className="contribution-amount">
                   ¥{contribution.amount}
                   <small>{contribution.currency}</small>

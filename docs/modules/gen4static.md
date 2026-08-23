@@ -13,6 +13,8 @@
 
 G4 页面复用 G3 Static 的三栏控制网格、IV 表格、快捷键、结果虚拟表和取消筛选开关的交互方式，但不复用 G3 的请求、Worker、存档或计算器状态。
 
+应用侧栏切换到其他模块时，本页面在当前浏览器页面会话内保持挂载，保留 Generator/Searcher 输入、筛选、结果和排序；刷新页面后恢复模块默认状态。
+
 ## 2. 计算规则
 
 Generator 复制 PokeFinder `StaticGenerator4::generateMethod1/MethodJ/MethodK` 的 RNG 调用顺序。Method 1 先读取 PID 的低/高 16 位，再读取两组 IV；Method J/K 先处理 Cute Charm 或 Synchronize，再按性格循环读取 PID，最后读取 IV。结果中的 Advances 是 `Initial Advances + candidateIndex`，`Offset` 只参与 RNG 定位。

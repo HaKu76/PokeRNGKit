@@ -434,6 +434,9 @@ select:focus-visible {
   padding: 32px clamp(20px, 4vw, 48px) 56px;
   animation: content-enter 360ms var(--ease-out) both;
 }
+.main-content[hidden] {
+  display: none !important;
+}
 .page-heading {
   position: relative;
   display: flex;
@@ -942,7 +945,7 @@ h1 {
 }
 .contributions-table {
   width: 100%;
-  min-width: 420px;
+  min-width: 540px;
   border-collapse: collapse;
 }
 .contributions-table th,
@@ -975,6 +978,11 @@ h1 {
 .contribution-amount {
   font-family: ui-monospace, monospace;
   font-weight: 700;
+  white-space: nowrap;
+}
+.contribution-date {
+  color: var(--muted) !important;
+  font-family: ui-monospace, monospace;
   white-space: nowrap;
 }
 .contribution-amount small {
