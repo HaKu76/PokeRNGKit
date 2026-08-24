@@ -20,7 +20,8 @@ invalid because the timer would underflow.
 
 ## UI workflow
 
-- Open `Target Painting Timer` from the global floating tool rail.
+- Open `Target Painting Timer` from the Target Painting Timer tab in Gen III
+  Seed Tools.
 - Enter the four-digit hexadecimal Painting Seed.
 - Keep `Calibration + Offset` at decimal `30` unless the emulator setup has a
   measured local calibration.

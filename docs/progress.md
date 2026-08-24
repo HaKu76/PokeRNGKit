@@ -23,6 +23,12 @@
   Seed；Back Seed 作为 FRLG/RSE 的独立反推分支保留。
 - 保留：Target Painting Timer 只服务模拟器，默认十进制校准值为 `30`，不实现
   实机 Painting Reseeding。
+- 调整：Target Painting Timer 已移入“第三世代Seed工具”的独立页签，右下角工具
+  Rail 不再显示其入口；Tips 仍为全局浮窗，并可直接切换到该页签。回填定点
+  Generator 的四位十六进制 Seed 行为保持不变。
+- 调整：第四世代 `Swarm RNG` 已从右下角工具 Rail 移入第四世代侧边栏，作为独立
+  工作区保留每日 Encounter Seed、MT 推进与目标帧记录流程；不与仅有 Swarm 遭遇
+  表开关的第四世代野生乱数合并。
 - 已完成：代码与文档已定向格式化；本轮未运行测试、Lint、TypeScript、构建、Wasm
   或浏览器验收。
 - 下一步：由项目所有者决定是否授权工程验证、浏览器验收或提交。
@@ -358,7 +364,7 @@
 
 ## 2026-08-20 Gen IV Swarm RNG（已完成工程验证）
 
-- 新增：右下角浮动 `Swarm RNG` 工具，覆盖 D/P、Pt、HG、SS 的遭遇表和地点选择；不新增侧边栏核心工作区。
+- 新增：第四世代侧边栏 `Swarm RNG` 工作区，覆盖 D/P、Pt、HG、SS 的遭遇表和地点选择；其每日 Encounter Seed、MT 推进与目标帧记录流程独立于第四世代野生乱数的 Swarm 遭遇表开关。
 - 新增：`Find advances` 按已知 MT Seed 和推进范围筛选目标 Swarm；`Find encounter seed` 按 Real96 工具的高字节、Hour、Delay 与 MT Advances 顺序返回第一个每日 Encounter Seed。
 - 算法：在独立 C++/Wasm bridge 中实现 Gen IV MT19937、双 ARNG 和版本遭遇表取模；Dedicated Worker 负责握手、范围校验、结果复制和取消重建。
 - 交互：结果可选中为目标帧，支持 `+1` 和 HGSS Youngster Joey `+2` 推进记录；游戏与遭遇选择复用 `AutoCompleteComboBox`。

@@ -2,7 +2,6 @@ import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Crosshair, RotateCcw } from "lucide-react";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
-import { FloatingToolPanel } from "../shared/FloatingToolPanel";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import {
   gen4SwarmEncounters,
@@ -30,13 +29,7 @@ function gameLabel(game: Gen4SwarmGame) {
         : "SoulSilver";
 }
 
-export function Gen4SwarmPanel({
-  expanded,
-  onExpandedChange,
-}: {
-  expanded: boolean;
-  onExpandedChange(expanded: boolean): void;
-}) {
+export function Gen4SwarmPanel() {
   const { t } = useTranslation();
   const [game, setGame] = useState<Gen4SwarmGame>("dp");
   const [mode, setMode] = useState<"advances" | "seed">("advances");
@@ -157,17 +150,12 @@ export function Gen4SwarmPanel({
     targetAdvance === undefined ? undefined : targetAdvance - currentAdvance;
 
   return (
-    <FloatingToolPanel
-      className="gen4swarm-display"
-      closeLabel={t("collapse")}
-      expanded={expanded}
-      id="gen4-swarm-panel"
-      label={t("gen4SwarmModule")}
-      onExpandedChange={onExpandedChange}
-      subtitle={t("gen4SwarmEngine")}
-      tone="amber"
-      triggerId="gen4-swarm-trigger"
-    >
+    <section className="panel compact-module-panel gen4swarm-display">
+      <div className="panel-heading">
+        <div>
+          <h2>{t("gen4SwarmModule")}</h2>
+        </div>
+      </div>
       <form className="gen4swarm-body" onSubmit={generate}>
         <div
           className="gen4swarm-tabs"
@@ -477,6 +465,6 @@ export function Gen4SwarmPanel({
           )}
         </section>
       </form>
-    </FloatingToolPanel>
+    </section>
   );
 }

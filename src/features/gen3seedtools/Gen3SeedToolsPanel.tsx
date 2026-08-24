@@ -1,12 +1,15 @@
 import { useTranslation } from "react-i18next";
 import { Gen3InitialSeedPanel } from "../initialseed/Gen3InitialSeedPanel";
 import { Gen3NgcSeedPanel } from "../ngcseed/Gen3NgcSeedPanel";
+import { Gen3PaintingPanel } from "../gen3painting/Gen3PaintingPanel";
 import { Gen3SeedToTimePanel } from "../seedtotime/Gen3SeedToTimePanel";
 
-export type Gen3SeedToolTab = "initialseed" | "seedtotime" | "ngcseed";
+export type Gen3SeedToolTab =
+  "initialseed" | "seedtotime" | "ngcseed" | "painting";
 
 interface Gen3SeedToolsPanelProps {
   activeTab: Gen3SeedToolTab;
+  onApplyPaintingSeedToStatic(seed: number): void;
   onTabChange(tab: Gen3SeedToolTab): void;
   uiPreviewMode: boolean;
 }
@@ -15,10 +18,12 @@ const tabs: readonly Gen3SeedToolTab[] = [
   "initialseed",
   "seedtotime",
   "ngcseed",
+  "painting",
 ];
 
 export function Gen3SeedToolsPanel({
   activeTab,
+  onApplyPaintingSeedToStatic,
   onTabChange,
   uiPreviewMode,
 }: Gen3SeedToolsPanelProps) {
@@ -47,7 +52,9 @@ export function Gen3SeedToolsPanel({
                 ? "initialSeedModule"
                 : tab === "seedtotime"
                   ? "seedToTimeModule"
-                  : "ngcSeedModule",
+                  : tab === "ngcseed"
+                    ? "ngcSeedModule"
+                    : "gen3PaintingModule",
             )}
           </button>
         ))}
@@ -81,6 +88,16 @@ export function Gen3SeedToolsPanel({
         role="tabpanel"
       >
         <Gen3NgcSeedPanel uiPreviewMode={uiPreviewMode} />
+      </div>
+      <div
+        aria-hidden={activeTab !== "painting"}
+        aria-labelledby="gen3-seed-tools-tab-painting"
+        className="seed-tools-view"
+        hidden={activeTab !== "painting"}
+        id="gen3-seed-tools-painting"
+        role="tabpanel"
+      >
+        <Gen3PaintingPanel onApplyToStatic={onApplyPaintingSeedToStatic} />
       </div>
     </div>
   );

@@ -1803,11 +1803,23 @@ h1 {
 }
 .seed-tools-tabs {
   display: grid;
-  width: min(100%, 720px);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(100%, 960px);
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
 }
 .seed-tools-view {
   min-width: 0;
+}
+.gen3-painting-panel {
+  width: min(100%, 720px);
+}
+.gen3-painting-control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.gen3-painting-result {
+  margin-top: 18px;
 }
 .gen4id-operation-tabs {
   display: grid;
@@ -3127,16 +3139,12 @@ h1 {
   background: var(--surface-2);
   color: var(--teal);
 }
-.gen3-painting-body,
 .workflow-tips-body {
   display: grid;
   gap: 12px;
   max-height: min(70vh, 620px);
   overflow: auto;
   padding: 14px;
-}
-.gen3-painting-body .field input {
-  width: 100%;
 }
 .workflow-tips-list {
   display: grid;
@@ -3859,6 +3867,10 @@ h1 {
 }
 
 @media (max-width: 560px) {
+  .gen3-painting-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .gen7id-filter-lists {
     grid-template-columns: 1fr;
   }

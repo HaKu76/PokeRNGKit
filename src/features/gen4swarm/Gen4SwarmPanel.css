@@ -1,13 +1,11 @@
 .gen4swarm-display {
-  width: min(720px, calc(100vw - 24px));
+  width: min(100%, 720px);
 }
 
 .gen4swarm-body {
   display: grid;
   gap: 14px;
-  max-height: min(720px, calc(100vh - 120px));
-  overflow: auto;
-  padding: 16px;
+  padding-top: 14px;
 }
 
 .gen4swarm-tabs {

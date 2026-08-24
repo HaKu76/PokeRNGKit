@@ -24,13 +24,11 @@ import {
   Menu,
   Monitor,
   Moon,
-  Paintbrush,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
   SlidersHorizontal,
   Sun,
-  RadioTower,
   UserRound,
   X,
 } from "lucide-react";
@@ -147,7 +145,6 @@ import { TsvListPanel } from "./features/tsvlist/TsvListPanel";
 import { IvToolsPanel } from "./features/ivtools/IvToolsPanel";
 import { FloatingToolPanel } from "./features/shared/FloatingToolPanel";
 import { Select } from "./features/shared/Select";
-import { Gen3PaintingPanel } from "./features/gen3painting/Gen3PaintingPanel";
 import { Gen3WorkflowTipsPanel } from "./features/gen3workflow/Gen3WorkflowTipsPanel";
 import { ProfileSelector } from "./features/shared/ProfileSelector";
 import { useOverlayScrollLock } from "./features/shared/useOverlayScrollLock";
@@ -337,6 +334,7 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
       { id: "gen4id", label: "gen4IdModule" },
       { id: "gen4seedfinder", label: "gen4SeedFinderModule" },
       { id: "gen4seedtotime", label: "gen4SeedToTimeModule" },
+      { id: "gen4swarm", label: "gen4SwarmModule" },
       { id: "gen4static", label: "gen4StaticModule" },
       { id: "gen4wild", label: "gen4WildModule" },
       { id: "gen4egg", label: "gen4EggModule" },
@@ -626,9 +624,7 @@ function App() {
   const [miscRngExpanded, setMiscRngExpanded] = useState(false);
   const [tsvListExpanded, setTsvListExpanded] = useState(false);
   const [ivToolsExpanded, setIvToolsExpanded] = useState(false);
-  const [gen3PaintingExpanded, setGen3PaintingExpanded] = useState(false);
   const [gen3WorkflowExpanded, setGen3WorkflowExpanded] = useState(false);
-  const [gen4SwarmExpanded, setGen4SwarmExpanded] = useState(false);
   const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
     useState<Gen5AdjacentSeedsInitialContext>();
@@ -833,10 +829,6 @@ function App() {
     setOpenModuleGroups(new Set(["gen3"]));
     setModuleRailOpen(false);
     closeFloatingTools();
-  };
-
-  const openGen3Painting = () => {
-    toggleFloatingTool("gen3Painting");
   };
 
   const applyPaintingSeedToStatic = (seed: number) => {
@@ -1076,23 +1068,19 @@ function App() {
           ? "encounter"
           : researcherExpanded
             ? "researcher"
-            : gen4SwarmExpanded
-              ? "gen4Swarm"
-              : keyBvExpanded
-                ? "keybv"
-                : miscRngExpanded
-                  ? "miscRng"
-                  : tsvListExpanded
-                    ? "tsvList"
-                    : ivToolsExpanded
-                      ? "ivTools"
-                      : gen3PaintingExpanded
-                        ? "gen3Painting"
-                        : gen3WorkflowExpanded
-                          ? "gen3Workflow"
-                          : profileTools && unifiedProfileExpanded
-                            ? "profile"
-                            : undefined;
+            : keyBvExpanded
+              ? "keybv"
+              : miscRngExpanded
+                ? "miscRng"
+                : tsvListExpanded
+                  ? "tsvList"
+                  : ivToolsExpanded
+                    ? "ivTools"
+                    : gen3WorkflowExpanded
+                      ? "gen3Workflow"
+                      : profileTools && unifiedProfileExpanded
+                        ? "profile"
+                        : undefined;
 
   const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
@@ -1101,12 +1089,10 @@ function App() {
     setSponsorshipExpanded(false);
     setUnifiedProfileExpanded(false);
     setResearcherExpanded(false);
-    setGen4SwarmExpanded(false);
     setKeyBvExpanded(false);
     setMiscRngExpanded(false);
     setTsvListExpanded(false);
     setIvToolsExpanded(false);
-    setGen3PaintingExpanded(false);
     setGen3WorkflowExpanded(false);
     closeProfilePanels();
   };
@@ -1144,12 +1130,10 @@ function App() {
       | "iv"
       | "profile"
       | "researcher"
-      | "gen4Swarm"
       | "keybv"
       | "miscRng"
       | "tsvList"
       | "ivTools"
-      | "gen3Painting"
       | "gen3Workflow"
       | "sponsorship",
   ) => {
@@ -1162,12 +1146,10 @@ function App() {
     else if (tool === "encounter") setEncounterLookupExpanded(true);
     else if (tool === "iv") setIvCalculatorExpanded(true);
     else if (tool === "researcher") setResearcherExpanded(true);
-    else if (tool === "gen4Swarm") setGen4SwarmExpanded(true);
     else if (tool === "keybv") setKeyBvExpanded(true);
     else if (tool === "miscRng") setMiscRngExpanded(true);
     else if (tool === "tsvList") setTsvListExpanded(true);
     else if (tool === "ivTools") setIvToolsExpanded(true);
-    else if (tool === "gen3Painting") setGen3PaintingExpanded(true);
     else if (tool === "gen3Workflow") setGen3WorkflowExpanded(true);
     else if (tool === "profile") changeUnifiedProfileExpanded(true);
   };
@@ -3522,6 +3504,7 @@ function App() {
             ) : activeModule === "gen3seedtools" ? (
               <Gen3SeedToolsPanel
                 activeTab={gen3SeedToolsTab}
+                onApplyPaintingSeedToStatic={applyPaintingSeedToStatic}
                 onTabChange={setGen3SeedToolsTab}
                 uiPreviewMode={uiPreviewMode}
               />
@@ -3569,6 +3552,8 @@ function App() {
               <Gen4SeedFinderPanel uiPreviewMode={uiPreviewMode} />
             ) : activeModule === "gen4seedtotime" ? (
               <Gen4SeedToTimePanel uiPreviewMode={uiPreviewMode} />
+            ) : activeModule === "gen4swarm" ? (
+              <Gen4SwarmPanel />
             ) : activeModule === "gen4static" ? (
               <Gen4StaticPanel
                 onOpenIvCalculator={openGen4IvCalculator}
@@ -3847,25 +3832,12 @@ function App() {
         </WorkspaceCache>
       </div>
       <div className="floating-tools">
-        <Gen3PaintingPanel
-          expanded={activeFloatingTool === "gen3Painting"}
-          onApplyToStatic={applyPaintingSeedToStatic}
-          onExpandedChange={(expanded) => {
-            setGen3PaintingExpanded(expanded);
-            if (expanded) {
-              setModuleRailOpen(false);
-              setGen3WorkflowExpanded(false);
-              closeProfilePanels();
-            }
-          }}
-        />
         <Gen3WorkflowTipsPanel
           expanded={activeFloatingTool === "gen3Workflow"}
           onExpandedChange={(expanded) => {
             setGen3WorkflowExpanded(expanded);
             if (expanded) {
               setModuleRailOpen(false);
-              setGen3PaintingExpanded(false);
               closeProfilePanels();
             }
           }}
@@ -3884,7 +3856,11 @@ function App() {
             setActiveModule("gen3seedtools");
             closeFloatingTools();
           }}
-          onOpenPainting={() => openGen3Painting()}
+          onOpenPainting={() => {
+            setGen3SeedToolsTab("painting");
+            setActiveModule("gen3seedtools");
+            closeFloatingTools();
+          }}
         />
         <IvToolsPanel
           expanded={activeFloatingTool === "ivTools"}
@@ -3952,25 +3928,6 @@ function App() {
               setIvCalculatorExpanded(false);
               setContributionsExpanded(false);
               setSponsorshipExpanded(false);
-              closeProfilePanels();
-            }
-          }}
-        />
-        <Gen4SwarmPanel
-          expanded={activeFloatingTool === "gen4Swarm"}
-          onExpandedChange={(expanded) => {
-            setGen4SwarmExpanded(expanded);
-            if (expanded) {
-              setModuleRailOpen(false);
-              setIvCalculatorExpanded(false);
-              setEncounterLookupExpanded(false);
-              setContributionsExpanded(false);
-              setSponsorshipExpanded(false);
-              setResearcherExpanded(false);
-              setKeyBvExpanded(false);
-              setMiscRngExpanded(false);
-              setTsvListExpanded(false);
-              setIvToolsExpanded(false);
               closeProfilePanels();
             }
           }}
@@ -4099,44 +4056,6 @@ function App() {
               type="button"
             >
               <BookOpen aria-hidden="true" size={19} />
-            </button>
-            <button
-              aria-controls="gen3-painting-panel"
-              aria-expanded={activeFloatingTool === "gen3Painting"}
-              aria-haspopup="dialog"
-              aria-label="Target Painting Timer"
-              className={
-                activeFloatingTool === "gen3Painting" ? "active" : undefined
-              }
-              data-tone="teal"
-              id="gen3-painting-trigger"
-              onClick={() => {
-                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
-                toggleFloatingTool("gen3Painting");
-              }}
-              title="Target Painting Timer"
-              type="button"
-            >
-              <Paintbrush aria-hidden="true" size={19} />
-            </button>
-            <button
-              aria-controls="gen4-swarm-panel"
-              aria-expanded={activeFloatingTool === "gen4Swarm"}
-              aria-haspopup="dialog"
-              aria-label={t("gen4SwarmModule")}
-              className={
-                activeFloatingTool === "gen4Swarm" ? "active" : undefined
-              }
-              data-tone="amber"
-              id="gen4-swarm-trigger"
-              onClick={() => {
-                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
-                toggleFloatingTool("gen4Swarm");
-              }}
-              title={t("gen4SwarmModule")}
-              type="button"
-            >
-              <RadioTower aria-hidden="true" size={19} />
             </button>
             <button
               aria-controls="iv-tools-panel"
