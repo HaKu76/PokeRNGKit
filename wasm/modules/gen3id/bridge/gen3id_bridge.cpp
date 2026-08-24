@@ -25,7 +25,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 2;
+    constexpr std::uint32_t apiVersion = 3;
     constexpr std::uint32_t maxStatesPerCall = 100000;
 
     enum ErrorCode : std::uint32_t
@@ -50,17 +50,30 @@ namespace
         return { static_cast<u16>(value) };
     }
 
-    void pack(const std::vector<IDState> &states)
+    void pack(const std::vector<IDState> &states, std::uint32_t filterFlags, std::uint32_t pid,
+              std::uint32_t shinyFilter)
     {
         results.clear();
         results.reserve(states.size());
 
         for (const auto &state : states)
         {
+            std::uint32_t shiny = 0;
+            if ((filterFlags & Id3FilterFlag::FilterPID) != 0)
+            {
+                const std::uint32_t shinyXor = state.getTID() ^ state.getSID() ^ (pid >> 16) ^ (pid & 0xffff);
+                shiny = shinyXor == 0 ? 2 : shinyXor < 8 ? 1 : 0;
+                const bool matches = shinyFilter == 0 || (shinyFilter == 1 && shiny == 1)
+                    || (shinyFilter == 2 && shiny == 2) || (shinyFilter == 3 && shiny != 0);
+                if (!matches)
+                {
+                    continue;
+                }
+            }
             results.push_back({ state.getAdvances(),
                                 static_cast<std::uint32_t>(state.getTID())
                                     | (static_cast<std::uint32_t>(state.getSID()) << 16),
-                                state.getTSV() });
+                                state.getTSV() | (shiny << 16) });
         }
     }
 
@@ -156,7 +169,8 @@ extern "C"
     POKERNGKIT_KEEPALIVE std::uint32_t gen3id_generate(std::uint32_t mode, std::uint32_t input,
                                                    std::uint32_t initialAdvances, std::uint32_t maxAdvances,
                                                    std::uint32_t filterFlags, std::uint32_t tid,
-                                                   std::uint32_t sid, std::uint32_t tsv)
+                                                   std::uint32_t sid, std::uint32_t tsv,
+                                                   std::uint32_t pid, std::uint32_t shinyFilter)
     {
         results.clear();
         searchResults.clear();
@@ -170,7 +184,10 @@ extern "C"
 
         if (((filterFlags & Id3FilterFlag::FilterTID) != 0 && tid > 0xffff)
             || ((filterFlags & Id3FilterFlag::FilterSID) != 0 && sid > 0xffff)
-            || ((filterFlags & Id3FilterFlag::FilterTSV) != 0 && tsv > 0x1fff))
+            || ((filterFlags & Id3FilterFlag::FilterTSV) != 0 && tsv > 0x1fff)
+            || shinyFilter > 3
+            || ((filterFlags & Id3FilterFlag::FilterShiny) != 0
+                && (filterFlags & Id3FilterFlag::FilterPID) == 0))
         {
             lastError = ErrorCode::InvalidInput;
             return 0;
@@ -184,7 +201,7 @@ extern "C"
         switch (static_cast<Id3Mode>(mode))
         {
         case Id3Mode::XDColo:
-            pack(generator.generateXDColo(input));
+            pack(generator.generateXDColo(input), filterFlags, pid, shinyFilter);
             break;
         case Id3Mode::FRLGE:
             if (input > 0xffff)
@@ -192,7 +209,7 @@ extern "C"
                 lastError = ErrorCode::InvalidInput;
                 return 0;
             }
-            pack(generator.generateFRLGE(static_cast<u16>(input)));
+            pack(generator.generateFRLGE(static_cast<u16>(input)), filterFlags, pid, shinyFilter);
             break;
         case Id3Mode::RS:
             if (input > 0xffff)
@@ -200,7 +217,7 @@ extern "C"
                 lastError = ErrorCode::InvalidInput;
                 return 0;
             }
-            pack(generator.generateRS(static_cast<u16>(input)));
+            pack(generator.generateRS(static_cast<u16>(input)), filterFlags, pid, shinyFilter);
             break;
         default:
             lastError = ErrorCode::InvalidMode;

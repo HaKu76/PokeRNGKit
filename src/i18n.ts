@@ -21,6 +21,7 @@ const resources = {
       initialSeedModule: "Initial Seed Finder",
       ngcSeedModule: "GameCube Seed Finder",
       seedToTimeModule: "第三世代Seed查询时间",
+      seedToolsModule: "Gen III Seed Tools",
       staticModule: "Gen 3 Static",
       wildModule: "Wild",
       ivToPidModule: "IVs to PID",
@@ -697,6 +698,7 @@ const resources = {
       maxResults: "Max Results",
       rsIds: "RS IDs",
       frlgRse: "FRLG / RSE",
+      frlgBackSeed: "Back Seed (FRLG / RSE)",
       emptyInitialSeed: "No initial seed results",
       initialSeedWasmMissing:
         "Initial Seed Wasm artifacts are not built. Run npm run wasm:build after activating Emscripten.",
@@ -705,6 +707,33 @@ const resources = {
       rowTid: "TID",
       rowSid: "SID",
       rowTsv: "TSV",
+      targetPid: "Target PID",
+      idTargetPidShinyHint: "Filter IDs compatible with this PID",
+      findCompatibleId: "Find compatible ID",
+      openPaintingReseeding: "Open Target Painting Timer",
+      gen3WorkflowTitle: "Tips",
+      gen3WorkflowSubtitle: "Emerald / 6V Shiny Static",
+      gen3WorkflowStepSearcher:
+        "Use the Static Searcher to find a target PID and 32-bit Seed with 6V and shiny filters.",
+      gen3WorkflowStepId:
+        "Find a compatible TID/SID and TSV for the target PID, including star/square shiny filtering.",
+      gen3WorkflowOpenId: "Open ID Generator",
+      gen3WorkflowStepSave:
+        "Save the selected TID/SID in the Emerald profile before checking the Static result.",
+      gen3WorkflowStepBridge:
+        "Pass the 32-bit target Seed through Gen 3 Seed to Time to recover the 16-bit Seed used by the emulator timer.",
+      gen3WorkflowOpenSeedToTime: "Open Seed to Time",
+      gen3WorkflowStepBackSeed:
+        "For FireRed/LeafGreen/Ruby/Sapphire, use Back Seed to reverse a target 32-bit Seed into candidate 16-bit initial Seeds.",
+      gen3WorkflowOpenBackSeed: "Open Back Seed",
+      gen3WorkflowStepTimer:
+        "Enter the recovered four-digit hexadecimal Seed in the emulator-only Target Painting Timer; the default decimal calibration is 30.",
+      gen3WorkflowOpenPainting: "Open Painting Timer",
+      gen3WorkflowStepHit:
+        "After hitting the emulator timer, return to the Static Generator and verify the target PID and 6V spread.",
+      gen3WorkflowShinyNote:
+        "Square shiny TSV is derived from the XOR of the target PID's upper and lower 16-bit halves; it is not entered directly into the PID shiny formula.",
+      copyPid: "Copy PID",
       sortedAscending: "sorted ascending",
       sortedDescending: "sorted descending",
       noFilter: "No filter",
@@ -712,6 +741,7 @@ const resources = {
       version: "Gen III / ID API 2",
       initialSeedVersion: "Gen III / Initial Seed Finder API 1",
       ngcSeedVersion: "Gen III / GameCube Seed Finder API 1",
+      seedToolsVersion: "Gen III / Seed Tools",
       ngcSeedEngine: "GAMECUBE SEED FINDER",
       ngcGales: "Gales",
       ngcColo: "Colo",
@@ -744,6 +774,7 @@ const resources = {
       ngcSeedWasmMissing:
         "GameCube Seed Wasm artifacts are not built. Run npm run wasm:build after activating Emscripten.",
       initialSeedEngine: "INITIAL SEED FINDER",
+      seedToolsEngine: "GEN III SEED TOOLS",
       seedToTimeVersion: "Gen III / Seed to Time API 1",
       seedToTimeEngine: "GEN 3 SEED TO TIME",
       seedToTimeSeed: "16/32位Seed",
@@ -1954,6 +1985,7 @@ const resources = {
       initialSeedModule: "Initial Seed Finder",
       ngcSeedModule: "GameCube Seed Finder",
       seedToTimeModule: "Gen 3 Seed to Time",
+      seedToolsModule: "Gen III Seed Tools",
       staticModule: "第3世代 Static",
       wildModule: "野生",
       ivToPidModule: "IVs to PID",
@@ -2559,6 +2591,7 @@ const resources = {
       maxResults: "Max Results",
       rsIds: "RS IDs",
       frlgRse: "FRLG / RSE",
+      frlgBackSeed: "Back Seed (FRLG / RSE)",
       emptyInitialSeed: "初期シードの検索結果はありません",
       initialSeedWasmMissing:
         "Initial Seed Wasm が生成されていません。Emscripten を有効にして npm run wasm:build を実行してください。",
@@ -2566,6 +2599,33 @@ const resources = {
       rowTid: "TID",
       rowSid: "SID",
       rowTsv: "TSV",
+      targetPid: "Target PID",
+      idTargetPidShinyHint: "この PID に合う ID を検索",
+      findCompatibleId: "対応する ID を検索",
+      openPaintingReseeding: "Target Painting Timer を開く",
+      gen3WorkflowTitle: "Tips",
+      gen3WorkflowSubtitle: "Emerald / 6V Shiny Static",
+      gen3WorkflowStepSearcher:
+        "Static Searcher で 6V と色違い条件を指定し、目標 PID と 32-bit Seed を探します。",
+      gen3WorkflowStepId:
+        "目標 PID に合う TID/SID と TSV を、星・四角色違い条件を含めて ID Generator で探します。",
+      gen3WorkflowOpenId: "ID Generator を開く",
+      gen3WorkflowStepSave:
+        "Static の判定に使う TID/SID を Emerald プロファイルに保存します。",
+      gen3WorkflowStepBridge:
+        "32-bit の目標 Seed を Gen 3 Seed to Time に渡し、エミュレーターのタイマーで使う 16-bit Seed を取得します。",
+      gen3WorkflowOpenSeedToTime: "Seed to Time を開く",
+      gen3WorkflowStepBackSeed:
+        "FireRed/LeafGreen/Ruby/Sapphire では Back Seed で 32-bit の目標 Seed から 16-bit 初期 Seed を逆算します。",
+      gen3WorkflowOpenBackSeed: "Back Seed を開く",
+      gen3WorkflowStepTimer:
+        "取得した 4 桁の 16 進 Seed をエミュレーター専用 Target Painting Timer に入力します。既定の 10 進校正値は 30 です。",
+      gen3WorkflowOpenPainting: "Painting Timer を開く",
+      gen3WorkflowStepHit:
+        "エミュレーターのタイマーを合わせたら Static Generator に戻り、目標 PID と 6V を確認します。",
+      gen3WorkflowShinyNote:
+        "四角色違いの TSV は目標 PID の上位 16-bit と下位 16-bit の XOR で決まり、PID の色違い式へ TSV を直接入力するものではありません。",
+      copyPid: "PID をコピー",
       sortedAscending: "昇順",
       sortedDescending: "降順",
       noFilter: "指定なし",
@@ -2573,6 +2633,7 @@ const resources = {
       version: "第3世代 / ID API 2",
       initialSeedVersion: "Gen III / Initial Seed Finder API 1",
       ngcSeedVersion: "Gen III / GameCube Seed Finder API 1",
+      seedToolsVersion: "Gen III / Seed Tools",
       ngcSeedEngine: "GAMECUBE SEED FINDER",
       ngcGales: "Gales",
       ngcColo: "Colo",
@@ -2605,6 +2666,7 @@ const resources = {
       ngcSeedWasmMissing:
         "GameCube Seed Wasm artifacts are not built. Run npm run wasm:build after activating Emscripten.",
       initialSeedEngine: "INITIAL SEED FINDER",
+      seedToolsEngine: "GEN III SEED TOOLS",
       seedToTimeVersion: "Gen III / Seed to Time API 1",
       seedToTimeEngine: "GEN 3 SEED TO TIME",
       seedToTimeSeed: "16/32-Bit Seed",
@@ -3819,9 +3881,10 @@ const resources = {
       workerPool: "Worker 池",
       modules: "模块",
       idModule: "第三世代ID乱数",
-      initialSeedModule: "Initial Seed Finder",
+      initialSeedModule: "初始Seed检索",
       ngcSeedModule: "NGC Seed查询",
       seedToTimeModule: "第三世代Seed查询时间",
+      seedToolsModule: "第三世代Seed工具",
       staticModule: "第三世代定点乱数",
       wildModule: "第三世代野生乱数",
       ivToPidModule: "个体值查询PID",
@@ -4495,6 +4558,7 @@ const resources = {
       maxResults: "Max Results",
       rsIds: "RS IDs",
       frlgRse: "FRLG / RSE",
+      frlgBackSeed: "Back Seed (FRLG / RSE)",
       emptyInitialSeed: "暂无初始种子结果",
       initialSeedWasmMissing:
         "尚未生成 Initial Seed Wasm 产物。请激活 Emscripten 后运行 npm run wasm:build。",
@@ -4502,13 +4566,41 @@ const resources = {
       rowTid: "TID",
       rowSid: "SID",
       rowTsv: "TSV",
+      targetPid: "目标 PID",
+      idTargetPidShinyHint: "筛选与此 PID 兼容的 ID",
+      findCompatibleId: "查找对应 ID",
+      openPaintingReseeding: "打开 Target Painting Timer",
+      gen3WorkflowTitle: "Tips",
+      gen3WorkflowSubtitle: "绿宝石 / 6V 异色定点",
+      gen3WorkflowStepSearcher:
+        "先在定点检索器用 6V 和异色条件找到目标 PID 与 32 位 Seed。",
+      gen3WorkflowStepId:
+        "在 ID 生成器按目标 PID 搜索兼容的 TID/SID 与 TSV，并同时筛选星闪或方块闪。",
+      gen3WorkflowOpenId: "打开 ID 生成器",
+      gen3WorkflowStepSave:
+        "将选定的 TID/SID 保存到绿宝石存档信息，后续定点结果会使用该身份。",
+      gen3WorkflowStepBridge:
+        "将 32 位目标 Seed 交给 Gen 3 Seed to Time，桥接得到模拟器计时器使用的 16 位 Seed。",
+      gen3WorkflowOpenSeedToTime: "打开 Seed to Time",
+      gen3WorkflowStepBackSeed:
+        "火红/叶绿/红宝石/蓝宝石使用 Back Seed，将目标 32 位 Seed 反推为候选 16 位初始 Seed。",
+      gen3WorkflowOpenBackSeed: "打开 Back Seed",
+      gen3WorkflowStepTimer:
+        "将得到的四位十六进制 Seed 输入仅供模拟器使用的 Target Painting Timer，默认十进制校准值为 30。",
+      gen3WorkflowOpenPainting: "打开 Painting Timer",
+      gen3WorkflowStepHit:
+        "模拟器计时器命中后回到定点生成器，确认目标 PID 与 6V 结果。",
+      gen3WorkflowShinyNote:
+        "方块闪 TSV 由目标 PID 的高低 16 位异或得到，不是把 TSV 直接代入 PID 闪光公式。",
+      copyPid: "复制 PID",
       sortedAscending: "升序",
       sortedDescending: "降序",
       noFilter: "无筛选",
       language: "语言",
       version: "第三世代 / ID API 2",
-      initialSeedVersion: "Gen III / Initial Seed Finder API 1",
+      initialSeedVersion: "第三世代 / 初始Seed检索 API 1",
       ngcSeedVersion: "第三世代 / NGC Seed查询 API 1",
+      seedToolsVersion: "第三世代 / Seed工具",
       ngcSeedEngine: "NGC SEED查询",
       ngcGales: "XD",
       ngcColo: "竞技场",
@@ -4540,7 +4632,8 @@ const resources = {
       emptyNgcSeed: "暂无 NGC Seed 结果",
       ngcSeedWasmMissing:
         "尚未生成 NGC Seed Wasm 产物。请激活 Emscripten 后运行 npm run wasm:build。",
-      initialSeedEngine: "INITIAL SEED FINDER",
+      initialSeedEngine: "初始SEED检索",
+      seedToolsEngine: "第三世代Seed工具",
       seedToTimeVersion: "Gen III / Seed to Time API 1",
       seedToTimeEngine: "GEN 3 SEED TO TIME",
       seedToTimeSeed: "16/32-Bit Seed",

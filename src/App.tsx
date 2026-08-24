@@ -14,6 +14,7 @@ import {
 import { useTranslation } from "react-i18next";
 import {
   Calculator,
+  BookOpen,
   Check,
   ChevronDown,
   Dices,
@@ -23,6 +24,7 @@ import {
   Menu,
   Monitor,
   Moon,
+  Paintbrush,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
@@ -40,6 +42,7 @@ import {
   validateId3Request,
   type Id3Mode,
   type Id3Request,
+  type Id3ShinyFilter,
   type Id3State,
 } from "./features/id/domain";
 import { Gen3IdSearcherPanel } from "./features/id/Gen3IdSearcherPanel";
@@ -60,9 +63,10 @@ import {
   gen3StaticProfileOrDefault,
 } from "./features/profiles/domain";
 import { useGen3Profiles } from "./features/profiles/useGen3Profiles";
-import { Gen3InitialSeedPanel } from "./features/initialseed/Gen3InitialSeedPanel";
-import { Gen3NgcSeedPanel } from "./features/ngcseed/Gen3NgcSeedPanel";
-import { Gen3SeedToTimePanel } from "./features/seedtotime/Gen3SeedToTimePanel";
+import {
+  Gen3SeedToolsPanel,
+  type Gen3SeedToolTab,
+} from "./features/gen3seedtools/Gen3SeedToolsPanel";
 import { Gen3SpindaPainterPanel } from "./features/spindapainter/Gen3SpindaPainterPanel";
 import { Gen3IvToPidPanel } from "./features/ivtopid/Gen3IvToPidPanel";
 import { Gen3PidToIvPanel } from "./features/pidtoiv/Gen3PidToIvPanel";
@@ -142,6 +146,9 @@ import { MiscRngPanel } from "./features/miscrng/MiscRngPanel";
 import { TsvListPanel } from "./features/tsvlist/TsvListPanel";
 import { IvToolsPanel } from "./features/ivtools/IvToolsPanel";
 import { FloatingToolPanel } from "./features/shared/FloatingToolPanel";
+import { Select } from "./features/shared/Select";
+import { Gen3PaintingPanel } from "./features/gen3painting/Gen3PaintingPanel";
+import { Gen3WorkflowTipsPanel } from "./features/gen3workflow/Gen3WorkflowTipsPanel";
 import { ProfileSelector } from "./features/shared/ProfileSelector";
 import { useOverlayScrollLock } from "./features/shared/useOverlayScrollLock";
 import { normalizeDecimalInput, normalizeHexInput } from "./input";
@@ -177,9 +184,7 @@ type SortKey = keyof Id3State;
 type SupportedLanguage = "zh" | "en" | "ja";
 type ActiveModule =
   | "id"
-  | "initialseed"
-  | "ngcseed"
-  | "seedtotime"
+  | "gen3seedtools"
   | "static"
   | "wild"
   | "ivtopid"
@@ -307,9 +312,7 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
     marker: "3",
     items: [
       { id: "id", label: "idModule" },
-      { id: "initialseed", label: "initialSeedModule" },
-      { id: "ngcseed", label: "ngcSeedModule" },
-      { id: "seedtotime", label: "seedToTimeModule" },
+      { id: "gen3seedtools", label: "seedToolsModule" },
       { id: "static", label: "staticModule" },
       { id: "wild", label: "wildModule" },
       { id: "ivtopid", label: "ivToPidModule" },
@@ -600,6 +603,8 @@ function App() {
   const threeDsProfiles = useThreeDsProfiles();
   const gen8Profiles = useGen8Profiles();
   const [activeModule, setActiveModule] = useState<ActiveModule>("id");
+  const [gen3SeedToolsTab, setGen3SeedToolsTab] =
+    useState<Gen3SeedToolTab>("initialseed");
   const [pokerusInitialMode, setPokerusInitialMode] = useState<
     "gen3" | "pthgss"
   >("gen3");
@@ -621,6 +626,8 @@ function App() {
   const [miscRngExpanded, setMiscRngExpanded] = useState(false);
   const [tsvListExpanded, setTsvListExpanded] = useState(false);
   const [ivToolsExpanded, setIvToolsExpanded] = useState(false);
+  const [gen3PaintingExpanded, setGen3PaintingExpanded] = useState(false);
+  const [gen3WorkflowExpanded, setGen3WorkflowExpanded] = useState(false);
   const [gen4SwarmExpanded, setGen4SwarmExpanded] = useState(false);
   const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
@@ -657,6 +664,14 @@ function App() {
   const [filterTid, setFilterTid] = useState("");
   const [filterSid, setFilterSid] = useState("");
   const [filterTsv, setFilterTsv] = useState("");
+  const [filterPid, setFilterPid] = useState("");
+  const [filterIdShiny, setFilterIdShiny] =
+    useState<Id3ShinyFilter>("star-square");
+  const [gen3StaticTransfer, setGen3StaticTransfer] = useState<{
+    seed: number;
+    requestId: number;
+  }>();
+  const gen3WorkflowRequestId = useRef(0);
   const [results, setResults] = useState<Id3State[]>([]);
   const [progress, setProgress] = useState<Id3SearchProgress>({
     processedStates: 0,
@@ -808,6 +823,33 @@ function App() {
 
   const openGen4IvCalculator = openIvCalculator;
 
+  const openGen3IdForPid = (pid: number, seed: number) => {
+    void seed;
+    setFilterPid(formatHex(pid, 8));
+    setFilterIdShiny("star-square");
+    setMode("fr-lg");
+    setIdOperation("generator");
+    setActiveModule("id");
+    setOpenModuleGroups(new Set(["gen3"]));
+    setModuleRailOpen(false);
+    closeFloatingTools();
+  };
+
+  const openGen3Painting = () => {
+    toggleFloatingTool("gen3Painting");
+  };
+
+  const applyPaintingSeedToStatic = (seed: number) => {
+    gen3WorkflowRequestId.current += 1;
+    setGen3StaticTransfer({
+      seed,
+      requestId: gen3WorkflowRequestId.current,
+    });
+    closeFloatingTools();
+    setActiveModule("static");
+    setOpenModuleGroups(new Set(["gen3"]));
+  };
+
   const readRequest = (): Id3Request | undefined => {
     const input =
       mode === "xd-colo"
@@ -830,6 +872,8 @@ function App() {
         tsv: filterTsv.trim()
           ? (parseDecimal(filterTsv) ?? Number.NaN)
           : undefined,
+        pid: filterPid.trim() ? (parseHex(filterPid) ?? Number.NaN) : undefined,
+        shiny: filterPid.trim() ? filterIdShiny : undefined,
       },
     };
     return validateId3Request(request).length === 0 ? request : undefined;
@@ -873,12 +917,19 @@ function App() {
   const exportCsv = () => {
     if (sortedResults.length === 0) return;
     const rows = [
-      [t("rowAdvance"), t("rowTid"), t("rowSid"), t("rowTsv")],
+      [t("rowAdvance"), t("rowTid"), t("rowSid"), t("rowTsv"), t("shiny")],
       ...sortedResults.map((state) => [
         state.advances,
         state.tid,
         state.sid,
         state.tsv,
+        t(
+          state.shiny === 2
+            ? "shinySquare"
+            : state.shiny === 1
+              ? "shinyStar"
+              : "shinyNone",
+        ),
       ]),
     ];
     const csv = rows.map((row) => row.join(",")).join("\n");
@@ -1035,9 +1086,13 @@ function App() {
                     ? "tsvList"
                     : ivToolsExpanded
                       ? "ivTools"
-                      : profileTools && unifiedProfileExpanded
-                        ? "profile"
-                        : undefined;
+                      : gen3PaintingExpanded
+                        ? "gen3Painting"
+                        : gen3WorkflowExpanded
+                          ? "gen3Workflow"
+                          : profileTools && unifiedProfileExpanded
+                            ? "profile"
+                            : undefined;
 
   const closeFloatingTools = () => {
     setEncounterLookupExpanded(false);
@@ -1051,6 +1106,8 @@ function App() {
     setMiscRngExpanded(false);
     setTsvListExpanded(false);
     setIvToolsExpanded(false);
+    setGen3PaintingExpanded(false);
+    setGen3WorkflowExpanded(false);
     closeProfilePanels();
   };
 
@@ -1092,6 +1149,8 @@ function App() {
       | "miscRng"
       | "tsvList"
       | "ivTools"
+      | "gen3Painting"
+      | "gen3Workflow"
       | "sponsorship",
   ) => {
     const expanded = activeFloatingTool !== tool;
@@ -1108,6 +1167,8 @@ function App() {
     else if (tool === "miscRng") setMiscRngExpanded(true);
     else if (tool === "tsvList") setTsvListExpanded(true);
     else if (tool === "ivTools") setIvToolsExpanded(true);
+    else if (tool === "gen3Painting") setGen3PaintingExpanded(true);
+    else if (tool === "gen3Workflow") setGen3WorkflowExpanded(true);
     else if (tool === "profile") changeUnifiedProfileExpanded(true);
   };
 
@@ -1297,56 +1358,20 @@ function App() {
             </button>
             <button
               className={
-                activeModule === "initialseed"
+                activeModule === "gen3seedtools"
                   ? "module-entry active"
                   : "module-entry"
               }
               onClick={() => {
-                setActiveModule("initialseed");
+                setActiveModule("gen3seedtools");
                 setModuleRailOpen(false);
               }}
               type="button"
             >
               <span className="module-index">02</span>
               <span>
-                <strong>{t("initialSeedModule")}</strong>
-                <small>{t("initialSeedVersion")}</small>
-              </span>
-            </button>
-            <button
-              className={
-                activeModule === "ngcseed"
-                  ? "module-entry active"
-                  : "module-entry"
-              }
-              onClick={() => {
-                setActiveModule("ngcseed");
-                setModuleRailOpen(false);
-              }}
-              type="button"
-            >
-              <span className="module-index">03</span>
-              <span>
-                <strong>{t("ngcSeedModule")}</strong>
-                <small>{t("ngcSeedVersion")}</small>
-              </span>
-            </button>
-            <button
-              className={
-                activeModule === "seedtotime"
-                  ? "module-entry active"
-                  : "module-entry"
-              }
-              onClick={() => {
-                setActiveModule("seedtotime");
-                setModuleRailOpen(false);
-              }}
-              type="button"
-            >
-              <span className="module-index">04</span>
-              <span>
-                <strong>{t("seedToTimeModule")}</strong>
-                <small>{t("seedToTimeVersion")}</small>
+                <strong>{t("seedToolsModule")}</strong>
+                <small>{t("seedToolsVersion")}</small>
               </span>
             </button>
             <button
@@ -2572,219 +2597,213 @@ function App() {
                   {t(
                     activeModule === "id"
                       ? "engine"
-                      : activeModule === "initialseed"
-                        ? "initialSeedEngine"
-                        : activeModule === "ngcseed"
-                          ? "ngcSeedEngine"
-                          : activeModule === "seedtotime"
-                            ? "seedToTimeEngine"
-                            : activeModule === "static"
-                              ? "staticEngine"
-                              : activeModule === "wild"
-                                ? "wildEngine"
-                                : activeModule === "ivtopid"
-                                  ? "ivToPidEngine"
-                                  : activeModule === "egg"
-                                    ? "eggEngine"
-                                    : activeModule === "gamecube"
-                                      ? "gameCubeEngine"
-                                      : activeModule === "pidtoiv"
-                                        ? "pidToIvEngine"
-                                        : activeModule === "pokespot"
-                                          ? "pokeSpotEngine"
-                                          : activeModule === "jirachiadvancer"
-                                            ? "jirachiAdvancerEngine"
-                                            : activeModule === "spindapainter"
-                                              ? "spindaPainterEngine"
-                                              : activeModule === "gen4id"
-                                                ? "gen4IdEngine"
+                      : activeModule === "gen3seedtools"
+                        ? "seedToolsEngine"
+                        : activeModule === "static"
+                          ? "staticEngine"
+                          : activeModule === "wild"
+                            ? "wildEngine"
+                            : activeModule === "ivtopid"
+                              ? "ivToPidEngine"
+                              : activeModule === "egg"
+                                ? "eggEngine"
+                                : activeModule === "gamecube"
+                                  ? "gameCubeEngine"
+                                  : activeModule === "pidtoiv"
+                                    ? "pidToIvEngine"
+                                    : activeModule === "pokespot"
+                                      ? "pokeSpotEngine"
+                                      : activeModule === "jirachiadvancer"
+                                        ? "jirachiAdvancerEngine"
+                                        : activeModule === "spindapainter"
+                                          ? "spindaPainterEngine"
+                                          : activeModule === "gen4id"
+                                            ? "gen4IdEngine"
+                                            : activeModule === "gen4seedfinder"
+                                              ? "gen4SeedFinderEngine"
+                                              : activeModule ===
+                                                  "gen4seedtotime"
+                                                ? "gen4SeedToTimeModule"
                                                 : activeModule ===
-                                                    "gen4seedfinder"
-                                                  ? "gen4SeedFinderEngine"
-                                                  : activeModule ===
-                                                      "gen4seedtotime"
-                                                    ? "gen4SeedToTimeModule"
+                                                    "gen5profiles"
+                                                  ? "gen5ProfilesEngine"
+                                                  : activeModule === "gen5id"
+                                                    ? "gen5IdEngine"
                                                     : activeModule ===
-                                                        "gen5profiles"
-                                                      ? "gen5ProfilesEngine"
+                                                        "gen5adjacentseeds"
+                                                      ? "gen5AdjacentSeedsEngine"
                                                       : activeModule ===
-                                                          "gen5id"
-                                                        ? "gen5IdEngine"
+                                                          "gen5ivcache"
+                                                        ? "gen5IvCacheEngine"
                                                         : activeModule ===
-                                                            "gen5adjacentseeds"
-                                                          ? "gen5AdjacentSeedsEngine"
+                                                            "gen5sha1cache"
+                                                          ? "gen5Sha1CacheEngine"
                                                           : activeModule ===
-                                                              "gen5ivcache"
-                                                            ? "gen5IvCacheEngine"
+                                                              "gen5dreamradar"
+                                                            ? "gen5DreamRadarEngine"
                                                             : activeModule ===
-                                                                "gen5sha1cache"
-                                                              ? "gen5Sha1CacheEngine"
+                                                                "gen5static"
+                                                              ? "gen5StaticEngine"
                                                               : activeModule ===
-                                                                  "gen5dreamradar"
-                                                                ? "gen5DreamRadarEngine"
+                                                                  "gen5wild"
+                                                                ? "gen5WildEngine"
                                                                 : activeModule ===
-                                                                    "gen5static"
-                                                                  ? "gen5StaticEngine"
+                                                                    "gen5hiddengrotto"
+                                                                  ? "gen5HiddenGrottoEngine"
                                                                   : activeModule ===
-                                                                      "gen5wild"
-                                                                    ? "gen5WildEngine"
+                                                                      "gen5egg"
+                                                                    ? "gen5EggEngine"
                                                                     : activeModule ===
-                                                                        "gen5hiddengrotto"
-                                                                      ? "gen5HiddenGrottoEngine"
+                                                                        "gen5event"
+                                                                      ? "gen5EventEngine"
                                                                       : activeModule ===
-                                                                          "gen5egg"
-                                                                        ? "gen5EggEngine"
+                                                                          "researcher"
+                                                                        ? "researcherEngine"
                                                                         : activeModule ===
-                                                                            "gen5event"
-                                                                          ? "gen5EventEngine"
+                                                                            "gen6stationary"
+                                                                          ? "gen6StationaryEngine"
                                                                           : activeModule ===
-                                                                              "researcher"
-                                                                            ? "researcherEngine"
+                                                                              "gen6timefinder"
+                                                                            ? "gen6StationaryTimeModule"
                                                                             : activeModule ===
-                                                                                "gen6stationary"
-                                                                              ? "gen6StationaryEngine"
+                                                                                "gen6bank"
+                                                                              ? "gen6BankEngine"
                                                                               : activeModule ===
-                                                                                  "gen6timefinder"
-                                                                                ? "gen6StationaryTimeModule"
+                                                                                  "gen6event"
+                                                                                ? "gen6EventEngine"
                                                                                 : activeModule ===
-                                                                                    "gen6bank"
-                                                                                  ? "gen6BankEngine"
+                                                                                    "gen6eventtimefinder"
+                                                                                  ? "gen6EventTimeModule"
                                                                                   : activeModule ===
-                                                                                      "gen6event"
-                                                                                    ? "gen6EventEngine"
+                                                                                      "gen6wild"
+                                                                                    ? "gen6WildEngine"
                                                                                     : activeModule ===
-                                                                                        "gen6eventtimefinder"
-                                                                                      ? "gen6EventTimeModule"
+                                                                                        "gen6dexnav"
+                                                                                      ? "gen6DexNavEngine"
                                                                                       : activeModule ===
-                                                                                          "gen6wild"
-                                                                                        ? "gen6WildEngine"
+                                                                                          "gen6pokeradar"
+                                                                                        ? "gen6PokeRadarEngine"
                                                                                         : activeModule ===
-                                                                                            "gen6dexnav"
-                                                                                          ? "gen6DexNavEngine"
+                                                                                            "gen6egg"
+                                                                                          ? "gen6EggEngine"
                                                                                           : activeModule ===
-                                                                                              "gen6pokeradar"
-                                                                                            ? "gen6PokeRadarEngine"
+                                                                                              "gen6id"
+                                                                                            ? "gen6IdEngine"
                                                                                             : activeModule ===
-                                                                                                "gen6egg"
-                                                                                              ? "gen6EggEngine"
+                                                                                                "gen6mainseed"
+                                                                                              ? "gen6MainSeedEngine"
                                                                                               : activeModule ===
-                                                                                                  "gen6id"
-                                                                                                ? "gen6IdEngine"
+                                                                                                  "gen6mtseed"
+                                                                                                ? "gen6MtSeedModule"
                                                                                                 : activeModule ===
-                                                                                                    "gen6mainseed"
-                                                                                                  ? "gen6MainSeedEngine"
+                                                                                                    "gen6mtseedtime"
+                                                                                                  ? "gen6MtSeedTimeModule"
                                                                                                   : activeModule ===
-                                                                                                      "gen6mtseed"
-                                                                                                    ? "gen6MtSeedModule"
+                                                                                                      "gen6tinyindex"
+                                                                                                    ? "gen6TinyIndexEngine"
                                                                                                     : activeModule ===
-                                                                                                        "gen6mtseedtime"
-                                                                                                      ? "gen6MtSeedTimeModule"
+                                                                                                        "gen6tinyrocksmash"
+                                                                                                      ? "gen6TinyRockSmashEngine"
                                                                                                       : activeModule ===
-                                                                                                          "gen6tinyindex"
-                                                                                                        ? "gen6TinyIndexEngine"
+                                                                                                          "gen6tinyhoney"
+                                                                                                        ? "gen6TinyHoneyEngine"
                                                                                                         : activeModule ===
-                                                                                                            "gen6tinyrocksmash"
-                                                                                                          ? "gen6TinyRockSmashEngine"
+                                                                                                            "gen6tinyambush"
+                                                                                                          ? "gen6TinyAmbushEngine"
                                                                                                           : activeModule ===
-                                                                                                              "gen6tinyhoney"
-                                                                                                            ? "gen6TinyHoneyEngine"
+                                                                                                              "gen6tinytimeline"
+                                                                                                            ? "gen6TinyTimelineEngine"
                                                                                                             : activeModule ===
-                                                                                                                "gen6tinyambush"
-                                                                                                              ? "gen6TinyAmbushEngine"
+                                                                                                                "gen7id"
+                                                                                                              ? "gen7IdEngine"
                                                                                                               : activeModule ===
-                                                                                                                  "gen6tinytimeline"
-                                                                                                                ? "gen6TinyTimelineEngine"
+                                                                                                                  "gen7timefinder"
+                                                                                                                ? "gen7StationaryTimeEngine"
                                                                                                                 : activeModule ===
-                                                                                                                    "gen7id"
-                                                                                                                  ? "gen7IdEngine"
+                                                                                                                    "gen7eventtimefinder"
+                                                                                                                  ? "gen7EventTimeEngine"
                                                                                                                   : activeModule ===
-                                                                                                                      "gen7timefinder"
-                                                                                                                    ? "gen7StationaryTimeEngine"
+                                                                                                                      "gen7wildtimefinder"
+                                                                                                                    ? "gen7WildTimeEngine"
                                                                                                                     : activeModule ===
-                                                                                                                        "gen7eventtimefinder"
-                                                                                                                      ? "gen7EventTimeEngine"
+                                                                                                                        "gen7idtimefinder"
+                                                                                                                      ? "gen7IdTimeEngine"
                                                                                                                       : activeModule ===
-                                                                                                                          "gen7wildtimefinder"
-                                                                                                                        ? "gen7WildTimeEngine"
+                                                                                                                          "gen7stationary"
+                                                                                                                        ? "gen7StationaryEngine"
                                                                                                                         : activeModule ===
-                                                                                                                            "gen7idtimefinder"
-                                                                                                                          ? "gen7IdTimeEngine"
+                                                                                                                            "gen7wild"
+                                                                                                                          ? "gen7WildEngine"
                                                                                                                           : activeModule ===
-                                                                                                                              "gen7stationary"
-                                                                                                                            ? "gen7StationaryEngine"
+                                                                                                                              "gen7sos"
+                                                                                                                            ? "gen7SosEngine"
                                                                                                                             : activeModule ===
-                                                                                                                                "gen7wild"
-                                                                                                                              ? "gen7WildEngine"
+                                                                                                                                "gen7egg"
+                                                                                                                              ? "gen7EggEngine"
                                                                                                                               : activeModule ===
-                                                                                                                                  "gen7sos"
-                                                                                                                                ? "gen7SosEngine"
+                                                                                                                                  "gen7battletree"
+                                                                                                                                ? "gen7BattleTreeEngine"
                                                                                                                                 : activeModule ===
-                                                                                                                                    "gen7egg"
-                                                                                                                                  ? "gen7EggEngine"
+                                                                                                                                    "gen7event"
+                                                                                                                                  ? "gen7EventEngine"
                                                                                                                                   : activeModule ===
-                                                                                                                                      "gen7battletree"
-                                                                                                                                    ? "gen7BattleTreeEngine"
+                                                                                                                                      "gen7main"
+                                                                                                                                    ? "gen7MainEngine"
                                                                                                                                     : activeModule ===
-                                                                                                                                        "gen7event"
-                                                                                                                                      ? "gen7EventEngine"
+                                                                                                                                        "gen7eggseedfinder"
+                                                                                                                                      ? "gen7EggSeedFinderModule"
                                                                                                                                       : activeModule ===
-                                                                                                                                          "gen7main"
-                                                                                                                                        ? "gen7MainEngine"
+                                                                                                                                          "gen7festivalplaza"
+                                                                                                                                        ? "gen7FestivalPlazaEngine"
                                                                                                                                         : activeModule ===
-                                                                                                                                            "gen7eggseedfinder"
-                                                                                                                                          ? "gen7EggSeedFinderModule"
+                                                                                                                                            "threedsprofiles"
+                                                                                                                                          ? "threeDsProfilesEngine"
                                                                                                                                           : activeModule ===
-                                                                                                                                              "gen7festivalplaza"
-                                                                                                                                            ? "gen7FestivalPlazaEngine"
+                                                                                                                                              "gen8id"
+                                                                                                                                            ? "gen8IdEngine"
                                                                                                                                             : activeModule ===
-                                                                                                                                                "threedsprofiles"
-                                                                                                                                              ? "threeDsProfilesEngine"
+                                                                                                                                                "gen8egg"
+                                                                                                                                              ? "gen8EggEngine"
                                                                                                                                               : activeModule ===
-                                                                                                                                                  "gen8id"
-                                                                                                                                                ? "gen8IdEngine"
+                                                                                                                                                  "gen8event"
+                                                                                                                                                ? "gen8EventEngine"
                                                                                                                                                 : activeModule ===
-                                                                                                                                                    "gen8egg"
-                                                                                                                                                  ? "gen8EggEngine"
+                                                                                                                                                    "gen8profiles"
+                                                                                                                                                  ? "gen8ProfilesEngine"
                                                                                                                                                   : activeModule ===
-                                                                                                                                                      "gen8event"
-                                                                                                                                                    ? "gen8EventEngine"
+                                                                                                                                                      "gen8raids"
+                                                                                                                                                    ? "gen8RaidsEngine"
                                                                                                                                                     : activeModule ===
-                                                                                                                                                        "gen8profiles"
-                                                                                                                                                      ? "gen8ProfilesEngine"
+                                                                                                                                                        "gen8static"
+                                                                                                                                                      ? "gen8StaticEngine"
                                                                                                                                                       : activeModule ===
-                                                                                                                                                          "gen8raids"
-                                                                                                                                                        ? "gen8RaidsEngine"
+                                                                                                                                                          "gen8underground"
+                                                                                                                                                        ? "gen8UndergroundEngine"
                                                                                                                                                         : activeModule ===
-                                                                                                                                                            "gen8static"
-                                                                                                                                                          ? "gen8StaticEngine"
+                                                                                                                                                            "gen8denmap"
+                                                                                                                                                          ? "gen8DenMapEngine"
                                                                                                                                                           : activeModule ===
-                                                                                                                                                              "gen8underground"
-                                                                                                                                                            ? "gen8UndergroundEngine"
+                                                                                                                                                              "gen8wild"
+                                                                                                                                                            ? "gen8WildEngine"
                                                                                                                                                             : activeModule ===
-                                                                                                                                                                "gen8denmap"
-                                                                                                                                                              ? "gen8DenMapEngine"
+                                                                                                                                                                "pokerusfinder"
+                                                                                                                                                              ? "pokerusFinderEngine"
                                                                                                                                                               : activeModule ===
-                                                                                                                                                                  "gen8wild"
-                                                                                                                                                                ? "gen8WildEngine"
+                                                                                                                                                                  "gen4static"
+                                                                                                                                                                ? "gen4StaticEngine"
                                                                                                                                                                 : activeModule ===
-                                                                                                                                                                    "pokerusfinder"
-                                                                                                                                                                  ? "pokerusFinderEngine"
+                                                                                                                                                                    "gen4egg"
+                                                                                                                                                                  ? "gen4EggEngine"
                                                                                                                                                                   : activeModule ===
-                                                                                                                                                                      "gen4static"
-                                                                                                                                                                    ? "gen4StaticEngine"
+                                                                                                                                                                      "gen4event"
+                                                                                                                                                                    ? "gen4EventEngine"
                                                                                                                                                                     : activeModule ===
-                                                                                                                                                                        "gen4egg"
-                                                                                                                                                                      ? "gen4EggEngine"
+                                                                                                                                                                        "gen4chainedsid"
+                                                                                                                                                                      ? "gen4ChainedSidEngine"
                                                                                                                                                                       : activeModule ===
-                                                                                                                                                                          "gen4event"
-                                                                                                                                                                        ? "gen4EventEngine"
-                                                                                                                                                                        : activeModule ===
-                                                                                                                                                                            "gen4chainedsid"
-                                                                                                                                                                          ? "gen4ChainedSidEngine"
-                                                                                                                                                                          : activeModule ===
-                                                                                                                                                                              "gen4advance"
-                                                                                                                                                                            ? "gen4AdvanceEngine"
-                                                                                                                                                                            : "gen4WildEngine",
+                                                                                                                                                                          "gen4advance"
+                                                                                                                                                                        ? "gen4AdvanceEngine"
+                                                                                                                                                                        : "gen4WildEngine",
                   )}
                 </h1>
               </div>
@@ -2829,219 +2848,213 @@ function App() {
                   {t(
                     activeModule === "id"
                       ? "version"
-                      : activeModule === "initialseed"
-                        ? "initialSeedVersion"
-                        : activeModule === "ngcseed"
-                          ? "ngcSeedVersion"
-                          : activeModule === "seedtotime"
-                            ? "seedToTimeVersion"
-                            : activeModule === "static"
-                              ? "staticVersion"
-                              : activeModule === "wild"
-                                ? "wildVersion"
-                                : activeModule === "ivtopid"
-                                  ? "ivToPidVersion"
-                                  : activeModule === "egg"
-                                    ? "eggVersion"
-                                    : activeModule === "gamecube"
-                                      ? "gameCubeVersion"
-                                      : activeModule === "pidtoiv"
-                                        ? "pidToIvVersion"
-                                        : activeModule === "pokespot"
-                                          ? "pokeSpotVersion"
-                                          : activeModule === "jirachiadvancer"
-                                            ? "jirachiAdvancerVersion"
-                                            : activeModule === "spindapainter"
-                                              ? "spindaPainterVersion"
-                                              : activeModule === "gen4id"
-                                                ? "gen4IdVersion"
+                      : activeModule === "gen3seedtools"
+                        ? "seedToolsVersion"
+                        : activeModule === "static"
+                          ? "staticVersion"
+                          : activeModule === "wild"
+                            ? "wildVersion"
+                            : activeModule === "ivtopid"
+                              ? "ivToPidVersion"
+                              : activeModule === "egg"
+                                ? "eggVersion"
+                                : activeModule === "gamecube"
+                                  ? "gameCubeVersion"
+                                  : activeModule === "pidtoiv"
+                                    ? "pidToIvVersion"
+                                    : activeModule === "pokespot"
+                                      ? "pokeSpotVersion"
+                                      : activeModule === "jirachiadvancer"
+                                        ? "jirachiAdvancerVersion"
+                                        : activeModule === "spindapainter"
+                                          ? "spindaPainterVersion"
+                                          : activeModule === "gen4id"
+                                            ? "gen4IdVersion"
+                                            : activeModule === "gen4seedfinder"
+                                              ? "gen4SeedFinderVersion"
+                                              : activeModule ===
+                                                  "gen4seedtotime"
+                                                ? "gen4SeedToTimeVersion"
                                                 : activeModule ===
-                                                    "gen4seedfinder"
-                                                  ? "gen4SeedFinderVersion"
-                                                  : activeModule ===
-                                                      "gen4seedtotime"
-                                                    ? "gen4SeedToTimeVersion"
+                                                    "gen5profiles"
+                                                  ? "gen5ProfilesVersion"
+                                                  : activeModule === "gen5id"
+                                                    ? "gen5IdVersion"
                                                     : activeModule ===
-                                                        "gen5profiles"
-                                                      ? "gen5ProfilesVersion"
+                                                        "gen5adjacentseeds"
+                                                      ? "gen5AdjacentSeedsVersion"
                                                       : activeModule ===
-                                                          "gen5id"
-                                                        ? "gen5IdVersion"
+                                                          "gen5ivcache"
+                                                        ? "gen5IvCacheVersion"
                                                         : activeModule ===
-                                                            "gen5adjacentseeds"
-                                                          ? "gen5AdjacentSeedsVersion"
+                                                            "gen5sha1cache"
+                                                          ? "gen5Sha1CacheVersion"
                                                           : activeModule ===
-                                                              "gen5ivcache"
-                                                            ? "gen5IvCacheVersion"
+                                                              "gen5dreamradar"
+                                                            ? "gen5DreamRadarVersion"
                                                             : activeModule ===
-                                                                "gen5sha1cache"
-                                                              ? "gen5Sha1CacheVersion"
+                                                                "gen5static"
+                                                              ? "gen5StaticVersion"
                                                               : activeModule ===
-                                                                  "gen5dreamradar"
-                                                                ? "gen5DreamRadarVersion"
+                                                                  "gen5wild"
+                                                                ? "gen5WildVersion"
                                                                 : activeModule ===
-                                                                    "gen5static"
-                                                                  ? "gen5StaticVersion"
+                                                                    "gen5hiddengrotto"
+                                                                  ? "gen5HiddenGrottoVersion"
                                                                   : activeModule ===
-                                                                      "gen5wild"
-                                                                    ? "gen5WildVersion"
+                                                                      "gen5egg"
+                                                                    ? "gen5EggVersion"
                                                                     : activeModule ===
-                                                                        "gen5hiddengrotto"
-                                                                      ? "gen5HiddenGrottoVersion"
+                                                                        "gen5event"
+                                                                      ? "gen5EventVersion"
                                                                       : activeModule ===
-                                                                          "gen5egg"
-                                                                        ? "gen5EggVersion"
+                                                                          "researcher"
+                                                                        ? "researcherVersion"
                                                                         : activeModule ===
-                                                                            "gen5event"
-                                                                          ? "gen5EventVersion"
+                                                                            "gen6stationary"
+                                                                          ? "gen6StationaryVersion"
                                                                           : activeModule ===
-                                                                              "researcher"
-                                                                            ? "researcherVersion"
+                                                                              "gen6timefinder"
+                                                                            ? "gen6StationaryTimeVersion"
                                                                             : activeModule ===
-                                                                                "gen6stationary"
-                                                                              ? "gen6StationaryVersion"
+                                                                                "gen6bank"
+                                                                              ? "gen6BankVersion"
                                                                               : activeModule ===
-                                                                                  "gen6timefinder"
-                                                                                ? "gen6StationaryTimeVersion"
+                                                                                  "gen6event"
+                                                                                ? "gen6EventVersion"
                                                                                 : activeModule ===
-                                                                                    "gen6bank"
-                                                                                  ? "gen6BankVersion"
+                                                                                    "gen6eventtimefinder"
+                                                                                  ? "gen6EventTimeVersion"
                                                                                   : activeModule ===
-                                                                                      "gen6event"
-                                                                                    ? "gen6EventVersion"
+                                                                                      "gen6wild"
+                                                                                    ? "gen6WildVersion"
                                                                                     : activeModule ===
-                                                                                        "gen6eventtimefinder"
-                                                                                      ? "gen6EventTimeVersion"
+                                                                                        "gen6dexnav"
+                                                                                      ? "gen6DexNavVersion"
                                                                                       : activeModule ===
-                                                                                          "gen6wild"
-                                                                                        ? "gen6WildVersion"
+                                                                                          "gen6pokeradar"
+                                                                                        ? "gen6PokeRadarVersion"
                                                                                         : activeModule ===
-                                                                                            "gen6dexnav"
-                                                                                          ? "gen6DexNavVersion"
+                                                                                            "gen6egg"
+                                                                                          ? "gen6EggVersion"
                                                                                           : activeModule ===
-                                                                                              "gen6pokeradar"
-                                                                                            ? "gen6PokeRadarVersion"
+                                                                                              "gen6id"
+                                                                                            ? "gen6IdVersion"
                                                                                             : activeModule ===
-                                                                                                "gen6egg"
-                                                                                              ? "gen6EggVersion"
+                                                                                                "gen6mainseed"
+                                                                                              ? "gen6MainSeedVersion"
                                                                                               : activeModule ===
-                                                                                                  "gen6id"
-                                                                                                ? "gen6IdVersion"
+                                                                                                  "gen6mtseed"
+                                                                                                ? "gen6MtSeedVersion"
                                                                                                 : activeModule ===
-                                                                                                    "gen6mainseed"
-                                                                                                  ? "gen6MainSeedVersion"
+                                                                                                    "gen6mtseedtime"
+                                                                                                  ? "gen6MtSeedVersion"
                                                                                                   : activeModule ===
-                                                                                                      "gen6mtseed"
-                                                                                                    ? "gen6MtSeedVersion"
+                                                                                                      "gen6tinyindex"
+                                                                                                    ? "gen6TinyIndexVersion"
                                                                                                     : activeModule ===
-                                                                                                        "gen6mtseedtime"
-                                                                                                      ? "gen6MtSeedVersion"
+                                                                                                        "gen6tinyrocksmash"
+                                                                                                      ? "gen6TinyRockSmashVersion"
                                                                                                       : activeModule ===
-                                                                                                          "gen6tinyindex"
-                                                                                                        ? "gen6TinyIndexVersion"
+                                                                                                          "gen6tinyhoney"
+                                                                                                        ? "gen6TinyHoneyApiVersion"
                                                                                                         : activeModule ===
-                                                                                                            "gen6tinyrocksmash"
-                                                                                                          ? "gen6TinyRockSmashVersion"
+                                                                                                            "gen6tinyambush"
+                                                                                                          ? "gen6TinyAmbushVersion"
                                                                                                           : activeModule ===
-                                                                                                              "gen6tinyhoney"
-                                                                                                            ? "gen6TinyHoneyApiVersion"
+                                                                                                              "gen6tinytimeline"
+                                                                                                            ? "gen6TinyTimelineVersion"
                                                                                                             : activeModule ===
-                                                                                                                "gen6tinyambush"
-                                                                                                              ? "gen6TinyAmbushVersion"
+                                                                                                                "gen7id"
+                                                                                                              ? "gen7IdVersion"
                                                                                                               : activeModule ===
-                                                                                                                  "gen6tinytimeline"
-                                                                                                                ? "gen6TinyTimelineVersion"
+                                                                                                                  "gen7timefinder"
+                                                                                                                ? "gen7StationaryVersion"
                                                                                                                 : activeModule ===
-                                                                                                                    "gen7id"
-                                                                                                                  ? "gen7IdVersion"
+                                                                                                                    "gen7eventtimefinder"
+                                                                                                                  ? "gen7EventTimeVersion"
                                                                                                                   : activeModule ===
-                                                                                                                      "gen7timefinder"
-                                                                                                                    ? "gen7StationaryVersion"
+                                                                                                                      "gen7wildtimefinder"
+                                                                                                                    ? "gen7WildTimeVersion"
                                                                                                                     : activeModule ===
-                                                                                                                        "gen7eventtimefinder"
-                                                                                                                      ? "gen7EventTimeVersion"
+                                                                                                                        "gen7idtimefinder"
+                                                                                                                      ? "gen7IdTimeVersion"
                                                                                                                       : activeModule ===
-                                                                                                                          "gen7wildtimefinder"
-                                                                                                                        ? "gen7WildTimeVersion"
+                                                                                                                          "gen7stationary"
+                                                                                                                        ? "gen7StationaryTimeVersion"
                                                                                                                         : activeModule ===
-                                                                                                                            "gen7idtimefinder"
-                                                                                                                          ? "gen7IdTimeVersion"
+                                                                                                                            "gen7wild"
+                                                                                                                          ? "gen7WildVersion"
                                                                                                                           : activeModule ===
-                                                                                                                              "gen7stationary"
-                                                                                                                            ? "gen7StationaryTimeVersion"
+                                                                                                                              "gen7sos"
+                                                                                                                            ? "gen7SosVersion"
                                                                                                                             : activeModule ===
-                                                                                                                                "gen7wild"
-                                                                                                                              ? "gen7WildVersion"
+                                                                                                                                "gen7egg"
+                                                                                                                              ? "gen7EggVersion"
                                                                                                                               : activeModule ===
-                                                                                                                                  "gen7sos"
-                                                                                                                                ? "gen7SosVersion"
+                                                                                                                                  "gen7battletree"
+                                                                                                                                ? "gen7BattleTreeVersion"
                                                                                                                                 : activeModule ===
-                                                                                                                                    "gen7egg"
-                                                                                                                                  ? "gen7EggVersion"
+                                                                                                                                    "gen7event"
+                                                                                                                                  ? "gen7EventVersion"
                                                                                                                                   : activeModule ===
-                                                                                                                                      "gen7battletree"
-                                                                                                                                    ? "gen7BattleTreeVersion"
+                                                                                                                                      "gen7main"
+                                                                                                                                    ? "gen7MainVersion"
                                                                                                                                     : activeModule ===
-                                                                                                                                        "gen7event"
-                                                                                                                                      ? "gen7EventVersion"
+                                                                                                                                        "gen7eggseedfinder"
+                                                                                                                                      ? "gen7EggSeedFinderVersion"
                                                                                                                                       : activeModule ===
-                                                                                                                                          "gen7main"
-                                                                                                                                        ? "gen7MainVersion"
+                                                                                                                                          "gen7festivalplaza"
+                                                                                                                                        ? "gen7FestivalPlazaVersion"
                                                                                                                                         : activeModule ===
-                                                                                                                                            "gen7eggseedfinder"
-                                                                                                                                          ? "gen7EggSeedFinderVersion"
+                                                                                                                                            "threedsprofiles"
+                                                                                                                                          ? "threeDsProfilesVersion"
                                                                                                                                           : activeModule ===
-                                                                                                                                              "gen7festivalplaza"
-                                                                                                                                            ? "gen7FestivalPlazaVersion"
+                                                                                                                                              "gen8id"
+                                                                                                                                            ? "gen8IdVersion"
                                                                                                                                             : activeModule ===
-                                                                                                                                                "threedsprofiles"
-                                                                                                                                              ? "threeDsProfilesVersion"
+                                                                                                                                                "gen8egg"
+                                                                                                                                              ? "gen8EggVersion"
                                                                                                                                               : activeModule ===
-                                                                                                                                                  "gen8id"
-                                                                                                                                                ? "gen8IdVersion"
+                                                                                                                                                  "gen8event"
+                                                                                                                                                ? "gen8EventVersion"
                                                                                                                                                 : activeModule ===
-                                                                                                                                                    "gen8egg"
-                                                                                                                                                  ? "gen8EggVersion"
+                                                                                                                                                    "gen8profiles"
+                                                                                                                                                  ? "gen8ProfilesVersion"
                                                                                                                                                   : activeModule ===
-                                                                                                                                                      "gen8event"
-                                                                                                                                                    ? "gen8EventVersion"
+                                                                                                                                                      "gen8raids"
+                                                                                                                                                    ? "gen8RaidsVersion"
                                                                                                                                                     : activeModule ===
-                                                                                                                                                        "gen8profiles"
-                                                                                                                                                      ? "gen8ProfilesVersion"
+                                                                                                                                                        "gen8static"
+                                                                                                                                                      ? "gen8StaticVersion"
                                                                                                                                                       : activeModule ===
-                                                                                                                                                          "gen8raids"
-                                                                                                                                                        ? "gen8RaidsVersion"
+                                                                                                                                                          "gen8underground"
+                                                                                                                                                        ? "gen8UndergroundVersion"
                                                                                                                                                         : activeModule ===
-                                                                                                                                                            "gen8static"
-                                                                                                                                                          ? "gen8StaticVersion"
+                                                                                                                                                            "gen8denmap"
+                                                                                                                                                          ? "gen8DenMapVersion"
                                                                                                                                                           : activeModule ===
-                                                                                                                                                              "gen8underground"
-                                                                                                                                                            ? "gen8UndergroundVersion"
+                                                                                                                                                              "gen8wild"
+                                                                                                                                                            ? "gen8WildVersion"
                                                                                                                                                             : activeModule ===
-                                                                                                                                                                "gen8denmap"
-                                                                                                                                                              ? "gen8DenMapVersion"
+                                                                                                                                                                "pokerusfinder"
+                                                                                                                                                              ? "pokerusFinderVersion"
                                                                                                                                                               : activeModule ===
-                                                                                                                                                                  "gen8wild"
-                                                                                                                                                                ? "gen8WildVersion"
+                                                                                                                                                                  "gen4static"
+                                                                                                                                                                ? "gen4StaticVersion"
                                                                                                                                                                 : activeModule ===
-                                                                                                                                                                    "pokerusfinder"
-                                                                                                                                                                  ? "pokerusFinderVersion"
+                                                                                                                                                                    "gen4egg"
+                                                                                                                                                                  ? "gen4EggVersion"
                                                                                                                                                                   : activeModule ===
-                                                                                                                                                                      "gen4static"
-                                                                                                                                                                    ? "gen4StaticVersion"
+                                                                                                                                                                      "gen4event"
+                                                                                                                                                                    ? "gen4EventVersion"
                                                                                                                                                                     : activeModule ===
-                                                                                                                                                                        "gen4egg"
-                                                                                                                                                                      ? "gen4EggVersion"
+                                                                                                                                                                        "gen4chainedsid"
+                                                                                                                                                                      ? "gen4ChainedSidVersion"
                                                                                                                                                                       : activeModule ===
-                                                                                                                                                                          "gen4event"
-                                                                                                                                                                        ? "gen4EventVersion"
-                                                                                                                                                                        : activeModule ===
-                                                                                                                                                                            "gen4chainedsid"
-                                                                                                                                                                          ? "gen4ChainedSidVersion"
-                                                                                                                                                                          : activeModule ===
-                                                                                                                                                                              "gen4advance"
-                                                                                                                                                                            ? "gen4AdvanceVersion"
-                                                                                                                                                                            : "gen4WildVersion",
+                                                                                                                                                                          "gen4advance"
+                                                                                                                                                                        ? "gen4AdvanceVersion"
+                                                                                                                                                                        : "gen4WildVersion",
                   )}
                 </div>
               </div>
@@ -3324,6 +3337,40 @@ function App() {
                         />
                         <small>DEC / 0 - 8191</small>
                       </label>
+                      <label className="field">
+                        <span>{t("targetPid")}</span>
+                        <input
+                          maxLength={8}
+                          onChange={(event) =>
+                            setFilterPid(
+                              normalizeHexInput(event.target.value, 8),
+                            )
+                          }
+                          placeholder={t("noFilter")}
+                          value={filterPid}
+                        />
+                        <small>HEX / 32-bit</small>
+                      </label>
+                      <label className="field">
+                        <span>{t("shiny")}</span>
+                        <Select
+                          disabled={!filterPid.trim()}
+                          onChange={(event) =>
+                            setFilterIdShiny(
+                              event.target.value as Id3ShinyFilter,
+                            )
+                          }
+                          value={filterIdShiny}
+                        >
+                          <option value="star-square">
+                            {t("shinyStarSquare")}
+                          </option>
+                          <option value="star">{t("shinyStar")}</option>
+                          <option value="square">{t("shinySquare")}</option>
+                          <option value="any">{t("any")}</option>
+                        </Select>
+                        <small>{t("idTargetPidShinyHint")}</small>
+                      </label>
                     </div>
                   </section>
                 </form>
@@ -3404,28 +3451,36 @@ function App() {
                       </div>
                     ) : (
                       <div
-                        className="virtual-table"
+                        className="virtual-table id-generator-table"
                         style={{
                           height: `${rowVirtualizer.getTotalSize() + 38}px`,
                         }}
                       >
                         <div className="table-header">
-                          {(["advances", "tid", "sid", "tsv"] as SortKey[]).map(
-                            (key) => (
-                              <button
-                                key={key}
-                                onClick={() => toggleSort(key)}
-                                type="button"
-                              >
-                                {t(
-                                  key === "advances"
-                                    ? "rowAdvance"
+                          {(
+                            [
+                              "advances",
+                              "tid",
+                              "sid",
+                              "tsv",
+                              "shiny",
+                            ] as SortKey[]
+                          ).map((key) => (
+                            <button
+                              key={key}
+                              onClick={() => toggleSort(key)}
+                              type="button"
+                            >
+                              {t(
+                                key === "advances"
+                                  ? "rowAdvance"
+                                  : key === "shiny"
+                                    ? "shiny"
                                     : `row${key.charAt(0).toUpperCase()}${key.slice(1)}`,
-                                )}
-                                {sortLabel(key)}
-                              </button>
-                            ),
-                          )}
+                              )}
+                              {sortLabel(key)}
+                            </button>
+                          ))}
                         </div>
                         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                           const state = sortedResults[virtualRow.index];
@@ -3447,6 +3502,15 @@ function App() {
                               <span>
                                 {state.tsv.toString().padStart(4, "0")}
                               </span>
+                              <span>
+                                {t(
+                                  state.shiny === 2
+                                    ? "shinySquare"
+                                    : state.shiny === 1
+                                      ? "shinyStar"
+                                      : "shinyNone",
+                                )}
+                              </span>
                             </div>
                           );
                         })}
@@ -3455,15 +3519,17 @@ function App() {
                   </div>
                 </section>
               </>
-            ) : activeModule === "initialseed" ? (
-              <Gen3InitialSeedPanel uiPreviewMode={uiPreviewMode} />
-            ) : activeModule === "ngcseed" ? (
-              <Gen3NgcSeedPanel uiPreviewMode={uiPreviewMode} />
-            ) : activeModule === "seedtotime" ? (
-              <Gen3SeedToTimePanel uiPreviewMode={uiPreviewMode} />
+            ) : activeModule === "gen3seedtools" ? (
+              <Gen3SeedToolsPanel
+                activeTab={gen3SeedToolsTab}
+                onTabChange={setGen3SeedToolsTab}
+                uiPreviewMode={uiPreviewMode}
+              />
             ) : activeModule === "static" ? (
               <Gen3StaticPanel
+                initialTransfer={gen3StaticTransfer}
                 onOpenIvCalculator={openIvCalculator}
+                onFindCompatibleId={openGen3IdForPid}
                 profile={gen3StaticProfileOrDefault(profiles.selectedProfile)}
                 uiPreviewMode={uiPreviewMode}
               />
@@ -3781,6 +3847,45 @@ function App() {
         </WorkspaceCache>
       </div>
       <div className="floating-tools">
+        <Gen3PaintingPanel
+          expanded={activeFloatingTool === "gen3Painting"}
+          onApplyToStatic={applyPaintingSeedToStatic}
+          onExpandedChange={(expanded) => {
+            setGen3PaintingExpanded(expanded);
+            if (expanded) {
+              setModuleRailOpen(false);
+              setGen3WorkflowExpanded(false);
+              closeProfilePanels();
+            }
+          }}
+        />
+        <Gen3WorkflowTipsPanel
+          expanded={activeFloatingTool === "gen3Workflow"}
+          onExpandedChange={(expanded) => {
+            setGen3WorkflowExpanded(expanded);
+            if (expanded) {
+              setModuleRailOpen(false);
+              setGen3PaintingExpanded(false);
+              closeProfilePanels();
+            }
+          }}
+          onOpenId={() => {
+            setActiveModule("id");
+            setIdOperation("generator");
+            closeFloatingTools();
+          }}
+          onOpenInitialSeed={() => {
+            setGen3SeedToolsTab("initialseed");
+            setActiveModule("gen3seedtools");
+            closeFloatingTools();
+          }}
+          onOpenSeedToTime={() => {
+            setGen3SeedToolsTab("seedtotime");
+            setActiveModule("gen3seedtools");
+            closeFloatingTools();
+          }}
+          onOpenPainting={() => openGen3Painting()}
+        />
         <IvToolsPanel
           expanded={activeFloatingTool === "ivTools"}
           onExpandedChange={(expanded) => {
@@ -3976,6 +4081,44 @@ function App() {
             className="floating-tool-actions"
             id="floating-tool-actions"
           >
+            <button
+              aria-controls="gen3-workflow-tips-panel"
+              aria-expanded={activeFloatingTool === "gen3Workflow"}
+              aria-haspopup="dialog"
+              aria-label="Tips"
+              className={
+                activeFloatingTool === "gen3Workflow" ? "active" : undefined
+              }
+              data-tone="brand"
+              id="gen3-workflow-tips-trigger"
+              onClick={() => {
+                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                toggleFloatingTool("gen3Workflow");
+              }}
+              title="Tips"
+              type="button"
+            >
+              <BookOpen aria-hidden="true" size={19} />
+            </button>
+            <button
+              aria-controls="gen3-painting-panel"
+              aria-expanded={activeFloatingTool === "gen3Painting"}
+              aria-haspopup="dialog"
+              aria-label="Target Painting Timer"
+              className={
+                activeFloatingTool === "gen3Painting" ? "active" : undefined
+              }
+              data-tone="teal"
+              id="gen3-painting-trigger"
+              onClick={() => {
+                if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
+                toggleFloatingTool("gen3Painting");
+              }}
+              title="Target Painting Timer"
+              type="button"
+            >
+              <Paintbrush aria-hidden="true" size={19} />
+            </button>
             <button
               aria-controls="gen4-swarm-panel"
               aria-expanded={activeFloatingTool === "gen4Swarm"}

@@ -1,5 +1,32 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-24 第三世代 Seed 工具合并
+
+- 调整：侧栏将 `初始Seed检索`、`Seed查询时间` 和 `GameCube Seed查询` 合并为
+  一个 `Seed工具` 入口，进入后使用三页签切换具体工作流。
+- 保留：三个功能的 Wasm、Worker、输入限制、结果表和算法文档仍然独立；统一
+  工作区让页签切换不卸载面板，因此已有输入、结果和检索状态不会被清空。
+- 接入：Tips 中的 Back Seed 与 Seed to Time 快捷入口改为打开统一 Seed 工具并
+  自动切换到对应页签。
+- 已通过：本轮触及文件的 `npm run format:files`、全仓
+  `npm run format:check` 与 `git diff --check`。
+- 未运行：测试、Lint、TypeScript、构建、Wasm、浏览器验收和生产回归；这些仍需
+  项目所有者对具体命令或 URL 授权。
+
+## 2026-08-24 Gen III Back Seed 与 Seed to Time 流程标注
+
+- 澄清：第三世代 `Initial Seed Finder` 的 `FRLG / RSE` 页签就是 Real96
+  `FRLGRSEInitialSeedsFinder/backSeed.cpp` 的 Back Seed 反推流程，功能未丢失；
+  现在页签显式显示为 `Back Seed (FRLG / RSE)`，并补充 Tips 入口。
+- 修正：Tips 将 `Gen 3 Seed to Time` 放在定点 Searcher 得到的 32 位 Seed 与
+  模拟器 Target Painting Timer 之间，明确其职责是桥接得到四位十六进制 16 位
+  Seed；Back Seed 作为 FRLG/RSE 的独立反推分支保留。
+- 保留：Target Painting Timer 只服务模拟器，默认十进制校准值为 `30`，不实现
+  实机 Painting Reseeding。
+- 已完成：代码与文档已定向格式化；本轮未运行测试、Lint、TypeScript、构建、Wasm
+  或浏览器验收。
+- 下一步：由项目所有者决定是否授权工程验证、浏览器验收或提交。
+
 ## 2026-08-24 Actions #172 ESLint 修复
 
 - 定位：GitHub Actions `32652282635` 在 `npm run verify -> npm run lint` 检查 `public/sw-update.js` 时因 Service Worker 全局 `self` 缺少声明而失败，Windows EXE、Pages 和生产部署步骤因此被跳过。
@@ -1643,3 +1670,7 @@ npm run wasm:build
 - 验证结果必须区分历史证据、本轮工程检查、部署页面回归和项目所有者最终验收。
 - 控件名和输入限制必须重新核对 PokeFinder Form、Core、测试和翻译文件。
 - README、进度、提交、构建和发布说明使用 `hakuhiro-project-style`。
+
+# Progress Update
+
+- Gen III workflow refinement: added target PID plus star/square shiny filtering to the ID Generator, visible/right-click PID actions in Static Searcher results, the emulator-only Emerald Target Painting Timer with decimal calibration default `30`, and a global Emerald 6V shiny workflow Tips panel. No real-console Painting Reseeding or Battle Video flow is included.

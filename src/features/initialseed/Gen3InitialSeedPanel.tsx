@@ -219,7 +219,7 @@ export function Gen3InitialSeedPanel({
             role="tab"
             type="button"
           >
-            {t(entry === "rs-ids" ? "rsIds" : "frlgRse")}
+            {t(entry === "rs-ids" ? "rsIds" : "frlgBackSeed")}
           </button>
         ))}
       </div>

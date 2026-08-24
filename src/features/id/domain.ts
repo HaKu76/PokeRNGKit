@@ -1,15 +1,18 @@
-export const ID3_API_VERSION = 2;
+export const ID3_API_VERSION = 3;
 export const ID3_CHUNK_SIZE = 100_000;
 export const ID3_MAX_TOTAL_STATES = 50_000_000;
 export const ID3_MAX_RESULTS = 250_000;
 
 export type Id3Mode = "xd-colo" | "fr-lg" | "rs";
 export type Id3SearcherMode = "sid" | "pid";
+export type Id3ShinyFilter = "any" | "star" | "square" | "star-square";
 
 export interface Id3Filters {
   tid?: number;
   sid?: number;
   tsv?: number;
+  pid?: number;
+  shiny?: Id3ShinyFilter;
 }
 
 export interface Id3Request {
@@ -25,6 +28,7 @@ export interface Id3State {
   tid: number;
   sid: number;
   tsv: number;
+  shiny: 0 | 1 | 2;
 }
 
 export interface Id3Chunk {
@@ -73,8 +77,14 @@ export function id3FilterFlags(filters: Id3Filters): number {
   return (
     (filters.tid === undefined ? 0 : 1) |
     (filters.sid === undefined ? 0 : 2) |
-    (filters.tsv === undefined ? 0 : 4)
+    (filters.tsv === undefined ? 0 : 4) |
+    (filters.pid === undefined ? 0 : 8) |
+    (filters.shiny === undefined || filters.shiny === "any" ? 0 : 16)
   );
+}
+
+export function id3ShinyFilterToWasm(filter: Id3ShinyFilter | undefined) {
+  return { any: 0, star: 1, square: 2, "star-square": 3 }[filter ?? "any"];
 }
 
 export function validateId3Request(request: Id3Request): string[] {
@@ -115,6 +125,15 @@ export function validateId3Request(request: Id3Request): string[] {
       request.filters.tsv > 0x1fff)
   ) {
     errors.push("filterTsv");
+  }
+  if (request.filters.pid !== undefined && !isUint32(request.filters.pid)) {
+    errors.push("filterPid");
+  }
+  if (
+    request.filters.shiny !== undefined &&
+    !["any", "star", "square", "star-square"].includes(request.filters.shiny)
+  ) {
+    errors.push("filterShiny");
   }
 
   return errors;
@@ -187,7 +206,8 @@ export function decodeId3States(buffer: ArrayBuffer): Id3State[] {
       advances: words[source],
       tid: tidSid & 0xffff,
       sid: tidSid >>> 16,
-      tsv: words[source + 2],
+      tsv: words[source + 2] & 0xffff,
+      shiny: (words[source + 2] >>> 16) as 0 | 1 | 2,
     };
   }
   return states;

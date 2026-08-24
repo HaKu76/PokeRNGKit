@@ -15,6 +15,8 @@ enum Id3FilterFlag : std::uint32_t
     FilterTID = 1,
     FilterSID = 2,
     FilterTSV = 4,
+    FilterPID = 8,
+    FilterShiny = 16,
 };
 
 enum class Id3SearchMode : std::uint32_t
@@ -45,7 +47,8 @@ extern "C"
     std::uint32_t gen3id_api_version();
     std::uint32_t gen3id_generate(std::uint32_t mode, std::uint32_t input, std::uint32_t initialAdvances,
                                std::uint32_t maxAdvances, std::uint32_t filterFlags, std::uint32_t tid,
-                               std::uint32_t sid, std::uint32_t tsv);
+                               std::uint32_t sid, std::uint32_t tsv, std::uint32_t pid,
+                               std::uint32_t shinyFilter);
     std::uint32_t gen3id_search(std::uint32_t mode, std::uint32_t tid, std::uint32_t input);
     std::uintptr_t gen3id_result_ptr();
     std::uint32_t gen3id_result_count();

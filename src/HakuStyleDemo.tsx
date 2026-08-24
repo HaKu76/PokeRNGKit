@@ -305,9 +305,9 @@ export default function HakuStyleDemo() {
           items: [
             { id: "id", label: t("idModule"), detail: t("version") },
             {
-              id: "initialseed",
-              label: t("initialSeedModule"),
-              detail: t("initialSeedVersion"),
+              id: "seedtools",
+              label: t("seedToolsModule"),
+              detail: t("seedToolsVersion"),
             },
             {
               id: "static",

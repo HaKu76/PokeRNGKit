@@ -46,7 +46,7 @@ describe("ID3 domain", () => {
   it("decodes the 12-byte C ABI state schema", () => {
     const words = new Uint32Array([7, 1234 | (5678 << 16), 640]);
     expect(decodeId3States(words.buffer)).toEqual([
-      { advances: 7, tid: 1234, sid: 5678, tsv: 640 },
+      { advances: 7, tid: 1234, sid: 5678, tsv: 640, shiny: 0 },
     ]);
   });
 

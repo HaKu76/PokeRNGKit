@@ -16,7 +16,7 @@ namespace
 
     void verify(Id3Mode mode, std::uint32_t input, const std::array<ExpectedState, 10> &expected)
     {
-        const auto count = gen3id_generate(static_cast<std::uint32_t>(mode), input, 0, 9, 0, 0, 0, 0);
+        const auto count = gen3id_generate(static_cast<std::uint32_t>(mode), input, 0, 9, 0, 0, 0, 0, 0, 0);
         assert(gen3id_last_error() == 0);
         assert(count == expected.size());
 
@@ -67,8 +67,8 @@ int main()
                  { 6, 26587, 44997, 6403 }, { 7, 64563, 26587, 4989 }, { 8, 61228, 64563, 611 },
                  { 9, 64606, 61228, 622 } } });
 
-    assert(gen3id_generate(static_cast<std::uint32_t>(Id3Mode::FRLGE), 0, 0, 9, FilterSID, 0, 59774, 0) == 1);
-    assert(gen3id_generate(99, 0, 0, 0, 0, 0, 0, 0) == 0);
+    assert(gen3id_generate(static_cast<std::uint32_t>(Id3Mode::FRLGE), 0, 0, 9, FilterSID, 0, 59774, 0, 0, 0) == 1);
+    assert(gen3id_generate(99, 0, 0, 0, 0, 0, 0, 0, 0, 0) == 0);
     assert(gen3id_last_error() == 1);
 
     auto count = gen3id_search(static_cast<std::uint32_t>(Id3SearchMode::SID), 48163, 64377);

@@ -38,14 +38,37 @@ function previewState(
     tid,
     sid,
     tsv: (tid ^ sid) >>> 3,
+    shiny:
+      request.filters.pid === undefined
+        ? 0
+        : (tid ^
+              sid ^
+              (request.filters.pid >>> 16) ^
+              (request.filters.pid & 0xffff)) ===
+            0
+          ? 2
+          : (tid ^
+                sid ^
+                (request.filters.pid >>> 16) ^
+                (request.filters.pid & 0xffff)) <
+              8
+            ? 1
+            : 0,
   };
 }
 
 function matchesFilters(request: Id3Request, state: Id3State): boolean {
+  const shinyMatches =
+    request.filters.shiny === undefined ||
+    request.filters.shiny === "any" ||
+    (request.filters.shiny === "star" && state.shiny === 1) ||
+    (request.filters.shiny === "square" && state.shiny === 2) ||
+    (request.filters.shiny === "star-square" && state.shiny !== 0);
   return (
     (request.filters.tid === undefined || state.tid === request.filters.tid) &&
     (request.filters.sid === undefined || state.sid === request.filters.sid) &&
-    (request.filters.tsv === undefined || state.tsv === request.filters.tsv)
+    (request.filters.tsv === undefined || state.tsv === request.filters.tsv) &&
+    shinyMatches
   );
 }
 

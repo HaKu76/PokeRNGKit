@@ -75,6 +75,8 @@ interface Gen3StaticPanelProps {
   profile: Gen3Profile;
   uiPreviewMode: boolean;
   onOpenIvCalculator(): void;
+  onFindCompatibleId(pid: number, seed: number): void;
+  initialTransfer?: { seed: number; requestId: number };
 }
 
 const NATURE_MASK_ALL = 0x1ff_ffff;
@@ -179,6 +181,8 @@ function ivLabelKey(key: IvKey) {
 }
 
 export function Gen3StaticPanel({
+  initialTransfer,
+  onFindCompatibleId,
   onOpenIvCalculator,
   profile,
   uiPreviewMode,
@@ -233,6 +237,12 @@ export function Gen3StaticPanel({
   const [summary, setSummary] = useState<Gen3StaticSearchSummary>();
   const [status, setStatus] = useState<RunStatus>("ready");
   const [error, setError] = useState("");
+  const [pidMenu, setPidMenu] = useState<{
+    pid: number;
+    seed: number;
+    x: number;
+    y: number;
+  }>();
   const [sort, setSort] = useState<{
     key: StaticSortKey;
     direction: "asc" | "desc";
@@ -275,6 +285,25 @@ export function Gen3StaticPanel({
   useEffect(() => {
     if (profile.deadBattery) setSeed("5A0");
   }, [profile]);
+  useEffect(() => {
+    if (!initialTransfer) return;
+    resetRunState("generator");
+    setSeed(formatHex(initialTransfer.seed, 4));
+    setInitialAdvances("0");
+  }, [initialTransfer?.requestId]);
+  useEffect(() => {
+    if (!pidMenu) return;
+    const close = () => setPidMenu(undefined);
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+    };
+    window.addEventListener("click", close);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      window.removeEventListener("click", close);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [pidMenu]);
   useEffect(() => {
     if (category !== activeCategory) setCategory(activeCategory);
   }, [activeCategory, category]);
@@ -975,11 +1004,39 @@ export function Gen3StaticPanel({
                       transform: `translateY(${virtualRow.start + 38}px)`,
                     }}
                   >
-                    {columns.map((column) => (
-                      <span key={column.key}>
-                        {displayStateValue(state, column.key)}
-                      </span>
-                    ))}
+                    {columns.map((column) => {
+                      const searchablePid =
+                        operation === "searcher" &&
+                        column.key === "pid" &&
+                        "seed" in state;
+                      return (
+                        <span key={column.key}>
+                          {searchablePid ? (
+                            <button
+                              className="static-result-link"
+                              onClick={() =>
+                                onFindCompatibleId(state.pid, state.seed)
+                              }
+                              onContextMenu={(event) => {
+                                event.preventDefault();
+                                setPidMenu({
+                                  pid: state.pid,
+                                  seed: state.seed,
+                                  x: event.clientX,
+                                  y: event.clientY,
+                                });
+                              }}
+                              title={t("findCompatibleId")}
+                              type="button"
+                            >
+                              {displayStateValue(state, column.key)}
+                            </button>
+                          ) : (
+                            displayStateValue(state, column.key)
+                          )}
+                        </span>
+                      );
+                    })}
                   </div>
                 );
               })}
@@ -987,6 +1044,35 @@ export function Gen3StaticPanel({
           )}
         </div>
       </section>
+      {pidMenu && (
+        <div
+          className="result-context-menu"
+          onClick={(event) => event.stopPropagation()}
+          role="menu"
+          style={{ left: pidMenu.x, top: pidMenu.y }}
+        >
+          <button
+            onClick={() => {
+              onFindCompatibleId(pidMenu.pid, pidMenu.seed);
+              setPidMenu(undefined);
+            }}
+            role="menuitem"
+            type="button"
+          >
+            {t("findCompatibleId")}
+          </button>
+          <button
+            onClick={() => {
+              void navigator.clipboard.writeText(formatHex(pidMenu.pid, 8));
+              setPidMenu(undefined);
+            }}
+            role="menuitem"
+            type="button"
+          >
+            {t("copyPid")}
+          </button>
+        </div>
+      )}
     </>
   );
 }

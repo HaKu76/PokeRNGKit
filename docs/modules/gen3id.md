@@ -134,10 +134,12 @@ Searcher 控件文本核对自参考项目 `RNGRecovertest/Form1.Designer.cs`：
 
 TypeScript 把大范围拆成最多 100,000 个状态的分片，并交给多个独立 Worker/Wasm 实例。分片只改变任务调度，不改变初始状态、推进序号或 ID 生成顺序；结果按 `chunkIndex` 恢复为确定顺序。
 
-`gen3id` API v2 在原 `gen3id_generate` 之外增加 `gen3id_search`。Searcher 使用独立 `Gen3IdSearcherWorkerPool` 和单个 Worker；搜索规模最多为八个 SID 候选，无需分片或多 Worker。取消会终止 Worker，下一任务重新初始化。返回记录固定为 24 字节：
+`gen3id` API v3 在原 `gen3id_generate` 之外增加 `gen3id_search`，并为 Generator 增加目标 PID、星闪/方块闪和兼容 TSV 过滤。Searcher 使用独立 `Gen3IdSearcherWorkerPool` 和单个 Worker；搜索规模最多为八个 SID 候选，无需分片或多 Worker。取消会终止 Worker，下一任务重新初始化。Generator 返回记录固定为 12 字节，第三个 word 的低 16 位是 TSV，高 16 位是目标 PID 下的闪光类型（`0` 普通、`1` 星闪、`2` 方块闪）：
 
 ```text
-uint32 seed / frame / tidSID / tsvShiny / yearMonthDay / hourMinute
+uint32 advances / tidSID / tsvShiny
+
+其中目标 PID 过滤只在 Generator 请求带有 PID 时启用；TID/SID/TSV 仍然是独立的精确筛选。TSV 仍按 `(TID XOR SID) >> 3` 计算，不能把 TSV 直接代入 PID 闪光判定。
 ```
 
 日期字段由 Wasm 返回结构化整数，TypeScript 只负责显示与 CSV，不重复日期反查算法。

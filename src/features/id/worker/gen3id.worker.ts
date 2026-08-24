@@ -5,6 +5,7 @@ import {
   id3FilterFlags,
   id3ModeToWasm,
   id3SearcherModeToWasm,
+  id3ShinyFilterToWasm,
 } from "../domain";
 import type { Id3WorkerRequest, Id3WorkerResponse } from "./messages";
 
@@ -20,6 +21,8 @@ interface Id3EmscriptenModule {
     tid: number,
     sid: number,
     tsv: number,
+    pid: number,
+    shinyFilter: number,
   ): number;
   _gen3id_search(mode: number, tid: number, input: number): number;
   _gen3id_result_ptr(): number;
@@ -75,6 +78,8 @@ function run(message: Extract<Id3WorkerRequest, { type: "run" }>) {
     message.filters.tid ?? 0,
     message.filters.sid ?? 0,
     message.filters.tsv ?? 0,
+    message.filters.pid ?? 0,
+    id3ShinyFilterToWasm(message.filters.shiny),
   );
   const errorCode = wasm._gen3id_last_error();
   if (errorCode !== 0) {
