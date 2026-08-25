@@ -10,8 +10,19 @@ const locationPath = path.join(
   upstreamRoot,
   "Gen6/Gen6Encounter/LocationTable6.cs",
 );
+const personalPath = path.join(upstreamRoot, "Resources/bytes/personal_ao");
 const locationText = fs.readFileSync(locationPath, "utf8");
+const personal = fs.readFileSync(personalPath);
 const outputPath = path.join(root, "src/features/gen6wild/data.ts");
+
+const GEN6_WILD_BABY_SPECIES = [
+  30, 31, 172, 173, 174, 175, 201, 236, 238, 239, 240, 298, 360, 406, 433, 438,
+  439, 440, 446, 447, 458,
+];
+const GEN6_WILD_UNDISCOVERED_SPECIES = Array.from(
+  { length: 721 },
+  (_, species) => species + 1,
+).filter((species) => personal[species * 0x50 + 0x16] === 0x0f);
 
 function balancedBlock(text, marker) {
   const markerIndex = text.indexOf(marker);
@@ -187,6 +198,9 @@ export const GEN6_WILD_SLOT_DISTRIBUTIONS = {
   "rock-smash": [50, 30, 15, 4, 1],
   fishing: [60, 35, 5],
 } as const;
+
+export const GEN6_WILD_BABY_SPECIES: readonly number[] = ${JSON.stringify(GEN6_WILD_BABY_SPECIES)};
+export const GEN6_WILD_UNDISCOVERED_SPECIES: readonly number[] = ${JSON.stringify(GEN6_WILD_UNDISCOVERED_SPECIES)};
 
 export const GEN6_WILD_AREAS: readonly Gen6WildArea[] = ${JSON.stringify(areas)};
 export const GEN6_WILD_LOCATIONS = {

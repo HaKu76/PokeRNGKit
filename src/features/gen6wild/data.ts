@@ -25,6 +25,18 @@ export const GEN6_WILD_SLOT_DISTRIBUTIONS = {
   fishing: [60, 35, 5],
 } as const;
 
+export const GEN6_WILD_BABY_SPECIES: readonly number[] = [
+  30, 31, 172, 173, 174, 175, 201, 236, 238, 239, 240, 298, 360, 406, 433, 438,
+  439, 440, 446, 447, 458,
+];
+export const GEN6_WILD_UNDISCOVERED_SPECIES: readonly number[] = [
+  30, 31, 144, 145, 146, 150, 151, 172, 173, 174, 175, 201, 236, 238, 239, 240,
+  243, 244, 245, 249, 250, 251, 298, 360, 377, 378, 379, 380, 381, 382, 383,
+  384, 385, 386, 406, 433, 438, 439, 440, 446, 447, 458, 480, 481, 482, 483,
+  484, 485, 486, 487, 488, 491, 492, 493, 494, 638, 639, 640, 641, 642, 643,
+  644, 645, 646, 647, 648, 649, 716, 717, 718, 719, 720, 721,
+];
+
 export const GEN6_WILD_AREAS: readonly Gen6WildArea[] = [
   {
     id: "omega-ruby-normal-326-1",

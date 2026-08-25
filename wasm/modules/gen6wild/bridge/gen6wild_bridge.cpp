@@ -307,7 +307,9 @@ Generated generateOne(const Gen6WildPackedRequest &request, const std::vector<st
         if (shinyValue(result.pid, request.tsv, request.trv) != 0) break;
     }
     std::array<bool, 6> used{};
-    auto perfect = (metadata & (1U << 9)) != 0 ? 3U : request.perfectIvCount;
+    // The encounter's guaranteed IV count is separate from the result filter.
+    // PerfectIvCount is an RNGFilters threshold and must not change the RNG stream.
+    auto perfect = (metadata & (1U << 9)) != 0 ? 3U : 0U;
     while (perfect > 0)
     {
         const auto index = randRange(next(), 6);

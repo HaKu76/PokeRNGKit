@@ -2,7 +2,9 @@ import type { ThreeDsProfile } from "../3dsprofiles/domain";
 import { GEN6_EVENT_PERSONAL } from "../gen6event/data";
 import {
   GEN6_WILD_AREAS,
+  GEN6_WILD_BABY_SPECIES,
   GEN6_WILD_LOCATIONS,
+  GEN6_WILD_UNDISCOVERED_SPECIES,
   type Gen6WildArea,
   type Gen6WildType,
   type Gen6WildVersion,
@@ -263,7 +265,11 @@ export function gen6WildSlots(
       level: levels[index] ?? levels[0] ?? 1,
       genderRatio: ratio,
       randomGender: ratio > 15 && ratio < 239,
-      fixedThreeIv: false,
+      fixedThreeIv:
+        GEN6_WILD_UNDISCOVERED_SPECIES.includes(value) &&
+        (version === "x" ||
+          version === "y" ||
+          !GEN6_WILD_BABY_SPECIES.includes(value)),
     };
   });
 }

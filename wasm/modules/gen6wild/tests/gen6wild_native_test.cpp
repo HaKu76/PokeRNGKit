@@ -1,7 +1,9 @@
 /* PokeRNGKit Gen VI Wild native fixture. GPL-3.0-or-later. */
 #include "gen6wild_bridge.h"
 
+#include <array>
 #include <cassert>
+#include <cstring>
 
 int main()
 {
@@ -33,6 +35,37 @@ int main()
     assert(gen6wild_generate(&request) > 0);
     assert(gen6wild_processed_count() == 32);
     assert(gen6wild_last_error() == 0);
+
+    // Perfect IV filtering must not change the generated IV stream or advance
+    // count. This is independent from encounter mechanics that guarantee IVs.
+    request.filtersDisabled = 1;
+    request.perfectIvCount = 0;
+    assert(gen6wild_generate(&request) == 32);
+    std::array<Gen6WildPackedResult, 32> baseline {};
+    std::memcpy(baseline.data(), reinterpret_cast<const void *>(gen6wild_result_ptr()),
+                sizeof(baseline));
+    request.perfectIvCount = 3;
+    assert(gen6wild_generate(&request) == 32);
+    assert(std::memcmp(baseline.data(), reinterpret_cast<const void *>(gen6wild_result_ptr()),
+                       sizeof(baseline)) == 0);
+
+    request.filtersDisabled = 0;
+    request.perfectIvCount = 1;
+    std::uint32_t expected = 0;
+    for (const auto &result : baseline) {
+        const auto ivCount =
+            ((result.iv0 & 0xffU) >= request.perfectIvValue) +
+            (((result.iv0 >> 8) & 0xffU) >= request.perfectIvValue) +
+            (((result.iv0 >> 16) & 0xffU) >= request.perfectIvValue) +
+            (((result.iv0 >> 24) & 0xffU) >= request.perfectIvValue) +
+            ((result.iv1 & 0xffU) >= request.perfectIvValue) +
+            (((result.iv1 >> 8) & 0xffU) >= request.perfectIvValue);
+        if (ivCount >= request.perfectIvCount) ++expected;
+    }
+    assert(gen6wild_generate(&request) == expected);
+
+    request.filtersDisabled = 1;
+    request.perfectIvCount = 0;
     request.encounterType = 1;
     request.slotDistribution[0] = 20;
     request.slotDistribution[1] = 20;

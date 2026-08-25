@@ -12,24 +12,24 @@
 
 空十六进制和十进制输入按 `0` 解释。上游帧上限为 `1000000000`，浏览器绝对帧保护上限为 `5000000`。
 
-| 输入                      | 进制与范围                                   | 默认/行为                                           | 上游依据                                      |
-| ------------------------- | -------------------------------------------- | --------------------------------------------------- | --------------------------------------------- |
-| Version                   | X、Y、Omega Ruby、Alpha Sapphire             | X/Y 共用 XY 表，OR/AS 共用 ORAS 表                  | `MainForm.cs`、`Gen6/PKMW6.cs`                |
-| Encounter Type            | Normal、Horde、Rock Smash、Fishing           | 由 `LocationTable6.GetTable()` 决定地点表           | `Gen6/Gen6Encounter/LocationTable6.cs`        |
-| Seed / Tiny Seed          | 十六进制，最多 8 位，`0..0xFFFFFFFF`         | 空值为 `0`                                          | `RNG/MT.cs`、`RNG/TinyMT.cs`                  |
-| Initial Frame / Max Frame | 十进制，`0..1000000000`；浏览器 `0..5000000` | Initial 必须小于等于 Max                            | `Util/FuncUtil.cs::MAXFRAME`、Web 预算        |
-| Delay                     | 十进制，`0..4000`                            | `Consider Delay` 开启时应用于 TinyMT 和主 RNG 起点  | `Core/RNGPool.cs::Generate6`、`Gen6/Wild6.cs` |
-| Tiny Frame                | 十进制，`0..1000000000`                      | `tinySeed + tinyFrame + frame` 建立独立 TinyMT 输入 | `Core/RNGPool.cs`、`Gen6/Wild6.cs`            |
-| TSV / TRV                 | TSV `0..4095`；TRV `0..15`                   | 默认从 3DS Profile 同步                             | `MainForm.Designer.cs`、`WildRNG.cs`          |
-| Encounter Rate            | 十进制，`0..100`                             | Normal/Fishing/Rock Smash 使用遇敌判定              | `Gen6/Wild6.cs`                               |
-| Party Pokemon             | 十进制，`0..5`                               | Fishing 额外消耗 `3 * PartyPokemon` 个 TinyMT 状态  | `Gen6/Wild6.cs::Prepare`                      |
-| PID Rolls                 | 十进制，`1..40`                              | 关闭 Shiny Charm 时实际只取 1 次                    | `Wild6.cs`、Web 预算                          |
-| Sync Nature               | `0..24` 或空值                               | 只有 Synchronize 队首可设置；空值按未选择           | `Wild6.cs`、`WildRNG.cs`                      |
-| Flute                     | `-1..1`                                      | `+1` 白色、`-1` 黑色、`0` 关闭；等级限制在 `1..100` | `WildRNG.cs::ModifyLevel`                     |
-| Slot                      | Normal 12、Horde/Rock Smash 5、Fishing 3     | 机率总和必须为 `100`；零机率槽位允许                | `WildRNG.cs::SlotDistribution`                |
-| IV 范围                   | 六组闭区间，各端 `0..31`                     | 最小值不得大于最大值                                | `Core/RNGFilters.cs`                          |
-| Perfect IV                | 数值 `0..31`，数量 `0..6`                    | 结果中达到数值的 IV 数量必须达到 Count              | `Core/RNGFilters.cs`                          |
-| Result Limit              | 十进制，`1..100000`                          | 结果达到上限后结束 Worker 任务                      | Web Worker 任务保护                           |
+| 输入                      | 进制与范围                                   | 默认/行为                                                                           | 上游依据                                      |
+| ------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------- |
+| Version                   | X、Y、Omega Ruby、Alpha Sapphire             | X/Y 共用 XY 表，OR/AS 共用 ORAS 表                                                  | `MainForm.cs`、`Gen6/PKMW6.cs`                |
+| Encounter Type            | Normal、Horde、Rock Smash、Fishing           | 由 `LocationTable6.GetTable()` 决定地点表                                           | `Gen6/Gen6Encounter/LocationTable6.cs`        |
+| Seed / Tiny Seed          | 十六进制，最多 8 位，`0..0xFFFFFFFF`         | 空值为 `0`                                                                          | `RNG/MT.cs`、`RNG/TinyMT.cs`                  |
+| Initial Frame / Max Frame | 十进制，`0..1000000000`；浏览器 `0..5000000` | Initial 必须小于等于 Max                                                            | `Util/FuncUtil.cs::MAXFRAME`、Web 预算        |
+| Delay                     | 十进制，`0..4000`                            | `Consider Delay` 开启时应用于 TinyMT 和主 RNG 起点                                  | `Core/RNGPool.cs::Generate6`、`Gen6/Wild6.cs` |
+| Tiny Frame                | 十进制，`0..1000000000`                      | `tinySeed + tinyFrame + frame` 建立独立 TinyMT 输入                                 | `Core/RNGPool.cs`、`Gen6/Wild6.cs`            |
+| TSV / TRV                 | TSV `0..4095`；TRV `0..15`                   | 默认从 3DS Profile 同步                                                             | `MainForm.Designer.cs`、`WildRNG.cs`          |
+| Encounter Rate            | 十进制，`0..100`                             | Normal/Fishing/Rock Smash 使用遇敌判定                                              | `Gen6/Wild6.cs`                               |
+| Party Pokemon             | 十进制，`0..5`                               | Fishing 额外消耗 `3 * PartyPokemon` 个 TinyMT 状态                                  | `Gen6/Wild6.cs::Prepare`                      |
+| PID Rolls                 | 十进制，`1..40`                              | 关闭 Shiny Charm 时实际只取 1 次                                                    | `Wild6.cs`、Web 预算                          |
+| Sync Nature               | `0..24` 或空值                               | 只有 Synchronize 队首可设置；空值按未选择                                           | `Wild6.cs`、`WildRNG.cs`                      |
+| Flute                     | `-1..1`                                      | `+1` 白色、`-1` 黑色、`0` 关闭；等级限制在 `1..100`                                 | `WildRNG.cs::ModifyLevel`                     |
+| Slot                      | Normal 12、Horde/Rock Smash 5、Fishing 3     | 机率总和必须为 `100`；零机率槽位允许                                                | `WildRNG.cs::SlotDistribution`                |
+| IV 范围                   | 六组闭区间，各端 `0..31`                     | 最小值不得大于最大值                                                                | `Core/RNGFilters.cs`                          |
+| Perfect IV                | 数值 `0..31`，数量 `0..6`                    | 结果中达到数值的 IV 数量必须达到 Count；筛选数量不改变遭遇本身的保底 IV 或 RNG 推进 | `Core/RNGFilters.cs`                          |
+| Result Limit              | 十进制，`1..100000`                          | 结果达到上限后结束 Worker 任务                                                      | Web Worker 任务保护                           |
 
 ## 算法与结果
 

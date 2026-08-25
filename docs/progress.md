@@ -1,5 +1,13 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-25 完美个体筛选冲突修复
+
+- 修复：Gen VI Wild 不再把筛选用的 `Perfect IV Count` 当作遭遇生成时的保底 31 IV 数量，筛选 Count 不会改变 RNG 推进或生成结果。
+- 保留：Gen VI Wild 上游 Undiscovered Egg Group 的 3V 规则；XY 保留 BabyMons 的 3V 行为，ORAS 按上游排除 BabyMons。
+- 增加：原生夹具覆盖筛选 Count 与生成流独立、筛选结果数量正确；TypeScript 夹具覆盖 Perfect IV 与六项 IV 区间的组合筛选。
+- 已通过：`npm run wasm:test:native`（69/69 CTest）、`npm run verify`（177 个测试文件、615 项测试、生产构建）。
+- 已知：Lint 仍保留 `src/features/static/Gen3StaticPanel.tsx:296` 的既有 Hook 依赖 warning，以及生产构建的大 chunk warning；未进行外部 Chrome/Edge 或生产 URL 验收。
+
 ## 2026-08-25 完美个体筛选扩展与工程验证
 
 - 新增：Gen III、Gen IV、Gen V、Gen VI Egg 和 Gen VIII 相关 Generator/Searcher
