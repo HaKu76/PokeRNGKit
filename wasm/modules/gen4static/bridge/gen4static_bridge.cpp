@@ -14,6 +14,7 @@
 #include "gen4static_bridge.h"
 
 #include <Core/RNG/LCRNG.hpp>
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -28,7 +29,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maxStatesPerCall = 100000;
 
     enum ErrorCode : std::uint32_t
@@ -122,6 +123,13 @@ namespace
             }
         }
         return true;
+    }
+
+    bool matchesPerfectIvs(const IvArray &ivs, std::uint32_t value, std::uint32_t count)
+    {
+        return static_cast<std::uint32_t>(std::count_if(ivs.begin(), ivs.end(), [value](std::uint8_t iv) {
+            return iv >= value;
+        })) >= count;
     }
 
     bool matchesState(const IvArray &ivs, std::uint8_t nature, std::uint8_t shiny, std::uint8_t gender,
@@ -467,7 +475,8 @@ extern "C"
         std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
         std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
         std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax,
-        std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax)
+        std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax,
+        std::uint32_t perfectIvValue, std::uint32_t perfectIvCount)
     {
         generatedResults.clear();
         searchedResults.clear();
@@ -482,7 +491,8 @@ extern "C"
             || static_cast<std::uint64_t>(initialAdvances) + offset + maxAdvances > 0xffffffffULL
             || !validCommonInput(method, lead, syncNature, species, level, genderRatio, shinyLock, tid, sid,
                                  shinyFilter, genderFilter, abilityFilter, natureFilter, hiddenPowerFilter,
-                                 minimum, maximum))
+                                 minimum, maximum)
+            || perfectIvValue > 31 || perfectIvCount > 6)
         {
             lastError = ErrorCode::InvalidInput;
             return 0;
@@ -566,6 +576,7 @@ extern "C"
             const auto iv1 = go.nextUShort();
             const auto iv2 = go.nextUShort();
             const IvArray ivs = decodeIvs(iv1, iv2);
+            if (!matchesPerfectIvs(ivs, perfectIvValue, perfectIvCount)) continue;
             if (!appendGeneratedState(initialAdvances + count, pid, ivs, genderRatio, level, tsv,
                                       rng.nextUShort(), natureFilter, hiddenPowerFilter, minimum, maximum,
                                       shinyFilter, genderFilter, abilityFilter))
@@ -586,7 +597,8 @@ extern "C"
         std::uint32_t attackMin, std::uint32_t defenseMin, std::uint32_t specialAttackMin,
         std::uint32_t specialDefenseMin, std::uint32_t speedMin, std::uint32_t hpMax,
         std::uint32_t attackMax, std::uint32_t defenseMax, std::uint32_t specialAttackMax,
-        std::uint32_t specialDefenseMax, std::uint32_t speedMax)
+        std::uint32_t specialDefenseMax, std::uint32_t speedMax, std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount)
     {
         generatedResults.clear();
         searchedResults.clear();
@@ -600,7 +612,8 @@ extern "C"
         if (stateCount == 0 || stateCount > maxStatesPerCall || minAdvance > maxAdvance || minDelay > maxDelay
             || !validCommonInput(method, lead, syncNature, species, level, genderRatio, shinyLock, tid, sid,
                                  shinyFilter, genderFilter, abilityFilter, natureFilter, hiddenPowerFilter,
-                                 minimum, maximum))
+                                 minimum, maximum)
+            || perfectIvValue > 31 || perfectIvCount > 6)
         {
             lastError = ErrorCode::InvalidInput;
             return 0;
@@ -629,6 +642,7 @@ extern "C"
                 ivs[stat] = static_cast<std::uint8_t>(minimum[stat] + stateIndex % widths[stat]);
                 stateIndex /= widths[stat];
             }
+            if (!matchesPerfectIvs(ivs, perfectIvValue, perfectIvCount)) continue;
             const auto recovered = recoverPokeRngIvs(ivs);
             if (!searchRecoveredIvs(recovered, ivs, minAdvance, maxAdvance, minDelay, maxDelay, method, lead,
                                     genderRatio, level, shinyLock, tsv, natureFilter, hiddenPowerFilter, minimum,

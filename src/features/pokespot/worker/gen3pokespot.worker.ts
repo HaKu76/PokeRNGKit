@@ -76,6 +76,8 @@ function run(message: Extract<Gen3PokeSpotWorkerRequest, { type: "run" }>) {
     filters.slotMask,
     ...filters.ivMin,
     ...filters.ivMax,
+    filters.perfectIvValue,
+    filters.perfectIvCount,
   );
   const errorCode = wasm._gen3pokespot_last_error();
   if (errorCode !== 0 && errorCode !== 2)

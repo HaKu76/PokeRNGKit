@@ -51,7 +51,7 @@ function requestWords(
   message: Extract<GameCubeWorkerRequest, { type: "run" }>,
 ) {
   const { request, chunk } = message;
-  const words = new Uint32Array(55);
+  const words = new Uint32Array(57);
   words[0] = categoryToWasm(request.category);
   words[1] = versionToWasm(request.version, request.category);
   words[2] = request.template.species;
@@ -80,6 +80,8 @@ function requestWords(
   request.template.locks.forEach((lock, index) =>
     words.set([lock.nature, lock.gender, lock.genderRatio], 40 + index * 3),
   );
+  words[55] = request.filters.perfectIvValue;
+  words[56] = request.filters.perfectIvCount;
   return words;
 }
 function run(message: Extract<GameCubeWorkerRequest, { type: "run" }>) {

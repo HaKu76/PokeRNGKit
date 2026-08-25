@@ -31,6 +31,8 @@ const common = {
     hiddenPowerMask: 0xffff,
     ivMin: [0, 0, 0, 0, 0, 0] as Gen4EggIvTuple,
     ivMax: [31, 31, 31, 31, 31, 31] as Gen4EggIvTuple,
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
 };
 

@@ -2,7 +2,7 @@
   "id": "gen4event",
   "generation": 4,
   "contractVersion": 1,
-  "apiVersion": 1,
+  "apiVersion": 2,
   "target": "gen4event",
   "operations": ["generator", "searcher"],
   "artifacts": {

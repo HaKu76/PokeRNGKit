@@ -58,7 +58,7 @@ namespace
 
 int main()
 {
-    assert(gen4wild_api_version() == 1);
+    assert(gen4wild_api_version() == 2);
     const std::array<Gen4WildPackedSlot, 12> slots = {
         slot(125, 39, { 65, 83, 57, 105, 95, 85 }, { 13, 13 }, 63, { 0, 322, 0 }, { 9, 9, 0 }),
         slot(419, 40, { 85, 105, 55, 115, 85, 50 }, { 11, 11 }, 127, { 0, 186, 0 }, { 33, 33, 0 }),

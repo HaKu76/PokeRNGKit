@@ -34,7 +34,8 @@ extern "C"
         std::uint32_t attackMin, std::uint32_t defenseMin, std::uint32_t specialAttackMin,
         std::uint32_t specialDefenseMin, std::uint32_t speedMin, std::uint32_t hpMax,
         std::uint32_t attackMax, std::uint32_t defenseMax, std::uint32_t specialAttackMax,
-        std::uint32_t specialDefenseMax, std::uint32_t speedMax);
+        std::uint32_t specialDefenseMax, std::uint32_t speedMax, std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount);
     std::uint32_t gen4event_search(
         std::uint32_t startIndex, std::uint32_t stateCount, std::uint32_t minAdvance,
         std::uint32_t maxAdvance, std::uint32_t minDelay, std::uint32_t maxDelay,
@@ -43,7 +44,8 @@ extern "C"
         std::uint32_t defenseMin, std::uint32_t specialAttackMin,
         std::uint32_t specialDefenseMin, std::uint32_t speedMin, std::uint32_t hpMax,
         std::uint32_t attackMax, std::uint32_t defenseMax, std::uint32_t specialAttackMax,
-        std::uint32_t specialDefenseMax, std::uint32_t speedMax);
+        std::uint32_t specialDefenseMax, std::uint32_t speedMax, std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount);
     std::uintptr_t gen4event_result_ptr();
     std::uint32_t gen4event_result_count();
     std::uint32_t gen4event_last_error();

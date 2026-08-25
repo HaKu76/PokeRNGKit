@@ -33,7 +33,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maximumResults = 100000;
     constexpr std::uint64_t maximumEvaluations = 250000000;
     constexpr std::uint64_t bwMultiplier = 0x5d588b656c078965ULL;
@@ -575,6 +575,10 @@ namespace
         if ((request.hiddenPowerMask & (1U << state.hiddenPower)) == 0) return false;
         for (std::size_t index = 0; index < state.ivs.size(); index++)
             if (state.ivs[index] < request.ivMin[index] || state.ivs[index] > request.ivMax[index]) return false;
+        if (std::count_if(state.ivs.begin(), state.ivs.end(), [&request](std::uint8_t iv) {
+                return iv >= request.perfectIvValue;
+            }) < static_cast<int>(request.perfectIvCount))
+            return false;
         return true;
     }
 
@@ -586,6 +590,10 @@ namespace
         if ((request.hiddenPowerMask & (1U << state.hiddenPower)) == 0) return false;
         for (std::size_t index = 0; index < state.ivs.size(); index++)
             if (state.ivs[index] < request.ivMin[index] || state.ivs[index] > request.ivMax[index]) return false;
+        if (std::count_if(state.ivs.begin(), state.ivs.end(), [&request](std::uint8_t iv) {
+                return iv >= request.perfectIvValue;
+            }) < static_cast<int>(request.perfectIvCount))
+            return false;
         return true;
     }
 
@@ -914,6 +922,7 @@ namespace
             || request.filtersDisabled > 1 || request.shinyFilter > 4 || request.genderFilter > 3
             || request.abilityFilter > 3 || request.natureMask == 0 || request.natureMask > 0x1ffffff
             || request.hiddenPowerMask == 0 || request.hiddenPowerMask > 0xffff || request.chunkCount == 0
+            || request.perfectIvValue > 31 || request.perfectIvCount > 6
             || !validParentCombination(request.parentAGender, request.parentBGender))
             return false;
         for (std::size_t index = 0; index < 6; index++)
@@ -991,7 +1000,7 @@ namespace
     }
 }
 
-static_assert(sizeof(Gen5EggPackedRequest) == 71 * sizeof(std::uint32_t));
+static_assert(sizeof(Gen5EggPackedRequest) == 73 * sizeof(std::uint32_t));
 static_assert(sizeof(Gen5EggPackedResult) == 16 * sizeof(std::uint32_t));
 
 extern "C"

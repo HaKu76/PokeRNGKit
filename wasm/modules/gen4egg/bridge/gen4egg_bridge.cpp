@@ -32,8 +32,8 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
-    constexpr std::uint32_t expectedRequestWords = 48;
+    constexpr std::uint32_t apiVersion = 2;
+    constexpr std::uint32_t expectedRequestWords = 50;
     constexpr std::size_t maxResults = 100000;
 
     enum ErrorCode : std::uint32_t
@@ -75,6 +75,8 @@ namespace
         std::uint32_t parentGender(std::size_t parent) const { return value[44 + parent]; }
         std::uint32_t minDelay() const { return value[46]; }
         std::uint32_t maxDelay() const { return value[47]; }
+        std::uint32_t perfectIvValue() const { return value[48]; }
+        std::uint32_t perfectIvCount() const { return value[49]; }
     };
 
     struct HeldState
@@ -106,7 +108,8 @@ namespace
             || request.genderRatio() > 255 || request.alternateGenderRatio() > 255
             || request.tid() > 0xffff || request.sid() > 0xffff || request.minDelay() > request.maxDelay()
             || request.natureMask() == 0 || request.natureMask() > 0x1ffffff
-            || request.powerMask() == 0 || request.powerMask() > 0xffff || !validParentCombination(request))
+            || request.powerMask() == 0 || request.powerMask() > 0xffff || !validParentCombination(request)
+            || request.perfectIvValue() > 31 || request.perfectIvCount() > 6)
         {
             return false;
         }
@@ -184,11 +187,14 @@ namespace
 
     bool matchesIvs(const Request &request, const std::array<std::uint8_t, 6> &ivs)
     {
+        std::uint32_t perfect = 0;
         for (std::size_t index = 0; index < ivs.size(); index++)
         {
             if (ivs[index] < request.minimum(index) || ivs[index] > request.maximum(index)) return false;
+            if (ivs[index] >= request.perfectIvValue()) perfect++;
         }
-        return (request.powerMask() & (1u << hiddenPower(ivs))) != 0;
+        return perfect >= request.perfectIvCount()
+            && (request.powerMask() & (1u << hiddenPower(ivs))) != 0;
     }
 
     std::vector<HeldState> generateHeld(const Request &request, std::uint32_t seed,

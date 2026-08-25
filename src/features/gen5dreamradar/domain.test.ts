@@ -64,6 +64,8 @@ const filters = {
   ],
   natureMask: 0x1ff_ffff,
   hiddenPowerMask: 0xffff,
+  perfectIvValue: 31,
+  perfectIvCount: 0,
 };
 
 const generator: Gen5DreamRadarGeneratorRequest = {

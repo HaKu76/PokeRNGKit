@@ -9,6 +9,7 @@ import {
   type Gen5WildRequest,
   type Gen5WildResult,
 } from "../domain";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 import type {
   Gen5WildEngine,
   Gen5WildOptions,
@@ -54,7 +55,14 @@ function previewIvs(request: Gen5WildRequest) {
     }
     if (!possible) continue;
     const ivs = values as Gen5WildIvTuple;
-    if ((request.filters.hiddenPowerMask & (1 << hiddenPower(ivs).type)) !== 0)
+    if (
+      (request.filters.hiddenPowerMask & (1 << hiddenPower(ivs).type)) !== 0 &&
+      passesPerfectIvFilter(
+        ivs,
+        request.filters.perfectIvValue,
+        request.filters.perfectIvCount,
+      )
+    )
       return ivs;
   }
   return undefined;

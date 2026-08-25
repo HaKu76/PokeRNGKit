@@ -1,8 +1,15 @@
 # 第四世代孵化乱数 Generator / Searcher
 
+## 完美个体筛选
+
+- 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
+- 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
+- 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
+
 > - 模块标识：`gen4egg`
 > - PokeFinder 基线：4.3.2 revision `dd00fe7`
-> - Worker / Wasm API：`1`
+> - Worker / Wasm API：`2`
 > - 生产模型：静态前端、独立 Web Worker、独立 Emscripten Wasm
 
 ## 1. 覆盖范围
@@ -82,7 +89,7 @@ seed = ((ab << 24) | (cd << 16)) + delay
 
 ## 6. Wasm 与 Worker
 
-请求固定为 48 个 `uint32_t`。Generator 结果固定为 23 个 `uint32_t`，Searcher 结果固定为 25 个 `uint32_t`。C++ 使用 `static_assert` 固定记录宽度；Worker 在复制结果前检查 API、错误码、结果数量、内存对齐、结果范围和单次 100,000 条上限。
+请求固定为 50 个 `uint32_t`。Generator 结果固定为 23 个 `uint32_t`，Searcher 结果固定为 25 个 `uint32_t`。C++ 使用 `static_assert` 固定记录宽度；Worker 在复制结果前检查 API、错误码、结果数量、内存对齐、结果范围和单次 100,000 条上限。
 
 ```text
 Gen4EggPanel

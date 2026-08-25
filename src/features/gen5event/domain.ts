@@ -4,9 +4,10 @@ import type {
   Gen5Language,
   Gen5Profile,
 } from "../gen5profiles/domain";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
-export const GEN5_EVENT_API_VERSION = 1;
-export const GEN5_EVENT_REQUEST_WORDS = 64;
+export const GEN5_EVENT_API_VERSION = 2;
+export const GEN5_EVENT_REQUEST_WORDS = 66;
 export const GEN5_EVENT_RESULT_WORDS = 11;
 export const GEN5_EVENT_MAX_RESULTS = 100_000;
 export const GEN5_EVENT_MAX_EVALUATIONS = 250_000_000n;
@@ -63,6 +64,8 @@ export interface Gen5EventFilters {
   hiddenPowerMask: number;
   ivMin: Gen5EventIvTuple;
   ivMax: Gen5EventIvTuple;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 interface Gen5EventRequestBase {
@@ -299,6 +302,8 @@ function validateFilters(filters: Gen5EventFilters) {
     ![1, 2, 3, 255].includes(filters.shiny)
   )
     throw new TypeError("Invalid Event filter selection.");
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
 }
 
 export function gen5EventSearcherSeedCount(request: Gen5EventSearcherRequest) {
@@ -613,6 +618,8 @@ export function encodeGen5EventRequest(
     request.filters.hiddenPowerMask,
     ...request.filters.ivMin,
     ...request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
     request.resultLimit,
     ...(request.mode === "searcher"
       ? [...dateParts(request.startDate), ...dateParts(request.endDate)]

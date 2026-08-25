@@ -1,5 +1,28 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-25 完美个体筛选扩展与工程验证
+
+- 新增：Gen III、Gen IV、Gen V、Gen VI Egg 和 Gen VIII 相关 Generator/Searcher
+  工作区统一支持 `Perfect IV Value` 与 `Perfect IV Count`，语义为六项个体值中
+  不低于指定值的项目数量至少达到指定数量；默认值为 `31 / 0`，范围为 `0..31 / 0..6`。
+- 接入：共享筛选控件、domain 校验、Worker 请求编码、Wasm bridge、API 版本与请求长度，
+  并同步 TypeScript/C++ 固定请求夹具、预览测试、模块文档和简体中文标签。
+- 更新：贡献记录第二条赞助人改为“厉害啊”，新增“千一”于 2026-08-25 贡献 20 RMB
+  用于 AI Token；记录总额为 120 RMB。
+- 已通过：`npm run format:check`、`git diff --check`、`npm run verify` 和
+  `npm run wasm:test:native`；177 个测试文件、615 项测试、69 个 CTest、TypeScript 检查、
+  Vite 生产构建和 PWA 预缓存均成功。构建保留既有大 chunk 警告，Lint 保留 1 条
+  `Gen3StaticPanel.tsx` Hook 依赖警告。
+- 未运行：`npm run verify:full`，本机未发现 `emcc`、`em++` 或 `emcmake`；外部 Chrome/Edge
+  视觉验收、生产页面算法回归和 Windows EXE 实机验收也未运行。
+- Git：当前分支为 `main`，本轮功能与文档改动已完成本地提交；推送 `origin/main` 时
+  GitHub 443 连接被重置，网络恢复后需重试推送。
+
+## 2026-08-25 贡献记录更新
+
+- 修正：第二条赞助记录的赞助人名称改为“厉害啊”，保留 2026-08-23、50 RMB 和 AI Token 用途。
+- 新增：第三条赞助记录为“千一”于 2026-08-25 赞助 20 RMB，用于 AI Token；贡献记录总额更新为 120 RMB。
+
 ## 2026-08-24 第三世代 Seed 工具合并
 
 - 调整：侧栏将 `初始Seed检索`、`Seed查询时间` 和 `GameCube Seed查询` 合并为
@@ -44,7 +67,7 @@
 
 - 修复：应用按模块键缓存本页面会话中已访问的工作区；从定点乱数切换到野生乱数再返回时，表单输入、检索结果、排序和操作上下文不再因组件卸载而重置。
 - 边界：非当前模块通过原生 `hidden` 与 `inert` 隐藏并禁止交互，仍保留 React 状态；刷新页面恢复现有默认状态，不把可能很大的结果集写入 localStorage 或 IndexedDB。
-- 更新：贡献榜新增“**然”于 2026-08-23 贡献 50 RMB 用于 AI Token 的记录，并增加日期列；记录总额同步更新为 100 RMB。
+- 更新：贡献榜新增“厉害啊”于 2026-08-23 贡献 50 RMB 用于 AI Token 的记录，并增加日期列；记录总额同步更新为 100 RMB。
 - 已通过：本轮触及文件格式化、全仓格式检查和 `git diff --check`。
 - 未运行：测试、Lint、TypeScript、构建、浏览器切换回归和生产页面回归；本轮未取得对应具体命令或 URL 的授权。
 

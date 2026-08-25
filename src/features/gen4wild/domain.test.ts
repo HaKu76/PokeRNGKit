@@ -68,6 +68,8 @@ const generatorRequest: Gen4WildGeneratorRequest = {
     levelMax: 100,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
 };
 

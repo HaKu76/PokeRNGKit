@@ -10,6 +10,7 @@ import {
   type Gen5HiddenGrottoRequest,
   type Gen5HiddenGrottoResult,
 } from "../domain";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 import type {
   Gen5HiddenGrottoEngine,
   Gen5HiddenGrottoOptions,
@@ -63,10 +64,16 @@ function previewIvs(request: Gen5HiddenGrottoRequest) {
     if (!valid) continue;
     const ivs = values as Gen5HiddenGrottoIvTuple;
     if (
-      request.pokemonFilters.hiddenPowerMask === 0 ||
-      (request.pokemonFilters.hiddenPowerMask &
-        (1 << hiddenPower(ivs).type)) !==
-        0
+      (request.pokemonFilters.hiddenPowerMask === 0 ||
+        (request.pokemonFilters.hiddenPowerMask &
+          (1 << hiddenPower(ivs).type)) !==
+          0) &&
+      (request.pokemonFilters.disabled ||
+        passesPerfectIvFilter(
+          ivs,
+          request.pokemonFilters.perfectIvValue,
+          request.pokemonFilters.perfectIvCount,
+        ))
     )
       return ivs;
   }

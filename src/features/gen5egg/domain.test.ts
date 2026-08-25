@@ -84,6 +84,8 @@ const filters = {
   ability: "any" as const,
   natureMask: 0x1ff_ffff,
   hiddenPowerMask: 0xffff,
+  perfectIvValue: 31,
+  perfectIvCount: 0,
   ivMin: [0, 0, 0, 0, 0, 0] as [number, number, number, number, number, number],
   ivMax: [31, 31, 31, 31, 31, 31] as [
     number,
@@ -225,7 +227,7 @@ describe("Gen 5 Egg domain", () => {
     ).toThrow("Start date is after end date");
   });
 
-  it("splits deterministic Generator frames and packs 71 words", () => {
+  it("splits deterministic Generator frames and packs 73 words", () => {
     expect(
       splitGen5EggRequest(generator, 3).map(({ start, count }) => [
         start,
@@ -242,7 +244,7 @@ describe("Gen 5 Egg domain", () => {
       start: 0,
       count: 1,
     });
-    expect(encoded).toHaveLength(71);
+    expect(encoded).toHaveLength(73);
     expect([...encoded.slice(23, 29)]).toEqual(parentA.ivs);
     expect(encoded[37]).toBe(0);
     expect(encoded[38]).toBe(1);

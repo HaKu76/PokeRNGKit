@@ -28,6 +28,8 @@ const value: Gen8UndergroundRequest = {
     weightMax: 255,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     species: getGen8UndergroundSpecies("brilliantdiamond", 2, 1),
   },
   resultLimit: 100,

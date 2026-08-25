@@ -22,6 +22,7 @@ import { useGen5Profiles } from "../gen5profiles/useGen5Profiles";
 import type { Gen5AdjacentSeedsInitialContext } from "../gen5adjacentseeds/domain";
 import { FloatingToolPanel } from "../shared/FloatingToolPanel";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import {
   gen5StaticFastSearchEligible,
   parseGen5StaticIvCache,
@@ -322,6 +323,8 @@ export function Gen5StaticPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [natureMask, setNatureMask] = useState(ALL_NATURES);
   const [hiddenPowerMask, setHiddenPowerMask] = useState(ALL_HIDDEN_POWERS);
   const [ability, setAbility] = useState<0 | 1 | 255>(255);
@@ -504,6 +507,8 @@ export function Gen5StaticPanel({
     ability,
     gender,
     shiny,
+    perfectIvValue: Number(perfectIvValue || "0"),
+    perfectIvCount: Number(perfectIvCount || "0"),
   });
 
   const buildRequest = (): Gen5StaticRequest => {
@@ -1190,6 +1195,13 @@ export function Gen5StaticPanel({
                 </div>
               ))}
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              disabled={busy || (mode === "generator" && filtersDisabled)}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <div className="gen5static-filter-grid">
               <MultiCheckSelect
                 anyLabel={labels.any}

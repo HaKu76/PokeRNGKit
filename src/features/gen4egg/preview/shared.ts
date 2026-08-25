@@ -1,4 +1,5 @@
 import type { Gen4EggFilters, Gen4EggIvTuple, Gen4EggState } from "../domain";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 
 export const GEN4_EGG_PREVIEW_SAMPLE_LIMIT = 320;
 export const GEN4_EGG_PREVIEW_STEP_LIMIT = 8;
@@ -53,6 +54,11 @@ export function gen4EggPreviewMatchesFilters(
     state.ivs.every(
       (value, index) =>
         value >= filters.ivMin[index] && value <= filters.ivMax[index],
+    ) &&
+    passesPerfectIvFilter(
+      state.ivs,
+      filters.perfectIvValue,
+      filters.perfectIvCount,
     )
   );
 }

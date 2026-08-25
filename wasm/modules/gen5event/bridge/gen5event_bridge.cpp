@@ -32,7 +32,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maximumResults = 100000;
     constexpr std::uint64_t maximumEvaluations = 250000000;
     constexpr std::uint64_t bwMultiplier = 0x5d588b656c078965ULL;
@@ -570,6 +570,10 @@ namespace
         if (request.filtersDisabled != 0) return true;
         for (std::size_t index = 0; index < state.ivs.size(); index++)
             if (state.ivs[index] < request.ivMin[index] || state.ivs[index] > request.ivMax[index]) return false;
+        if (std::count_if(state.ivs.begin(), state.ivs.end(), [&request](std::uint8_t iv) {
+                return iv >= request.perfectIvValue;
+            }) < static_cast<int>(request.perfectIvCount))
+            return false;
         return (request.abilityFilter == 255 || request.abilityFilter == state.ability)
             && (request.genderFilter == 255 || request.genderFilter == state.gender)
             && (request.shinyFilter == 255 || (request.shinyFilter & state.shiny) != 0)
@@ -722,6 +726,7 @@ namespace
             || !validShinyFilter(request.shinyFilter) || request.natureMask == 0
             || request.natureMask > 0x1ffffffU || request.hiddenPowerMask == 0
             || request.hiddenPowerMask > 0xffffU || request.resultLimit == 0
+            || request.perfectIvValue > 31 || request.perfectIvCount > 6
             || request.resultLimit > maximumResults || request.chunkCount == 0)
             return false;
         for (std::size_t index = 0; index < 6; index++)
@@ -780,7 +785,7 @@ namespace
     }
 }
 
-static_assert(sizeof(Gen5EventPackedRequest) == 64 * sizeof(std::uint32_t));
+static_assert(sizeof(Gen5EventPackedRequest) == 66 * sizeof(std::uint32_t));
 static_assert(sizeof(Gen5EventPackedResult) == 11 * sizeof(std::uint32_t));
 
 extern "C"

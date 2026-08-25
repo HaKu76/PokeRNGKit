@@ -8,6 +8,7 @@ import {
   type Gen5EventRequest,
   type Gen5EventResult,
 } from "../domain";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 import type {
   Gen5EventEngine,
   Gen5EventSearchOptions,
@@ -55,8 +56,14 @@ function previewIvs(request: Gen5EventRequest) {
       continue;
     const power = hiddenPower(ivs);
     if (
-      request.filters.disabled ||
-      (request.filters.hiddenPowerMask & (1 << power.type)) !== 0
+      (request.filters.disabled ||
+        (request.filters.hiddenPowerMask & (1 << power.type)) !== 0) &&
+      (request.filters.disabled ||
+        passesPerfectIvFilter(
+          ivs,
+          request.filters.perfectIvValue,
+          request.filters.perfectIvCount,
+        ))
     )
       return ivs;
   }

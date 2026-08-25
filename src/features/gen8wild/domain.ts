@@ -1,4 +1,8 @@
 import type { Gen8Profile } from "../gen8profiles/domain";
+import {
+  passesPerfectIvFilter,
+  validatePerfectIvFilter,
+} from "../shared/perfectIvFilter";
 import type { Gen8WildEncounter, Gen8WildVersion } from "./data";
 import {
   getGen8WildLocations,
@@ -7,8 +11,8 @@ import {
   type Gen8WildEncounterSettings,
 } from "./encounters";
 
-export const GEN8_WILD_API_VERSION = 1;
-export const GEN8_WILD_REQUEST_WORDS = 48;
+export const GEN8_WILD_API_VERSION = 2;
+export const GEN8_WILD_REQUEST_WORDS = 50;
 export const GEN8_WILD_RESULT_WORDS = 12;
 export const GEN8_WILD_MAX_RESULTS = 100_000;
 export const GEN8_WILD_MAX_EVALUATIONS = 250_000_000;
@@ -42,6 +46,8 @@ export interface Gen8WildFilters {
   weightMax: number;
   ivMin: Gen8WildIvTuple;
   ivMax: Gen8WildIvTuple;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen8WildRequest {
@@ -282,6 +288,8 @@ function validateFilters(filters: Gen8WildFilters, slotCount: number) {
       throw new TypeError("Each IV range must be between 0 and 31.");
     }
   });
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
 }
 
 export function gen8WildTaskCount(request: Gen8WildRequest) {
@@ -417,6 +425,8 @@ export function encodeGen8WildRequest(
     request.filters.weightMax,
     ...request.filters.ivMin,
     ...request.filters.ivMax,
+    request.filters.disabled ? 31 : request.filters.perfectIvValue,
+    request.filters.disabled ? 0 : request.filters.perfectIvCount,
     request.offset,
     request.resultLimit,
     request.profile.nationalDex ? 1 : 0,
@@ -513,7 +523,13 @@ export function validateGen8WildResult(
     !integerIn(result.weight, 0, 255) ||
     !integerIn(result.characteristic, 0, 29) ||
     result.ivs.some((value) => !integerIn(value, 0, 31)) ||
-    result.stats.some((value) => !integerIn(value, 1, 999))
+    result.stats.some((value) => !integerIn(value, 1, 999)) ||
+    (!request.filters.disabled &&
+      !passesPerfectIvFilter(
+        result.ivs,
+        request.filters.perfectIvValue,
+        request.filters.perfectIvCount,
+      ))
   ) {
     throw new RangeError("Invalid Gen 8 Wild result.");
   }

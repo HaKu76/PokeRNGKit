@@ -1,4 +1,5 @@
 import { Select } from "../shared/Select";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Settings2, Square, Trash2 } from "lucide-react";
 import {
@@ -209,6 +210,8 @@ export function Gen8RaidsPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [showStats, setShowStats] = useState(false);
   const [results, setResults] = useState<Gen8RaidResult[]>([]);
   const [status, setStatus] = useState<RunStatus>("ready");
@@ -350,6 +353,8 @@ export function Gen8RaidsPanel({
         ivMax: (disabled
           ? [31, 31, 31, 31, 31, 31]
           : ivMax.map(parseGen8RaidDecimal)) as Gen8RaidIvTuple,
+        perfectIvValue: disabled ? 31 : parseGen8RaidDecimal(perfectIvValue),
+        perfectIvCount: disabled ? 0 : parseGen8RaidDecimal(perfectIvCount),
       },
       resultLimit: 100_000,
     };
@@ -869,6 +874,13 @@ export function Gen8RaidsPanel({
                 />
               </label>
             ))}
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              disabled={filtersDisabled}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
           </div>
         </fieldset>
       </section>

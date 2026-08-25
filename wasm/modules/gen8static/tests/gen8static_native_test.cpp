@@ -18,9 +18,9 @@ namespace
         return condition;
     }
 
-    std::array<std::uint32_t, 41> request()
+    std::array<std::uint32_t, 43> request()
     {
-        std::array<std::uint32_t, 41> value = {};
+        std::array<std::uint32_t, 43> value = {};
         value[0] = 0x87654321U;
         value[1] = 0x12345678U;
         value[2] = 0x12345678U;
@@ -41,7 +41,9 @@ namespace
         value[25] = 255;
         value[27] = 255;
         for (std::size_t index = 0; index < 6; index++) value[34 + index] = 31;
-        value[40] = 100;
+        value[40] = 31;
+        value[41] = 0;
+        value[42] = 100;
         return value;
     }
 
@@ -75,7 +77,7 @@ namespace
 
 int main()
 {
-    if (!check(gen8static_api_version() == 1, "unexpected API version")) return 1;
+    if (!check(gen8static_api_version() == 2, "unexpected API version")) return 1;
 
     auto value = request();
     if (!check(gen8static_generate(value.data()) == 10, "Turtwig result count mismatch")) return 1;
@@ -194,7 +196,7 @@ int main()
                "range limit returned the wrong error"))
         return 1;
     auto limited = request();
-    limited[40] = 1;
+    limited[42] = 1;
     if (!check(gen8static_generate(limited.data()) == 1 && gen8static_limit_reached() == 1,
                "result limit was not enforced"))
         return 1;

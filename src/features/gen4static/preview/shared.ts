@@ -3,6 +3,7 @@ import type {
   Gen4StaticFilters,
   Gen4StaticState,
 } from "../domain";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 
 export const PREVIEW_SAMPLE_LIMIT = 500;
 export const PREVIEW_STEP_LIMIT = 8;
@@ -55,6 +56,11 @@ export function matchesFilters(
     state.ivs.every(
       (value, index) =>
         value >= filters.ivMin[index] && value <= filters.ivMax[index],
+    ) &&
+    passesPerfectIvFilter(
+      state.ivs,
+      filters.perfectIvValue,
+      filters.perfectIvCount,
     )
   );
 }

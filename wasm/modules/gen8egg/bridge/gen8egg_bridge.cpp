@@ -32,7 +32,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maximumResults = 100000;
     constexpr std::uint32_t maximumEvaluations = 250000000;
     constexpr std::uint32_t allNatures = 0x1ffffff;
@@ -366,6 +366,7 @@ namespace
             return false;
         for (std::size_t index = 0; index < 6; index++)
             if (request.ivMin[index] > request.ivMax[index] || request.ivMax[index] > 31) return false;
+        if (request.perfectIvValue > 31 || request.perfectIvCount > 6) return false;
         Gen8EggPackedRequest normalized = request;
         canonicalizeParents(normalized);
         const std::uint32_t donorAbility
@@ -458,6 +459,10 @@ namespace
             return false;
         for (std::size_t index = 0; index < 6; index++)
             if (state.ivs[index] < request.ivMin[index] || state.ivs[index] > request.ivMax[index]) return false;
+        if (std::count_if(state.ivs.begin(), state.ivs.end(), [&](std::uint8_t iv) {
+                return iv >= request.perfectIvValue;
+            }) < request.perfectIvCount)
+            return false;
         return true;
     }
 
@@ -623,7 +628,7 @@ namespace
     }
 }
 
-static_assert(sizeof(Gen8EggPackedRequest) == 53 * sizeof(std::uint32_t));
+static_assert(sizeof(Gen8EggPackedRequest) == 55 * sizeof(std::uint32_t));
 static_assert(sizeof(Gen8EggPackedResult) == 13 * sizeof(std::uint32_t));
 
 extern "C"
@@ -674,4 +679,3 @@ extern "C"
         return lastError;
     }
 }
-

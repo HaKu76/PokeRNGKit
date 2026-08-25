@@ -37,7 +37,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maximumResults = 100000;
     constexpr std::uint32_t maximumCacheEntries = 1000000;
     constexpr std::uint64_t maximumEvaluations = 250000000;
@@ -608,6 +608,10 @@ namespace
         if (request.filtersDisabled != 0) return true;
         for (std::size_t index = 0; index < ivs.size(); index++)
             if (ivs[index] < request.ivMin[index] || ivs[index] > request.ivMax[index]) return false;
+        if (std::count_if(ivs.begin(), ivs.end(), [&request](std::uint8_t iv) {
+                return iv >= request.perfectIvValue;
+            }) < static_cast<int>(request.perfectIvCount))
+            return false;
         return request.hiddenPowerMask == 0
             || (request.hiddenPowerMask & (1U << hiddenPowerType)) != 0;
     }
@@ -1070,6 +1074,7 @@ namespace
             for (std::size_t index = 0; index < 6; index++)
                 if (request.ivMin[index] > request.ivMax[index] || request.ivMax[index] > 31)
                     return false;
+            if (request.perfectIvValue > 31 || request.perfectIvCount > 6) return false;
 
             const auto &slot = slots[request.selectedGroup * 3 + request.selectedSlot];
             if ((slot.personal.gender == 0 && request.gender != 0)
@@ -1191,7 +1196,7 @@ namespace
     }
 }
 
-static_assert(sizeof(Gen5HiddenGrottoPackedRequest) == 114 * sizeof(std::uint32_t));
+static_assert(sizeof(Gen5HiddenGrottoPackedRequest) == 116 * sizeof(std::uint32_t));
 static_assert(sizeof(Gen5HiddenGrottoPackedResult) == 16 * sizeof(std::uint32_t));
 
 extern "C"

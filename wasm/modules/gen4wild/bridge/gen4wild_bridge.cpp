@@ -26,13 +26,13 @@
 #endif
 
 namespace {
-constexpr std::uint32_t apiVersion = 1;
+constexpr std::uint32_t apiVersion = 2;
 constexpr std::size_t maxResults = 250000;
 static_assert(sizeof(Gen4WildPackedSlot) == 19 * sizeof(std::uint32_t));
 static_assert(sizeof(Gen4WildPackedState) == 22 * sizeof(std::uint32_t));
 static_assert(sizeof(Gen4WildPackedSearcherState) == 22 * sizeof(std::uint32_t));
 #ifdef __EMSCRIPTEN__
-static_assert(sizeof(Gen4WildPackedRequest) == 75 * sizeof(std::uint32_t));
+static_assert(sizeof(Gen4WildPackedRequest) == 77 * sizeof(std::uint32_t));
 #endif
 thread_local std::vector<Gen4WildPackedState> generated;
 thread_local std::vector<Gen4WildPackedSearcherState> searched;
@@ -98,6 +98,14 @@ bool postFilter(const Gen4WildPackedRequest &request, std::uint8_t shiny, std::u
     return true;
 }
 
+template <typename Ivs>
+bool matchesPerfectIvs(const Gen4WildPackedRequest &request, const Ivs &ivs)
+{
+    return static_cast<std::uint32_t>(std::count_if(ivs.begin(), ivs.end(), [&request](std::uint8_t iv) {
+        return iv >= request.perfectIvValue;
+    })) >= request.perfectIvCount;
+}
+
 struct EncounterContext {
     std::array<Slot, 12> slots;
     std::vector<PersonalInfo> personal;
@@ -136,8 +144,9 @@ struct EncounterContext {
 
 void append(const Gen4WildPackedRequest &request, const WildGeneratorState4 &state)
 {
-    if (!postFilter(request, state.getShiny(), state.getLevel(), state.getEncounterSlot()) || generated.size() >= maxResults) return;
     const auto ivs = state.getIVs();
+    if (!postFilter(request, state.getShiny(), state.getLevel(), state.getEncounterSlot())
+        || !matchesPerfectIvs(request, ivs) || generated.size() >= maxResults) return;
     generated.push_back({ state.getAdvances(), state.getBattleAdvances(), state.getPID(),
                           { ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5] }, state.getAbility(), state.getGender(), state.getLevel(),
                           state.getNature(), state.getShiny(), state.getEncounterSlot(), state.getSpecie(), state.getForm(), state.getItem(),
@@ -146,8 +155,9 @@ void append(const Gen4WildPackedRequest &request, const WildGeneratorState4 &sta
 
 void append(const Gen4WildPackedRequest &request, const WildSearcherState4 &state)
 {
-    if (!postFilter(request, state.getShiny(), state.getLevel(), state.getEncounterSlot()) || searched.size() >= maxResults) return;
     const auto ivs = state.getIVs();
+    if (!postFilter(request, state.getShiny(), state.getLevel(), state.getEncounterSlot())
+        || !matchesPerfectIvs(request, ivs) || searched.size() >= maxResults) return;
     const auto seed = state.getSeed();
     searched.push_back({ seed, seed & 0xffff, (seed >> 16) & 0xff, state.getAdvances(), state.getPID(),
                          { ivs[0], ivs[1], ivs[2], ivs[3], ivs[4], ivs[5] }, state.getAbility(), state.getGender(), state.getLevel(),
@@ -162,7 +172,8 @@ KEEP std::uint32_t gen4wild_api_version() { return apiVersion; }
 KEEP std::uint32_t gen4wild_generate(const Gen4WildPackedRequest *request)
 {
     generated.clear(); searched.clear(); searchActive = false; lastError = 0;
-    if (!request || !request->slots || request->slotCount == 0 || request->slotCount > 12 || request->fixedSlot >= request->slotCount) { lastError = 1; return 0; }
+    if (!request || !request->slots || request->slotCount == 0 || request->slotCount > 12 || request->fixedSlot >= request->slotCount
+        || request->perfectIvValue > 31 || request->perfectIvCount > 6) { lastError = 1; return 0; }
     EncounterContext context(*request);
     const auto method = methodFromRequest(*request);
     WildGenerator4 generator(request->initialAdvances, request->maxAdvances, request->offset, method,
@@ -175,7 +186,8 @@ KEEP std::uint32_t gen4wild_generate(const Gen4WildPackedRequest *request)
 KEEP std::uint32_t gen4wild_search(const Gen4WildPackedRequest *request, std::uint32_t startIndex, std::uint32_t stateCount)
 {
     generated.clear(); searched.clear(); searchActive = true; lastError = 0;
-    if (!request || !request->slots || request->slotCount == 0 || request->slotCount > 12 || stateCount == 0 || request->fixedSlot >= request->slotCount) { lastError = 1; return 0; }
+    if (!request || !request->slots || request->slotCount == 0 || request->slotCount > 12 || stateCount == 0 || request->fixedSlot >= request->slotCount
+        || request->perfectIvValue > 31 || request->perfectIvCount > 6) { lastError = 1; return 0; }
     EncounterContext context(*request);
     WildSearcher4 searcher(request->minAdvance, request->maxAdvance, request->minDelay, request->maxDelay, methodFromRequest(*request),
                            static_cast<Lead>(request->lead), request->feebasTile != 0, request->radarShiny != 0,
@@ -191,6 +203,7 @@ KEEP std::uint32_t gen4wild_search(const Gen4WildPackedRequest *request, std::ui
         std::array<u8, 6> ivs {};
         auto cursor = index;
         for (int stat = 5; stat >= 0; stat--) { const auto width = maximum[stat] - minimum[stat] + 1; ivs[stat] = static_cast<u8>(minimum[stat] + cursor % width); cursor /= width; }
+        if (!matchesPerfectIvs(*request, ivs)) continue;
         searcher.startSearch(ivs, ivs, static_cast<u8>(request->fixedSlot));
         for (const auto &state : searcher.getResults()) append(*request, state);
     }

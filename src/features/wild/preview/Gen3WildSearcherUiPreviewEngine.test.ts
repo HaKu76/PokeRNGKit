@@ -40,6 +40,8 @@ const request: Gen3WildSearcherRequest = {
     levelMax: 100,
     ivMin: [30, 31, 31, 31, 31, 30],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
 };
 

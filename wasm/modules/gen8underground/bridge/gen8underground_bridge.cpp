@@ -17,8 +17,8 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
-    constexpr std::uint32_t requestWords = 54;
+    constexpr std::uint32_t apiVersion = 2;
+    constexpr std::uint32_t requestWords = 56;
     constexpr std::uint32_t resultWords = 12;
     constexpr std::uint32_t maximumResults = 100000;
     constexpr std::uint32_t allNatures = 0x1ffffff;
@@ -59,9 +59,11 @@ namespace
         WeightMax = 23,
         IvMin = 24,
         IvMax = 30,
-        SpeciesMask = 36,
-        Offset = 52,
-        ResultLimit = 53,
+        PerfectIvValue = 36,
+        PerfectIvCount = 37,
+        SpeciesMask = 38,
+        Offset = 54,
+        ResultLimit = 55,
     };
 
     struct Personal
@@ -658,6 +660,7 @@ namespace
         if ((request[ShinyMask] & (1U << state.shiny)) == 0) return false;
         for (std::size_t index = 0; index < 6; index++)
             if (state.ivs[index] < request[IvMin + index] || state.ivs[index] > request[IvMax + index]) return false;
+        if (std::count_if(state.ivs.begin(), state.ivs.end(), [&](std::uint8_t iv) { return iv >= request[PerfectIvValue]; }) < request[PerfectIvCount]) return false;
         return true;
     }
 
@@ -714,6 +717,7 @@ namespace
             return false;
         for (std::size_t index = 0; index < 6; index++)
             if (request[IvMin + index] > request[IvMax + index] || request[IvMax + index] > 31) return false;
+        if (request[PerfectIvValue] > 31 || request[PerfectIvCount] > 6) return false;
         return true;
     }
 
@@ -828,4 +832,4 @@ extern "C"
 }
 
 static_assert(sizeof(PackedResult) == resultWords * sizeof(std::uint32_t));
-static_assert(requestWords == 54);
+static_assert(requestWords == 56);

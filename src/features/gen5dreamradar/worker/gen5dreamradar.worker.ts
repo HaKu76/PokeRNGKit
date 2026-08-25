@@ -11,7 +11,7 @@ import type {
   Gen5DreamRadarWorkerResponse,
 } from "./messages";
 
-const REQUEST_WORDS = 58;
+const REQUEST_WORDS = 60;
 const RESULT_WORDS = 11;
 
 interface Gen5DreamRadarEmscriptenModule {
@@ -113,6 +113,8 @@ function packRequest(
     ...request.filters.ivMax,
     request.filters.natureMask,
     request.filters.hiddenPowerMask,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
     ...(request.mode === "generator" ? [...splitHex(request.seed)] : [0, 0]),
     ...(request.mode === "searcher"
       ? [...dateParts(request.startDate), ...dateParts(request.endDate)]

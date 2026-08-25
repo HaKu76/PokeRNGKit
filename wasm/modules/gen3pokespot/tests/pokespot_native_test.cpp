@@ -7,8 +7,8 @@ int main()
 {
     const std::uint32_t count = gen3pokespot_generate(
         0, 0, 0, 9, 0, 9, 0, 0, 0, 12345, 54321, 0, 0, 0, 0x1ffffff, 0xffff, 7,
-        0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31);
-    assert(gen3pokespot_api_version() == 1);
+        0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31, 31, 0);
+    assert(gen3pokespot_api_version() == 2);
     assert(gen3pokespot_last_error() == 0);
     assert(count == 30);
     assert(gen3pokespot_result_count() == count);

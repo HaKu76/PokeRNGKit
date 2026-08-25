@@ -94,6 +94,8 @@ const request: Gen5WildSearcherRequest = {
     disabled: false,
     ivMin: [30, 30, 30, 0, 30, 30],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     natureMask: 0x1ff_ffff,
     hiddenPowerMask: 0xffff,
     ability: 255,

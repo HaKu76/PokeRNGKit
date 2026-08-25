@@ -47,7 +47,7 @@ function gameToWasm(version: Gen4WildGeneratorRequest["profile"]["version"]) {
     soulsilver: 1 << 11,
   }[version];
 }
-const REQUEST_WORDS = 75;
+const REQUEST_WORDS = 77;
 function requestStruct(
   request: Gen4WildGeneratorRequest | Gen4WildSearcherRequest,
   pointer: number,
@@ -96,6 +96,8 @@ function requestStruct(
   for (let i = 0; i < 26; i++)
     words[45 + i] = profile.unownDiscovered[i] ? 1 : 0;
   for (let i = 0; i < 4; i++) words[71 + i] = profile.unownPuzzles[i] ? 1 : 0;
+  words[75] = request.filters.perfectIvValue;
+  words[76] = request.filters.perfectIvCount;
 }
 async function init(message: Extract<Gen4WildWorkerRequest, { type: "init" }>) {
   if (

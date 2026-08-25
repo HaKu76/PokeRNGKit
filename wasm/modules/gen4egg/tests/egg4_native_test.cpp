@@ -6,9 +6,9 @@
 
 namespace
 {
-    std::array<std::uint32_t, 48> request(std::uint32_t game, bool masuda)
+    std::array<std::uint32_t, 50> request(std::uint32_t game, bool masuda)
     {
-        std::array<std::uint32_t, 48> value {};
+        std::array<std::uint32_t, 50> value {};
         value[0] = game;
         value[3] = 0;
         value[4] = 9;
@@ -31,6 +31,8 @@ namespace
         }
         value[44] = 0;
         value[45] = 1;
+        value[48] = 31;
+        value[49] = 0;
         return value;
     }
 
@@ -102,7 +104,7 @@ int main()
 {
     static_assert(sizeof(Gen4EggPackedState) == 23 * sizeof(std::uint32_t));
     static_assert(sizeof(Gen4EggPackedSearcherState) == 25 * sizeof(std::uint32_t));
-    assert(gen4egg_api_version() == 1);
+    assert(gen4egg_api_version() == 2);
     checkDiamond();
     checkMasuda();
     checkHgss();

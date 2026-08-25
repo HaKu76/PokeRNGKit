@@ -1,6 +1,6 @@
 {
   "id": "gen3egg",
-  "apiVersion": 1,
+  "apiVersion": 2,
   "target": "gen3egg",
   "artifacts": ["gen3egg.mjs", "gen3egg.wasm"],
   "source": "PokeFinder 4.3.2 EggGenerator3"

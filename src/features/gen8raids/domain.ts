@@ -1,8 +1,12 @@
 import type { Gen8Profile } from "../gen8profiles/domain";
+import {
+  passesPerfectIvFilter,
+  validatePerfectIvFilter,
+} from "../shared/perfectIvFilter";
 import { getGen8RaidPersonal, type Gen8RaidTemplate } from "./data";
 
-export const GEN8_RAIDS_API_VERSION = 1;
-export const GEN8_RAIDS_REQUEST_WORDS = 41;
+export const GEN8_RAIDS_API_VERSION = 2;
+export const GEN8_RAIDS_REQUEST_WORDS = 43;
 export const GEN8_RAIDS_RESULT_WORDS = 12;
 export const GEN8_RAIDS_MAX_RESULTS = 100_000;
 export const GEN8_RAIDS_MAX_EVALUATIONS = 250_000_000;
@@ -46,6 +50,8 @@ export interface Gen8RaidFilters {
   weightMax: number;
   ivMin: Gen8RaidIvTuple;
   ivMax: Gen8RaidIvTuple;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen8RaidChunk {
@@ -209,6 +215,8 @@ function validateFilters(filters: Gen8RaidFilters) {
       throw new TypeError("Each IV range must be between 0 and 31.");
     }
   });
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
 }
 
 export function gen8RaidTaskCount(request: Gen8RaidRequest) {
@@ -319,6 +327,8 @@ export function encodeGen8RaidRequest(
     filters.disabled ? 255 : filters.weightMax,
     ...filters.ivMin.map((value) => (filters.disabled ? 0 : value)),
     ...filters.ivMax.map((value) => (filters.disabled ? 31 : value)),
+    filters.disabled ? 31 : filters.perfectIvValue,
+    filters.disabled ? 0 : filters.perfectIvCount,
     request.resultLimit,
     request.template.starMask,
     request.template.gigantamax ? 1 : 0,
@@ -457,6 +467,11 @@ function resultPassesFilters(filters: Gen8RaidFilters, result: Gen8RaidResult) {
     result.ivs.every(
       (value, index) =>
         value >= filters.ivMin[index] && value <= filters.ivMax[index],
+    ) &&
+    passesPerfectIvFilter(
+      result.ivs,
+      filters.perfectIvValue,
+      filters.perfectIvCount,
     )
   );
 }

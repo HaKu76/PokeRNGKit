@@ -38,6 +38,8 @@ const filters: Gen8EggFilters = {
   hiddenPowerMask: 0xffff,
   ivMin: [0, 0, 0, 0, 0, 0],
   ivMax: [31, 31, 31, 31, 31, 31],
+  perfectIvValue: 31,
+  perfectIvCount: 0,
 };
 
 const request: Gen8EggRequest = {
@@ -147,7 +149,7 @@ describe("Gen 8 Egg domain", () => {
     expect(mapGen8EggInheritanceSource(2, true)).toBe(1);
   });
 
-  it("splits inclusive frames and packs the 53-word request", () => {
+  it("splits inclusive frames and packs the 55-word request", () => {
     expect(
       splitGen8EggRequest(request, 3).map(({ start, count }) => [start, count]),
     ).toEqual(Array.from({ length: 10 }, (_, index) => [index, 1]));
@@ -161,7 +163,7 @@ describe("Gen 8 Egg domain", () => {
       start: 0,
       count: 1,
     });
-    expect(encoded).toHaveLength(53);
+    expect(encoded).toHaveLength(55);
     expect([...encoded.slice(14, 20)]).toEqual(parentA.ivs);
     expect(encoded[28]).toBe(0);
     expect(encoded[29]).toBe(1);

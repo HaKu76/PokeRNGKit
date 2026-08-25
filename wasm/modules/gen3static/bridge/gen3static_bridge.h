@@ -78,7 +78,9 @@ extern "C"
         std::uint32_t defenseMax,
         std::uint32_t specialAttackMax,
         std::uint32_t specialDefenseMax,
-        std::uint32_t speedMax);
+        std::uint32_t speedMax,
+        std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount);
     std::uint32_t gen3static_search(
         std::uint32_t startIndex,
         std::uint32_t stateCount,
@@ -105,7 +107,9 @@ extern "C"
         std::uint32_t defenseMax,
         std::uint32_t specialAttackMax,
         std::uint32_t specialDefenseMax,
-        std::uint32_t speedMax);
+        std::uint32_t speedMax,
+        std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount);
     std::uintptr_t gen3static_result_ptr();
     std::uint32_t gen3static_result_count();
     std::uint32_t gen3static_last_error();

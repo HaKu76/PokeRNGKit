@@ -28,6 +28,7 @@ import { DEFAULT_GEN8_BDSP_PROFILE } from "../gen8profiles/domain";
 import type { Gen8ProfilesController } from "../gen8profiles/useGen8Profiles";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import {
   formatGen8EventHex32,
   GEN8_EVENT_MAX_RESULTS,
@@ -244,6 +245,8 @@ export function Gen8EventPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [showStats, setShowStats] = useState(false);
   const [results, setResults] = useState<Gen8EventResult[]>([]);
   const [status, setStatus] = useState<RunStatus>("ready");
@@ -402,6 +405,8 @@ export function Gen8EventPanel({
         ivMax: (filtersOff
           ? [31, 31, 31, 31, 31, 31]
           : ivMax.map(parseGen8EventDecimal)) as Gen8EventIvTuple,
+        perfectIvValue: filtersOff ? 31 : parseGen8EventDecimal(perfectIvValue),
+        perfectIvCount: filtersOff ? 0 : parseGen8EventDecimal(perfectIvCount),
       },
       resultLimit: GEN8_EVENT_MAX_RESULTS,
     };
@@ -1132,6 +1137,12 @@ export function Gen8EventPanel({
                     </div>
                   ))}
                 </div>
+                <PerfectIvFilterFields
+                  count={perfectIvCount}
+                  onCountChange={setPerfectIvCount}
+                  onValueChange={setPerfectIvValue}
+                  value={perfectIvValue}
+                />
               </fieldset>
             </div>
           )}

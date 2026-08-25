@@ -18,7 +18,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maximumResults = 100000;
     constexpr std::uint32_t maximumEvaluations = 250000000;
     constexpr std::uint32_t allNatures = 0x1ffffff;
@@ -62,7 +62,9 @@ namespace
         WeightMax = 27,
         IvMin = 28,
         IvMax = 34,
-        ResultLimit = 40,
+        PerfectIvValue = 40,
+        PerfectIvCount = 41,
+        ResultLimit = 42,
     };
 
     struct Personal
@@ -386,6 +388,7 @@ namespace
         if (state.weight < request[WeightMin] || state.weight > request[WeightMax]) return false;
         for (std::size_t index = 0; index < 6; index++)
             if (state.ivs[index] < request[IvMin + index] || state.ivs[index] > request[IvMax + index]) return false;
+        if (std::count_if(state.ivs.begin(), state.ivs.end(), [&](std::uint8_t iv) { return iv >= request[PerfectIvValue]; }) < request[PerfectIvCount]) return false;
         return true;
     }
 
@@ -436,6 +439,7 @@ namespace
             return false;
         for (std::size_t index = 0; index < 6; index++)
             if (request[IvMin + index] > request[IvMax + index] || request[IvMax + index] > 31) return false;
+        if (request[PerfectIvValue] > 31 || request[PerfectIvCount] > 6) return false;
         return true;
     }
 

@@ -41,6 +41,8 @@ const request: Gen5WildGeneratorRequest = {
     disabled: false,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     natureMask: 0x1ff_ffff,
     hiddenPowerMask: 0xffff,
     ability: 255,
@@ -106,7 +108,7 @@ class CompletingWorker {
           type: "ready",
           moduleId: "gen5wild",
           contractVersion: RNG_MODULE_CONTRACT_VERSION,
-          apiVersion: 1,
+          apiVersion: 2,
           operations: ["generator", "searcher"],
         });
       } else if (message.type === "task") {
@@ -114,7 +116,7 @@ class CompletingWorker {
         this.emit({
           type: "batch",
           moduleId: "gen5wild",
-          apiVersion: 1,
+          apiVersion: 2,
           taskId: message.taskId,
           operation: message.operation,
           chunkIndex: message.chunkIndex,
@@ -144,7 +146,7 @@ class HoldingWorker extends CompletingWorker {
           type: "ready",
           moduleId: "gen5wild",
           contractVersion: RNG_MODULE_CONTRACT_VERSION,
-          apiVersion: 1,
+          apiVersion: 2,
           operations: ["generator", "searcher"],
         }),
       );

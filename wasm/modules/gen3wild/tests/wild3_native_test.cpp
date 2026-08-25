@@ -32,7 +32,7 @@ namespace
             slots.data(), slots.size(), seed, 0, maxAdvances, 0, 1, 255, 0, tanoby ? 7 : 10,
             tanoby ? 0 : 1, 0, 0, 0, tanoby ? 1 : 0, 0, 0, 12345, 54321, shiny, gender, ability, natures, powers,
             encounterSlots, levelMin, levelMax, ivMin[0], ivMin[1], ivMin[2], ivMin[3],
-            ivMin[4], ivMin[5], ivMax[0], ivMax[1], ivMax[2], ivMax[3], ivMax[4], ivMax[5]);
+            ivMin[4], ivMin[5], ivMax[0], ivMax[1], ivMax[2], ivMax[3], ivMax[4], ivMax[5], 31, 0);
     }
 
     std::uint32_t search(const std::array<Gen3WildPackedSlot, 12> &slots,
@@ -52,13 +52,13 @@ namespace
             tanoby ? 0 : 1, 0, 0, 0, tanoby ? 1 : 0, bike ? 1 : 0, item, 12345, 54321, 0, 0, 0,
             allNatures, allHiddenPowers, allSlots, 1, 100,
             ivMin[0], ivMin[1], ivMin[2], ivMin[3], ivMin[4], ivMin[5],
-            ivMax[0], ivMax[1], ivMax[2], ivMax[3], ivMax[4], ivMax[5]);
+            ivMax[0], ivMax[1], ivMax[2], ivMax[3], ivMax[4], ivMax[5], 31, 0);
     }
 }
 
 int main()
 {
-    assert(gen3wild_api_version() == 4);
+    assert(gen3wild_api_version() == 5);
     const std::array<Gen3WildPackedSlot, 12> slots = {
         Gen3WildPackedSlot { 27, 0, 20, 20, 127, 4 | (4 << 8) },
         Gen3WildPackedSlot { 328, 0, 20, 20, 127, 4 | (4 << 8) },
@@ -114,7 +114,7 @@ int main()
                slots.data(), slots.size(), state->advances, 0, 0, 0, 1, 255, 0, 10,
                1, 0, 0, 0, 0, 0, 0, 12345, 54321, 0, 0, 0, allNatures,
                allHiddenPowers, allSlots, 1, 100, 31, 31, 31, 31, 31, 31,
-               31, 31, 31, 31, 31, 31)
+               31, 31, 31, 31, 31, 31, 31, 0)
            == 1);
     assert(search(slots, 2, 0) == 54);
     assert(search(slots, 4, 25) == 4);

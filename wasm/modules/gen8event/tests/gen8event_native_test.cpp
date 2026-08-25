@@ -77,7 +77,7 @@ namespace
 
 int main()
 {
-    if (!check(gen8event_api_version() == 1, "unexpected API version")) return 1;
+    if (!check(gen8event_api_version() == 2, "unexpected API version")) return 1;
 
     auto value = request();
     if (!check(gen8event_generate(&value) == 10, "fixture returned an unexpected result count")) return 1;

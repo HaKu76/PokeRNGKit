@@ -16,6 +16,7 @@ import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { getGen3AbilityName } from "../shared/gen3Abilities";
 import { gen3HiddenPower } from "../shared/gen3HiddenPower";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { getGen3Personal } from "../shared/gen3Personal";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import {
@@ -308,6 +309,8 @@ export function Gen3WildPanel({
       max: ["31", "31", "31", "31", "31", "31"],
     },
   });
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [showStats, setShowStats] = useState(false);
   const [results, setResults] = useState<WildResultState[]>([]);
   const [progress, setProgress] = useState<Gen3WildSearchProgress>({
@@ -535,6 +538,8 @@ export function Gen3WildPanel({
           levelMax: 100,
           ivMin: [0, 0, 0, 0, 0, 0],
           ivMax: [31, 31, 31, 31, 31, 31],
+          perfectIvValue: 31,
+          perfectIvCount: 0,
         }
       : {
           shiny,
@@ -551,6 +556,8 @@ export function Gen3WildPanel({
           ivMax: activeIvRanges.max.map(
             (value) => parseDecimal(value) ?? Number.NaN,
           ) as Gen3WildFilters["ivMax"],
+          perfectIvValue: parseDecimal(perfectIvValue) ?? Number.NaN,
+          perfectIvCount: parseDecimal(perfectIvCount) ?? Number.NaN,
         };
 
   const run = async (event: FormEvent) => {
@@ -1131,6 +1138,12 @@ export function Gen3WildPanel({
                 </Select>
               </label>
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <div className="iv-filter">
               <div className="iv-filter-header">
                 <span>{t("ivs")}</span>

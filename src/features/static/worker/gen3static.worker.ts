@@ -44,6 +44,8 @@ interface Gen3StaticEmscriptenModule {
     specialAttackMax: number,
     specialDefenseMax: number,
     speedMax: number,
+    perfectIvValue: number,
+    perfectIvCount: number,
   ): number;
   _gen3static_search(
     startIndex: number,
@@ -72,6 +74,8 @@ interface Gen3StaticEmscriptenModule {
     specialAttackMax: number,
     specialDefenseMax: number,
     speedMax: number,
+    perfectIvValue: number,
+    perfectIvCount: number,
   ): number;
   _gen3static_result_ptr(): number;
   _gen3static_result_count(): number;
@@ -137,6 +141,8 @@ function run(message: Extract<Gen3StaticWorkerRequest, { type: "run" }>) {
     filters.hiddenPowerMask,
     ...filters.ivMin,
     ...filters.ivMax,
+    filters.perfectIvValue,
+    filters.perfectIvCount,
   );
   const errorCode = wasm._gen3static_last_error();
   if (errorCode !== 0)
@@ -184,6 +190,8 @@ function search(message: Extract<Gen3StaticWorkerRequest, { type: "search" }>) {
     filters.hiddenPowerMask,
     ...filters.ivMin,
     ...filters.ivMax,
+    filters.perfectIvValue,
+    filters.perfectIvCount,
   );
   const errorCode = wasm._gen3static_last_error();
   if (errorCode !== 0)

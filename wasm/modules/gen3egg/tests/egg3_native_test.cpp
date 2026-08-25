@@ -18,9 +18,9 @@ namespace
     constexpr std::uint32_t natureMask = 0x1ff'ffff;
     constexpr std::uint32_t hiddenPowerMask = 0xffff;
 
-    std::array<std::uint32_t, 54> createRequest(bool emerald, std::uint32_t method)
+    std::array<std::uint32_t, 56> createRequest(bool emerald, std::uint32_t method)
     {
-        std::array<std::uint32_t, 54> request {};
+        std::array<std::uint32_t, 56> request {};
         request[0] = emerald ? 0 : 1;
         request[1] = method;
         request[10] = emerald ? 18 : 0;
@@ -43,6 +43,8 @@ namespace
         request[49] = 1;
         request[50] = 0;
         request[51] = emerald ? 1 : 0;
+        request[54] = 31;
+        request[55] = 0;
         return request;
     }
 
@@ -98,7 +100,7 @@ namespace
 int main()
 {
     static_assert(sizeof(Gen3EggPackedState) == 88);
-    assert(gen3egg_api_version() == 1);
+    assert(gen3egg_api_version() == 2);
     testEmeraldNormal();
     testRsFrlgSplit();
     return 0;

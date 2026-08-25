@@ -1,5 +1,12 @@
 # 第八世代野生乱数
 
+## 完美个体筛选
+
+- 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
+- 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
+- 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
+
 ## 功能范围
 
 本模块对应 PokeFinder 4.3.2 `Gen 8 Wild`，仅接受 Brilliant Diamond / Shining Pearl Profile。上游 `Wild8` 只有 Generator；PokeRNGKit 不增加 Sword / Shield 或反向检索工作流。
@@ -44,8 +51,8 @@ Great Marsh 使用普通图鉴或全国图鉴替换池；Trophy Garden 支持两
 
 ## Worker 与 Wasm
 
-- Module id：`gen8wild`；contract / API version：`1`；operation：`generator`
-- 请求为 48 个 `uint32_t`，结果为 12 个 `uint32_t`
+- Module id：`gen8wild`；contract / API version：`2`；operation：`generator`
+- 请求为 50 个 `uint32_t`，结果为 12 个 `uint32_t`
 - 生产算法只在 Dedicated Worker 内的 C++/Emscripten Wasm 执行；最多 8 个独立 Worker，不使用 SharedArrayBuffer 或 pthread
 - Worker 按 `chunkIndex` 恢复确定顺序；取消后终止并重建实例，拒绝迟到批次、异常结果长度和越界 Wasm 指针
 - 结果记录固定为 Advances、Item、Slot、Species、Level、EC、PID、Shiny、Nature、Ability、六项 IV、Hidden Power、Gender、Height、Weight、Characteristic 和六项能力值；接口压缩为 12 个结果字

@@ -1,5 +1,12 @@
 # 第八世代定点乱数
 
+## 完美个体筛选
+
+- 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
+- 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
+- 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
+
 ## 功能范围
 
 本模块对应 PokeFinder 4.3.2 `Gen 8 Static`，仅接受 Brilliant Diamond / Shining Pearl Profile。PokeFinder 该模块只有 Generator，没有 Searcher；PokeRNGKit 不增加上游不存在的 Sword / Shield Static 或反向检索工作流。
@@ -43,8 +50,8 @@ Roamer 仅包含 Mesprit 与 Cresselia。外层 Xorshift 每帧生成 EC，再�
 
 ## Worker 与 Wasm
 
-- Module id：`gen8static`；contract / API version：`1`；operation：`generator`
-- 请求为 41 个 `uint32_t`，结果为 11 个 `uint32_t`
+- Module id：`gen8static`；contract / API version：`2`；operation：`generator`
+- 请求为 43 个 `uint32_t`，结果为 11 个 `uint32_t`
 - 生产算法仅在 Dedicated Worker 内的 C++/Emscripten Wasm 执行；最多 8 个独立 Worker，不使用 SharedArrayBuffer 或 pthread
 - Worker 按 `chunkIndex` 恢复确定顺序，取消后终止并重建实例，拒绝迟到批次、越界指针和异常结果长度
 

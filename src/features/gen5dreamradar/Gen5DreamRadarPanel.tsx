@@ -18,6 +18,7 @@ import {
 } from "../gen4ivcalculator/gen4IvData";
 import { useGen5Profiles } from "../gen5profiles/useGen5Profiles";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import {
   GEN5_DREAM_RADAR_ENCOUNTERS,
   formatGen5DreamRadarButtons,
@@ -248,6 +249,8 @@ export function Gen5DreamRadarPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [natureMask, setNatureMask] = useState(ALL_NATURES);
   const [hiddenPowerMask, setHiddenPowerMask] = useState(ALL_HIDDEN_POWERS);
   const [results, setResults] = useState<Gen5DreamRadarResult[]>([]);
@@ -357,6 +360,8 @@ export function Gen5DreamRadarPanel({
       ) as Gen5DreamRadarFilters["ivMax"],
       natureMask,
       hiddenPowerMask,
+      perfectIvValue: Number(perfectIvValue || "0"),
+      perfectIvCount: Number(perfectIvCount || "0"),
     };
     const radarProfile = gen5DreamRadarProfile(profile!);
     return mode === "generator"
@@ -779,6 +784,13 @@ export function Gen5DreamRadarPanel({
                 </div>
               ))}
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              disabled={busy || (mode === "generator" && filtersDisabled)}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <div className="gen5dreamradar-filter-selects">
               <MultiCheckSelect
                 anyLabel={t("any")}

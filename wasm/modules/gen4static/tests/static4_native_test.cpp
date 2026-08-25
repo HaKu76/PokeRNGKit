@@ -36,7 +36,7 @@ namespace
         return gen4static_generate(seed, 0, 9, 0, method, lead, syncNature, encounter.species,
                                    encounter.level, encounter.genderRatio, encounter.shinyLock, 12345, 54321,
                                    Gen4ShinyAny, Gen4GenderAny, Gen4AbilityAny, allNatures, allHiddenPowers,
-                                   0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31);
+                                   0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31, 31, 0);
     }
 
     std::uint32_t search(std::uint32_t method, std::uint32_t lead, const Encounter &encounter)
@@ -44,7 +44,7 @@ namespace
         return gen4static_search(0, 1, 0, 1000, 600, 2000, method, lead, 0, encounter.species,
                                  encounter.level, encounter.genderRatio, encounter.shinyLock, 12345, 54321,
                                  Gen4ShinyAny, Gen4GenderAny, Gen4AbilityAny, allNatures, allHiddenPowers,
-                                 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31);
+                                 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 0);
     }
 
     void checkFirst(const Gen4StaticPackedState &state, std::uint32_t pid,
@@ -77,7 +77,7 @@ namespace
 
 int main()
 {
-    assert(gen4static_api_version() == 1);
+    assert(gen4static_api_version() == 2);
 
     const Encounter manaphy = { 490, 1, 255, Gen4ShinyNever };
     assert(generate(0, Gen4Method1, Gen4LeadNone, 0, manaphy) == 10);

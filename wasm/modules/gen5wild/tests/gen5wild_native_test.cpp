@@ -142,7 +142,7 @@ namespace
 
 int main()
 {
-    if (!check(gen5wild_api_version() == 1, "unexpected API version")) return 1;
+    if (!check(gen5wild_api_version() == 2, "unexpected API version")) return 1;
 
     auto request = baseRequest();
     setBlackGrass(request);

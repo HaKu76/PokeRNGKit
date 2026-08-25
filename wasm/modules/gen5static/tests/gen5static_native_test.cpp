@@ -109,7 +109,7 @@ namespace
 
 int main()
 {
-    if (!check(gen5static_api_version() == 1, "unexpected API version")) return 1;
+    if (!check(gen5static_api_version() == 2, "unexpected API version")) return 1;
 
     auto request = baseRequest();
     if (!fixture(request,

@@ -74,7 +74,9 @@ extern "C"
         std::uint32_t defenseMax,
         std::uint32_t specialAttackMax,
         std::uint32_t specialDefenseMax,
-        std::uint32_t speedMax);
+        std::uint32_t speedMax,
+        std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount);
     std::uint32_t gen3wild_search(
         const Gen3WildPackedSlot *slots,
         std::uint32_t slotCount,
@@ -112,7 +114,9 @@ extern "C"
         std::uint32_t defenseMax,
         std::uint32_t specialAttackMax,
         std::uint32_t specialDefenseMax,
-        std::uint32_t speedMax);
+        std::uint32_t speedMax,
+        std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount);
     std::uintptr_t gen3wild_result_ptr();
     std::uint32_t gen3wild_result_count();
     std::uint32_t gen3wild_last_error();

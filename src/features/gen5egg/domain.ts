@@ -4,10 +4,11 @@ import type {
   Gen5Language,
   Gen5Profile,
 } from "../gen5profiles/domain";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 import { GEN5_EGG_SPECIES_SET, getGen5EggBaseStats } from "./data";
 
-export const GEN5_EGG_API_VERSION = 1;
-export const GEN5_EGG_REQUEST_WORDS = 71;
+export const GEN5_EGG_API_VERSION = 2;
+export const GEN5_EGG_REQUEST_WORDS = 73;
 export const GEN5_EGG_RESULT_WORDS = 16;
 export const GEN5_EGG_MAX_RESULTS = 100_000;
 export const GEN5_EGG_MAX_EVALUATIONS = 250_000_000n;
@@ -42,6 +43,8 @@ export interface Gen5EggFilters {
   hiddenPowerMask: number;
   ivMin: Gen5EggIvTuple;
   ivMax: Gen5EggIvTuple;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen5EggProfile {
@@ -419,6 +422,8 @@ function validateFilters(filters: Gen5EggFilters) {
       throw new TypeError("Each IV range must be between 0 and 31.");
     }
   });
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
 }
 
 export function gen5EggSearcherSeedCount(request: Gen5EggSearcherRequest) {
@@ -624,6 +629,8 @@ export function encodeGen5EggRequest(
     request.filters.hiddenPowerMask,
     ...request.filters.ivMin,
     ...request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
     Number(seed & 0xffff_ffffn),
     Number(seed >> 32n),
     ...start,

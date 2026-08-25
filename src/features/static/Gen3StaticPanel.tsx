@@ -13,6 +13,7 @@ import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import type { Gen3Profile } from "../profiles/domain";
 import { getGen3AbilityName } from "../shared/gen3Abilities";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { getGen3Personal } from "../shared/gen3Personal";
 import { getGen3SpeciesName } from "../shared/gen3Species";
 import { computeGen3Stats } from "../shared/gen3Stats";
@@ -227,6 +228,8 @@ export function Gen3StaticPanel({
       max: ["31", "31", "31", "31", "31", "31"],
     },
   });
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [results, setResults] = useState<StaticResultState[]>([]);
   const [progress, setProgress] = useState<Gen3StaticSearchProgress>({
     processedStates: 0,
@@ -422,6 +425,10 @@ export function Gen3StaticPanel({
       : activeIvRanges.max.map(
           (value) => parseDecimal(value) ?? Number.NaN,
         )) as Gen3StaticFilters["ivMax"],
+    perfectIvValue: disabled
+      ? 31
+      : (parseDecimal(perfectIvValue) ?? Number.NaN),
+    perfectIvCount: disabled ? 0 : (parseDecimal(perfectIvCount) ?? Number.NaN),
   });
 
   const readRequest = (): Gen3StaticRequest => ({
@@ -833,6 +840,12 @@ export function Gen3StaticPanel({
                 </Select>
               </label>
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <div className="iv-filter">
               <div className="iv-filter-header">
                 <span>{t("ivs")}</span>

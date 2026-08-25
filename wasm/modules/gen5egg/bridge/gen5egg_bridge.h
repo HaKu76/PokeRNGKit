@@ -59,6 +59,8 @@ struct Gen5EggPackedRequest
     std::uint32_t hiddenPowerMask;
     std::uint32_t ivMin[6];
     std::uint32_t ivMax[6];
+    std::uint32_t perfectIvValue;
+    std::uint32_t perfectIvCount;
     std::uint32_t seedLow;
     std::uint32_t seedHigh;
     std::uint32_t startYear;

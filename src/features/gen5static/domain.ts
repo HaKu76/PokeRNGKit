@@ -4,6 +4,7 @@ import type {
   Gen5Language,
   Gen5Profile,
 } from "../gen5profiles/domain";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 import {
   gen5StaticCategoriesForVersion,
   gen5StaticTemplatesForVersion,
@@ -11,7 +12,7 @@ import {
   type Gen5StaticTemplate,
 } from "./encounters";
 
-export const GEN5_STATIC_API_VERSION = 1;
+export const GEN5_STATIC_API_VERSION = 2;
 export const GEN5_STATIC_MAX_RESULTS = 100_000;
 export const GEN5_STATIC_MAX_EVALUATIONS = 250_000_000n;
 
@@ -71,6 +72,8 @@ export interface Gen5StaticFilters {
   ability: 0 | 1 | 255;
   gender: 0 | 1 | 255;
   shiny: 1 | 2 | 3 | 255;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 interface Gen5StaticRequestBase {
@@ -309,6 +312,8 @@ function validateFilters(filters: Gen5StaticFilters) {
     ![1, 2, 3, 255].includes(filters.shiny)
   )
     throw new TypeError("Invalid Static filter selection.");
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
 }
 
 function leadValue(lead: Gen5StaticLead) {

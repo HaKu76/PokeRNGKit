@@ -8,8 +8,9 @@ import {
   getGen5HiddenGrottoAllowedGenders,
   type Gen5HiddenGrottoArea,
 } from "./encounters";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
-export const GEN5_HIDDEN_GROTTO_API_VERSION = 1;
+export const GEN5_HIDDEN_GROTTO_API_VERSION = 2;
 export const GEN5_HIDDEN_GROTTO_MAX_RESULTS = 100_000;
 export const GEN5_HIDDEN_GROTTO_MAX_EVALUATIONS = 250_000_000n;
 
@@ -73,6 +74,8 @@ export interface Gen5HiddenGrottoPokemonFilters {
   hiddenPowerMask: number;
   levelMin: number;
   levelMax: number;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 interface Gen5HiddenGrottoRequestBase {
@@ -353,6 +356,8 @@ function validatePokemonFilters(filters: Gen5HiddenGrottoPokemonFilters) {
     !integerIn(filters.levelMax, filters.levelMin, 100)
   )
     throw new TypeError("Invalid Pokemon range filter.");
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
 }
 
 export function gen5HiddenGrottoLeadValue(lead: Gen5HiddenGrottoLead) {

@@ -17,6 +17,7 @@ import {
   gen4EventHiddenPower,
   pause,
 } from "./shared";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 
 function ivsAtIndex(request: Gen4EventSearcherRequest, index: number) {
   const ivs: Gen4EventIvTuple = [0, 0, 0, 0, 0, 0];
@@ -119,7 +120,13 @@ export class Gen4EventSearcherUiPreviewEngine implements Gen4EventSearcherEngine
         }).filter(
           (state): state is Gen4EventSearcherState =>
             state !== undefined &&
-            (request.filters.hiddenPowerMask & (1 << state.hiddenPower)) !== 0,
+            (request.filters.hiddenPowerMask & (1 << state.hiddenPower)) !==
+              0 &&
+            passesPerfectIvFilter(
+              state.ivs,
+              request.filters.perfectIvValue,
+              request.filters.perfectIvCount,
+            ),
         );
         const visible = batch.slice(0, Math.max(0, maxResults - resultCount));
         if (visible.length > 0) options.onBatch?.(visible);

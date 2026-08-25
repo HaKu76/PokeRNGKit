@@ -1,6 +1,7 @@
 export { gen3HiddenPower } from "../shared/gen3HiddenPower";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
-export const GEN3_EGG_API_VERSION = 1;
+export const GEN3_EGG_API_VERSION = 2;
 export const GEN3_EGG_HELD_CHUNK_SIZE = 20_000;
 export const GEN3_EGG_MAX_HELD_STATES = 1_000_000;
 export const GEN3_EGG_MAX_PICKUP_STATES = 1_000_000;
@@ -8,7 +9,7 @@ export const GEN3_EGG_MAX_PICKUP_STATES = 1_000_000;
 export const GEN3_EGG_MAX_COMBINED_STATES = 150_060_006;
 export const GEN3_EGG_MAX_PAIRS_PER_WASM_CALL = 100_000;
 export const GEN3_EGG_MAX_RESULTS = 250_000;
-export const GEN3_EGG_REQUEST_WORDS = 54;
+export const GEN3_EGG_REQUEST_WORDS = 56;
 export const GEN3_EGG_RESULT_WORDS = 22;
 export const GEN3_EGG_ALLOWED_SPECIES = new Set([
   1, 4, 7, 10, 13, 16, 19, 21, 23, 27, 29, 32, 37, 41, 43, 46, 48, 50, 52, 54,
@@ -48,6 +49,8 @@ export interface Gen3EggFilters {
   hiddenPowerMask: number;
   ivMin: [number, number, number, number, number, number];
   ivMax: [number, number, number, number, number, number];
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen3EggRequest {
@@ -311,6 +314,14 @@ export function validateGen3EggRequest(request: Gen3EggRequest): string[] {
       errors.push(`iv${index}`);
     }
   }
+  if (
+    !validatePerfectIvFilter(
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
+    )
+  ) {
+    errors.push("perfectIvs");
+  }
   return errors;
 }
 
@@ -391,6 +402,8 @@ export function encodeGen3EggRequest(request: Gen3EggRequest): Uint32Array {
     eggParentItemToWasm(request.parentB.item),
     request.parentA.nature,
     request.parentB.nature,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
   ]);
   return values;
 }

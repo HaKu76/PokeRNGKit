@@ -3,10 +3,11 @@ import type {
   Gen5Language,
   Gen5Profile,
 } from "../gen5profiles/domain";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
 export const GEN5_DREAM_RADAR_MAX_RESULTS = 100_000;
 export const GEN5_DREAM_RADAR_MAX_EVALUATIONS = 250_000_000n;
-export const GEN5_DREAM_RADAR_API_VERSION = 1;
+export const GEN5_DREAM_RADAR_API_VERSION = 2;
 
 export type Gen5DreamRadarMode = "generator" | "searcher";
 export type Gen5DreamRadarIvTuple = [
@@ -213,6 +214,8 @@ export interface Gen5DreamRadarFilters {
   ivMax: Gen5DreamRadarIvTuple;
   natureMask: number;
   hiddenPowerMask: number;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen5DreamRadarProfile {
@@ -475,6 +478,8 @@ function validateFilters(filters: Gen5DreamRadarFilters) {
     throw new TypeError("Select at least one Nature.");
   if (!integerIn(filters.hiddenPowerMask, 1, ALL_HIDDEN_POWERS))
     throw new TypeError("Select at least one Hidden Power type.");
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
 }
 
 export function gen5DreamRadarFiltersAcceptAll(filters: Gen5DreamRadarFilters) {
@@ -483,7 +488,9 @@ export function gen5DreamRadarFiltersAcceptAll(filters: Gen5DreamRadarFilters) {
     (filters.ivMin.every((value) => value === 0) &&
       filters.ivMax.every((value) => value === 31) &&
       filters.natureMask === ALL_NATURES &&
-      filters.hiddenPowerMask === ALL_HIDDEN_POWERS)
+      filters.hiddenPowerMask === ALL_HIDDEN_POWERS &&
+      filters.perfectIvValue === 31 &&
+      filters.perfectIvCount === 0)
   );
 }
 

@@ -34,6 +34,8 @@ const request: Gen5DreamRadarGeneratorRequest = {
     disabled: true,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     natureMask: 0x1ffffff,
     hiddenPowerMask: 0xffff,
   },
@@ -59,7 +61,7 @@ class RecoveringWorker {
           type: "ready",
           moduleId: "gen5dreamradar",
           contractVersion: RNG_MODULE_CONTRACT_VERSION,
-          apiVersion: 1,
+          apiVersion: 2,
           operations: ["generator", "searcher"],
         });
         return;
@@ -71,7 +73,7 @@ class RecoveringWorker {
       this.emit({
         type: "batch",
         moduleId: "gen5dreamradar",
-        apiVersion: 1,
+        apiVersion: 2,
         taskId: message.taskId,
         operation: "generator",
         chunkIndex: message.chunkIndex,

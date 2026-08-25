@@ -18,6 +18,8 @@ const generatorRequest: Gen4EventGeneratorRequest = {
     hiddenPowerMask: 0xffff,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
 };
 

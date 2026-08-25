@@ -51,6 +51,8 @@ const generator: Gen5EggGeneratorRequest = {
     ability: "hidden",
     natureMask: 1 << 7,
     hiddenPowerMask: 1 << 15,
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     ivMin: [31, 31, 31, 31, 31, 31],
     ivMax: [31, 31, 31, 31, 31, 31],
   },

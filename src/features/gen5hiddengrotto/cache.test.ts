@@ -97,6 +97,8 @@ const request: Gen5HiddenGrottoSearcherRequest = {
     disabled: false,
     ivMin: [30, 30, 30, 0, 30, 30],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     natureMask: 0,
     hiddenPowerMask: 0,
     levelMin: 10,

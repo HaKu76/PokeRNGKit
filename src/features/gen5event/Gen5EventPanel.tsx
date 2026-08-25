@@ -22,6 +22,7 @@ import { useGen5Profiles } from "../gen5profiles/useGen5Profiles";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { FloatingToolPanel } from "../shared/FloatingToolPanel";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { loadGen5EventDates, saveGen5EventDates } from "./dateSettings";
 import {
   formatGen5EventButtons,
@@ -264,6 +265,8 @@ export function Gen5EventPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [natureMask, setNatureMask] = useState(ALL_NATURES);
   const [hiddenPowerMask, setHiddenPowerMask] = useState(ALL_HIDDEN_POWERS);
   const [abilityFilter, setAbilityFilter] = useState<0 | 1 | 2 | 255>(255);
@@ -537,6 +540,8 @@ export function Gen5EventPanel({
     hiddenPowerMask,
     ivMin: ivMin.map((value) => Number(value || "0")) as Gen5EventIvTuple,
     ivMax: ivMax.map((value) => Number(value || "0")) as Gen5EventIvTuple,
+    perfectIvValue: Number(perfectIvValue || "0"),
+    perfectIvCount: Number(perfectIvCount || "0"),
   });
 
   const buildRequest = (): Gen5EventRequest => {
@@ -1257,6 +1262,12 @@ export function Gen5EventPanel({
                 </div>
               ))}
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
           </fieldset>
           <div className="gen5event-actions">
             <button

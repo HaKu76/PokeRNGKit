@@ -18,6 +18,7 @@ import { getGen3Personal } from "../shared/gen3Personal";
 import { getGen3Species, getGen3SpeciesName } from "../shared/gen3Species";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import {
   gen3EggCombinedStateCount,
   GEN3_EGG_ALLOWED_SPECIES,
@@ -220,6 +221,8 @@ export function Gen3EggPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [showInheritance, setShowInheritance] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [filtersDisabled, setFiltersDisabled] = useState(false);
@@ -382,6 +385,8 @@ export function Gen3EggPanel({
           hiddenPowerMask: HIDDEN_POWER_MASK_ALL,
           ivMin: [0, 0, 0, 0, 0, 0],
           ivMax: [31, 31, 31, 31, 31, 31],
+          perfectIvValue: 31,
+          perfectIvCount: 0,
         }
       : {
           shiny,
@@ -395,6 +400,8 @@ export function Gen3EggPanel({
           ivMax: ivMax.map(
             (value) => parseDecimal(value) ?? Number.NaN,
           ) as Gen3EggFilters["ivMax"],
+          perfectIvValue: parseDecimal(perfectIvValue) ?? Number.NaN,
+          perfectIvCount: parseDecimal(perfectIvCount) ?? Number.NaN,
         };
   const request = (): Gen3EggRequest => ({
     game,
@@ -939,6 +946,12 @@ export function Gen3EggPanel({
                 </Select>
               </label>
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <div className="iv-filter">
               <div className="iv-filter-header">
                 <span>{t("ivs")}</span>

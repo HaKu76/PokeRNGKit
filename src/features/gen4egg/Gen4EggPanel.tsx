@@ -23,6 +23,7 @@ import type { Gen4Profile } from "../gen4profiles/domain";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { GEN4_EGG_SPECIES, getGen4EggGenderRatios } from "./data";
 import {
   calculateGen4EggPoketch,
@@ -288,6 +289,8 @@ export function Gen4EggPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [showInheritance, setShowInheritance] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [results, setResults] = useState<Result[]>([]);
@@ -482,6 +485,8 @@ export function Gen4EggPanel({
         ivMax: (disableFilters
           ? [31, 31, 31, 31, 31, 31]
           : ivMax.map(parseDecimal)) as Gen4EggIvTuple,
+        perfectIvValue: disableFilters ? 31 : parseDecimal(perfectIvValue),
+        perfectIvCount: disableFilters ? 0 : parseDecimal(perfectIvCount),
       },
     };
   };
@@ -996,6 +1001,12 @@ export function Gen4EggPanel({
                 resetHint={t("checkListResetHint")}
               />
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <div className="iv-filter">
               <div className="iv-filter-header">
                 <span>{t("ivs")}</span>

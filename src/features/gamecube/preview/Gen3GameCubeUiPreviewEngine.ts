@@ -4,6 +4,7 @@ import type {
   GameCubeSummary,
 } from "../search";
 import type { GameCubeRequest, GameCubeState } from "../domain";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 
 export class Gen3GameCubeUiPreviewEngine implements GameCubeEngine {
   private cancelled = false;
@@ -36,6 +37,11 @@ export class Gen3GameCubeUiPreviewEngine implements GameCubeEngine {
           (iv, ivIndex) =>
             iv < request.filters.ivMin[ivIndex] ||
             iv > request.filters.ivMax[ivIndex],
+        ) ||
+        !passesPerfectIvFilter(
+          ivs,
+          request.filters.perfectIvValue,
+          request.filters.perfectIvCount,
         ) ||
         (request.filters.natureMask & (1 << nature)) === 0 ||
         (request.filters.ability !== "any" &&

@@ -47,6 +47,8 @@ const request: Gen3EggRequest = {
     hiddenPowerMask: 0xffff,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
 };
 

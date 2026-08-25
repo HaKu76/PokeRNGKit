@@ -53,25 +53,27 @@ const generator: Gen5EventGeneratorRequest = {
     hiddenPowerMask: 0xffff,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
   resultLimit: 100_000,
 };
 
 describe("Gen 5 Event domain", () => {
-  it("packs the fixed 64-word ABI in bridge field order", () => {
+  it("packs the fixed 66-word ABI in bridge field order", () => {
     const words = encodeGen5EventRequest(generator, {
       index: 0,
       start: 2,
       count: 4,
     });
-    expect(words).toHaveLength(64);
+    expect(words).toHaveLength(66);
     expect([...words.slice(0, 8)]).toEqual([
       0, 2, 0, 0, 12345, 54321, 0x22334455, 0x11,
     ]);
     expect(words[22]).toBe(255);
     expect(words[28]).toBe(1 << 1);
     expect(words[30]).toBe(31);
-    expect([...words.slice(60)]).toEqual([0, 0, 2, 4]);
+    expect([...words.slice(62)]).toEqual([0, 0, 2, 4]);
   });
 
   it("counts Searcher date, Timer0, keypress, and second units", () => {

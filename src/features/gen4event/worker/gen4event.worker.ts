@@ -49,6 +49,8 @@ function commonArguments(
     request.filters.hiddenPowerMask,
     ...request.filters.ivMin,
     ...request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
   ];
 }
 

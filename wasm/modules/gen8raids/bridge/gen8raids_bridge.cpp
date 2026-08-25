@@ -16,7 +16,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maximumEvaluations = 250000000;
     constexpr std::uint64_t frameIncrement = 0x82A2B175229D6A5BULL;
     constexpr std::uint8_t toxtricityAmpedNatures[] = { 3, 4, 2, 8, 9, 19, 22, 11, 13, 14, 0, 6, 24 };
@@ -189,12 +189,13 @@ namespace
         if ((request[21] & (1U << hiddenPower(ivs))) == 0) return false;
         for (std::size_t index = 0; index < 6; index++)
             if (ivs[index] < request[26 + index] || ivs[index] > request[32 + index]) return false;
+        if (std::count_if(ivs.begin(), ivs.end(), [&](std::uint8_t iv) { return iv >= request[38]; }) < request[39]) return false;
         return true;
     }
     bool validRequest(const std::uint32_t *request)
     {
         const std::uint64_t seed = (static_cast<std::uint64_t>(request[1]) << 32) | request[0];
-        if (seed == 0 || request[5] == 0 || request[5] > maximumEvaluations || request[8] == 0 || request[8] > 898 || request[9] > 31 || request[10] > 2 || request[11] > 4 || request[12] > 3 || request[13] < 1 || request[13] > 6 || request[14] < 1 || request[14] > 100 || request[15] > 255 || request[16] > 1 || request[17] == 0 || request[20] == 0 || request[21] == 0 || request[22] > request[23] || request[24] > request[25] || request[39] == 0 || request[39] > 31 || request[40] > 1 || request[38] == 0 || request[38] > 100000)
+        if (seed == 0 || request[5] == 0 || request[5] > maximumEvaluations || request[8] == 0 || request[8] > 898 || request[9] > 31 || request[10] > 2 || request[11] > 4 || request[12] > 3 || request[13] < 1 || request[13] > 6 || request[14] < 1 || request[14] > 100 || request[15] > 255 || request[16] > 1 || request[17] == 0 || request[20] == 0 || request[21] == 0 || request[22] > request[23] || request[24] > request[25] || request[38] > 31 || request[39] > 6 || request[40] == 0 || request[40] > 100000 || request[41] > 31 || request[42] > 1)
             return false;
         if (static_cast<std::uint64_t>(request[2]) + request[3] + request[4] + request[5] > std::numeric_limits<std::uint32_t>::max() + 1ULL) return false;
         for (std::size_t index = 0; index < 6; index++) if (request[26 + index] > 31 || request[32 + index] > 31 || request[26 + index] > request[32 + index]) return false;
@@ -206,7 +207,7 @@ namespace
     {
         const std::uint32_t metadata = ability | (static_cast<std::uint32_t>(gender) << 2) | (static_cast<std::uint32_t>(nature) << 4) | (static_cast<std::uint32_t>(shiny) << 9) | (static_cast<std::uint32_t>(characteristic(ec, ivs)) << 11);
         const std::uint32_t measures = height | (static_cast<std::uint32_t>(weight) << 8);
-        const std::uint32_t templateInfo = request[8] | (request[9] << 10) | (request[39] << 16) | (request[40] << 24);
+        const std::uint32_t templateInfo = request[8] | (request[9] << 10) | (request[41] << 16) | (request[42] << 24);
         const std::uint32_t ivs0 = ivs[0] | (static_cast<std::uint32_t>(ivs[1]) << 8) | (static_cast<std::uint32_t>(ivs[2]) << 16) | (static_cast<std::uint32_t>(ivs[3]) << 24);
         const std::uint32_t ivs1 = ivs[4] | (static_cast<std::uint32_t>(ivs[5]) << 8);
         const std::uint32_t stats01 = statValues[0] | (static_cast<std::uint32_t>(statValues[1]) << 16);
@@ -220,7 +221,7 @@ namespace
         std::uint64_t currentSeed = seed + frameIncrement * (static_cast<std::uint64_t>(request[2]) + request[3] + request[4]);
         const auto &info = personal(static_cast<std::uint16_t>(request[8]), static_cast<std::uint8_t>(request[9]));
         results.clear();
-        results.reserve(std::min(request[38], request[5]));
+        results.reserve(std::min(request[40], request[5]));
         processedCount = 0;
         limitReached = false;
         for (std::uint32_t count = 0; count < request[5]; count++, currentSeed += frameIncrement)
@@ -285,7 +286,7 @@ namespace
             if (passesFilter(request, shiny, ability, gender, nature, height, weight, ivs))
             {
                 results.emplace_back(pack(request[2] + request[4] + count, ec, pid, shiny, nature, ability, gender, ivs, stats(info, ivs, nature, static_cast<std::uint8_t>(request[14])), height, weight, info.abilities[ability], request));
-                if (results.size() >= request[38]) { limitReached = processedCount < request[5]; break; }
+                if (results.size() >= request[40]) { limitReached = processedCount < request[5]; break; }
             }
         }
     }

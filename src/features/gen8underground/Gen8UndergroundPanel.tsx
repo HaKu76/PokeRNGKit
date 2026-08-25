@@ -1,4 +1,5 @@
 import { Select } from "../shared/Select";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Download, Play, Settings2, Square, Trash2 } from "lucide-react";
 import {
@@ -271,6 +272,8 @@ export function Gen8UndergroundPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [showStats, setShowStats] = useState(false);
   const [results, setResults] = useState<Gen8UndergroundResult[]>([]);
   const [status, setStatus] = useState<RunStatus>("ready");
@@ -362,6 +365,12 @@ export function Gen8UndergroundPanel({
         ivMax: (disabled
           ? [31, 31, 31, 31, 31, 31]
           : ivMax.map(parseGen8UndergroundDecimal)) as Gen8UndergroundIvTuple,
+        perfectIvValue: disabled
+          ? 31
+          : parseGen8UndergroundDecimal(perfectIvValue),
+        perfectIvCount: disabled
+          ? 0
+          : parseGen8UndergroundDecimal(perfectIvCount),
         species: selectedSpecies,
       },
       resultLimit: 100_000,
@@ -994,6 +1003,13 @@ export function Gen8UndergroundPanel({
                     />
                   </label>
                 ))}
+                <PerfectIvFilterFields
+                  count={perfectIvCount}
+                  disabled={filtersDisabled}
+                  onCountChange={setPerfectIvCount}
+                  onValueChange={setPerfectIvValue}
+                  value={perfectIvValue}
+                />
               </div>
             </div>
           )}

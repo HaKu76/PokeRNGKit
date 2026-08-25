@@ -11,8 +11,9 @@ import {
   type Gen5WildEncounter,
   type Gen5WildSeason,
 } from "./encounters";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
-export const GEN5_WILD_API_VERSION = 1;
+export const GEN5_WILD_API_VERSION = 2;
 export const GEN5_WILD_MAX_RESULTS = 100_000;
 export const GEN5_WILD_MAX_EVALUATIONS = 250_000_000n;
 
@@ -77,6 +78,8 @@ export interface Gen5WildFilters {
   slotMask: number;
   levelMin: number;
   levelMax: number;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 interface Gen5WildRequestBase {
@@ -356,6 +359,8 @@ function validateFilters(filters: Gen5WildFilters, slotCount: number) {
     ![1, 2, 3, 255].includes(filters.shiny)
   )
     throw new TypeError("Invalid Wild filter selection.");
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
 }
 
 export function gen5WildLeadValue(lead: Gen5WildLead) {

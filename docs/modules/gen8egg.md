@@ -1,5 +1,12 @@
 # 第八世代孵化乱数
 
+## 完美个体筛选
+
+- 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
+- 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
+- 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
+
 ## 功能范围
 
 本模块对应 PokeFinder 4.3.2 的 `Gen 8 Eggs`，仅使用 Brilliant Diamond / Shining Pearl Profile：
@@ -66,9 +73,9 @@ Web 单次任务最多执行 `250,000,000` 次状态评估，评估量为 `Max A
 
 - Module id：`gen8egg`
 - Contract version：`1`
-- Wasm API version：`1`
+- Wasm API version：`2`
 - Operation：`generator`
-- 请求：53 个 `uint32_t`
+- 请求：55 个 `uint32_t`
 - 结果：13 个 `uint32_t`
 - 默认 Worker：最多 4 个；调用方最多请求 8 个
 

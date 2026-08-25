@@ -10,6 +10,7 @@ import {
 } from "../gen4ivcalculator/gen4IvData";
 import type { Gen4Profile } from "../gen4profiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import {
   gen4EventSearcherCombinationCount,
@@ -201,6 +202,8 @@ export function Gen4EventPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [results, setResults] = useState<Result[]>([]);
   const [progress, setProgress] = useState<Gen4EventProgress>({
     processedStates: 0,
@@ -345,6 +348,8 @@ export function Gen4EventPanel({
       hiddenPowerMask: powerMask || allPowers,
       ivMin: ivMin.map(parseDecimal) as Gen4EventIvTuple,
       ivMax: ivMax.map(parseDecimal) as Gen4EventIvTuple,
+      perfectIvValue: parseDecimal(perfectIvValue),
+      perfectIvCount: parseDecimal(perfectIvCount),
     },
   });
 
@@ -626,6 +631,12 @@ export function Gen4EventPanel({
                 </label>
               ))}
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <MultiCheckSelect
               anyLabel={t("any")}
               label={t("hiddenPower")}

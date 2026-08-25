@@ -7,8 +7,9 @@ import {
   type Gen4WildGame,
   type Gen4WildSlot,
 } from "./data";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
-export const GEN4_WILD_API_VERSION = 1;
+export const GEN4_WILD_API_VERSION = 2;
 export const GEN4_WILD_CHUNK_SIZE = 100_000;
 export const GEN4_WILD_SEARCHER_CHUNK_SIZE = 10_000;
 export const GEN4_WILD_MAX_TOTAL_STATES = 2_000_000;
@@ -123,6 +124,8 @@ export interface Gen4WildFilters {
   levelMax: number;
   ivMin: Gen4IvTuple;
   ivMax: Gen4IvTuple;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen4GameProfile {
@@ -762,6 +765,8 @@ function validateFilters(filters: Gen4WildFilters, slotCount: number) {
     )
       errors.push(`iv${index}`);
   });
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    errors.push("perfectIvs");
   return errors;
 }
 

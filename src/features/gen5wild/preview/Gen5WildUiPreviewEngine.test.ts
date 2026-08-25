@@ -38,6 +38,8 @@ const request: Gen5WildGeneratorRequest = {
     ivMax: [31, 31, 31, 31, 31, 31],
     natureMask: 0x1ff_ffff,
     hiddenPowerMask: 0xffff,
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     ability: 255,
     gender: 255,
     shiny: 255,

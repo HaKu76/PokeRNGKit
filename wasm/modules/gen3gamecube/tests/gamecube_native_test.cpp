@@ -14,7 +14,7 @@
 
 int main()
 {
-    std::array<std::uint32_t, 55> request = {};
+    std::array<std::uint32_t, 57> request = {};
     request[0] = 1;
     request[1] = 96;
     request[2] = 385;
@@ -37,8 +37,10 @@ int main()
     request[37] = 255;
     request[38] = 32;
     request[39] = 32;
+    request[55] = 31;
+    request[56] = 0;
 
-    assert(gen3gamecube_api_version() == 1);
+    assert(gen3gamecube_api_version() == 2);
     assert(gen3gamecube_generate(request.data(), request.size()) == 10);
     assert(gen3gamecube_last_error() == 0);
     const auto *states = reinterpret_cast<const Gen3GameCubePackedState *>(gen3gamecube_result_ptr());

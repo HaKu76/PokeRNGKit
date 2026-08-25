@@ -16,6 +16,7 @@ import {
   gen4EventHiddenPower,
   pause,
 } from "./shared";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 
 function previewState(
   request: Gen4EventGeneratorRequest,
@@ -104,12 +105,18 @@ export class Gen4EventUiPreviewEngine implements Gen4EventGeneratorEngine {
         const end = Math.floor(((step + 1) * sampleCount) / stepCount);
         const batch = Array.from({ length: end - start }, (_, index) =>
           previewState(request, start + index, sampleCount, totalStates),
-        ).filter((state) =>
-          state.ivs.every(
-            (value, index) =>
-              value >= request.filters.ivMin[index] &&
-              value <= request.filters.ivMax[index],
-          ),
+        ).filter(
+          (state) =>
+            state.ivs.every(
+              (value, index) =>
+                value >= request.filters.ivMin[index] &&
+                value <= request.filters.ivMax[index],
+            ) &&
+            passesPerfectIvFilter(
+              state.ivs,
+              request.filters.perfectIvValue,
+              request.filters.perfectIvCount,
+            ),
         );
         const visible = batch.slice(0, Math.max(0, maxResults - resultCount));
         if (visible.length > 0) options.onBatch?.(visible);

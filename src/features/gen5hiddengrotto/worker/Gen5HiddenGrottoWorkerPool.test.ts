@@ -53,6 +53,8 @@ const generator: Gen5HiddenGrottoGeneratorRequest = {
     disabled: false,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     natureMask: 0,
     hiddenPowerMask: 0,
     levelMin: 1,
@@ -176,7 +178,7 @@ class CompletingWorker {
           type: "ready",
           moduleId: "gen5hiddengrotto",
           contractVersion: RNG_MODULE_CONTRACT_VERSION,
-          apiVersion: 1,
+          apiVersion: 2,
           operations: [
             "slot-generator",
             "slot-searcher",
@@ -188,14 +190,14 @@ class CompletingWorker {
         this.emit({
           type: "cache-ready",
           moduleId: "gen5hiddengrotto",
-          apiVersion: 1,
+          apiVersion: 2,
           cacheKey: message.cacheKey,
         });
       } else if (message.type === "cache-clear") {
         this.emit({
           type: "cache-ready",
           moduleId: "gen5hiddengrotto",
-          apiVersion: 1,
+          apiVersion: 2,
           cacheKey: "",
         });
       } else {
@@ -206,7 +208,7 @@ class CompletingWorker {
         this.emit({
           type: "batch",
           moduleId: "gen5hiddengrotto",
-          apiVersion: 1,
+          apiVersion: 2,
           taskId: message.taskId,
           operation: message.operation,
           chunkIndex: message.chunkIndex,
@@ -239,7 +241,7 @@ class HoldingWorker extends CompletingWorker {
           type: "ready",
           moduleId: "gen5hiddengrotto",
           contractVersion: RNG_MODULE_CONTRACT_VERSION,
-          apiVersion: 1,
+          apiVersion: 2,
           operations: [
             "slot-generator",
             "slot-searcher",
@@ -285,7 +287,7 @@ describe("Gen5HiddenGrottoWorkerPool", () => {
     );
     expect(init).toMatchObject({
       moduleId: "gen5hiddengrotto",
-      apiVersion: 1,
+      apiVersion: 2,
       contractVersion: RNG_MODULE_CONTRACT_VERSION,
     });
     pool.dispose();

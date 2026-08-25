@@ -22,6 +22,7 @@ import type { Gen4Profile } from "../gen4profiles/domain";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import {
   DEFAULT_GEN4_WILD_SETTINGS,
   GEN4_WILD_ENCOUNTERS,
@@ -352,6 +353,8 @@ export function Gen4WildPanel({
       max: ["31", "31", "31", "31", "31", "31"],
     },
   });
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [showStats, setShowStats] = useState(false);
   const [results, setResults] = useState<Result[]>([]);
   const [progress, setProgress] = useState<Gen4WildProgress>({
@@ -624,6 +627,8 @@ export function Gen4WildPanel({
           levelMax: 100,
           ivMin: [0, 0, 0, 0, 0, 0],
           ivMax: [31, 31, 31, 31, 31, 31],
+          perfectIvValue: 31,
+          perfectIvCount: 0,
         }
       : {
           shiny,
@@ -636,6 +641,8 @@ export function Gen4WildPanel({
           levelMax: parseDecimal(levelMax),
           ivMin: activeIvRanges.min.map(parseDecimal) as Gen4IvTuple,
           ivMax: activeIvRanges.max.map(parseDecimal) as Gen4IvTuple,
+          perfectIvValue: parseDecimal(perfectIvValue),
+          perfectIvCount: parseDecimal(perfectIvCount),
         };
 
   const run = async (event: FormEvent) => {
@@ -1572,6 +1579,12 @@ export function Gen4WildPanel({
                 </Select>
               </label>
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <div className="iv-filter">
               <div className="iv-filter-header">
                 <span>{t("ivs")}</span>

@@ -15,8 +15,8 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
-    constexpr std::uint32_t requestWords = 48;
+    constexpr std::uint32_t apiVersion = 2;
+    constexpr std::uint32_t requestWords = 50;
     constexpr std::uint32_t resultWords = 12;
     constexpr std::uint32_t maximumResults = 100000;
     constexpr std::uint32_t allNatures = 0x1ffffff;
@@ -67,9 +67,11 @@ namespace
         WeightMax = 32,
         IvMin = 33,
         IvMax = 39,
-        Offset = 45,
-        ResultLimit = 46,
-        NationalDex = 47,
+        PerfectIvValue = 45,
+        PerfectIvCount = 46,
+        Offset = 47,
+        ResultLimit = 48,
+        NationalDex = 49,
     };
 
     enum EncounterType : std::uint8_t
@@ -722,6 +724,7 @@ namespace
         if (state.weight < request[WeightMin] || state.weight > request[WeightMax]) return false;
         for (std::size_t index = 0; index < 6; index++)
             if (state.ivs[index] < request[IvMin + index] || state.ivs[index] > request[IvMax + index]) return false;
+        if (std::count_if(state.ivs.begin(), state.ivs.end(), [&](std::uint8_t iv) { return iv >= request[PerfectIvValue]; }) < request[PerfectIvCount]) return false;
         return true;
     }
 
@@ -843,6 +846,7 @@ namespace
             || request[LevelMin] < 1 || request[LevelMin] > request[LevelMax] || request[LevelMax] > 100
             || request[HeightMin] > request[HeightMax] || request[HeightMax] > 255
             || request[WeightMin] > request[WeightMax] || request[WeightMax] > 255
+            || request[PerfectIvValue] > 31 || request[PerfectIvCount] > 6
             || request[ResultLimit] == 0 || request[ResultLimit] > maximumResults || request[NationalDex] > 1)
             return false;
         for (std::size_t index = 0; index < 6; index++)
@@ -928,4 +932,4 @@ extern "C"
 }
 
 static_assert(sizeof(PackedResult) == resultWords * sizeof(std::uint32_t));
-static_assert(requestWords == 48);
+static_assert(requestWords == 50);

@@ -1,8 +1,12 @@
 import type { Gen8Profile } from "../gen8profiles/domain";
+import {
+  passesPerfectIvFilter,
+  validatePerfectIvFilter,
+} from "../shared/perfectIvFilter";
 import { getGen8UndergroundSpecies, type Gen8UndergroundVersion } from "./data";
 
-export const GEN8_UNDERGROUND_API_VERSION = 1;
-export const GEN8_UNDERGROUND_REQUEST_WORDS = 54;
+export const GEN8_UNDERGROUND_API_VERSION = 2;
+export const GEN8_UNDERGROUND_REQUEST_WORDS = 56;
 export const GEN8_UNDERGROUND_RESULT_WORDS = 12;
 export const GEN8_UNDERGROUND_MAX_RESULTS = 100_000;
 export const GEN8_UNDERGROUND_MAX_EVALUATIONS = 250_000_000;
@@ -52,6 +56,8 @@ export interface Gen8UndergroundFilters {
   weightMax: number;
   ivMin: Gen8UndergroundIvTuple;
   ivMax: Gen8UndergroundIvTuple;
+  perfectIvValue: number;
+  perfectIvCount: number;
   species: readonly number[];
 }
 
@@ -209,6 +215,8 @@ function validateFilters(
       throw new TypeError("Each IV range must be between 0 and 31.");
     }
   });
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
   const available = new Set(
     getGen8UndergroundSpecies(
       request.profile.version,
@@ -356,12 +364,14 @@ export function encodeGen8UndergroundRequest(
     request.filters.weightMax,
     ...request.filters.ivMin,
     ...request.filters.ivMax,
+    request.filters.disabled ? 31 : request.filters.perfectIvValue,
+    request.filters.disabled ? 0 : request.filters.perfectIvCount,
   ]);
   request.filters.species.forEach((species) => {
-    words[36 + Math.floor(species / 32)] |= 1 << (species % 32);
+    words[38 + Math.floor(species / 32)] |= 1 << (species % 32);
   });
-  words[52] = request.offset;
-  words[53] = request.resultLimit;
+  words[54] = request.offset;
+  words[55] = request.resultLimit;
   return words;
 }
 
@@ -455,7 +465,13 @@ export function validateGen8UndergroundResult(
     !integerIn(result.weight, 0, 255) ||
     !integerIn(result.characteristic, 0, 29) ||
     result.ivs.some((value) => !integerIn(value, 0, 31)) ||
-    result.stats.some((value) => !integerIn(value, 1, 999))
+    result.stats.some((value) => !integerIn(value, 1, 999)) ||
+    (!request.filters.disabled &&
+      !passesPerfectIvFilter(
+        result.ivs,
+        request.filters.perfectIvValue,
+        request.filters.perfectIvCount,
+      ))
   ) {
     throw new RangeError("Invalid Gen 8 Underground result.");
   }

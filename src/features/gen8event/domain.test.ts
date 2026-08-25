@@ -47,6 +47,8 @@ const request: Gen8EventRequest = {
     weightMax: 255,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
   resultLimit: 100_000,
 };
@@ -144,7 +146,7 @@ describe("Gen 8 Event domain", () => {
     expect(() => parseGen8EventWondercard(buffer)).toThrow(/PID Type/);
   });
 
-  it("splits inclusive advances and packs the 45-word request", () => {
+  it("splits inclusive advances and packs the 47-word request", () => {
     expect(
       splitGen8EventRequest(request, 3).map(({ start, count }) => [
         start,
@@ -156,7 +158,7 @@ describe("Gen 8 Event domain", () => {
       start: 0,
       count: 1,
     });
-    expect(encoded).toHaveLength(45);
+    expect(encoded).toHaveLength(47);
     expect([...encoded.slice(8, 22)]).toEqual([
       12345, 54321, 0, 0, 0, 0, 490, 2, 1, 255, 0, 0, 3, 1,
     ]);

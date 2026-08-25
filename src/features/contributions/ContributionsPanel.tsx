@@ -18,9 +18,16 @@ const contributions: readonly ContributionRecord[] = [
   },
   {
     amount: 50,
-    contributor: "**然",
+    contributor: "厉害啊",
     currency: "RMB",
     date: "2026-08-23",
+    purpose: "AI Token",
+  },
+  {
+    amount: 20,
+    contributor: "千一",
+    currency: "RMB",
+    date: "2026-08-25",
     purpose: "AI Token",
   },
 ];

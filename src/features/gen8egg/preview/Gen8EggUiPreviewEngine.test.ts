@@ -25,6 +25,8 @@ const filters: Gen8EggFilters = {
   hiddenPowerMask: 1 << 15,
   ivMin: [31, 31, 31, 31, 31, 31],
   ivMax: [31, 31, 31, 31, 31, 31],
+  perfectIvValue: 31,
+  perfectIvCount: 0,
 };
 
 function request(overrides: Partial<Gen8EggRequest> = {}): Gen8EggRequest {

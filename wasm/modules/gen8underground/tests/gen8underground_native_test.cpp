@@ -17,9 +17,9 @@ namespace
         return condition;
     }
 
-    std::array<std::uint32_t, 54> request(std::uint32_t lead = 255, bool diglett = false, std::uint32_t storyFlag = 1)
+    std::array<std::uint32_t, 56> request(std::uint32_t lead = 255, bool diglett = false, std::uint32_t storyFlag = 1)
     {
-        std::array<std::uint32_t, 54> value = {};
+        std::array<std::uint32_t, 56> value = {};
         value[0] = 0x87654321;
         value[1] = 0x12345678;
         value[2] = 0x12345678;
@@ -38,8 +38,10 @@ namespace
         value[21] = 255;
         value[23] = 255;
         for (std::size_t index = 0; index < 6; index++) value[30 + index] = 31;
-        for (std::size_t index = 0; index < 16; index++) value[36 + index] = 0xffffffff;
-        value[53] = 1000;
+        value[36] = 31;
+        value[37] = 0;
+        for (std::size_t index = 0; index < 16; index++) value[38 + index] = 0xffffffff;
+        value[55] = 1000;
         return value;
     }
 
@@ -55,7 +57,7 @@ namespace
                  static_cast<std::uint8_t>(output[6]), static_cast<std::uint8_t>(output[6] >> 8) };
     }
 
-    bool fixture(std::array<std::uint32_t, 54> value, std::uint32_t expectedEc, std::uint32_t expectedPid,
+    bool fixture(std::array<std::uint32_t, 56> value, std::uint32_t expectedEc, std::uint32_t expectedPid,
                  std::uint16_t expectedSpecies, std::uint16_t expectedEggMove, std::uint8_t expectedLevel,
                  std::array<std::uint8_t, 6> expectedIvs, const char *message)
     {
@@ -73,7 +75,7 @@ namespace
 
 int main()
 {
-    if (!check(gen8underground_api_version() == 1, "unexpected API version")) return 1;
+    if (!check(gen8underground_api_version() == 2, "unexpected API version")) return 1;
     if (!fixture(request(), 2173469342U, 3329595061U, 198, 413, 17, { 28, 1, 23, 10, 31, 20 }, "None fixture count mismatch"))
         return 1;
     if (!fixture(request(255, true, 6), 2173469342U, 780827324U, 434, 583, 17, { 1, 23, 10, 31, 20, 26 },
@@ -93,7 +95,7 @@ int main()
         return 1;
 
     auto value = request();
-    value[53] = 1;
+    value[55] = 1;
     if (!check(gen8underground_generate(value.data()) == 1 && gen8underground_limit_reached() == 1,
                "result limit was not enforced"))
         return 1;
@@ -118,8 +120,8 @@ int main()
     if (!check(gen8underground_generate(value.data()) == 0, "square shiny filter mismatch")) return 1;
     value = request();
     value[15] = 1;
-    for (std::size_t index = 0; index < 16; index++) value[36 + index] = 0;
-    value[36] = 1;
+    for (std::size_t index = 0; index < 16; index++) value[38 + index] = 0;
+    value[38] = 1;
     if (!check(gen8underground_generate(value.data()) == 60, "disabled filters did not skip species")) return 1;
 
     return 0;

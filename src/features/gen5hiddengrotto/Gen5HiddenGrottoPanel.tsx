@@ -20,6 +20,7 @@ import type { Gen5AdjacentSeedsInitialContext } from "../gen5adjacentseeds/domai
 import { useGen5Profiles } from "../gen5profiles/useGen5Profiles";
 import { FloatingToolPanel } from "../shared/FloatingToolPanel";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import {
   parseGen5HiddenGrottoIvCache,
   parseGen5HiddenGrottoShaCache,
@@ -323,6 +324,8 @@ export function Gen5HiddenGrottoPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const firstSlot = GEN5_HIDDEN_GROTTO_AREAS[0].pokemon[0];
   const [levelMin, setLevelMin] = useState(String(firstSlot.minLevel));
   const [levelMax, setLevelMax] = useState(String(firstSlot.maxLevel));
@@ -440,6 +443,8 @@ export function Gen5HiddenGrottoPanel({
     disabled: workflow === "pokemon" && filtersAreDisabled,
     ivMin: ivMin.map(numberValue) as Gen5HiddenGrottoIvTuple,
     ivMax: ivMax.map(numberValue) as Gen5HiddenGrottoIvTuple,
+    perfectIvValue: numberValue(perfectIvValue),
+    perfectIvCount: numberValue(perfectIvCount),
     natureMask,
     hiddenPowerMask,
     levelMin: numberValue(levelMin),
@@ -1335,6 +1340,13 @@ export function Gen5HiddenGrottoPanel({
                   </div>
                 ))}
               </div>
+              <PerfectIvFilterFields
+                count={perfectIvCount}
+                disabled={busy || filtersAreDisabled}
+                onCountChange={setPerfectIvCount}
+                onValueChange={setPerfectIvValue}
+                value={perfectIvValue}
+              />
               <div className="gen5hiddengrotto-filter-grid">
                 <MultiCheckSelect
                   anyLabel={labels.any}

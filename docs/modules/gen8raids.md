@@ -1,5 +1,12 @@
 # 第八世代团体战乱数
 
+## 完美个体筛选
+
+- 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
+- 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
+- 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
+
 ## 功能范围
 
 本模块对应 PokeFinder 4.3.2 `Gen 8 Raids`，仅接受 Sword / Shield Profile。
@@ -33,8 +40,8 @@
 
 ## Worker 与 Wasm
 
-- Module id：`gen8raids`；contract / API version：`1`；operation：`generator`
-- 请求为 41 个 `uint32_t`，结果为 12 个 `uint32_t`
+- Module id：`gen8raids`；contract / API version：`2`；operation：`generator`
+- 请求为 43 个 `uint32_t`，结果为 12 个 `uint32_t`
 - 生产算法仅在 Dedicated Worker 内的 C++/Emscripten Wasm 执行；最多 8 个独立 Worker，不使用 SharedArrayBuffer 或 pthread。
 
 结果表的虚拟滚动容器在 `1280px` 以下保持 `clamp(440px, 56vh, 680px)` 的确定高度。该约束避免 100,000 条结果的虚拟内容反向撑高自动高度面板，并与 Gen 8 Static 的高数据量滚动修复保持一致。

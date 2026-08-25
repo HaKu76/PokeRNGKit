@@ -30,8 +30,8 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
-    constexpr std::uint32_t requestWords = 54;
+    constexpr std::uint32_t apiVersion = 2;
+    constexpr std::uint32_t requestWords = 56;
     constexpr std::uint32_t maxPairsPerCall = 100000;
     constexpr std::array<std::uint16_t, 182> allowedSpecies = {
         1, 4, 7, 10, 13, 16, 19, 21, 23, 27, 29, 32, 37, 41, 43, 46, 48, 50, 52, 54, 56, 58, 60, 63,
@@ -87,6 +87,8 @@ namespace
         std::uint8_t parentIv(std::size_t parent, std::size_t stat) const { return static_cast<std::uint8_t>(v[36 + parent * 6 + stat]); }
         std::uint32_t ivMin(std::size_t stat) const { return v[24 + stat]; }
         std::uint32_t ivMax(std::size_t stat) const { return v[30 + stat]; }
+        std::uint32_t perfectIvValue() const { return v[54]; }
+        std::uint32_t perfectIvCount() const { return v[55]; }
     };
 
     std::uint8_t getGender(std::uint32_t pid, std::uint32_t ratio)
@@ -151,11 +153,13 @@ namespace
             && (request.natureFilter() & (1u << nature)) != 0
             && (request.hiddenPowerFilter() & (1u << hiddenPowerType(ivs))) != 0
             && [&]() {
+                std::uint32_t perfect = 0;
                 for (std::size_t stat = 0; stat < 6; stat++)
                 {
                     if (ivs[stat] < request.ivMin(stat) || ivs[stat] > request.ivMax(stat)) return false;
+                    if (ivs[stat] >= request.perfectIvValue()) perfect++;
                 }
-                return true;
+                return perfect >= request.perfectIvCount();
             }();
     }
 
@@ -267,7 +271,8 @@ namespace
             || (leftGender == 2 && rightGender == 3) || (leftGender == 3 && rightGender == 2);
         if (!compatible || request.parentGender(0) > 3 || request.parentGender(1) > 3
             || request.parentItem(0) > 1 || request.parentItem(1) > 1
-            || request.parentNature(0) > 24 || request.parentNature(1) > 24)
+            || request.parentNature(0) > 24 || request.parentNature(1) > 24
+            || request.perfectIvValue() > 31 || request.perfectIvCount() > 6)
             return false;
         for (std::size_t stat = 0; stat < 6; stat++)
         {

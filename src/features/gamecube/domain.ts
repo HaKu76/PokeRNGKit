@@ -1,6 +1,7 @@
 import type { Gen3GameVersion } from "../profiles/domain";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
-export const GEN3_GAMECUBE_API_VERSION = 1;
+export const GEN3_GAMECUBE_API_VERSION = 2;
 export const GEN3_GAMECUBE_RESULT_WORDS = 12;
 export const GEN3_GAMECUBE_MAX_TOTAL_STATES = 50_000_000;
 export const GEN3_GAMECUBE_MAX_RESULTS = 250_000;
@@ -39,6 +40,8 @@ export interface GameCubeFilters {
   hiddenPowerMask: number;
   ivMin: [number, number, number, number, number, number];
   ivMax: [number, number, number, number, number, number];
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface GameCubeRequest {
@@ -214,6 +217,13 @@ export function validateGameCubeRequest(request: GameCubeRequest): string[] {
     )
       errors.push(`iv${index}`);
   }
+  if (
+    !validatePerfectIvFilter(
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
+    )
+  )
+    errors.push("perfectIvs");
   if (
     request.operation === "searcher" &&
     request.filters.ivMin.reduce(

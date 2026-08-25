@@ -16,9 +16,9 @@ namespace
         if (!condition) std::cerr << message << '\n';
         return condition;
     }
-    std::array<std::uint32_t, 41> request()
+    std::array<std::uint32_t, 43> request()
     {
-        std::array<std::uint32_t, 41> value = {};
+        std::array<std::uint32_t, 43> value = {};
         value[0] = 0x87654321U;
         value[1] = 0x12345678U;
         value[2] = 0;
@@ -42,15 +42,17 @@ namespace
         value[23] = 255;
         value[25] = 255;
         for (std::size_t index = 0; index < 6; index++) value[32 + index] = 31;
-        value[38] = 100;
-        value[39] = 1;
+        value[38] = 31;
+        value[39] = 0;
+        value[40] = 100;
+        value[41] = 1;
         return value;
     }
 }
 
 int main()
 {
-    if (!check(gen8raids_api_version() == 1, "unexpected API version")) return 1;
+    if (!check(gen8raids_api_version() == 2, "unexpected API version")) return 1;
     auto value = request();
     if (!check(gen8raids_generate(value.data()) == 10, "unexpected result count")) return 1;
     if (!check(gen8raids_processed_count() == 10, "unexpected processed count")) return 1;

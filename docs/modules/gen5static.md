@@ -1,5 +1,12 @@
 # 第五世代 Static
 
+## 完美个体筛选
+
+- 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
+- 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
+- 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
+
 ## 范围
 
 本模块对应 PokeFinder 4.3.2 的 `Static`，提供 Black、White、Black 2 与 White 2 的 `Generator` 和 `Searcher`。它覆盖 Starters、Fossils、Gifts、Stationary、Legends、Events、Roamers、Curtis 与 Yancy 九类模板，并保留普通定点、野生定点、赠送蛋与游走宝可梦的不同 RNG 路径。

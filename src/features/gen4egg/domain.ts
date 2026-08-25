@@ -1,5 +1,7 @@
-export const GEN4_EGG_API_VERSION = 1;
-export const GEN4_EGG_REQUEST_WORDS = 48;
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
+
+export const GEN4_EGG_API_VERSION = 2;
+export const GEN4_EGG_REQUEST_WORDS = 50;
 export const GEN4_EGG_GENERATOR_RESULT_WORDS = 23;
 export const GEN4_EGG_SEARCHER_RESULT_WORDS = 25;
 export const GEN4_EGG_GENERATOR_CHUNK_SIZE = 2_000;
@@ -31,6 +33,8 @@ export interface Gen4EggFilters {
   hiddenPowerMask: number;
   ivMin: Gen4EggIvTuple;
   ivMax: Gen4EggIvTuple;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 interface Gen4EggCommonRequest {
@@ -229,6 +233,13 @@ function validateCommon(request: Gen4EggCommonRequest) {
     )
       errors.push(`iv${index}`);
   });
+  if (
+    !validatePerfectIvFilter(
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
+    )
+  )
+    errors.push("perfectIvs");
   return errors;
 }
 
@@ -367,6 +378,8 @@ export function encodeGen4EggRequest(
     gen4EggParentGenderToWasm(request.parentB.gender),
     generator ? 0 : request.minDelay,
     generator ? 0 : request.maxDelay,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
   ]);
 }
 

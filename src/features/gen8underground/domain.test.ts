@@ -37,6 +37,8 @@ function request(): Gen8UndergroundRequest {
       weightMax: 255,
       ivMin: [0, 0, 0, 0, 0, 0],
       ivMax: [31, 31, 31, 31, 31, 31],
+      perfectIvValue: 31,
+      perfectIvCount: 0,
       species: getGen8UndergroundSpecies("brilliantdiamond", 2, 1),
     },
     resultLimit: 100_000,
@@ -68,7 +70,7 @@ describe("Gen 8 Underground domain", () => {
     ]);
     for (const species of value.filters.species) {
       expect(
-        packed[36 + Math.floor(species / 32)] & (1 << (species % 32)),
+        packed[38 + Math.floor(species / 32)] & (1 << (species % 32)),
       ).not.toBe(0);
     }
   });

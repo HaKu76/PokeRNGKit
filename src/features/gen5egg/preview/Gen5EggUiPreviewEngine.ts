@@ -1,4 +1,5 @@
 import { getGen5EggAlternateSpecies, getGen5EggBaseStats } from "../data";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 import {
   gen5EggCharacteristic,
   gen5EggTaskCount,
@@ -89,6 +90,15 @@ function stats(
 function previewResult(request: Gen5EggRequest): Gen5EggResult | undefined {
   const ivs = previewIvs(request);
   if (!ivs) return undefined;
+  if (
+    !request.filters.disabled &&
+    !passesPerfectIvFilter(
+      ivs,
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
+    )
+  )
+    return undefined;
   const buttonMask = previewButtonMask(request);
   if (request.mode === "searcher" && buttonMask === undefined) return undefined;
   const species =

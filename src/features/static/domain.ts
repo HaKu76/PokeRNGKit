@@ -1,9 +1,10 @@
 import type { Gen3GameVersion } from "../profiles/domain";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 import type { Gen3StaticCategory } from "./encounters";
 
 export { gen3HiddenPower } from "../shared/gen3HiddenPower";
 
-export const GEN3_STATIC_API_VERSION = 3;
+export const GEN3_STATIC_API_VERSION = 4;
 export const GEN3_STATIC_CHUNK_SIZE = 100_000;
 export const GEN3_STATIC_MAX_TOTAL_STATES = 50_000_000;
 export const GEN3_STATIC_MAX_RESULTS = 250_000;
@@ -32,6 +33,8 @@ export interface Gen3StaticFilters {
   hiddenPowerMask: number;
   ivMin: [number, number, number, number, number, number];
   ivMax: [number, number, number, number, number, number];
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen3StaticRequest {
@@ -180,6 +183,14 @@ export function validateGen3StaticRequest(
     ) {
       errors.push(`iv${index}`);
     }
+  }
+  if (
+    !validatePerfectIvFilter(
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
+    )
+  ) {
+    errors.push("perfectIvs");
   }
   return errors;
 }

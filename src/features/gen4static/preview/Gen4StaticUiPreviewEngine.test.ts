@@ -19,6 +19,8 @@ const filters = {
   hiddenPowerMask: 0xffff,
   ivMin: [0, 0, 0, 0, 0, 0] as Gen4IvTuple,
   ivMax: [31, 31, 31, 31, 31, 31] as Gen4IvTuple,
+  perfectIvValue: 31,
+  perfectIvCount: 0,
 };
 const generatorRequest: Gen4StaticGeneratorRequest = {
   seed: 0x12345678,

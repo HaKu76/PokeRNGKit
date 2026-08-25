@@ -46,6 +46,8 @@ const generator: Gen5EventGeneratorRequest = {
     shiny: 2,
     natureMask: 1 << 7,
     hiddenPowerMask: 0xffff,
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
   },

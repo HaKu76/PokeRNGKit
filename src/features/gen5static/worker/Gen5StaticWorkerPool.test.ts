@@ -55,6 +55,8 @@ const request: Gen5StaticSearcherRequest = {
     disabled: false,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     natureMask: 0x1ff_ffff,
     hiddenPowerMask: 0xffff,
     ability: 255,
@@ -86,28 +88,28 @@ class CacheWorker {
           type: "ready",
           moduleId: "gen5static",
           contractVersion: RNG_MODULE_CONTRACT_VERSION,
-          apiVersion: 1,
+          apiVersion: 2,
           operations: ["generator", "searcher"],
         });
       } else if (message.type === "cache") {
         this.emit({
           type: "cache-ready",
           moduleId: "gen5static",
-          apiVersion: 1,
+          apiVersion: 2,
           cacheKey: message.cacheKey,
         });
       } else if (message.type === "cache-clear") {
         this.emit({
           type: "cache-ready",
           moduleId: "gen5static",
-          apiVersion: 1,
+          apiVersion: 2,
           cacheKey: "",
         });
       } else {
         this.emit({
           type: "batch",
           moduleId: "gen5static",
-          apiVersion: 1,
+          apiVersion: 2,
           taskId: message.taskId,
           operation: message.operation,
           chunkIndex: message.chunkIndex,

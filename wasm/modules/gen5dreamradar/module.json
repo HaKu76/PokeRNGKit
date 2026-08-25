@@ -2,7 +2,7 @@
   "id": "gen5dreamradar",
   "generation": 5,
   "contractVersion": 1,
-  "apiVersion": 1,
+  "apiVersion": 2,
   "target": "gen5dreamradar",
   "operations": ["generator", "searcher"],
   "artifacts": {

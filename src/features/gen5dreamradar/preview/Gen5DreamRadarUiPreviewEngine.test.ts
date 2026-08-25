@@ -31,6 +31,8 @@ const request: Gen5DreamRadarGeneratorRequest = {
     ivMax: [31, 31, 31, 31, 31, 31],
     natureMask: 1 << 1,
     hiddenPowerMask: 1 << 7,
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
   resultLimit: 100_000,
 };

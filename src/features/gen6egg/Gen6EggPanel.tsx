@@ -10,6 +10,7 @@ import {
 } from "../3dsprofiles/domain";
 import { GEN7_WILD_NATURES } from "../gen7wild/data";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { useTsvListText } from "../tsvlist/domain";
 import { subscribeIvToolsChanges } from "../ivtools/domain";
 import {
@@ -186,6 +187,8 @@ export function Gen6EggPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [resultLimit, setResultLimit] = useState("100000");
   const [results, setResults] = useState<Gen6EggResult[]>([]);
   const [status, setStatus] = useState<Status>("ready");
@@ -303,6 +306,8 @@ export function Gen6EggPanel({
         hiddenPowerMask: hiddenPowerMask || 0xffff,
         ivMin: tuple(ivMin),
         ivMax: tuple(ivMax),
+        perfectIvValue: decimal(perfectIvValue),
+        perfectIvCount: decimal(perfectIvCount),
         natureInheritance: natureParent,
       },
       resultLimit: decimal(resultLimit),
@@ -774,6 +779,13 @@ export function Gen6EggPanel({
               <div>{ivEditor(ivMin, setIvMin)}</div>
               <div>{ivEditor(ivMax, setIvMax)}</div>
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              disabled={filtersDisabled}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
           </details>
           <div className="gen6egg-actions">
             <label className="field">

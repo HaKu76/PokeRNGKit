@@ -37,6 +37,8 @@ const request: Gen5StaticGeneratorRequest = {
     ivMax: [31, 31, 31, 31, 31, 31],
     natureMask: 1 << 7,
     hiddenPowerMask: 1 << 10,
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     ability: 1,
     gender: 1,
     shiny: 1,

@@ -22,6 +22,7 @@ import type { Gen5AdjacentSeedsInitialContext } from "../gen5adjacentseeds/domai
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { FloatingToolPanel } from "../shared/FloatingToolPanel";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { GEN5_EGG_SPECIES, getGen5EggSpeciesName } from "./data";
 import {
   formatGen5EggButtons,
@@ -372,6 +373,8 @@ export function Gen5EggPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [showInheritance, setShowInheritance] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [results, setResults] = useState<Gen5EggResult[]>([]);
@@ -591,6 +594,8 @@ export function Gen5EggPanel({
         ivMax: (filtersOff
           ? [31, 31, 31, 31, 31, 31]
           : ivMax.map(parseGen5EggDecimal)) as Gen5EggIvTuple,
+        perfectIvValue: filtersOff ? 31 : parseGen5EggDecimal(perfectIvValue),
+        perfectIvCount: filtersOff ? 0 : parseGen5EggDecimal(perfectIvCount),
       },
       resultLimit: GEN5_EGG_MAX_RESULTS,
     };
@@ -1245,6 +1250,12 @@ export function Gen5EggPanel({
                 </div>
               ))}
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <div className="gen5egg-filter-tools">
               <label className="gen5egg-toggle">
                 <input

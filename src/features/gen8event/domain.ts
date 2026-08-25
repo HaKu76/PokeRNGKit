@@ -1,8 +1,12 @@
 import type { Gen8Profile } from "../gen8profiles/domain";
 import { getIvBaseStats } from "../gen4ivcalculator/gen4IvData";
+import {
+  passesPerfectIvFilter,
+  validatePerfectIvFilter,
+} from "../shared/perfectIvFilter";
 
-export const GEN8_EVENT_API_VERSION = 1;
-export const GEN8_EVENT_REQUEST_WORDS = 45;
+export const GEN8_EVENT_API_VERSION = 2;
+export const GEN8_EVENT_REQUEST_WORDS = 47;
 export const GEN8_EVENT_RESULT_WORDS = 11;
 export const GEN8_EVENT_MAX_RESULTS = 100_000;
 export const GEN8_EVENT_MAX_EVALUATIONS = 250_000_000;
@@ -49,6 +53,8 @@ export interface Gen8EventFilters {
   weightMax: number;
   ivMin: Gen8EventIvTuple;
   ivMax: Gen8EventIvTuple;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen8EventRequest {
@@ -279,6 +285,8 @@ function validateFilters(filters: Gen8EventFilters) {
       throw new TypeError("Each IV range must be between 0 and 31.");
     }
   });
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
 }
 
 export function gen8EventTaskCount(request: Gen8EventRequest) {
@@ -398,6 +406,8 @@ export function encodeGen8EventRequest(
     request.filters.weightMax,
     ...request.filters.ivMin,
     ...request.filters.ivMax,
+    request.filters.disabled ? 31 : request.filters.perfectIvValue,
+    request.filters.disabled ? 0 : request.filters.perfectIvCount,
     request.resultLimit,
   ]);
 }
@@ -545,6 +555,11 @@ function resultPassesFilters(
     result.ivs.every(
       (value, index) =>
         value >= filters.ivMin[index] && value <= filters.ivMax[index],
+    ) &&
+    passesPerfectIvFilter(
+      result.ivs,
+      filters.perfectIvValue,
+      filters.perfectIvCount,
     )
   );
 }

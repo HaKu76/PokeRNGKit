@@ -8,6 +8,7 @@ import {
   type Gen5StaticRequest,
   type Gen5StaticResult,
 } from "../domain";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 import type {
   Gen5StaticEngine,
   Gen5StaticOptions,
@@ -61,7 +62,15 @@ function previewIvs(request: Gen5StaticRequest) {
     if (!possible) continue;
     const ivs = values as Gen5StaticIvTuple;
     const power = hiddenPower(ivs);
-    if ((request.filters.hiddenPowerMask & (1 << power.type)) !== 0) return ivs;
+    if (
+      (request.filters.hiddenPowerMask & (1 << power.type)) !== 0 &&
+      passesPerfectIvFilter(
+        ivs,
+        request.filters.perfectIvValue,
+        request.filters.perfectIvCount,
+      )
+    )
+      return ivs;
   }
   return undefined;
 }

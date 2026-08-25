@@ -1,5 +1,12 @@
 # 第四世代 Static Generator / Searcher
 
+## 完美个体筛选
+
+- 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
+- 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
+- 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
+
 本文说明 `gen4static` 的第四世代定点 Generator/Searcher、输入边界、结果布局和 Worker/Wasm 边界。生产算法位于 `wasm/modules/gen4static/bridge/gen4static_bridge.cpp`，TypeScript 只负责表单、筛选、分片、排序和结果解码。
 
 ## 1. 覆盖范围

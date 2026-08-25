@@ -11,6 +11,7 @@
 #include "gen3static_bridge.h"
 
 #include <Core/RNG/LCRNG.hpp>
+#include <algorithm>
 #include <array>
 #include <vector>
 
@@ -23,7 +24,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 3;
+    constexpr std::uint32_t apiVersion = 4;
     constexpr std::uint32_t maxStatesPerCall = 100000;
 
     enum ErrorCode : std::uint32_t
@@ -91,6 +92,13 @@ namespace
             }
         }
         return true;
+    }
+
+    bool matchesPerfectIvs(const std::array<std::uint8_t, 6> &ivs, std::uint32_t value, std::uint32_t count)
+    {
+        return static_cast<std::uint32_t>(std::count_if(ivs.begin(), ivs.end(), [value](std::uint8_t iv) {
+            return iv >= value;
+        })) >= count;
     }
 
     std::uint8_t hiddenPowerType(const std::array<std::uint8_t, 6> &ivs)
@@ -221,7 +229,7 @@ extern "C"
         std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin, std::uint32_t specialAttackMin,
         std::uint32_t specialDefenseMin, std::uint32_t speedMin, std::uint32_t hpMax, std::uint32_t attackMax,
         std::uint32_t defenseMax, std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax,
-        std::uint32_t speedMax)
+        std::uint32_t speedMax, std::uint32_t perfectIvValue, std::uint32_t perfectIvCount)
     {
         results.clear();
         lastError = ErrorCode::None;
@@ -231,7 +239,8 @@ extern "C"
             || (method != static_cast<std::uint32_t>(Gen3StaticMethod::Method1)
                 && method != static_cast<std::uint32_t>(Gen3StaticMethod::Method4))
             || shinyFilter > ShinyStarSquare || genderFilter > GenderFemale || abilityFilter > AbilitySecond
-            || natureFilter == 0 || natureFilter > 0x1ffffff || hiddenPowerFilter == 0 || hiddenPowerFilter > 0xffff)
+            || natureFilter == 0 || natureFilter > 0x1ffffff || hiddenPowerFilter == 0 || hiddenPowerFilter > 0xffff
+            || perfectIvValue > 31 || perfectIvCount > 6)
         {
             lastError = ErrorCode::InvalidInput;
             return 0;
@@ -279,7 +288,7 @@ extern "C"
             if (!matchesShiny(shiny, shinyFilter) || !matchesGender(gender, genderFilter)
                 || !matchesAbility(ability, abilityFilter)
                 || !matchesStateFilters(ivs, nature, natureFilter, hiddenPowerFilter)
-                || !matchesIv(ivs, ivMin, ivMax))
+                || !matchesIv(ivs, ivMin, ivMax) || !matchesPerfectIvs(ivs, perfectIvValue, perfectIvCount))
             {
                 continue;
             }
@@ -299,7 +308,8 @@ extern "C"
         std::uint32_t attackMin, std::uint32_t defenseMin,
         std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
         std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax, std::uint32_t specialAttackMax,
-        std::uint32_t specialDefenseMax, std::uint32_t speedMax)
+        std::uint32_t specialDefenseMax, std::uint32_t speedMax, std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount)
     {
         results.clear();
         lastError = ErrorCode::None;
@@ -308,7 +318,8 @@ extern "C"
             || (method != static_cast<std::uint32_t>(Gen3StaticMethod::Method1)
                 && method != static_cast<std::uint32_t>(Gen3StaticMethod::Method4))
             || shinyFilter > ShinyStarSquare || genderFilter > GenderFemale || abilityFilter > AbilitySecond
-            || natureFilter == 0 || natureFilter > 0x1ffffff || hiddenPowerFilter == 0 || hiddenPowerFilter > 0xffff)
+            || natureFilter == 0 || natureFilter > 0x1ffffff || hiddenPowerFilter == 0 || hiddenPowerFilter > 0xffff
+            || perfectIvValue > 31 || perfectIvCount > 6)
         {
             lastError = ErrorCode::InvalidInput;
             return 0;
@@ -356,7 +367,8 @@ extern "C"
                     : recoveredIvs;
                 if (!matchesShiny(shiny, shinyFilter) || !matchesGender(gender, genderFilter)
                     || !matchesAbility(ability, abilityFilter)
-                    || !matchesStateFilters(displayedIvs, nature, natureFilter, hiddenPowerFilter))
+                    || !matchesStateFilters(displayedIvs, nature, natureFilter, hiddenPowerFilter)
+                    || !matchesPerfectIvs(displayedIvs, perfectIvValue, perfectIvCount))
                 {
                     continue;
                 }

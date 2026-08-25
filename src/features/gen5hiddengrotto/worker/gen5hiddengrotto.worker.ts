@@ -13,7 +13,7 @@ import type {
   Gen5HiddenGrottoWorkerResponse,
 } from "./messages";
 
-const REQUEST_WORDS = 114;
+const REQUEST_WORDS = 116;
 const RESULT_WORDS = 16;
 
 interface Gen5HiddenGrottoEmscriptenModule {
@@ -139,6 +139,8 @@ function packRequest(
     request.pokemonFilters.levelMax,
     ...request.pokemonFilters.ivMin,
     ...request.pokemonFilters.ivMax,
+    request.pokemonFilters.perfectIvValue,
+    request.pokemonFilters.perfectIvCount,
     request.slotFilters.slotMask,
     request.slotFilters.genderMask,
     request.slotFilters.groupMask,

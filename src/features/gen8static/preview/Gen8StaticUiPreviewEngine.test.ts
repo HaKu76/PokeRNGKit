@@ -24,6 +24,8 @@ const value: Gen8StaticRequest = {
     weightMax: 255,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
   resultLimit: 100,
 };

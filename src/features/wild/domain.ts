@@ -1,9 +1,10 @@
 import type { Gen3GameVersion } from "../profiles/domain";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 import { getGen3WildSlotForm, isGen3WildTanobyChamber } from "./tanoby";
 
 export { isGen3WildTanobyChamber } from "./tanoby";
 
-export const GEN3_WILD_API_VERSION = 4;
+export const GEN3_WILD_API_VERSION = 5;
 export const GEN3_WILD_CHUNK_SIZE = 100_000;
 export const GEN3_WILD_SEARCHER_CHUNK_SIZE = 10_000;
 export const GEN3_WILD_MAX_TOTAL_STATES = 50_000_000;
@@ -58,6 +59,8 @@ export interface Gen3WildFilters {
   levelMax: number;
   ivMin: [number, number, number, number, number, number];
   ivMax: [number, number, number, number, number, number];
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen3WildRequest {
@@ -290,6 +293,13 @@ export function validateGen3WildRequest(request: Gen3WildRequest) {
     )
       errors.push(`iv${index}`);
   }
+  if (
+    !validatePerfectIvFilter(
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
+    )
+  )
+    errors.push("perfectIvs");
   if (
     !Number.isInteger(request.area.rate) ||
     request.area.rate < 1 ||

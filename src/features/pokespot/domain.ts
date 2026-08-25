@@ -1,4 +1,6 @@
-export const GEN3_POKE_SPOT_API_VERSION = 1;
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
+
+export const GEN3_POKE_SPOT_API_VERSION = 2;
 export const GEN3_POKE_SPOT_RESULT_WORDS = 16;
 export const GEN3_POKE_SPOT_CHUNK_SIZE = 100_000;
 export const GEN3_POKE_SPOT_TARGET_COMBINATIONS_PER_CHUNK = 1_000_000;
@@ -18,6 +20,8 @@ export interface Gen3PokeSpotFilters {
   slotMask: number;
   ivMin: [number, number, number, number, number, number];
   ivMax: [number, number, number, number, number, number];
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen3PokeSpotRequest {
@@ -138,6 +142,13 @@ export function validateGen3PokeSpotRequest(request: Gen3PokeSpotRequest) {
     )
       errors.push(`iv${index}`);
   }
+  if (
+    !validatePerfectIvFilter(
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
+    )
+  )
+    errors.push("perfectIvs");
   return errors;
 }
 

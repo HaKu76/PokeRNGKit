@@ -8,6 +8,7 @@ import {
   type Gen5DreamRadarRequest,
   type Gen5DreamRadarResult,
 } from "../domain";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 import type { Gen5DreamRadarEngine, Gen5DreamRadarOptions } from "../search";
 
 const ORDER = [0, 1, 2, 5, 3, 4] as const;
@@ -38,7 +39,15 @@ function previewIvs(request: Gen5DreamRadarRequest) {
       if (value === undefined) valid = false;
       else ivs[ivIndex] = value;
     });
-    if (valid) return ivs;
+    if (
+      valid &&
+      passesPerfectIvFilter(
+        ivs,
+        request.filters.perfectIvValue,
+        request.filters.perfectIvCount,
+      )
+    )
+      return ivs;
   }
   return undefined;
 }

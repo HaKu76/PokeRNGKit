@@ -1,6 +1,7 @@
 import { GEN4_STATIC_TEMPLATES } from "./encounters";
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
-export const GEN4_STATIC_API_VERSION = 1;
+export const GEN4_STATIC_API_VERSION = 2;
 export const GEN4_STATIC_CHUNK_SIZE = 500;
 export const GEN4_STATIC_MAX_TOTAL_STATES = 2_000_000;
 export const GEN4_STATIC_MAX_RESULTS = 100_000;
@@ -45,6 +46,8 @@ export interface Gen4StaticFilters {
   shiny: Gen4StaticShiny;
   gender: Gen4StaticGender;
   ability: Gen4StaticAbility;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen4StaticGeneratorRequest {
@@ -215,6 +218,13 @@ export function validateGen4StaticGeneratorRequest(
     )
       errors.push(`iv${index}`);
   });
+  if (
+    !validatePerfectIvFilter(
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
+    )
+  )
+    errors.push("perfectIvs");
   return errors;
 }
 

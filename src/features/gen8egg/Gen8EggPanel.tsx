@@ -20,6 +20,7 @@ import { DEFAULT_GEN8_BDSP_PROFILE } from "../gen8profiles/domain";
 import type { Gen8ProfilesController } from "../gen8profiles/useGen8Profiles";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { GEN8_EGG_SPECIES, getGen8EggSpeciesName } from "./data";
 import {
   GEN8_EGG_MAX_RESULTS,
@@ -261,6 +262,8 @@ export function Gen8EggPanel({
     "31",
     "31",
   ]);
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [showInheritance, setShowInheritance] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [results, setResults] = useState<Gen8EggResult[]>([]);
@@ -430,6 +433,8 @@ export function Gen8EggPanel({
         ivMax: (filtersOff
           ? [31, 31, 31, 31, 31, 31]
           : ivMax.map(parseGen8EggDecimal)) as Gen8EggIvTuple,
+        perfectIvValue: filtersOff ? 31 : parseGen8EggDecimal(perfectIvValue),
+        perfectIvCount: filtersOff ? 0 : parseGen8EggDecimal(perfectIvCount),
       },
       resultLimit: GEN8_EGG_MAX_RESULTS,
     };
@@ -1052,6 +1057,12 @@ export function Gen8EggPanel({
                     </div>
                   ))}
                 </div>
+                <PerfectIvFilterFields
+                  count={perfectIvCount}
+                  onCountChange={setPerfectIvCount}
+                  onValueChange={setPerfectIvValue}
+                  value={perfectIvValue}
+                />
               </fieldset>
             </div>
           )}

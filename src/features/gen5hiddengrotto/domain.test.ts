@@ -68,6 +68,8 @@ const pokemonFilters = {
   ],
   natureMask: 0,
   hiddenPowerMask: 0,
+  perfectIvValue: 31,
+  perfectIvCount: 0,
   levelMin: 1,
   levelMax: 100,
 };

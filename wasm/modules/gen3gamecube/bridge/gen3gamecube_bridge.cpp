@@ -33,8 +33,8 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
-    constexpr std::uint32_t requestWords = 55;
+    constexpr std::uint32_t apiVersion = 2;
+    constexpr std::uint32_t requestWords = 57;
     constexpr std::uint32_t maxGeneratorStates = 100000;
     constexpr std::uint64_t maxSearcherStates = 50000000;
     constexpr std::uint32_t maxResults = 250000;
@@ -67,6 +67,8 @@ namespace
         AbilityOne = 38,
         AbilityTwo = 39,
         Locks = 40,
+        PerfectIvValue = 55,
+        PerfectIvCount = 56,
     };
 
     enum ErrorCode : std::uint32_t
@@ -167,6 +169,7 @@ namespace
             || request[AbilityFilter] != 255 && request[AbilityFilter] > 1
             || request[NatureFilter] == 0 || request[NatureFilter] > 0x1ffffff
             || request[HiddenPowerFilter] == 0 || request[HiddenPowerFilter] > 0xffff
+            || request[PerfectIvValue] > 31 || request[PerfectIvCount] > 6
             || generator && (request[MaxAdvances] >= maxGeneratorStates
                              || static_cast<std::uint64_t>(request[InitialAdvances]) + request[MaxAdvances]
                                      + request[Offset]
@@ -199,14 +202,21 @@ namespace
     }
 
     template <typename State>
-    void pack(const std::vector<State> &states)
+    void pack(const std::vector<State> &states, std::uint32_t perfectIvValue, std::uint32_t perfectIvCount)
     {
-        const auto count = std::min<std::size_t>(states.size(), maxResults);
-        results.reserve(count);
-        for (std::size_t index = 0; index < count; index++)
+        results.reserve(std::min<std::size_t>(states.size(), maxResults));
+        for (const auto &state : states)
         {
-            const auto &state = states[index];
             const auto ivs = state.getIVs();
+            const auto perfect = std::count_if(ivs.begin(), ivs.end(), [perfectIvValue](std::uint8_t iv) {
+                return iv >= perfectIvValue;
+            });
+            if (static_cast<std::uint32_t>(perfect) < perfectIvCount) continue;
+            if (results.size() >= maxResults)
+            {
+                lastError = ErrorCode::ResultLimit;
+                break;
+            }
             std::uint32_t position;
             if constexpr (requires { state.getSeed(); })
                 position = state.getSeed();
@@ -217,7 +227,6 @@ namespace
                                 static_cast<std::uint32_t>(state.getNature())
                                     | (static_cast<std::uint32_t>(state.getShiny()) << 8) });
         }
-        if (states.size() > maxResults) lastError = ErrorCode::ResultLimit;
     }
 }
 
@@ -245,9 +254,9 @@ extern "C"
         GameCubeGenerator generator(request[InitialAdvances], request[MaxAdvances], request[Offset], method,
                                     request[FirstShadowUnset] != 0, context.profile, context.filter);
         if (context.category == 2)
-            pack(generator.generate(request[Seed], &context.shadowTemplate));
+            pack(generator.generate(request[Seed], &context.shadowTemplate), request[PerfectIvValue], request[PerfectIvCount]);
         else
-            pack(generator.generate(request[Seed], &context.staticTemplate));
+            pack(generator.generate(request[Seed], &context.staticTemplate), request[PerfectIvValue], request[PerfectIvCount]);
         return static_cast<std::uint32_t>(results.size());
     }
 
@@ -268,7 +277,7 @@ extern "C"
             searcher.startSearch(context.minimum, context.maximum, &context.shadowTemplate);
         else
             searcher.startSearch(context.minimum, context.maximum, &context.staticTemplate);
-        pack(searcher.getResults());
+        pack(searcher.getResults(), request[PerfectIvValue], request[PerfectIvCount]);
         return static_cast<std::uint32_t>(results.size());
     }
 

@@ -35,6 +35,8 @@ const request: Gen8UndergroundRequest = {
     weightMax: 255,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
     species: getGen8UndergroundSpecies("brilliantdiamond", 2, 1),
   },
   resultLimit: 100,
@@ -78,7 +80,7 @@ class OrderedWorker {
           type: "ready",
           moduleId: "gen8underground",
           contractVersion: RNG_MODULE_CONTRACT_VERSION,
-          apiVersion: 1,
+          apiVersion: 2,
           operations: ["generator"],
         }),
       );
@@ -89,7 +91,7 @@ class OrderedWorker {
       this.emit({
         type: "batch",
         moduleId: "gen8underground",
-        apiVersion: 1,
+        apiVersion: 2,
         taskId: message.taskId,
         operation: "generator",
         chunkIndex: message.chunkIndex,
@@ -129,7 +131,7 @@ class InvalidLengthWorker extends OrderedWorker {
       this.emit({
         type: "batch",
         moduleId: "gen8underground",
-        apiVersion: 1,
+        apiVersion: 2,
         taskId: message.taskId,
         operation: "generator",
         chunkIndex: message.chunkIndex,

@@ -33,7 +33,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maximumResults = 100000;
     constexpr std::uint64_t maximumEvaluations = 250000000;
     constexpr std::uint64_t bwMultiplier = 0x5d588b656c078965ULL;
@@ -423,6 +423,10 @@ namespace
         if (request.filtersDisabled != 0) return true;
         for (std::size_t index = 0; index < ivs.size(); index++)
             if (ivs[index] < request.ivMin[index] || ivs[index] > request.ivMax[index]) return false;
+        if (std::count_if(ivs.begin(), ivs.end(), [&request](std::uint8_t iv) {
+                return iv >= request.perfectIvValue;
+            }) < static_cast<int>(request.perfectIvCount))
+            return false;
         return (request.natureMask & (1U << nature)) != 0 && (request.hiddenPowerMask & (1U << hiddenPowerType)) != 0;
     }
 
@@ -558,6 +562,7 @@ namespace
         }
         for (std::size_t index = 0; index < 6; index++)
             if (request.ivMin[index] > request.ivMax[index] || request.ivMax[index] > 31) return false;
+        if (request.perfectIvValue > 31 || request.perfectIvCount > 6) return false;
         return true;
     }
 
@@ -590,7 +595,7 @@ namespace
     }
 }
 
-static_assert(sizeof(Gen5DreamRadarPackedRequest) == 58 * sizeof(std::uint32_t));
+static_assert(sizeof(Gen5DreamRadarPackedRequest) == 60 * sizeof(std::uint32_t));
 static_assert(sizeof(Gen5DreamRadarPackedResult) == 11 * sizeof(std::uint32_t));
 
 extern "C"

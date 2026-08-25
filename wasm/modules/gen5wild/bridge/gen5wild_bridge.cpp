@@ -36,7 +36,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maximumResults = 100000;
     constexpr std::uint32_t maximumCacheEntries = 1000000;
     constexpr std::uint64_t maximumEvaluations = 250000000;
@@ -621,6 +621,10 @@ namespace
         if (request.filtersDisabled != 0) return true;
         for (std::size_t index = 0; index < ivs.size(); index++)
             if (ivs[index] < request.ivMin[index] || ivs[index] > request.ivMax[index]) return false;
+        if (std::count_if(ivs.begin(), ivs.end(), [&request](std::uint8_t iv) {
+                return iv >= request.perfectIvValue;
+            }) < static_cast<int>(request.perfectIvCount))
+            return false;
         return (request.hiddenPowerMask & (1U << hiddenPowerType)) != 0;
     }
 
@@ -1027,6 +1031,7 @@ namespace
             || !validFilterChoice(request.genderFilter) || !validShinyFilter(request.shinyFilter)
             || request.natureMask == 0 || request.natureMask > 0x1ffffffU || request.hiddenPowerMask == 0
             || request.hiddenPowerMask > 0xffffU || request.slotMask == 0
+            || request.perfectIvValue > 31 || request.perfectIvCount > 6
             || request.slotMask >= (1U << request.slotCount) || request.levelMin == 0
             || request.levelMin > request.levelMax || request.levelMax > 100 || request.resultLimit == 0
             || request.resultLimit > maximumResults || request.chunkCount == 0)
@@ -1148,7 +1153,7 @@ namespace
     }
 }
 
-static_assert(sizeof(Gen5WildPackedRequest) == 84 * sizeof(std::uint32_t));
+static_assert(sizeof(Gen5WildPackedRequest) == 86 * sizeof(std::uint32_t));
 static_assert(sizeof(Gen5WildPackedResult) == 16 * sizeof(std::uint32_t));
 
 extern "C"

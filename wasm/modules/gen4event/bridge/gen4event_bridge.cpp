@@ -14,6 +14,7 @@
 #include "gen4event_bridge.h"
 
 #include <Core/RNG/LCRNG.hpp>
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -28,7 +29,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maxStatesPerCall = 100000;
 
     enum ErrorCode : std::uint32_t
@@ -89,6 +90,13 @@ namespace
             }
         }
         return true;
+    }
+
+    bool matchesPerfectIvs(const IvArray &ivs, std::uint32_t value, std::uint32_t count)
+    {
+        return static_cast<std::uint32_t>(std::count_if(ivs.begin(), ivs.end(), [value](std::uint8_t iv) {
+            return iv >= value;
+        })) >= count;
     }
 
     bool validCommonInput(std::uint32_t species, std::uint32_t nature, std::uint32_t level,
@@ -205,7 +213,8 @@ extern "C"
         std::uint32_t attackMin, std::uint32_t defenseMin, std::uint32_t specialAttackMin,
         std::uint32_t specialDefenseMin, std::uint32_t speedMin, std::uint32_t hpMax,
         std::uint32_t attackMax, std::uint32_t defenseMax, std::uint32_t specialAttackMax,
-        std::uint32_t specialDefenseMax, std::uint32_t speedMax)
+        std::uint32_t specialDefenseMax, std::uint32_t speedMax, std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount)
     {
         generatedResults.clear();
         searchedResults.clear();
@@ -214,6 +223,7 @@ extern "C"
         const FilterArray minimum = { hpMin, attackMin, defenseMin, specialAttackMin, specialDefenseMin, speedMin };
         const FilterArray maximum = { hpMax, attackMax, defenseMax, specialAttackMax, specialDefenseMax, speedMax };
         if (!validCommonInput(species, nature, level, hiddenPowerFilter, minimum, maximum)
+            || perfectIvValue > 31 || perfectIvCount > 6
             || initialAdvances > 0xffffffffu - offset
             || initialAdvances + offset > 0xffffffffu - maxAdvances)
         {
@@ -230,7 +240,7 @@ extern "C"
             const auto second = go.nextUShort();
             const auto ivs = decodeIvs(first, second);
             const auto callRng = rng.nextUShort();
-            if (matchesIv(ivs, minimum, maximum))
+            if (matchesIv(ivs, minimum, maximum) && matchesPerfectIvs(ivs, perfectIvValue, perfectIvCount))
             {
                 if (generatedResults.size() >= maxStatesPerCall)
                 {
@@ -259,7 +269,8 @@ extern "C"
         std::uint32_t defenseMin, std::uint32_t specialAttackMin,
         std::uint32_t specialDefenseMin, std::uint32_t speedMin, std::uint32_t hpMax,
         std::uint32_t attackMax, std::uint32_t defenseMax, std::uint32_t specialAttackMax,
-        std::uint32_t specialDefenseMax, std::uint32_t speedMax)
+        std::uint32_t specialDefenseMax, std::uint32_t speedMax, std::uint32_t perfectIvValue,
+        std::uint32_t perfectIvCount)
     {
         generatedResults.clear();
         searchedResults.clear();
@@ -268,6 +279,7 @@ extern "C"
         const FilterArray minimum = { hpMin, attackMin, defenseMin, specialAttackMin, specialDefenseMin, speedMin };
         const FilterArray maximum = { hpMax, attackMax, defenseMax, specialAttackMax, specialDefenseMax, speedMax };
         if (!validCommonInput(species, nature, level, hiddenPowerFilter, minimum, maximum)
+            || perfectIvValue > 31 || perfectIvCount > 6
             || minAdvance > maxAdvance || minDelay > maxDelay || stateCount == 0)
         {
             lastError = ErrorCode::InvalidInput;
@@ -296,7 +308,8 @@ extern "C"
                 ivs[stat] = static_cast<std::uint8_t>(minimum[stat] + stateIndex % widths[stat]);
                 stateIndex /= widths[stat];
             }
-            if ((hiddenPowerFilter & (1u << hiddenPowerType(ivs))) == 0)
+            if ((hiddenPowerFilter & (1u << hiddenPowerType(ivs))) == 0
+                || !matchesPerfectIvs(ivs, perfectIvValue, perfectIvCount))
             {
                 continue;
             }

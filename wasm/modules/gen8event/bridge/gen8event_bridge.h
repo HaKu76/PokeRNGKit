@@ -52,6 +52,8 @@ struct Gen8EventPackedRequest
     std::uint32_t weightMax;
     std::uint32_t ivMin[6];
     std::uint32_t ivMax[6];
+    std::uint32_t perfectIvValue;
+    std::uint32_t perfectIvCount;
     std::uint32_t resultLimit;
 };
 

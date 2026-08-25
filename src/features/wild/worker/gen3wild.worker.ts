@@ -61,6 +61,8 @@ interface Gen3WildEmscriptenModule {
     specialAttackMax: number,
     specialDefenseMax: number,
     speedMax: number,
+    perfectIvValue: number,
+    perfectIvCount: number,
   ): number;
   _gen3wild_search(
     slots: number,
@@ -100,6 +102,8 @@ interface Gen3WildEmscriptenModule {
     specialAttackMax: number,
     specialDefenseMax: number,
     speedMax: number,
+    perfectIvValue: number,
+    perfectIvCount: number,
   ): number;
   _gen3wild_result_ptr(): number;
   _gen3wild_result_count(): number;
@@ -174,6 +178,8 @@ function run(message: Extract<Gen3WildWorkerRequest, { type: "run" }>) {
       request.filters.levelMax,
       ...request.filters.ivMin,
       ...request.filters.ivMax,
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
     );
     const errorCode = wasm._gen3wild_last_error();
     if (errorCode !== 0)
@@ -238,6 +244,8 @@ function search(message: Extract<Gen3WildWorkerRequest, { type: "search" }>) {
       request.filters.levelMax,
       ...request.filters.ivMin,
       ...request.filters.ivMax,
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
     );
     const errorCode = wasm._gen3wild_last_error();
     if (errorCode !== 0)

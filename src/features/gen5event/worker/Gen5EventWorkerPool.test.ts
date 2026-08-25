@@ -52,6 +52,8 @@ const request: Gen5EventGeneratorRequest = {
     hiddenPowerMask: 0xffff,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
   resultLimit: 100_000,
 };
@@ -88,7 +90,7 @@ class OrderedWorker {
           type: "ready",
           moduleId: "gen5event",
           contractVersion: RNG_MODULE_CONTRACT_VERSION,
-          apiVersion: 1,
+          apiVersion: 2,
           operations: ["generator", "searcher"],
         }),
       );
@@ -99,7 +101,7 @@ class OrderedWorker {
       this.emit({
         type: "batch",
         moduleId: "gen5event",
-        apiVersion: 1,
+        apiVersion: 2,
         taskId: message.taskId,
         operation: message.operation,
         chunkIndex: message.chunkIndex,
@@ -139,7 +141,7 @@ class InvalidLengthWorker extends OrderedWorker {
       this.emit({
         type: "batch",
         moduleId: "gen5event",
-        apiVersion: 1,
+        apiVersion: 2,
         taskId: message.taskId,
         operation: message.operation,
         chunkIndex: message.chunkIndex,

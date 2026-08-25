@@ -1,5 +1,12 @@
 # 第五世代野生乱数
 
+## 完美个体筛选
+
+- 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
+- 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
+- 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
+
 ## 范围
 
 本模块对应 PokeFinder 4.3.2 的 `Gen 5 Wild`，提供 Black、White、Black 2 与 White 2 的 `Generator` 和 `Searcher`。遭遇类型覆盖 Grass、Dark Grass、Rustling Grass、Surfing、Rippling Surfing、Fishing 与 Rippling Fishing，并按游戏、季节、地点和遭遇类型加载本地遭遇表。

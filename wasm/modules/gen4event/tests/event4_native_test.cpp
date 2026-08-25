@@ -24,13 +24,13 @@ namespace
                            std::uint32_t maxAdvances, std::uint32_t offset)
     {
         return gen4event_generate(seed, initialAdvances, maxAdvances, offset, 1, 0, 1,
-                                  allHiddenPowers, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31);
+                                  allHiddenPowers, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31, 31, 0);
     }
 }
 
 int main()
 {
-    assert(gen4event_api_version() == 1);
+    assert(gen4event_api_version() == 2);
 
     assert(generate(0, 0, 0, 0) == 1);
     assert(gen4event_result_count() == 1);
@@ -48,11 +48,11 @@ int main()
     assert(state->chatot == 0);
 
     assert(gen4event_generate(0, 0, 0, 0, 0, 0, 1, allHiddenPowers,
-                              0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31) == 0);
+                              0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31, 31, 0) == 0);
     assert(gen4event_last_error() == 1);
 
     assert(gen4event_search(0, 1, 0, 1000, 600, 2000, 1, 0, 1, allHiddenPowers,
-                            0, 0, 0, 11, 26, 30, 0, 0, 0, 11, 26, 30) > 0);
+                            0, 0, 0, 11, 26, 30, 0, 0, 0, 11, 26, 30, 31, 0) > 0);
     assert(gen4event_result_count() > 0);
     const auto *searchState
         = reinterpret_cast<const Gen4EventPackedSearcherState *>(gen4event_result_ptr());

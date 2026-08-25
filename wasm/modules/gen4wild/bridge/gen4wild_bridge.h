@@ -93,6 +93,8 @@ struct Gen4WildPackedRequest {
     std::uint32_t ivMax[6];
     std::uint32_t unownDiscovered[26];
     std::uint32_t unownPuzzle[4];
+    std::uint32_t perfectIvValue;
+    std::uint32_t perfectIvCount;
 };
 
 extern "C" {

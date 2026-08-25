@@ -11,7 +11,7 @@ import {
 } from "../domain";
 import type { Gen5WildWorkerRequest, Gen5WildWorkerResponse } from "./messages";
 
-const REQUEST_WORDS = 84;
+const REQUEST_WORDS = 86;
 const RESULT_WORDS = 16;
 
 interface Gen5WildEmscriptenModule {
@@ -210,6 +210,8 @@ function packRequest(
     request.filters.levelMax,
     ...request.filters.ivMin,
     ...request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
     request.resultLimit,
     ...(request.mode === "generator" ? [...splitHex(request.seed)] : [0, 0]),
     ...(request.mode === "searcher"

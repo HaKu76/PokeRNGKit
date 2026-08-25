@@ -96,7 +96,7 @@ namespace
 
 int main()
 {
-    if (!check(gen8egg_api_version() == 1, "unexpected API version")) return 1;
+    if (!check(gen8egg_api_version() == 2, "unexpected API version")) return 1;
     if (!fixture(1, 1, 65, { 11, 6, 6, 6, 5, 6 })) return 1;
     if (!fixture(29, 32, 38, { 11, 6, 6, 5, 4, 6 })) return 1;
     if (!fixture(313, 313, 35, { 12, 6, 6, 6, 5, 7 })) return 1;

@@ -1,4 +1,5 @@
 import { gen3HiddenPower } from "../../shared/gen3HiddenPower";
+import { passesPerfectIvFilter } from "../../shared/perfectIvFilter";
 import { POKE_SPOT_LOCATIONS } from "../encounters";
 import type { Gen3PokeSpotRequest, Gen3PokeSpotState } from "../domain";
 import type {
@@ -53,6 +54,14 @@ export class Gen3PokeSpotUiPreviewEngine implements Gen3PokeSpotEngine {
           (iv, ivIndex) =>
             iv < request.filters.ivMin[ivIndex] ||
             iv > request.filters.ivMax[ivIndex],
+        )
+      )
+        continue;
+      if (
+        !passesPerfectIvFilter(
+          ivs,
+          request.filters.perfectIvValue,
+          request.filters.perfectIvCount,
         )
       )
         continue;

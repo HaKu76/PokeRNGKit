@@ -60,6 +60,8 @@ const request: Gen3WildRequest = {
     levelMax: 100,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
 };
 
@@ -214,6 +216,8 @@ describe("Gen3 wild domain", () => {
         ...request.filters,
         ivMin: [30, 31, 31, 31, 31, 30],
         ivMax: [31, 31, 31, 31, 31, 31],
+        perfectIvValue: 31,
+        perfectIvCount: 0,
       },
     };
     expect(gen3WildSearcherCombinationCount(searcher)).toBe(4);

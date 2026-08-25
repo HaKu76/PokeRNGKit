@@ -6,7 +6,7 @@
 
 namespace
 {
-    constexpr std::size_t requestWords = 48;
+    constexpr std::size_t requestWords = 50;
     constexpr std::size_t resultWords = 12;
 
     bool check(bool condition, const char *message)
@@ -39,7 +39,10 @@ namespace
         value[30] = 255;
         value[32] = 255;
         for (std::size_t index = 0; index < 6; index++) value[39 + index] = 31;
-        value[46] = 100000;
+        value[45] = 31;
+        value[46] = 0;
+        value[47] = 0;
+        value[48] = 100000;
         return value;
     }
 
@@ -117,7 +120,7 @@ namespace
 
 int main()
 {
-    if (!check(gen8wild_api_version() == 1, "unexpected API version")) return 1;
+    if (!check(gen8wild_api_version() == 2, "unexpected API version")) return 1;
 
     auto value = request();
     if (!check(gen8wild_generate(value.data()) == 10, "wild result count mismatch")) return 1;
@@ -198,7 +201,7 @@ int main()
         return 1;
 
     value = request();
-    value[46] = 1;
+    value[48] = 1;
     if (!check(gen8wild_generate(value.data()) == 1 && gen8wild_limit_reached() == 1, "result limit failed")) return 1;
 
     return 0;

@@ -173,7 +173,7 @@ namespace
 
 int main()
 {
-    if (!check(gen5egg_api_version() == 1, "unexpected API version")) return 1;
+    if (!check(gen5egg_api_version() == 2, "unexpected API version")) return 1;
     for (std::size_t fixture = 0; fixture < pids.size(); fixture++)
         if (!checkFixture(fixture)) return 1;
 

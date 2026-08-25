@@ -1,3 +1,5 @@
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
+
 export const GEN6_EGG_API_VERSION = 2;
 export const GEN6_EGG_REQUEST_WORDS = 154;
 export const GEN6_EGG_RESULT_WORDS = 20;
@@ -41,6 +43,8 @@ export interface Gen6EggFilters {
   ivMin: Gen6EggIvTuple;
   ivMax: Gen6EggIvTuple;
   natureInheritance: Gen6EggParentFilter;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen6EggRequest {
@@ -245,6 +249,8 @@ export function validateGen6EggFilters(filters: Gen6EggFilters) {
   for (let i = 0; i < 6; i++)
     if (filters.ivMin[i] > filters.ivMax[i])
       throw new TypeError("IV filter minimum exceeds maximum.");
+  if (!validatePerfectIvFilter(filters.perfectIvValue, filters.perfectIvCount))
+    throw new TypeError("Perfect IV filter must use 0..31 and 0..6.");
   return filters;
 }
 
@@ -375,6 +381,11 @@ export function gen6EggResultPassesFilters(
   for (let i = 0; i < 6; i++)
     if (result.ivs[i] < filters.ivMin[i] || result.ivs[i] > filters.ivMax[i])
       return false;
+  if (
+    result.ivs.filter((iv) => iv >= filters.perfectIvValue).length <
+    filters.perfectIvCount
+  )
+    return false;
   return true;
 }
 

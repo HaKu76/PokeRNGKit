@@ -20,6 +20,7 @@ import {
 } from "../gen4ivcalculator/gen4IvData";
 import type { Gen4Profile } from "../gen4profiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import { PerfectIvFilterFields } from "../shared/PerfectIvFilterFields";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import {
   GEN4_STATIC_MAX_TOTAL_STATES,
@@ -294,6 +295,8 @@ export function Gen4StaticPanel({
       max: ["31", "31", "31", "31", "31", "31"],
     },
   });
+  const [perfectIvValue, setPerfectIvValue] = useState("31");
+  const [perfectIvCount, setPerfectIvCount] = useState("0");
   const [results, setResults] = useState<Result[]>([]);
   const [progress, setProgress] = useState<Gen4StaticProgress>({
     processedStates: 0,
@@ -476,6 +479,14 @@ export function Gen4StaticPanel({
       shiny: filtersDisabled && operation === "generator" ? "any" : shiny,
       gender: filtersDisabled && operation === "generator" ? "any" : gender,
       ability: filtersDisabled && operation === "generator" ? "any" : ability,
+      perfectIvValue:
+        filtersDisabled && operation === "generator"
+          ? 31
+          : parseDecimal(perfectIvValue),
+      perfectIvCount:
+        filtersDisabled && operation === "generator"
+          ? 0
+          : parseDecimal(perfectIvCount),
     },
   });
 
@@ -984,6 +995,12 @@ export function Gen4StaticPanel({
                 </Select>
               </label>
             </div>
+            <PerfectIvFilterFields
+              count={perfectIvCount}
+              onCountChange={setPerfectIvCount}
+              onValueChange={setPerfectIvValue}
+              value={perfectIvValue}
+            />
             <div className="iv-filter">
               <div className="iv-filter-header">
                 <span>{t("ivs")}</span>

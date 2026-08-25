@@ -2,7 +2,7 @@
   "id": "gen4static",
   "generation": 4,
   "contractVersion": 1,
-  "apiVersion": 1,
+  "apiVersion": 2,
   "target": "gen4static",
   "operations": ["generator", "searcher"],
   "artifacts": {

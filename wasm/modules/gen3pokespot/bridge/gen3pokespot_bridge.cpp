@@ -24,7 +24,7 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 1;
+    constexpr std::uint32_t apiVersion = 2;
     constexpr std::uint32_t maxFoodStatesPerCall = 100000;
     constexpr std::uint32_t maxResultsPerCall = 250000;
 
@@ -120,7 +120,8 @@ extern "C"
         std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
         std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
         std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax,
-        std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax)
+        std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax,
+        std::uint32_t perfectIvValue, std::uint32_t perfectIvCount)
     {
         results.clear();
         lastError = ErrorCode::None;
@@ -134,7 +135,7 @@ extern "C"
             || sid > 0xffff || shinyFilter > 3 || genderFilter > 2 || abilityFilter > 2
             || natureFilter == 0 || natureFilter > 0x1ffffff || hiddenPowerFilter == 0
             || hiddenPowerFilter > 0xffff || encounterSlotFilter == 0 || encounterSlotFilter > 7
-            || !validIvRanges(minimum, maximum)
+            || !validIvRanges(minimum, maximum) || perfectIvValue > 31 || perfectIvCount > 6
             || static_cast<std::uint64_t>(foodInitialAdvances) + foodOffset + foodMaxAdvances > 0xffffffffULL
             || static_cast<std::uint64_t>(encounterInitialAdvances) + encounterOffset + encounterMaxAdvances > 0xffffffffULL)
         {
@@ -178,11 +179,13 @@ extern "C"
                 static_cast<std::uint8_t>((iv2 >> 10) & 31), static_cast<std::uint8_t>(iv2 & 31),
             };
             bool ivMatches = true;
+            std::uint32_t perfect = 0;
             for (std::size_t index = 0; index < ivs.size(); index++)
             {
                 if (ivs[index] < minimum[index] || ivs[index] > maximum[index]) ivMatches = false;
+                if (ivs[index] >= perfectIvValue) perfect++;
             }
-            if (!ivMatches || (hiddenPowerFilter & (1u << hiddenPower(ivs))) == 0) continue;
+            if (!ivMatches || perfect < perfectIvCount || (hiddenPowerFilter & (1u << hiddenPower(ivs))) == 0) continue;
             const std::uint8_t abilityRoll = generated.nextUShort(2);
             for (const FoodState &state : food)
             {

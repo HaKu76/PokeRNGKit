@@ -12,7 +12,7 @@ import type {
   Gen5StaticWorkerResponse,
 } from "./messages";
 
-const REQUEST_WORDS = 62;
+const REQUEST_WORDS = 64;
 const RESULT_WORDS = 12;
 
 interface Gen5StaticEmscriptenModule {
@@ -211,6 +211,8 @@ function packRequest(
     request.filters.hiddenPowerMask,
     ...request.filters.ivMin,
     ...request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
     request.resultLimit,
     ...(request.mode === "generator" ? [...splitHex(request.seed)] : [0, 0]),
     ...(request.mode === "searcher"

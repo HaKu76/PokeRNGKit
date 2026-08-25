@@ -47,7 +47,8 @@ extern "C"
         std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
         std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
         std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax,
-        std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax);
+        std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax,
+        std::uint32_t perfectIvValue, std::uint32_t perfectIvCount);
     std::uintptr_t gen3pokespot_result_ptr();
     std::uint32_t gen3pokespot_result_count();
     std::uint32_t gen3pokespot_last_error();

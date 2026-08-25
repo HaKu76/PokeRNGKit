@@ -63,6 +63,8 @@ function commonArguments(
     filters.hiddenPowerMask,
     ...filters.ivMin,
     ...filters.ivMax,
+    filters.perfectIvValue,
+    filters.perfectIvCount,
   ];
 }
 

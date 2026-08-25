@@ -34,19 +34,21 @@ function request(): Gen8RaidRequest {
       weightMax: 255,
       ivMin: [0, 0, 0, 0, 0, 0],
       ivMax: [31, 31, 31, 31, 31, 31],
+      perfectIvValue: 31,
+      perfectIvCount: 0,
     },
     resultLimit: 100,
   };
 }
 
 describe("Gen 8 Raids domain", () => {
-  it("packs 41 request words and splits inclusive frame ranges", () => {
+  it("packs 43 request words and splits inclusive frame ranges", () => {
     const value = request();
     expect(validateGen8RaidRequest(value)).toBe(value);
     expect(gen8RaidTaskCount(value)).toBe(10);
     const chunks = splitGen8RaidRequest(value, 2, 3);
     expect(chunks.reduce((sum, chunk) => sum + chunk.count, 0)).toBe(10);
-    expect(encodeGen8RaidRequest(value, chunks[0])).toHaveLength(41);
+    expect(encodeGen8RaidRequest(value, chunks[0])).toHaveLength(43);
   });
 
   it("rejects an overflowing advance window", () => {

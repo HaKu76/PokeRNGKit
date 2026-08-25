@@ -57,6 +57,8 @@ const generatorRequest: Gen4EggGeneratorRequest = {
     hiddenPowerMask: 0xffff,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
 };
 
@@ -271,21 +273,21 @@ describe("Gen4 Egg domain", () => {
     );
   });
 
-  it("encodes the complete 48-word Generator and Searcher requests", () => {
+  it("encodes the complete 50-word Generator and Searcher requests", () => {
     const generator = encodeGen4EggRequest(generatorRequest);
     expect(generator).toHaveLength(GEN4_EGG_REQUEST_WORDS);
     expect(Array.from(generator.slice(0, 15))).toEqual([
       0, 0x1234_5678, 0x9abc_def0, 10, 4_500, 2, 20, 5, 3, 29, 254, 0, 12_345,
       54_321, 1,
     ]);
-    expect(Array.from(generator.slice(46))).toEqual([0, 0]);
+    expect(Array.from(generator.slice(48))).toEqual([31, 0]);
 
     const searcher = encodeGen4EggRequest(searcherRequest);
     expect(searcher).toHaveLength(GEN4_EGG_REQUEST_WORDS);
     expect(Array.from(searcher.slice(0, 9))).toEqual([
       1, 0, 0, 10, 30, 0, 20, 100, 0,
     ]);
-    expect(Array.from(searcher.slice(46))).toEqual([600, 600]);
+    expect(Array.from(searcher.slice(46, 50))).toEqual([600, 600, 31, 0]);
   });
 
   it("decodes the 23-word Generator and 25-word Searcher records", () => {

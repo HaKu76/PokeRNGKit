@@ -46,15 +46,17 @@ const request: Gen8WildRequest = {
     weightMax: 255,
     ivMin: [0, 0, 0, 0, 0, 0],
     ivMax: [31, 31, 31, 31, 31, 31],
+    perfectIvValue: 31,
+    perfectIvCount: 0,
   },
   resultLimit: 100,
 };
 
 describe("Gen 8 Wild domain", () => {
-  it("packs a 48-word request and preserves chunk order", () => {
+  it("packs a 50-word request and preserves chunk order", () => {
     const chunks = splitGen8WildRequest(request, 2, 3);
     expect(chunks.map((chunk) => chunk.start)).toEqual([0, 3, 6, 8, 9]);
-    expect(encodeGen8WildRequest(request, chunks[0])).toHaveLength(48);
+    expect(encodeGen8WildRequest(request, chunks[0])).toHaveLength(50);
   });
 
   it("requires one Honey Tree slot", () => {

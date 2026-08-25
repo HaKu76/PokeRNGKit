@@ -1,4 +1,6 @@
-export const GEN4_EVENT_API_VERSION = 1;
+import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
+
+export const GEN4_EVENT_API_VERSION = 2;
 export const GEN4_EVENT_CHUNK_SIZE = 500;
 export const GEN4_EVENT_MAX_STATES_PER_CALL = 100_000;
 export const GEN4_EVENT_MAX_TOTAL_STATES = 2_000_000;
@@ -10,6 +12,8 @@ export interface Gen4EventFilters {
   hiddenPowerMask: number;
   ivMin: Gen4EventIvTuple;
   ivMax: Gen4EventIvTuple;
+  perfectIvValue: number;
+  perfectIvCount: number;
 }
 
 export interface Gen4EventCommonRequest {
@@ -106,6 +110,13 @@ function validateCommon(request: Gen4EventCommonRequest) {
     )
       errors.push(`iv${index}`);
   });
+  if (
+    !validatePerfectIvFilter(
+      request.filters.perfectIvValue,
+      request.filters.perfectIvCount,
+    )
+  )
+    errors.push("perfectIvs");
   return errors;
 }
 
