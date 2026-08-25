@@ -55,6 +55,18 @@ int main()
     assert(searchCount == 4);
     assert(gen3static_result_count() == 4);
 
+    const auto perfectSearchCount = gen3static_search(186, 1, 4, 383, 45, 255, 0, 12345, 54321, 0, 0, 0,
+                                                      0x1ffffff, 0xffff, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31,
+                                                      31, 31, 31, 5);
+    assert(perfectSearchCount == 4);
+    state = reinterpret_cast<const Gen3StaticPackedState *>(gen3static_result_ptr());
+    assert(state->hp == 31 && state->attack == 31 && state->defense == 31 && state->specialAttack == 31
+           && state->specialDefense == 31 && state->speed == 31);
+    assert(gen3static_search(187, 1, 4, 383, 45, 255, 0, 12345, 54321, 0, 0, 0, 0x1ffffff, 0xffff, 0, 0, 0,
+                             0, 0, 0, 31, 31, 31, 31, 31, 31, 31, 5)
+           == 0);
+    assert(gen3static_last_error() == 1);
+
     const auto filtered = gen3static_generate(0x12345678, 0, 0, 0, 1, 150, 70, 255, 0, 0, 0, 0, 0, 0,
                                               1u << 15, 1u << 11, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31, 31, 0);
     assert(filtered == 1);

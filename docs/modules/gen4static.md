@@ -5,6 +5,7 @@
 - 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
 - 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
 - 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- Searcher 先将六项 IV 的闭区间与完美个体条件求交，再按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 编号；例如六项 `0..31`、`31/5` 只产生 `187` 个候选，不会按 `32^6` 计数。六项范围和完美条件仍是 AND 关系，不是互斥模式。
 - 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
 
 本文说明 `gen4static` 的第四世代定点 Generator/Searcher、输入边界、结果布局和 Worker/Wasm 边界。生产算法位于 `wasm/modules/gen4static/bridge/gen4static_bridge.cpp`，TypeScript 只负责表单、筛选、分片、排序和结果解码。
@@ -26,7 +27,7 @@ G4 页面复用 G3 Static 的三栏控制网格、IV 表格、快捷键、结果
 
 Generator 复制 PokeFinder `StaticGenerator4::generateMethod1/MethodJ/MethodK` 的 RNG 调用顺序。Method 1 先读取 PID 的低/高 16 位，再读取两组 IV；Method J/K 先处理 Cute Charm 或 Synchronize，再按性格循环读取 PID，最后读取 IV。结果中的 Advances 是 `Initial Advances + candidateIndex`，`Offset` 只参与 RNG 定位。
 
-Searcher 按 `LCRNGReverse::recoverPokeRNGIV` 恢复 IV 对应 Seed，随后按方法、队首、Delay 和 Advance 范围验证 PID。IV 组合顺序为 `HP -> Atk -> Def -> SpA -> SpD -> Spe`，每组分片最多 500 个组合，C ABI 单次最多处理 100,000 个组合。
+Searcher 按 `LCRNGReverse::recoverPokeRNGIV` 恢复 IV 对应 Seed，随后按方法、队首、Delay 和 Advance 范围验证 PID。IV 组合先取六项范围与完美个体条件的交集，顺序为 `HP -> Atk -> Def -> SpA -> SpD -> Spe`，每组分片最多 500 个组合，C ABI 单次最多处理 100,000 个组合。
 
 Generator 的 `Max Advances` 包含起点，状态总数为 `Max Advances + 1`；这是 PokeFinder 上游 `for (cnt = 0; cnt <= maxAdvances; cnt++)` 的实际语义。
 
@@ -59,7 +60,7 @@ Generator 的 DPPt 结果为 Advances、音高及通用状态列；HGSS 额外�
 
 ## 5. Wasm / Worker
 
-模块 manifest 与 C ABI API 版本均为 `1`，导出：`gen4static_api_version`、`gen4static_generate`、`gen4static_search`、`gen4static_result_ptr`、`gen4static_result_count`、`gen4static_last_error`。Generator 状态记录 68 字节，Searcher 状态记录 80 字节；Worker 解码前检查记录宽度，并按 `chunkIndex` 恢复批次顺序。
+模块 manifest 与 C ABI API 版本均为 `2`，导出：`gen4static_api_version`、`gen4static_generate`、`gen4static_search`、`gen4static_result_ptr`、`gen4static_result_count`、`gen4static_last_error`。Generator 状态记录 68 字节，Searcher 状态记录 80 字节；Worker 解码前检查记录宽度，并按 `chunkIndex` 恢复批次顺序。
 
 取消会终止并重建独立 Worker。结果上限为 100,000；输入总范围超过 2,000,000 个状态/组合时由领域校验拒绝。
 
@@ -76,4 +77,4 @@ Generator 的 DPPt 结果为 Advances、音高及通用状态列；HGSS 额外�
 
 ## 7. 验证状态
 
-TypeScript 领域测试、分片测试、数据数量测试和 UI 预览引擎测试已写入工作区。2026-08-13 经项目所有者授权，使用外部 Chrome 对 `https://haku76.github.io/PokeRNGKit/` 的生产资源 `index-mLBsBTQF.js` 回归 Method 1 / Manaphy：Seed `0`、Initial Advances `0`、Max Advances `9`、Offset `0` 返回 10 条，首条 Advances `0`、PID `E97E0000`、IV `17/19/20/13/12/16`、觉醒属性岩石、威力 `31`，与原生固定夹具十进制 PID `3917348864` 一致。Method J/K、Searcher、取消、移动端和项目所有者最终验收仍待完成。
+TypeScript 领域测试、分片测试、数据数量测试和 UI 预览引擎测试已写入工作区。2026-08-25 已通过 `npm run verify`（178 个测试文件、619 项测试、TypeScript 检查和生产 PWA 构建）以及四模块 native 夹具（4/4）；新增六项 `0..31`、`31/5` 的索引 `186/187` 边界也已通过。2026-08-13 的外部 Chrome Manaphy 生产回归仍保留；Method J/K、Searcher、取消、移动端和项目所有者最终验收仍待完成。

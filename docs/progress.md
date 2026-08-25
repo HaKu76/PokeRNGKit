@@ -1,5 +1,15 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-25 Searcher 完美个体组合计数修复
+
+- 对齐：按 3DSRNGTool `RNGFilters.CheckIVs` 保持两层 AND 语义，先检查六项 `IVlow..IVup`，再检查不低于 `PerfectIVValue` 的项目数是否达到 `PerfectIVCount`；没有增加互斥开关。
+- 修复：Gen III/IV Static 与 Wild Searcher 的范围校验、Worker 分片、UI 预览和 C++ bridge 统一按两层筛选的交集候选计数与反向索引，不再先按完整六维笛卡尔积触发任务上限。
+- 结果：六项 `0..31`、`Perfect IV Value=31`、`Perfect IV Count=5` 的候选数为 `187`，由 186 个恰好 5 项为 31 的组合与 1 个全 31 组合构成。
+- 增加：共享 TypeScript/C++ 组合计数与反向索引；四个 domain 测试和四个 native 夹具覆盖索引 `186` 有效、`187` 越界。
+- 已通过：定向 Vitest 9 个文件、39 项测试；四模块 native 夹具 4/4；`npm run verify` 的格式、Lint、TypeScript、178 个测试文件、619 项测试和生产 PWA 构建。
+- 已知：Lint 保留 `src/features/static/Gen3StaticPanel.tsx:296` 的既有 Hook 依赖 warning，构建保留大 chunk warning；未运行外部 Chrome/Edge、生产 URL 回归、真实 Emscripten Wasm 构建或 Windows EXE 验收。
+- Git：当前分支为 `main`；本轮修复、夹具和文档纳入同一提交并推送 `origin/main`。
+
 ## 2026-08-25 完美个体筛选冲突修复
 
 - 修复：Gen VI Wild 不再把筛选用的 `Perfect IV Count` 当作遭遇生成时的保底 31 IV 数量，筛选 Count 不会改变 RNG 推进或生成结果。

@@ -10,6 +10,7 @@ import {
   gen4StaticTemplatesForVersion,
   validateGen4StaticGeneratorRequest,
   validateGen4StaticSearcherRequest,
+  type Gen4IvTuple,
   type Gen4StaticGeneratorRequest,
   type Gen4StaticSearcherRequest,
 } from "./domain";
@@ -164,6 +165,17 @@ describe("Gen IV Static domain", () => {
       { index: 0, startIndex: 0, stateCount: 40 },
       { index: 1, startIndex: 40, stateCount: 24 },
     ]);
+
+    const perfectRequest = {
+      ...searcherRequest,
+      filters: {
+        ...searcherRequest.filters,
+        ivMin: [0, 0, 0, 0, 0, 0] as Gen4IvTuple,
+        perfectIvValue: 31,
+        perfectIvCount: 5,
+      },
+    };
+    expect(gen4StaticSearcherCombinationCount(perfectRequest)).toBe(187);
   });
 
   it("loads all 99 upstream templates and filters them by version", () => {

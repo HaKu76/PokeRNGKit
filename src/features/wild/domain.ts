@@ -1,4 +1,5 @@
 import type { Gen3GameVersion } from "../profiles/domain";
+import { countIvCombinations } from "../shared/perfectIvCombinations";
 import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 import { getGen3WildSlotForm, isGen3WildTanobyChamber } from "./tanoby";
 
@@ -355,10 +356,11 @@ export function validateGen3WildRequest(request: Gen3WildRequest) {
 export function gen3WildSearcherCombinationCount(
   request: Gen3WildSearcherRequest,
 ) {
-  return request.filters.ivMin.reduce(
-    (total, minimum, index) =>
-      total * (request.filters.ivMax[index] - minimum + 1),
-    1,
+  return countIvCombinations(
+    request.filters.ivMin,
+    request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
   );
 }
 

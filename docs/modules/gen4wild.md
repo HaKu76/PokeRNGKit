@@ -5,13 +5,14 @@
 - 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
 - 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
 - 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- Searcher 先将六项 IV 的闭区间与完美个体条件求交，再按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 编号；例如六项 `0..31`、`31/5` 只产生 `187` 个候选，不会按 `32^6` 计数。六项范围和完美条件仍是 AND 关系，不是互斥模式。
 - 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
 
 > - 模块标识：`gen4wild`
-> - 当前状态：Generator/Searcher、静态遭遇数据、UI、Worker Pool、Wasm bridge 和夹具已写入工作区；尚未运行工程、原生、Wasm 或浏览器验证
+> - 当前状态：Generator/Searcher、静态遭遇数据、UI、Worker Pool、Wasm bridge 和夹具已完成工程与原生验证；外部浏览器和生产页面回归待完成
 > - PokeFinder 基线：4.3.2 revision `dd00fe7`
 > - EncounterTableGenerator Gen4 基线：revision `9a2ed62`
-> - API 版本：`1`
+> - API 版本：`2`
 
 ## 1. 覆盖范围
 
@@ -89,9 +90,9 @@ Gen4WildPanel
                     `-- gen4wild_search
 ```
 
-模块使用 `rngModuleContract.ts` 的 Worker 信封和 API v1。请求结构固定为 75 个 `uint32_t`，每个槽位固定为 19 个 `uint32_t`，Generator/Searcher 结果均固定为 22 个 `uint32_t`。C++ 使用 `static_assert` 固定记录宽度，Worker 解码前检查结果长度。
+模块使用 `rngModuleContract.ts` 的 Worker 信封和 API v2。请求结构固定为 75 个 `uint32_t`，每个槽位固定为 19 个 `uint32_t`，Generator/Searcher 结果均固定为 22 个 `uint32_t`。C++ 使用 `static_assert` 固定记录宽度，Worker 解码前检查结果长度。
 
-Generator 每片最多 100,000 个状态；Searcher 每片最多 10,000 个 IV 组合。Pool 按 `chunkIndex` 提交乱序批次；取消或达到结果上限时终止现有 Worker，下一任务重新初始化。单任务 IV 组合和 Generator 状态上限均为 2,000,000，结果上限为 250,000。
+Generator 每片最多 100,000 个状态；Searcher 每片最多 10,000 个交集 IV 组合。Pool 按 `chunkIndex` 提交乱序批次；取消或达到结果上限时终止现有 Worker，下一任务重新初始化。单任务 IV 组合和 Generator 状态上限均为 2,000,000，结果上限为 250,000。
 
 Worker 在调用 Wasm 前重新执行领域校验，拒绝不匹配的游戏/遭遇表、方法、槽位、`u8/u16/u32` 边界和特殊 Searcher 约束。Wasm 不使用 pthread、`SharedArrayBuffer` 或跨源隔离。
 
@@ -106,7 +107,7 @@ Advances: 0..9
 TID / SID: 12345 / 54321
 ```
 
-首条预期为 Advances `0`、`Battle Advances` `50`、PID `1504931347`、IV `27/23/6/31/22/19`、Slot `4`、Species `278`、Level `38`、Nature `22`、觉醒属性 `6`、觉醒威力 `70`、电话 `1`、音高 `7`。同一地点全 31 IV、Advance `0..1000`、Delay `600..2000` 的 Searcher 预期返回 `33` 条；非法 fixed slot 必须返回错误。
+首条预期为 Advances `0`、`Battle Advances` `50`、PID `1504931347`、IV `27/23/6/31/22/19`、Slot `4`、Species `278`、Level `38`、Nature `22`、觉醒属性 `6`、觉醒威力 `70`、电话 `1`、音高 `7`。同一地点全 31 IV、Advance `0..1000`、Delay `600..2000` 的 Searcher 预期返回 `33` 条；六项 `0..31`、`31/5` 的索引 `186` 也返回同样结果，`187` 被拒绝；非法 fixed slot 必须返回错误。
 
 TypeScript 测试覆盖包含式分片、IV 笛卡尔积分片、19/22 word ABI、方法/版本/槽位/Delay/特殊 31 IV 校验，以及 Generator/Searcher UI 预览的确定性、结果上限和取消。
 
@@ -121,6 +122,6 @@ TypeScript 测试覆盖包含式分片、IV 笛卡尔积分片、19/22 word ABI�
 
 ## 8. 验证状态
 
-本轮没有获得运行 build、test、typecheck、lint、原生/Wasm 夹具、浏览器预览或算法回归的授权，因此以上源码和夹具均不得写成已通过。已通过本任务文件的定向 Prettier 检查与 `git diff --check`；当前功能分支没有 `node_modules`，因此未直接运行全仓 `npm run format:check`。
+2026-08-25 已通过 `npm run verify`（178 个测试文件、619 项测试、TypeScript 检查和生产 PWA 构建）以及 `$env:POKERNGKIT_WASM_MODULES='gen3static,gen3wild,gen4static,gen4wild'; npm run wasm:test:native`（4/4 native 夹具）。新增六项 `0..31`、`31/5` 的组合索引边界也已通过。Lint 保留 `Gen3StaticPanel.tsx:296` 的既有 Hook 依赖 warning；外部浏览器和生产页面回归仍未运行。
 
-下一步由项目所有者审查并提交分支，等待 GitHub Actions 完成工程、原生和 Wasm 构建。部署后再使用项目所有者提供的生产 URL，在外部 Chrome/Edge 对照 PokeFinder 回归 DPPt Method J、HGSS Method K、甜甜蜜树、宝可追踪、捕虫大赛、狩猎地带、取消和结果列。
+下一步等待 GitHub Actions 完成部署。部署后再使用项目所有者提供的生产 URL，在外部 Chrome/Edge 对照 PokeFinder 回归 DPPt Method J、HGSS Method K、甜甜蜜树、宝可追踪、捕虫大赛、狩猎地带、取消和结果列。

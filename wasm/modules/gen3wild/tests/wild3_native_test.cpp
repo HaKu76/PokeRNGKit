@@ -40,19 +40,25 @@ namespace
                          std::uint32_t encounter = 0, std::uint32_t rate = 10,
                          bool bike = false, std::uint32_t item = 0, bool tanoby = false,
                          const std::array<std::uint32_t, 6> &ivMin = { 31, 31, 31, 31, 31, 31 },
-                         const std::array<std::uint32_t, 6> &ivMax = { 31, 31, 31, 31, 31, 31 })
+                         const std::array<std::uint32_t, 6> &ivMax = { 31, 31, 31, 31, 31, 31 },
+                         std::uint32_t startIndex = 0, std::uint32_t stateCountOverride = 0,
+                         std::uint32_t perfectIvCount = 0)
     {
-        std::uint32_t stateCount = 1;
-        for (std::size_t index = 0; index < ivMin.size(); index++)
+        std::uint32_t stateCount = stateCountOverride;
+        if (stateCount == 0)
         {
-            stateCount *= ivMax[index] - ivMin[index] + 1;
+            stateCount = 1;
+            for (std::size_t index = 0; index < ivMin.size(); index++)
+            {
+                stateCount *= ivMax[index] - ivMin[index] + 1;
+            }
         }
         return gen3wild_search(
-            slots.data(), slots.size(), 0, stateCount, method, lead, encounter, rate,
+            slots.data(), slots.size(), startIndex, stateCount, method, lead, encounter, rate,
             tanoby ? 0 : 1, 0, 0, 0, tanoby ? 1 : 0, bike ? 1 : 0, item, 12345, 54321, 0, 0, 0,
             allNatures, allHiddenPowers, allSlots, 1, 100,
             ivMin[0], ivMin[1], ivMin[2], ivMin[3], ivMin[4], ivMin[5],
-            ivMax[0], ivMax[1], ivMax[2], ivMax[3], ivMax[4], ivMax[5], 31, 0);
+            ivMax[0], ivMax[1], ivMax[2], ivMax[3], ivMax[4], ivMax[5], 31, perfectIvCount);
     }
 }
 
@@ -118,6 +124,14 @@ int main()
            == 1);
     assert(search(slots, 2, 0) == 54);
     assert(search(slots, 4, 25) == 4);
+
+    assert(search(slots, 1, 255, 0, 10, false, 0, false,
+                  { 0, 0, 0, 0, 0, 0 }, { 31, 31, 31, 31, 31, 31 }, 186, 1, 5)
+           == 20);
+    assert(search(slots, 1, 255, 0, 10, false, 0, false,
+                  { 0, 0, 0, 0, 0, 0 }, { 31, 31, 31, 31, 31, 31 }, 187, 1, 5)
+           == 0);
+    assert(gen3wild_last_error() == 1);
 
     const std::array<Gen3WildPackedSlot, 12> liptoo = {
         Gen3WildPackedSlot { 201, 2, 25, 25, 255, 13 | (13 << 8) },

@@ -9,6 +9,7 @@
  */
 
 #include "gen3wild_bridge.h"
+#include "../../../shared/perfect_iv_combinations.hpp"
 
 #include <Core/RNG/LCRNG.hpp>
 #include <algorithm>
@@ -289,20 +290,6 @@ namespace
             recover(high);
         }
         return recovered;
-    }
-
-    std::array<std::uint8_t, 6> ivsAtIndex(std::uint64_t index,
-                                           const std::array<std::uint32_t, 6> &minimum,
-                                           const std::array<std::uint32_t, 6> &maximum)
-    {
-        std::array<std::uint8_t, 6> ivs {};
-        for (int stat = 5; stat >= 0; stat--)
-        {
-            const std::uint32_t size = maximum[stat] - minimum[stat] + 1;
-            ivs[stat] = static_cast<std::uint8_t>(minimum[stat] + index % size);
-            index /= size;
-        }
-        return ivs;
     }
 
     std::uint8_t calculateLevel(const Gen3WildPackedSlot &slot, std::uint16_t value)
@@ -633,8 +620,8 @@ extern "C"
                 lastError = ErrorCode::InvalidInput;
                 return 0;
             }
-            totalStates *= maximum[index] - minimum[index] + 1;
         }
+        totalStates = pokerngkit::countIvCombinations(minimum, maximum, perfectIvValue, perfectIvCount);
         if (static_cast<std::uint64_t>(startIndex) + stateCount > totalStates)
         {
             lastError = ErrorCode::InvalidInput;
@@ -707,7 +694,8 @@ extern "C"
 
         for (std::uint32_t offset = 0; offset < stateCount; offset++)
         {
-            const auto ivs = ivsAtIndex(static_cast<std::uint64_t>(startIndex) + offset, minimum, maximum);
+            const auto ivs = pokerngkit::ivCombinationAtIndex(
+                static_cast<std::uint64_t>(startIndex) + offset, minimum, maximum, perfectIvValue, perfectIvCount);
             if ((hiddenPowerMask & (1u << hiddenPowerType(ivs))) == 0
                 || !matchesPerfectIvs(ivs, perfectIvValue, perfectIvCount))
             {

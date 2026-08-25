@@ -128,6 +128,27 @@ describe("Gen3 Static domain", () => {
       { index: 0, startIndex: 0, stateCount: 40 },
       { index: 1, startIndex: 40, stateCount: 24 },
     ]);
+
+    const perfectRequest = {
+      ...searcherRequest,
+      filters: {
+        ...searcherRequest.filters,
+        ivMin: [0, 0, 0, 0, 0, 0] as [
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+        ],
+        perfectIvValue: 31,
+        perfectIvCount: 5,
+      },
+    };
+    expect(gen3StaticSearcherCombinationCount(perfectRequest)).toBe(187);
+    expect(createGen3StaticSearcherChunks(perfectRequest, 200)).toEqual([
+      { index: 0, startIndex: 0, stateCount: 187 },
+    ]);
   });
 
   it("calculates the Generation III Hidden Power type and strength", () => {

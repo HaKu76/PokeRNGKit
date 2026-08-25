@@ -226,6 +226,32 @@ describe("Gen3 wild domain", () => {
       { index: 1, startIndex: 3, stateCount: 1 },
     ]);
     expect(validateGen3WildSearcherRequest(searcher)).toEqual([]);
+
+    const perfectSearcher = {
+      ...searcher,
+      filters: {
+        ...searcher.filters,
+        ivMin: [0, 0, 0, 0, 0, 0] as [
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+        ],
+        ivMax: [31, 31, 31, 31, 31, 31] as [
+          number,
+          number,
+          number,
+          number,
+          number,
+          number,
+        ],
+        perfectIvValue: 31,
+        perfectIvCount: 5,
+      },
+    };
+    expect(gen3WildSearcherCombinationCount(perfectSearcher)).toBe(187);
   });
 
   it("decodes the first searcher result word as Seed", () => {

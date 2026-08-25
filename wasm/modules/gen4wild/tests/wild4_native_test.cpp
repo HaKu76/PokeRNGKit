@@ -103,6 +103,17 @@ int main()
     std::fill(std::begin(searcherRequest.ivMin), std::end(searcherRequest.ivMin), 31);
     assert(gen4wild_search(&searcherRequest, 0, 1) == 33);
 
+    std::fill(std::begin(searcherRequest.ivMin), std::end(searcherRequest.ivMin), 0);
+    searcherRequest.perfectIvValue = 31;
+    searcherRequest.perfectIvCount = 5;
+    assert(gen4wild_search(&searcherRequest, 186, 1) == 33);
+    const auto *perfectState = reinterpret_cast<const Gen4WildPackedSearcherState *>(gen4wild_result_ptr());
+    assert(std::all_of(std::begin(perfectState->ivs), std::end(perfectState->ivs), [](std::uint32_t iv) {
+        return iv == 31;
+    }));
+    assert(gen4wild_search(&searcherRequest, 187, 1) == 0);
+    assert(gen4wild_last_error() == 1);
+
     generatorRequest.fixedSlot = slots.size();
     assert(gen4wild_generate(&generatorRequest) == 0);
     assert(gen4wild_last_error() == 1);

@@ -5,6 +5,7 @@
 - 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
 - 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
 - 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- Searcher 先将六项 IV 的闭区间与完美个体条件求交，再按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 编号；例如六项 `0..31`、`31/5` 只产生 `187` 个候选，不会按 `32^6` 计数。六项范围和完美条件仍是 AND 关系，不是互斥模式。
 - 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
 
 本文说明 `gen3static` Generator 与 Searcher 的计算规则。实现对齐 PokeFinder 4.3.2 `StaticGenerator3`、`StaticSearcher3` 与 `LCRNGReverse::recoverPokeRNGIV`；浏览器编排使用同一版本化 Wasm 模块的两个独立 Worker Pool。
@@ -116,7 +117,7 @@ ID 模块展示的 `TSV = (TID XOR SID) >> 3` 不能直接代入这里。
 
 ## 8. Searcher 反向恢复
 
-Searcher 不扫描完整 `2^32` Seed 空间，而是枚举筛选区间内的六项 IV 笛卡尔积。组合索引按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 展开，TypeScript 可以把连续索引范围稳定拆给多个 Worker。
+Searcher 不扫描完整 `2^32` Seed 空间，而是枚举六项 IV 范围与完美个体条件交集后的候选。组合索引按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 展开，TypeScript 与 C++ bridge 使用同一反向索引，因此连续索引范围可以稳定拆给多个 Worker。
 
 每组 IV 先重新打包为两个 15 位观测值。反向恢复使用上游 `LCRNGReverse::recoverPokeRNGIV` 的整数关系：
 
@@ -130,7 +131,7 @@ Searcher 结果第一列是 Seed；Generator 结果第一列是 Advances。两�
 
 ## 9. 筛选与快捷设置
 
-IV、性格、觉醒力量、特性、性别和异色筛选在 C++ bridge 中执行，不会改变 RNG 序列或候选 Seed。`gen3static` API 3 使用 25 位性格掩码和 16 位觉醒力量掩码；界面没有勾选或全部勾选时均按 PokeFinder `CheckList` 的 `Any` 语义提交完整掩码。
+IV、完美个体、性格、觉醒力量、特性、性别和异色筛选在 C++ bridge 中执行，不会改变 RNG 序列或候选 Seed。`gen3static` API 4 使用 25 位性格掩码和 16 位觉醒力量掩码；界面没有勾选或全部勾选时均按 PokeFinder `CheckList` 的 `Any` 语义提交完整掩码。
 
 筛选器布局复用上游 `Form/Controls/Filter.ui`：桌面端左侧放六项 IV 与工具，右侧以紧凑行排列 Ability、Gender、Hidden Power、Nature、Shiny；窄屏降为单列。该结构与 `gen3wild` 复用同一 React 多选控件和网格，Wild 仅在上游对应位置额外插入 Encounter Slot 与 Level。
 
@@ -179,10 +180,10 @@ power     = 30 + floor(powerBits * 40 / 63)
 | Offset           | `Advance32Bit`，`0..4294967295`，10 位十进制 | 只保留十进制                             |
 | TID / SID        | `TIDSID`，`0..65535`，5 位十进制             | 从当前存档信息读取                       |
 | IV min / max     | `0..31`                                      | 最小值不得大于最大值                     |
-| Nature           | `CheckList`，25 项多选                       | API 3 使用 25 位掩码；空选择按完整掩码   |
-| Hidden Power     | `CheckList`，16 项多选                       | API 3 使用 16 位掩码；空选择按完整掩码   |
+| Nature           | `CheckList`，25 项多选                       | API 4 使用 25 位掩码；空选择按完整掩码   |
+| Hidden Power     | `CheckList`，16 项多选                       | API 4 使用 16 位掩码；空选择按完整掩码   |
 
-Generator 还要求 `Initial Advances + Offset + Max Advances <= 0xFFFFFFFF`。Searcher 的 IV 组合总数不得超过 50,000,000；Web 初始值为六项 `31..31`，保证首次检索可以运行，用户仍可按上游范围规则扩大搜索空间。每次 C ABI 调用最多处理 100,000 个状态或 IV 组合。
+Generator 还要求 `Initial Advances + Offset + Max Advances <= 0xFFFFFFFF`。Searcher 的交集候选总数不得超过 50,000,000；Web 初始值为六项 `31..31`，保证首次检索可以运行，用户仍可按上游范围规则扩大搜索空间。每次 C ABI 调用最多处理 100,000 个状态或 IV 组合。
 
 ## 12. 结果与固定夹具
 
@@ -197,6 +198,8 @@ Nature index:  15
 ```
 
 Searcher 的 Groudon、Method 4、`31/31/31/31/31/31` 固定夹具恢复 4 个候选结果。
+
+完美个体边界夹具使用六项 `0..31`、`Perfect IV Value=31`、`Perfect IV Count=5`：索引 `186` 为全 31 并通过，索引 `187` 超出 `187` 个候选并被 C ABI 拒绝。
 
 当前界面包含 PokeFinder 第三世代掌机 Static 的 67 条模板，按 `Starters / Fossils / Gifts / Game Corner / Stationary / Legends / Events / Roamers` 八类组织。分类与宝可梦为独立下拉框，并按当前存档的 Ruby、Sapphire、FireRed、LeafGreen 或 Emerald 版本过滤：Game Corner 只在 FRLG 显示，Events 在 Ruby/Sapphire 隐藏。Bugged Roamer 隐藏 Method 4 并强制 Method 1。
 
@@ -239,3 +242,5 @@ Worker Pool、批次排序、进度、取消和 250,000 条结果上限属于浏
 npm run wasm:test:native
 npm test
 ```
+
+2026-08-25 已通过：`npm run verify`（178 个测试文件、619 项测试、TypeScript 检查和生产 PWA 构建）、`$env:POKERNGKIT_WASM_MODULES='gen3static,gen3wild,gen4static,gen4wild'; npm run wasm:test:native`（4/4 native 夹具）。Lint 保留 `Gen3StaticPanel.tsx:296` 的既有 Hook 依赖 warning；外部浏览器和生产页面回归仍待项目所有者验收。

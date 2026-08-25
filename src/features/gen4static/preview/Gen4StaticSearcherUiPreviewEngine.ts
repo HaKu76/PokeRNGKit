@@ -1,3 +1,4 @@
+import { ivCombinationAtIndex } from "../../shared/perfectIvCombinations";
 import {
   gen4StaticSearcherCombinationCount,
   GEN4_STATIC_MAX_RESULTS,
@@ -19,21 +20,17 @@ import {
   previewGender,
 } from "./shared";
 
-function ivsAtIndex(request: Gen4StaticSearcherRequest, index: number) {
-  const ivs: Gen4IvTuple = [0, 0, 0, 0, 0, 0];
-  for (let stat = 5; stat >= 0; stat--) {
-    const size = request.filters.ivMax[stat] - request.filters.ivMin[stat] + 1;
-    ivs[stat] = request.filters.ivMin[stat] + (index % size);
-    index = Math.floor(index / size);
-  }
-  return ivs;
-}
-
 function previewState(
   request: Gen4StaticSearcherRequest,
   combinationIndex: number,
 ): Gen4StaticSearcherState {
-  const ivs = ivsAtIndex(request, combinationIndex);
+  const ivs = ivCombinationAtIndex(
+    combinationIndex,
+    request.filters.ivMin,
+    request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
+  ) as Gen4IvTuple;
   let mixed =
     (Math.imul(combinationIndex + 1, 0x045d9f3b) ^
       request.template.species ^

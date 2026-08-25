@@ -1,5 +1,6 @@
 /* PokeRNGKit Gen IV Wild WebAssembly bridge. PokeFinder source is GPL-3.0-or-later. */
 #include "gen4wild_bridge.h"
+#include "../../../shared/perfect_iv_combinations.hpp"
 #include <Core/Enum/Encounter.hpp>
 #include <Core/Enum/Game.hpp>
 #include <Core/Enum/Lead.hpp>
@@ -192,17 +193,17 @@ KEEP std::uint32_t gen4wild_search(const Gen4WildPackedRequest *request, std::ui
     WildSearcher4 searcher(request->minAdvance, request->maxAdvance, request->minDelay, request->maxDelay, methodFromRequest(*request),
                            static_cast<Lead>(request->lead), request->feebasTile != 0, request->radarShiny != 0,
                            request->unownRadio != 0, static_cast<u8>(request->happiness), context.area, context.profile, context.filter);
-    std::array<u8, 6> minimum { static_cast<u8>(request->ivMin[0]), static_cast<u8>(request->ivMin[1]), static_cast<u8>(request->ivMin[2]), static_cast<u8>(request->ivMin[3]), static_cast<u8>(request->ivMin[4]), static_cast<u8>(request->ivMin[5]) };
-    std::array<u8, 6> maximum { static_cast<u8>(request->ivMax[0]), static_cast<u8>(request->ivMax[1]), static_cast<u8>(request->ivMax[2]), static_cast<u8>(request->ivMax[3]), static_cast<u8>(request->ivMax[4]), static_cast<u8>(request->ivMax[5]) };
-    const std::uint64_t total = [&] { std::uint64_t value = 1; for (std::size_t index = 0; index < 6; index++) value *= maximum[index] - minimum[index] + 1; return value; }();
+    const pokerngkit::IvBounds minimum { request->ivMin[0], request->ivMin[1], request->ivMin[2], request->ivMin[3], request->ivMin[4], request->ivMin[5] };
+    const pokerngkit::IvBounds maximum { request->ivMax[0], request->ivMax[1], request->ivMax[2], request->ivMax[3], request->ivMax[4], request->ivMax[5] };
+    const auto total = pokerngkit::countIvCombinations(
+        minimum, maximum, request->perfectIvValue, request->perfectIvCount);
     if (static_cast<std::uint64_t>(startIndex) + stateCount > total) { lastError = 1; return 0; }
     // The upstream searcher accepts one complete IV range. Slice the requested range locally so Worker chunks remain independent.
     std::uint64_t index = startIndex;
     for (std::uint32_t count = 0; count < stateCount; count++, index++)
     {
-        std::array<u8, 6> ivs {};
-        auto cursor = index;
-        for (int stat = 5; stat >= 0; stat--) { const auto width = maximum[stat] - minimum[stat] + 1; ivs[stat] = static_cast<u8>(minimum[stat] + cursor % width); cursor /= width; }
+        const auto ivs = pokerngkit::ivCombinationAtIndex(
+            index, minimum, maximum, request->perfectIvValue, request->perfectIvCount);
         if (!matchesPerfectIvs(*request, ivs)) continue;
         searcher.startSearch(ivs, ivs, static_cast<u8>(request->fixedSlot));
         for (const auto &state : searcher.getResults()) append(*request, state);

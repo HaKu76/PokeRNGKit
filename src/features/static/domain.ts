@@ -1,4 +1,5 @@
 import type { Gen3GameVersion } from "../profiles/domain";
+import { countIvCombinations } from "../shared/perfectIvCombinations";
 import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 import type { Gen3StaticCategory } from "./encounters";
 
@@ -198,10 +199,11 @@ export function validateGen3StaticRequest(
 export function gen3StaticSearcherCombinationCount(
   request: Gen3StaticSearcherRequest,
 ) {
-  return request.filters.ivMin.reduce(
-    (total, minimum, index) =>
-      total * (request.filters.ivMax[index] - minimum + 1),
-    1,
+  return countIvCombinations(
+    request.filters.ivMin,
+    request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
   );
 }
 

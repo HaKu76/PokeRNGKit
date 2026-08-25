@@ -9,6 +9,7 @@
  */
 
 #include "gen3static_bridge.h"
+#include "../../../shared/perfect_iv_combinations.hpp"
 
 #include <Core/RNG/LCRNG.hpp>
 #include <algorithm>
@@ -197,18 +198,6 @@ namespace
         return recovered;
     }
 
-    std::array<std::uint8_t, 6> ivsAtIndex(std::uint64_t index, const std::array<std::uint32_t, 6> &minimum,
-                                          const std::array<std::uint32_t, 6> &maximum)
-    {
-        std::array<std::uint8_t, 6> ivs {};
-        for (int stat = 5; stat >= 0; stat--)
-        {
-            const std::uint32_t size = maximum[stat] - minimum[stat] + 1;
-            ivs[stat] = static_cast<std::uint8_t>(minimum[stat] + index % size);
-            index /= size;
-        }
-        return ivs;
-    }
 }
 
 static_assert(sizeof(Gen3StaticPackedState) == 48);
@@ -336,8 +325,8 @@ extern "C"
                 lastError = ErrorCode::InvalidInput;
                 return 0;
             }
-            totalStates *= maximum[index] - minimum[index] + 1;
         }
+        totalStates = pokerngkit::countIvCombinations(minimum, maximum, perfectIvValue, perfectIvCount);
         if (static_cast<std::uint64_t>(startIndex) + stateCount > totalStates)
         {
             lastError = ErrorCode::InvalidInput;
@@ -348,7 +337,8 @@ extern "C"
         results.reserve(static_cast<std::size_t>(stateCount) * 2);
         for (std::uint32_t offset = 0; offset < stateCount; offset++)
         {
-            const auto recoveredIvs = ivsAtIndex(static_cast<std::uint64_t>(startIndex) + offset, minimum, maximum);
+            const auto recoveredIvs = pokerngkit::ivCombinationAtIndex(
+                static_cast<std::uint64_t>(startIndex) + offset, minimum, maximum, perfectIvValue, perfectIvCount);
             const RecoverySeeds recovered = method == static_cast<std::uint32_t>(Gen3StaticMethod::Method4)
                 ? recoverMethod4(recoveredIvs)
                 : recoverMethod1(recoveredIvs);

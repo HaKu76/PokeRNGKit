@@ -8,6 +8,7 @@ import {
   packGen4WildSlots,
   validateGen4WildGeneratorRequest,
   validateGen4WildSearcherRequest,
+  type Gen4IvTuple,
   type Gen4WildArea,
   type Gen4WildGeneratorRequest,
   type Gen4WildSearcherRequest,
@@ -106,6 +107,17 @@ describe("Gen IV Wild domain", () => {
       { index: 0, startIndex: 0, stateCount: 40 },
       { index: 1, startIndex: 40, stateCount: 24 },
     ]);
+
+    const perfectSearcher = {
+      ...searcherRequest,
+      filters: {
+        ...searcherRequest.filters,
+        ivMin: [0, 0, 0, 0, 0, 0] as Gen4IvTuple,
+        perfectIvValue: 31,
+        perfectIvCount: 5,
+      },
+    };
+    expect(gen4WildSearcherCombinationCount(perfectSearcher)).toBe(187);
   });
 
   it("packs 19-word slots and decodes 22-word result records", () => {

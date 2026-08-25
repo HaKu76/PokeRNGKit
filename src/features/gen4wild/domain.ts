@@ -7,6 +7,7 @@ import {
   type Gen4WildGame,
   type Gen4WildSlot,
 } from "./data";
+import { countIvCombinations } from "../shared/perfectIvCombinations";
 import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
 export const GEN4_WILD_API_VERSION = 2;
@@ -611,9 +612,11 @@ export function gen4WildFilterCode(
 export function gen4WildSearcherCombinationCount(
   request: Gen4WildSearcherRequest,
 ) {
-  return request.filters.ivMin.reduce(
-    (total, min, index) => total * (request.filters.ivMax[index] - min + 1),
-    1,
+  return countIvCombinations(
+    request.filters.ivMin,
+    request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
   );
 }
 

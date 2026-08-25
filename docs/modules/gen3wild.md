@@ -5,12 +5,13 @@
 - 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
 - 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
 - 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- Searcher 先将六项 IV 的闭区间与完美个体条件求交，再按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 编号；例如六项 `0..31`、`31/5` 只产生 `187` 个候选，不会按 `32^6` 计数。六项范围和完美条件仍是 AND 关系，不是互斥模式。
 - 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
 
 > - 模块标识：`gen3wild`
-> - 当前状态：Generator/Searcher 已接入 API v4、C++/Wasm 和独立 Worker Pool；Tanoby Chamber 已实现并通过本机原生夹具，Actions 与部署页面回归待完成
+> - 当前状态：Generator/Searcher 已接入 API v5、C++/Wasm 和独立 Worker Pool；Tanoby Chamber 与完美个体交集索引已通过本机原生夹具，部署页面回归待完成
 > - 上游基线：PokeFinder 4.3.2
-> - API 版本：`4`
+> - API 版本：`5`
 > - 当前范围：第三世代掌机 Wild，包括 FireRed / LeafGreen 的 7 个 Tanoby Chamber
 
 ## 能力与边界
@@ -48,7 +49,7 @@
 
 Generator/Searcher 的地点选择使用 `AutoCompleteComboBox.tsx`，对应 PokeFinder `Form/Gen3/Wild3.cpp:102-103` 的 `enableAutoComplete()` 调用；地点可点击展开完整候选，并使用包含匹配、弹出候选、方向键/Enter 选择和 `NoInsert` 语义。
 
-Searcher 不接收 Seed 或推进范围。它按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 枚举 IV 笛卡尔积，总组合不得超过 50,000,000，TypeScript 分片上限为 10,000 个组合。C ABI 对 Generator 状态和 Searcher 组合保留 100,000 的单次防御上限；单任务最多保留 250,000 条结果。
+Searcher 不接收 Seed 或推进范围。它按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 枚举六项 IV 范围与完美个体条件交集后的候选，总组合不得超过 50,000,000，TypeScript 分片上限为 10,000 个组合。C ABI 对 Generator 状态和 Searcher 组合保留 100,000 的单次防御上限；单任务最多保留 250,000 条结果。
 
 全不选或全选的 CheckList 语义与 PokeFinder 一致：界面显示 `Any`，请求层发送完整掩码。定点与野生共用的多选控件均支持 `Ctrl + Click` 一键清空勾选并回到 `Any`。Ctrl 点击 IV 标签设置 `31..31`，Alt 设置 `30..31`，Ctrl+Alt 设置 `0..0`，普通点击恢复 `0..31`。
 
@@ -77,6 +78,8 @@ Searcher 对每个 IV 组合执行：
 4. Synchronize 同时检查成功分支和失败后自然命中性格的分支；Searcher 使用通用 `Synchronize`，不选择指定性格。
 5. 通过槽位、形态、等级、Shiny、Gender、Ability、Nature 与 Hidden Power 筛选后，调用 `test[index].next()` 取得上游 `WildSearcherState` 的候选 Seed。
 
+IV 范围与完美个体筛选在反向枚举前求交，随后在每个恢复结果上再次执行最终筛选，保证分片计数与实际候选保持一致。
+
 None、Cute Charm、Synchronize、Pressure、Magnet Pull 与 Static 的 RNG 调用顺序逐段对齐 `WildSearcher3::search`。Hustle 与 Vital Spirit 在上游枚举中与 Pressure 共享同一值，因此使用同一等级分支。
 
 ## 5. Wasm、Worker 与协议
@@ -90,10 +93,10 @@ Gen3WildPanel
         `-- Dedicated Worker x N
               `-- gen3wild.mjs + gen3wild.wasm
                     |-- gen3wild_generate
-                    `-- gen3wild_search (API 4)
+                    `-- gen3wild_search (API 5)
 ```
 
-API v4 将 Generator/Searcher 的筛选和 `tanobyChamber` 标记都传入 C ABI，在 Wasm 内完成。旧 API 会在 Worker 初始化握手时被拒绝，避免 PWA 旧缓存把新 UI 请求发给旧模块。
+API v5 将 Generator/Searcher 的筛选、完美个体条件和 `tanobyChamber` 标记都传入 C ABI，在 Wasm 内完成。旧 API 会在 Worker 初始化握手时被拒绝，避免 PWA 旧缓存把新 UI 请求发给旧模块。
 
 每个 Worker 持有独立 Wasm 实例。任务可乱序完成，Pool 按 `chunkIndex` 恢复提交顺序；取消通过终止 Worker 生效。结果使用 60 字节定长记录和 transferable `ArrayBuffer`，不依赖 `SharedArrayBuffer`、Wasm pthread 或跨源隔离。第一字段由 Generator 解码为 Advances，由 Searcher 解码为 Seed。
 
@@ -162,12 +165,12 @@ Location: Liptoo Chamber / Grass / Rate 7
 
 第 0 帧预期为 PID `265752342`、Encounter Slot `0`、未知图腾 `C`（form `2`）、Level `25`、IV `5/14/26/6/30/26`、Nature `17`。Searcher 的 IV 范围为 `31/0/31/31/31/31..31/31/31/31/31/31`，预期得到 `97` 条结果。
 
-已通过：在 Visual Studio 2026 Build Tools x64 环境运行 `$env:POKERNGKIT_WASM_MODULES='gen3wild'; npm run wasm:test:native`，`gen3wild_native_parity` 通过 1/1；夹具同时覆盖普通地点 Generator/Searcher、Tanoby Generator/Searcher、非法输入和完整 Liptoo `97` 条结果。该原生证据不替代 Emscripten Wasm 构建或部署页面算法回归。TypeScript、格式、Web 构建和 UI 预览检查结果记录在 [`docs/progress.md`](../progress.md)。
+已通过：在 Visual Studio 2026 Build Tools x64 环境运行 `$env:POKERNGKIT_WASM_MODULES='gen3wild'; npm run wasm:test:native`，`gen3wild_native_parity` 通过 1/1；本轮四模块联合运行 `$env:POKERNGKIT_WASM_MODULES='gen3static,gen3wild,gen4static,gen4wild'; npm run wasm:test:native` 通过 4/4，且新增 `0..31 + 31/5` 的索引边界夹具通过。`npm run verify` 通过 178 个测试文件、619 项测试和生产 PWA 构建。该原生证据不替代 Emscripten Wasm 构建或部署页面算法回归。
 
 ## 9. 当前限制与下一步
 
 - Tanoby Chamber 地点显示沿用模块已有的地点本地化表；未知图腾结果在物种名后显示 `A..Z`、`!`、`?` 形态。
 - GitHub Pages 的真实 Worker/Wasm 与算法结果待 Codex 使用部署 URL 回归；移动端性能、取消延迟和离线缓存仍需项目所有者最终验收。
-- 普通地点与 Tanoby Searcher 的本机原生固定计数已通过；真实 Emscripten Wasm、部署页面、移动端性能、取消延迟和离线缓存仍需项目所有者最终验收。
+- 普通地点与 Tanoby Searcher 的本机原生固定计数、完美个体交集索引已通过；真实 Emscripten Wasm、部署页面、移动端性能、取消延迟和离线缓存仍需项目所有者最终验收。
 
-下一步先由 Actions 验证 API v4 原生夹具和 Wasm 构建。项目所有者提供 Pages URL 后，由 Codex 使用 PokeFinder 固定输入逐字段回归 Generator/Searcher 并记录证据，再由项目所有者完成界面、设备和发布验收。
+下一步等待 GitHub Actions 完成部署。项目所有者提供 Pages URL 后，由 Codex 使用 PokeFinder 固定输入逐字段回归 Generator/Searcher 并记录证据，再由项目所有者完成界面、设备和发布验收。

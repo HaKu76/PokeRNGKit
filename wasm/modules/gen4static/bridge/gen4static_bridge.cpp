@@ -12,6 +12,7 @@
  */
 
 #include "gen4static_bridge.h"
+#include "../../../shared/perfect_iv_combinations.hpp"
 
 #include <Core/RNG/LCRNG.hpp>
 #include <algorithm>
@@ -619,13 +620,8 @@ extern "C"
             return 0;
         }
 
-        std::array<std::uint32_t, 6> widths {};
-        std::uint64_t totalStates = 1;
-        for (std::size_t index = 0; index < minimum.size(); index++)
-        {
-            widths[index] = maximum[index] - minimum[index] + 1;
-            totalStates *= widths[index];
-        }
+        const auto totalStates = pokerngkit::countIvCombinations(
+            minimum, maximum, perfectIvValue, perfectIvCount);
         if (static_cast<std::uint64_t>(startIndex) + stateCount > totalStates)
         {
             lastError = ErrorCode::InvalidInput;
@@ -635,13 +631,8 @@ extern "C"
         const auto tsv = static_cast<std::uint16_t>(tid ^ sid);
         for (std::uint32_t offset = 0; offset < stateCount; offset++)
         {
-            std::uint64_t stateIndex = static_cast<std::uint64_t>(startIndex) + offset;
-            IvArray ivs {};
-            for (int stat = 5; stat >= 0; stat--)
-            {
-                ivs[stat] = static_cast<std::uint8_t>(minimum[stat] + stateIndex % widths[stat]);
-                stateIndex /= widths[stat];
-            }
+            const IvArray ivs = pokerngkit::ivCombinationAtIndex(
+                static_cast<std::uint64_t>(startIndex) + offset, minimum, maximum, perfectIvValue, perfectIvCount);
             if (!matchesPerfectIvs(ivs, perfectIvValue, perfectIvCount)) continue;
             const auto recovered = recoverPokeRngIvs(ivs);
             if (!searchRecoveredIvs(recovered, ivs, minAdvance, maxAdvance, minDelay, maxDelay, method, lead,

@@ -1,4 +1,5 @@
 import { gen3HiddenPower } from "../../shared/gen3HiddenPower";
+import { ivCombinationAtIndex } from "../../shared/perfectIvCombinations";
 import {
   gen3WildSearcherCombinationCount,
   GEN3_WILD_MAX_RESULTS,
@@ -14,21 +15,17 @@ import type {
 const PREVIEW_SAMPLE_LIMIT = 500;
 const PREVIEW_STEP_LIMIT = 8;
 
-function ivsAtIndex(request: Gen3WildSearcherRequest, index: number) {
-  const ivs = [0, 0, 0, 0, 0, 0] as Gen3WildSearcherState["ivs"];
-  for (let stat = 5; stat >= 0; stat--) {
-    const size = request.filters.ivMax[stat] - request.filters.ivMin[stat] + 1;
-    ivs[stat] = request.filters.ivMin[stat] + (index % size);
-    index = Math.floor(index / size);
-  }
-  return ivs;
-}
-
 function previewState(
   request: Gen3WildSearcherRequest,
   combinationIndex: number,
 ) {
-  const ivs = ivsAtIndex(request, combinationIndex);
+  const ivs = ivCombinationAtIndex(
+    combinationIndex,
+    request.filters.ivMin,
+    request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
+  );
   let mixed = request.tid ^ (request.sid << 16) ^ combinationIndex;
   for (const iv of ivs) mixed = Math.imul(mixed ^ iv, 0x045d_9f3b) >>> 0;
   mixed = Math.imul(mixed ^ (mixed >>> 16), 0x045d_9f3b) >>> 0;
@@ -87,6 +84,8 @@ function matches(
     abilityMatch &&
     (filters.natureMask & (1 << state.nature)) !== 0 &&
     (filters.hiddenPowerMask & (1 << gen3HiddenPower(state.ivs).type)) !== 0 &&
+    state.ivs.filter((value) => value >= filters.perfectIvValue).length >=
+      filters.perfectIvCount &&
     (filters.encounterSlotMask & (1 << state.encounterSlot)) !== 0 &&
     state.level >= filters.levelMin &&
     state.level <= filters.levelMax

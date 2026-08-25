@@ -39,12 +39,17 @@ namespace
                                    0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31, 31, 0);
     }
 
-    std::uint32_t search(std::uint32_t method, std::uint32_t lead, const Encounter &encounter)
+    std::uint32_t search(std::uint32_t method, std::uint32_t lead, const Encounter &encounter,
+                         const std::array<std::uint32_t, 6> &ivMin = { 31, 31, 31, 31, 31, 31 },
+                         const std::array<std::uint32_t, 6> &ivMax = { 31, 31, 31, 31, 31, 31 },
+                         std::uint32_t startIndex = 0, std::uint32_t stateCount = 1,
+                         std::uint32_t perfectIvCount = 0)
     {
-        return gen4static_search(0, 1, 0, 1000, 600, 2000, method, lead, 0, encounter.species,
+        return gen4static_search(startIndex, stateCount, 0, 1000, 600, 2000, method, lead, 0, encounter.species,
                                  encounter.level, encounter.genderRatio, encounter.shinyLock, 12345, 54321,
                                  Gen4ShinyAny, Gen4GenderAny, Gen4AbilityAny, allNatures, allHiddenPowers,
-                                 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 0);
+                                 ivMin[0], ivMin[1], ivMin[2], ivMin[3], ivMin[4], ivMin[5], ivMax[0], ivMax[1],
+                                 ivMax[2], ivMax[3], ivMax[4], ivMax[5], 31, perfectIvCount);
     }
 
     void checkFirst(const Gen4StaticPackedState &state, std::uint32_t pid,
@@ -130,6 +135,14 @@ int main()
     assert(search(Gen4MethodK, Gen4LeadNone, articunoHgss) == 65);
     assert(search(Gen4MethodK, Gen4LeadCuteCharmF, lapras) == 6);
     assert(search(Gen4MethodK, Gen4LeadSynchronize, hoOh) == 429);
+
+    assert(search(Gen4Method1, Gen4LeadNone, manaphy, { 0, 0, 0, 0, 0, 0 }, { 31, 31, 31, 31, 31, 31 }, 186,
+                 1, 5)
+           == 12);
+    assert(search(Gen4Method1, Gen4LeadNone, manaphy, { 0, 0, 0, 0, 0, 0 }, { 31, 31, 31, 31, 31, 31 }, 187,
+                 1, 5)
+           == 0);
+    assert(gen4static_last_error() == 1);
 
     assert(generate(0, 9, Gen4LeadNone, 0, manaphy) == 0);
     assert(gen4static_last_error() == 1);

@@ -1,4 +1,5 @@
 import { GEN4_STATIC_TEMPLATES } from "./encounters";
+import { countIvCombinations } from "../shared/perfectIvCombinations";
 import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
 export const GEN4_STATIC_API_VERSION = 2;
@@ -162,9 +163,11 @@ export function gen4StaticAbilityToWasm(filter: Gen4StaticAbility) {
 export function gen4StaticSearcherCombinationCount(
   request: Gen4StaticSearcherRequest,
 ) {
-  return request.filters.ivMin.reduce(
-    (total, min, index) => total * (request.filters.ivMax[index] - min + 1),
-    1,
+  return countIvCombinations(
+    request.filters.ivMin,
+    request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
   );
 }
 
