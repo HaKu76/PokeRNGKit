@@ -2548,7 +2548,13 @@ function App() {
           }
         >
           <main
-            className={`main-content${activeModule === "static" ? " gen3static-page" : ""}`}
+            className={`main-content${
+              activeModule === "static"
+                ? " gen3static-page"
+                : activeModule === "wild"
+                  ? " gen3wild-page"
+                  : ""
+            }`}
           >
             <div className="page-heading">
               <div>
@@ -2796,6 +2802,12 @@ function App() {
                   <div
                     className="gen3-static-operation-tabs"
                     id="gen3-static-operation-tabs"
+                  />
+                )}
+                {activeModule === "wild" && (
+                  <div
+                    className="gen3-wild-operation-tabs"
+                    id="gen3-wild-operation-tabs"
                   />
                 )}
                 {gen3ProfileScope && (

@@ -1,0 +1,476 @@
+/* Gen III Wild owns its workspace density and layout. Shared controls remain
+   module-agnostic; this page only supplies the compact sizing contract. */
+#root .main-content.gen3wild-page {
+  --control-height: 30px;
+  --gen3wild-control-height: 30px;
+}
+
+#root .main-content.gen3wild-page .gen3wild-control-grid {
+  display: grid;
+  width: 100%;
+  max-width: none;
+  grid-template-columns:
+    minmax(236px, 244px) minmax(244px, 252px)
+    minmax(480px, 1fr);
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+#root .main-content.gen3wild-page .gen3wild-control-grid > .static-panel {
+  width: 100%;
+  height: 100%;
+  align-self: stretch;
+}
+
+#root .main-content.gen3wild-page .gen3wild-rng-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+#root .main-content.gen3wild-page .gen3wild-rng-panel .panel-actions {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-control-grid
+  :is(.static-form-stack, .gen3-filter-selects, .perfect-iv-filter-fields) {
+  gap: 4px;
+}
+
+#root .main-content.gen3wild-page .gen3wild-control-grid .static-form-stack {
+  margin-top: 6px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-control-grid
+  :is(.gen3wild-rng-panel, .gen3wild-settings-panel)
+  .static-form-stack
+  > .field,
+#root
+  .main-content.gen3wild-page
+  .gen3wild-control-grid
+  .gen3wild-rng-panel
+  .compact-field-row
+  > .field {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  justify-content: start;
+  column-gap: 8px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-control-grid
+  .gen3wild-rng-panel
+  .compact-field-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-control-grid
+  :is(.gen3wild-rng-panel, .gen3wild-settings-panel)
+  .field
+  > :is(input, .haku-select, .autocomplete-combobox) {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-control-grid
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]),
+    .haku-select-trigger,
+    .multi-check-trigger,
+    .panel-actions button,
+    .filter-tool-row button
+  ),
+#root .main-content.gen3wild-page .page-profile-selector .haku-select-trigger,
+#root .main-content.gen3wild-page .page-profile-selector > button,
+#root
+  .main-content.gen3wild-page
+  .gen3-wild-operation-tabs
+  .operation-tabs
+  button {
+  height: var(--gen3wild-control-height);
+  min-height: var(--gen3wild-control-height);
+  padding-block: 3px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-control-grid
+  input:not([type="checkbox"]):not([type="radio"]) {
+  padding-inline: 8px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-control-grid
+  :is(.haku-select-trigger, .multi-check-trigger) {
+  gap: 8px;
+  padding-inline: 9px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-control-grid
+  :is(.haku-select-trigger > span, .multi-check-trigger > span:first-child) {
+  overflow: hidden;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .main-content.gen3wild-page .page-profile-selector > button {
+  width: var(--gen3wild-control-height);
+  min-width: var(--gen3wild-control-height);
+  padding: 0;
+}
+
+#root .main-content.gen3wild-page .gen3wild-settings-panel .wild-level-display {
+  grid-template-columns: 72px repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 2px;
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-settings-panel
+  .wild-level-display
+  input {
+  width: 100%;
+  min-width: 0;
+  height: var(--gen3wild-control-height);
+  min-height: var(--gen3wild-control-height);
+  padding: 3px 6px;
+}
+
+#root .main-content.gen3wild-page .gen3wild-filter-panel .filter-controls {
+  display: grid;
+  grid-template-columns: minmax(166px, 0.62fr) minmax(300px, 1.38fr);
+  align-items: start;
+  gap: 6px 10px;
+  margin-top: 6px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  .gen3wild-filter-selects {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 4px 8px;
+  margin-top: 0;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  .gen3wild-filter-selects
+  .field,
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  .perfect-iv-filter-fields
+  .field {
+  display: grid;
+  height: var(--gen3wild-control-height);
+  min-height: var(--gen3wild-control-height);
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 8px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  :is(.gen3wild-filter-selects, .perfect-iv-filter-fields)
+  .field
+  > span {
+  min-width: 0;
+  overflow: hidden;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  :is(.gen3wild-filter-selects, .perfect-iv-filter-fields)
+  .field
+  > :is(.haku-select, .multi-check-control, input) {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+#root .main-content.gen3wild-page .gen3wild-filter-panel .wild-level-filter {
+  display: grid;
+  height: var(--gen3wild-control-height);
+  min-height: var(--gen3wild-control-height);
+  grid-template-columns: 76px repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  .wild-level-filter
+  input {
+  width: 100%;
+  min-width: 0;
+  height: var(--gen3wild-control-height);
+  min-height: var(--gen3wild-control-height);
+  padding: 3px 4px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  .perfect-iv-filter-fields {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 0;
+}
+
+#root .main-content.gen3wild-page .gen3wild-filter-panel .iv-filter {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin-top: 0;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  :is(.iv-filter-header, .iv-filter-row) {
+  min-height: var(--gen3wild-control-height);
+  grid-template-columns: minmax(0, 1fr) 48px 48px;
+  gap: 4px;
+  padding-block: 1px;
+}
+
+#root .main-content.gen3wild-page .gen3wild-filter-panel .iv-filter-row input {
+  width: 100%;
+  min-width: 0;
+  height: 26px;
+  min-height: 26px;
+  padding: 2px 4px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  .gen3wild-filter-bottom-row {
+  display: grid;
+  grid-template-columns: minmax(166px, 0.62fr) minmax(300px, 1.38fr);
+  gap: 10px;
+  margin-top: 6px;
+}
+
+#root .main-content.gen3wild-page .gen3wild-filter-panel .filter-tool-row {
+  grid-column: 2;
+  display: flex;
+  height: var(--gen3wild-control-height);
+  min-height: var(--gen3wild-control-height);
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 0;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  .filter-tool-row
+  button {
+  width: clamp(118px, 35%, 150px);
+  margin-left: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--control-bg);
+  color: var(--text);
+  padding-inline: 9px;
+  font-size: 14px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-filter-panel
+  .filter-tool-row
+  button:hover {
+  border-color: var(--brand);
+  background: var(--surface-2);
+}
+
+#root .main-content.gen3wild-page .gen3wild-results-panel {
+  width: 100%;
+  max-width: none;
+  margin-top: 12px;
+}
+
+#root .main-content.gen3wild-page .gen3wild-results-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 10px 18px;
+}
+
+#root .main-content.gen3wild-page .gen3wild-result-alerts {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+#root .main-content.gen3wild-page .gen3wild-result-alerts .alert {
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 5px 9px;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .main-content.gen3wild-page .gen3wild-results-panel .table-shell {
+  height: clamp(240px, 42vh, 440px);
+}
+
+#root .main-content.gen3wild-page .wild-virtual-table,
+#root .main-content.gen3wild-page .wild-table-header,
+#root .main-content.gen3wild-page .wild-table-row {
+  min-width: 1240px;
+}
+
+#root .main-content.gen3wild-page .wild-table-header,
+#root .main-content.gen3wild-page .wild-table-row {
+  grid-template-columns:
+    88px 176px 52px 100px 64px 80px 136px repeat(6, 54px)
+    96px 60px 64px;
+}
+
+#root
+  .main-content.gen3wild-page
+  .gen3wild-results-panel
+  .wild-table-header
+  button:last-child {
+  border-right: 0;
+}
+
+#root .main-content.gen3wild-page .gen3-wild-operation-tabs {
+  display: flex;
+  min-width: 0;
+}
+
+#root .main-content.gen3wild-page .gen3-wild-operation-tabs .operation-tabs {
+  width: auto;
+  margin: 0;
+}
+
+body:has(#root .main-content.gen3wild-page:not([hidden]))
+  :is(
+    .haku-select-menu[data-menu-portal="true"] button,
+    .autocomplete-combobox-menu[data-menu-portal="true"] button,
+    .multi-check-menu[data-menu-portal="true"] label
+  ) {
+  height: 30px;
+  min-height: 30px;
+  padding-block: 3px;
+  line-height: 20px;
+}
+
+body:has(#root .main-content.gen3wild-page:not([hidden]))
+  :is(
+    .haku-select-menu[data-menu-portal="true"] button > span,
+    .autocomplete-combobox-menu[data-menu-portal="true"] button > span,
+    .multi-check-menu[data-menu-portal="true"] label > span
+  ) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@container pokerngkit-content (max-width: 980px) {
+  #root .main-content.gen3wild-page .gen3wild-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root .main-content.gen3wild-page .gen3wild-control-grid > .static-panel {
+    height: auto;
+  }
+}
+
+@container pokerngkit-content (max-width: 600px) {
+  #root .main-content.gen3wild-page .gen3wild-filter-panel .filter-controls,
+  #root
+    .main-content.gen3wild-page
+    .gen3wild-filter-panel
+    .gen3wild-filter-bottom-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root
+    .main-content.gen3wild-page
+    .gen3wild-filter-panel
+    :is(
+      .gen3wild-filter-selects,
+      .perfect-iv-filter-fields,
+      .iv-filter,
+      .filter-tool-row
+    ) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  #root
+    .main-content.gen3wild-page
+    .gen3wild-filter-panel
+    :is(.gen3wild-filter-selects, .perfect-iv-filter-fields) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root .main-content.gen3wild-page .gen3wild-filter-panel .filter-tool-row {
+    height: auto;
+    min-height: var(--gen3wild-control-height);
+    flex-wrap: wrap;
+  }
+
+  #root
+    .main-content.gen3wild-page
+    .gen3wild-filter-panel
+    .filter-tool-row
+    button {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  #root .main-content.gen3wild-page .gen3wild-results-heading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

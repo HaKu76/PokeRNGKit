@@ -2815,16 +2815,6 @@ h1 {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.wild-table-header,
-.wild-table-row {
-  grid-template-columns:
-    100px 200px 72px 112px 90px 110px 170px repeat(6, 72px) 110px 80px
-    90px;
-  min-width: 1566px;
-}
-.wild-virtual-table {
-  min-width: 1566px;
-}
 .gen4static-table.generator.dppt,
 .gen4static-table.generator.dppt .static-table-header,
 .gen4static-table.generator.dppt .static-table-row {
@@ -5746,19 +5736,6 @@ textarea:disabled {
     110px 88px 92px;
 }
 
-.wild-virtual-table,
-.wild-table-header,
-.wild-table-row {
-  min-width: 1506px;
-}
-
-.wild-table-header,
-.wild-table-row {
-  grid-template-columns:
-    100px 200px 72px 112px 90px 110px 170px repeat(6, 62px) 110px 80px
-    90px;
-}
-
 .gen4static-table.generator.dppt,
 .gen4static-table.generator.dppt .static-table-header,
 .gen4static-table.generator.dppt .static-table-row {
@@ -6434,18 +6411,6 @@ textarea:disabled {
     100px 108px 76px 92px 160px repeat(6, 56px)
     110px 88px 92px;
   min-width: 1162px;
-}
-
-.wild-virtual-table {
-  min-width: 1470px;
-}
-
-.wild-table-header,
-.wild-table-row {
-  grid-template-columns:
-    100px 200px 72px 112px 90px 110px 170px repeat(6, 56px) 110px 80px
-    90px;
-  min-width: 1470px;
 }
 
 .gen4static-table.generator.dppt,

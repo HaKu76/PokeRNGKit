@@ -26,6 +26,8 @@
 - 筛选支持 PokeFinder 的 Nature、Hidden Power、Encounter Slot 多选，Level、六项 IV 闭区间，Shiny、Gender 和 Ability。
 - Generator 提供“取消筛选”；Searcher 始终使用有效 IV 范围。
 - 筛选器桌面布局复用上游 `Form/Controls/Filter.ui`：左侧为六项 IV 与工具，右侧按 Ability、Encounter Slot、Gender、Hidden Power、Level、Nature、Shiny 的上游顺序排列紧凑行；Static 复用其中相同的布局和多选控件，只移除不适用的 Encounter Slot、Level。窄屏统一降为单列。
+- UI：第三世代 Wild 使用独立 `Gen3WildPanel.css` 和 `gen3wild-page` 页面作用域；桌面将 Generator/Searcher 放入标题栏并让乱数信息、设置、筛选三块同排，前两块按内容收窄，筛选和结果区共享右边界。输入、下拉、多选、操作按钮和菜单选项统一为 `30px`，长文本截断且菜单宽度跟随触发框；窄屏按单列重排。
+- UI：完美个体值、完美个体数采用左右结构并置于分类筛选下方；显示能力值、取消筛选和个体值计算器共用底部操作行。结果提示位于标题右侧，结果表首行直接贴合表头，最后一列表头不保留右边界线。
 - 结果表对齐 `WildGeneratorModel3` / `WildSearcherModel3` 的 16 列；Searcher 第一列为 Seed，Generator 第一列为 Advances。
 - 支持 IV/能力值显示切换、个体值计算器入口、数值排序、虚拟化显示、CSV、进度和取消。
 - 本地 `ui` 模式提供确定性样例，只用于表单和交互验收，不代表 Wasm RNG 结果。

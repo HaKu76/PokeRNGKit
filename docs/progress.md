@@ -7,6 +7,28 @@
 - 每次迁移同步解耦样式：模块专属布局和密度归入功能目录 CSS，共享控件只保留跨模块语义，
   并清理该面板散落在全局样式中的专属覆盖。
 
+## 2026-08-26 第三世代野生乱数紧凑布局迁移
+
+- 优化：第三世代 Wild 的生成器/检索器移入存档信息左侧标题栏；乱数信息、设置、筛选三块面板
+  桌面同排，前两块按内容收窄，筛选和结果区共享右边界，窄屏按单列重排。
+- 优化：输入框、`haku-select`、`multi-check-control`、生成/检索与个体值计算器按钮、下拉菜单选项
+  统一为 `30px`；完美个体值/个体数、等级和六项 IV 保持同列边界，长文本截断。
+- 修复：结果提示移到标题右侧，结果表首行虚拟偏移与 `40px` 表头一致，最后一列表头取消多余右边界线；
+  移除 Wild 面板内 `Gen III / Wild API 4`、存档版本和 `PokeFinder / Filter` 冗余说明。
+- 解耦：新增 `src/features/wild/Gen3WildPanel.css` 并由 `Gen3WildPanel.tsx` 导入，页面通过
+  `gen3wild-page` 局部变量控制密度；同步清理 `src/styles.css` 中 Wild 表格的散落覆盖，共享控件不判断具体模块。
+- 已修改：`src/features/wild/Gen3WildPanel.tsx`、`src/features/wild/Gen3WildPanel.css`、`src/App.tsx`、
+  `src/styles.css`、`docs/modules/gen3wild.md`。
+- 已通过：外部 Chrome `http://127.0.0.1:5173/` 默认视口与 `900×800` 窄视口检查；桌面三块面板尺寸约
+  `244 / 252 / 558px`，控件和菜单选项为 `30px`，单选、多选、地点菜单宽度分别跟随触发框，页面无横向溢出。
+  结果生成 500 条 UI 预览记录后，结果表宽度为 `1240px`，首行与表头间距为 `0px`，最后一列表头右边界为 `0px`；
+  控制台无 error/warning，窄视口检查后已恢复默认视口。
+- 已通过：`npm run verify`（格式、TypeScript、178 个测试文件共 619 项测试、Vite/PWA 生产构建）；Lint 保留
+  1 条既有 `Gen3StaticPanel.tsx` Hook 依赖 warning，构建保留既有大 chunk warning。
+- 未运行：生产 URL 回归、真实 Emscripten Wasm 构建和 Windows EXE 验收。
+- Git：当前分支为 `main`；本轮 Wild 面板修改尚未提交，待完整验证后独立提交并推送。
+- 下一步：提交 `style: 优化第三世代野生乱数布局` 并推送，再开始下一个面板。
+
 ## 2026-08-26 第三世代定点乱数紧凑密度与筛选器对齐
 
 - 优化：第三世代定点乱数页面的输入框、单选下拉、多选触发器、模式标签、IV 范围、
