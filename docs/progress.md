@@ -26,8 +26,8 @@
 - 已通过：`npm run verify`（格式、TypeScript、178 个测试文件共 619 项测试、Vite/PWA 生产构建）；Lint 保留
   1 条既有 `Gen3StaticPanel.tsx` Hook 依赖 warning，构建保留既有大 chunk warning。
 - 未运行：生产 URL 回归、真实 Emscripten Wasm 构建和 Windows EXE 验收。
-- Git：当前分支为 `main`；本轮 Wild 面板修改尚未提交，待完整验证后独立提交并推送。
-- 下一步：提交 `style: 优化第三世代野生乱数布局` 并推送，再开始下一个面板。
+- Git：当前分支为 `main`；本轮修改已提交为 `2c24ad1 style: 优化第三世代野生乱数布局` 并推送至 `origin/main`。
+- 下一步：选择下一个尚未迁移的 RNG 面板，按本目标逐个核对、验证、提交并推送。
 
 ## 2026-08-26 第三世代定点乱数紧凑密度与筛选器对齐
 
