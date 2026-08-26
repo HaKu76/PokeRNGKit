@@ -1,4 +1,5 @@
 import { Select } from "../shared/Select";
+import { BodyPortal } from "../shared/BodyPortal";
 import { type ChangeEvent, type FormEvent, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
@@ -32,12 +33,18 @@ const unownLetters = Array.from({ length: 26 }, (_, index) =>
 const unownPuzzleLabels = ["A-J", "R-V", "K-Q", "W-Z"];
 
 interface ProfileEditorProps {
+  portal?: boolean;
   original?: Gen4Profile;
   onCancel(): void;
   onSave(draft: Gen4ProfileDraft): Promise<void>;
 }
 
-function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
+function ProfileEditor({
+  original,
+  onCancel,
+  onSave,
+  portal = false,
+}: ProfileEditorProps) {
   const { t } = useTranslation();
   const [name, setName] = useState(original?.name ?? "");
   const [version, setVersion] = useState<Gen4GameVersion>(
@@ -104,7 +111,7 @@ function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
     );
   };
 
-  return (
+  const content = (
     <div className="modal-backdrop">
       <form
         aria-labelledby="gen4-profile-editor-title"
@@ -220,6 +227,8 @@ function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
       </form>
     </div>
   );
+
+  return portal ? <BodyPortal>{content}</BodyPortal> : content;
 }
 
 interface ProfileManagerProps {
@@ -396,6 +405,7 @@ export function Gen4ProfileManager({
         else await controller.updateProfile(editing, draft);
         setEditing(undefined);
       }}
+      portal={embedded}
       original={editing === "new" ? undefined : editing}
     />
   );

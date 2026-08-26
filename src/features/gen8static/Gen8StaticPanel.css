@@ -452,6 +452,26 @@
   box-shadow: 0 0 0 2px var(--focus-ring);
 }
 
+/* Match the desktop reflow to the content container, not the viewport. */
+@container pokerngkit-content (max-width: 1500px) {
+  .gen8static-panel {
+    height: auto;
+  }
+
+  .gen8static-control-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen8static-filter-fieldset {
+    grid-column: 1 / -1;
+  }
+
+  .gen8static-results {
+    height: clamp(440px, 56vh, 680px);
+    min-height: 440px;
+  }
+}
+
 @media (max-width: 1380px) {
   .gen8static-panel {
     height: auto;

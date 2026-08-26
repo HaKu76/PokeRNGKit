@@ -1,4 +1,5 @@
 import { Select } from "../shared/Select";
+import { BodyPortal } from "../shared/BodyPortal";
 import {
   type ChangeEvent,
   type FormEvent,
@@ -33,12 +34,18 @@ const versionKeys: Record<Gen3GameVersion, string> = {
 };
 
 interface ProfileEditorProps {
+  portal?: boolean;
   original?: Gen3Profile;
   onCancel(): void;
   onSave(draft: Gen3ProfileDraft): Promise<void>;
 }
 
-function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
+function ProfileEditor({
+  original,
+  onCancel,
+  onSave,
+  portal = false,
+}: ProfileEditorProps) {
   const { t } = useTranslation();
   const [name, setName] = useState(original?.name ?? "");
   const [version, setVersion] = useState<Gen3GameVersion>(
@@ -79,7 +86,7 @@ function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
     });
   };
 
-  return (
+  const content = (
     <div className="modal-backdrop">
       <form
         aria-labelledby="profile-editor-title"
@@ -161,6 +168,8 @@ function ProfileEditor({ original, onCancel, onSave }: ProfileEditorProps) {
       </form>
     </div>
   );
+
+  return portal ? <BodyPortal>{content}</BodyPortal> : content;
 }
 
 interface ProfileManagerProps {
@@ -337,6 +346,7 @@ export function Gen3ProfileManager({
         else await controller.updateProfile(editing, draft);
         setEditing(undefined);
       }}
+      portal={embedded}
       original={editing === "new" ? undefined : editing}
     />
   );

@@ -1,5 +1,27 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-26 工作区布局错乱修复
+
+- 修复：Gen5 孵化、Gen5 配信、Gen4 配信、Gen7 配信时间检索和 Gen8 静态面板按实际内容容器宽度提前重排，侧栏与工具 Rail 展开时不再让三栏内容互相覆盖。
+- 修复：Gen5 孵化双亲六项个体值网格移除强制最小轨道，并为紧凑标签增加省略保护，避免字段溢出到筛选面板。
+- 优化：Gen6/Gen7 工作区及 Gen8 孵化、配信面板的桌面高度为顶部标题和底部操作栏预留空间，降低窄桌面视口中的操作栏裁剪风险。
+- 已修改：`Gen4EventPanel.css`、`Gen5EggPanel.css`、`Gen5EventPanel.css`、`Gen7EventTimePanel.css`、`Gen8StaticPanel.css`、`styles.css` 及相关世代工作区样式。
+- 已通过：`npm run format:files -- src/styles.css src/features/gen5egg/Gen5EggPanel.css docs/progress.md`、`npm run format:check`、`git diff --check`，以及完整 `npm run verify`（178 个测试文件、619 项测试、TypeScript、Lint、Vite/PWA 生产构建）。
+- 浏览器证据：已尝试使用外部 Chrome 连接 `http://127.0.0.1:5173/` 复查，但两次标签连接均超时；未将本地浏览器检查写作通过或项目所有者验收。
+- 未运行：Wasm 原生/真实构建、生产页面回归和 Windows EXE 验收。
+- Git：当前分支为 `main`；本轮改动已提交为 `35a2631 fix: 修复工作区布局遮挡`。推送 `origin/main` 时 GitHub 连接被重置，当前本地分支领先远端 1 个提交，网络恢复后需重试。
+- 下一步：由项目所有者在外部 Chrome/Edge 中确认 Gen5 孵化、Gen4/Gen5 配信及 Gen6/Gen7/Gen8 工作区的桌面和窄视口表现。
+
+## 2026-08-26 存档编辑器浮层裁剪修复
+
+- 修复：第四代存档在心金/魂银版本显示未知图腾配置时，编辑器不再被统一存档浮窗的固定高度和 `overflow: hidden` 裁剪或叠加。
+- 修复：第三代、第五代、第八代和 3DS 存档编辑器同步移出可能存在的浮动面板父级，避免同类 fixed overlay 的层级和裁剪异常。
+- 调整：新增共享 `BodyPortal`，Gen3/Gen4 统一存档面板仅在嵌入模式 Portal 化，独立管理器保持原有 modal 层级、关闭和焦点行为。
+- 未运行：测试、Lint、TypeScript、构建、Wasm、外部 Chrome/Edge 视觉验收和生产页面回归；本轮只执行格式与差异检查。
+- Git：当前分支为 `main`；存档编辑器浮层修复已纳入 `35a2631 fix: 修复工作区布局遮挡`。推送 `origin/main` 时 GitHub 连接被重置，当前本地分支领先远端 1 个提交，网络恢复后需重试。
+- 已通过：`npm run format:check` 与 `git diff --check`。
+- 下一步：由项目所有者在外部 Chrome/Edge 中共同确认 Gen4 HGSS 及其他存档编辑器的桌面和窄视口表现。
+
 ## 2026-08-25 Searcher 完美个体组合计数修复
 
 - 对齐：按 3DSRNGTool `RNGFilters.CheckIVs` 保持两层 AND 语义，先检查六项 `IVlow..IVup`，再检查不低于 `PerfectIVValue` 的项目数是否达到 `PerfectIVCount`；没有增加互斥开关。

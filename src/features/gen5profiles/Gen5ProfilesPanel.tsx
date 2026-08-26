@@ -37,6 +37,7 @@ import {
   type Gen5ProfilesController,
 } from "./useGen5Profiles";
 import { useOverlayScrollLock } from "../shared/useOverlayScrollLock";
+import { BodyPortal } from "../shared/BodyPortal";
 
 const GAME_LABELS: Record<Gen5GameVersion, string> = {
   black: "Black",
@@ -1845,17 +1846,19 @@ export function Gen5ProfilesPanel({
         </div>
       )}
       {editor && (
-        <ProfileEditor
-          initial={editor.initial}
-          labels={labels}
-          onCancel={() => setEditor(undefined)}
-          onFindParameters={() => {
-            setEditor(undefined);
-            setTab("calibrator");
-          }}
-          onSave={saveEditor}
-          original={editor.original}
-        />
+        <BodyPortal>
+          <ProfileEditor
+            initial={editor.initial}
+            labels={labels}
+            onCancel={() => setEditor(undefined)}
+            onFindParameters={() => {
+              setEditor(undefined);
+              setTab("calibrator");
+            }}
+            onSave={saveEditor}
+            original={editor.original}
+          />
+        </BodyPortal>
       )}
     </div>
   );

@@ -38,6 +38,7 @@ import {
 } from "./domain";
 import type { Gen8ProfilesController } from "./useGen8Profiles";
 import { useOverlayScrollLock } from "../shared/useOverlayScrollLock";
+import { BodyPortal } from "../shared/BodyPortal";
 import "./Gen8ProfilesPanel.css";
 
 interface Labels {
@@ -959,13 +960,15 @@ export function Gen8ProfilesPanel({
         )}
       </section>
       {editor && (
-        <ProfileEditor
-          busy={controller.busy}
-          labels={labels}
-          onCancel={() => setEditor(undefined)}
-          onSave={save}
-          original={editor.original}
-        />
+        <BodyPortal>
+          <ProfileEditor
+            busy={controller.busy}
+            labels={labels}
+            onCancel={() => setEditor(undefined)}
+            onSave={save}
+            original={editor.original}
+          />
+        </BodyPortal>
       )}
     </div>
   );

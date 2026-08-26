@@ -54,6 +54,7 @@ import {
 } from "../shared/AutoCompleteComboBox";
 import type { ThreeDsProfilesController } from "./useThreeDsProfiles";
 import { useOverlayScrollLock } from "../shared/useOverlayScrollLock";
+import { BodyPortal } from "../shared/BodyPortal";
 import "./ThreeDsProfilesPanel.css";
 
 function normalizeDecimal(value: string, maximum: number, digits: number) {
@@ -1218,14 +1219,16 @@ export function ThreeDsProfilesPanel({
         )}
       </section>
       {editor && (
-        <ProfileEditor
-          busy={controller.busy}
-          onCancel={() => setEditor(undefined)}
-          onSave={save}
-          initialVersion={editor.initialVersion}
-          initialTime={editor.initialTime}
-          original={editor.original}
-        />
+        <BodyPortal>
+          <ProfileEditor
+            busy={controller.busy}
+            onCancel={() => setEditor(undefined)}
+            onSave={save}
+            initialVersion={editor.initialVersion}
+            initialTime={editor.initialTime}
+            original={editor.original}
+          />
+        </BodyPortal>
       )}
     </div>
   );

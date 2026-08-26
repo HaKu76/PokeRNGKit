@@ -8,7 +8,7 @@
   display: grid;
   min-width: 0;
   min-height: 0;
-  height: clamp(460px, calc(100dvh - 184px), 760px);
+  height: clamp(460px, calc(100dvh - 220px), 760px);
   grid-template-rows: minmax(0, auto) 52px minmax(0, 1fr);
   gap: 12px;
 }
@@ -412,6 +412,54 @@
   padding: 0 9px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Account for the module and utility rails before the three-column form clips. */
+@container pokerngkit-content (max-width: 1500px) {
+  .gen7event-time-workspace {
+    height: auto;
+    min-height: 0;
+  }
+
+  .gen7event-time-parameter-grid {
+    grid-template-columns: minmax(280px, 0.78fr) minmax(420px, 1.22fr);
+  }
+
+  .gen7event-time-filter-column {
+    grid-column: 1 / -1;
+  }
+
+  .gen7event-time-filter-column .gen7event-time-section {
+    overflow: visible;
+  }
+
+  .gen7event-time-filter-column fieldset {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(272px, 0.9fr);
+    align-items: start;
+    gap: 12px;
+  }
+
+  .gen7event-time-filter-column .gen7event-time-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gen7event-time-iv-filter {
+    margin-top: 0;
+  }
+
+  .gen7event-time-disable-filter {
+    grid-column: 1 / -1;
+  }
+
+  .gen7event-time-results {
+    min-height: 0;
+  }
+
+  .gen7event-time-table-shell {
+    height: clamp(280px, 52vh, 520px);
+    flex: none;
+  }
 }
 
 @media (max-width: 1380px) {

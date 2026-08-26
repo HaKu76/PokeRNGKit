@@ -181,6 +181,7 @@
 
 .gen5egg-section {
   display: grid;
+  min-width: 0;
   align-content: start;
   gap: 14px;
   padding: 16px;
@@ -270,6 +271,12 @@
   padding: 12px 0 0;
 }
 
+.gen5egg-parent-grid > *,
+.gen5egg-filter-fields > *,
+.gen5egg-filter-selects > * {
+  min-width: 0;
+}
+
 .gen5egg-parent-block legend {
   padding: 0 8px 0 0;
   color: var(--text);
@@ -277,8 +284,13 @@
 
 .gen5egg-parent-ivs {
   display: grid;
-  grid-template-columns: repeat(6, minmax(48px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 6px;
+}
+
+.gen5egg-parent-ivs > *,
+.gen5egg-parent-options > * {
+  min-width: 0;
 }
 
 .gen5egg-field.compact {
@@ -286,11 +298,16 @@
 }
 
 .gen5egg-field.compact > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 13px;
   line-height: 19px;
 }
 
 .gen5egg-field.compact input {
+  min-width: 0;
+  width: 100%;
   padding: 0 8px;
   text-align: center;
 }
@@ -698,6 +715,27 @@
   clip: rect(0, 0, 0, 0);
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* The module rail and utility rail reduce the content container below the
+   viewport width. Reflow before the parent IV grid can clip into Filters. */
+@container pokerngkit-content (max-width: 1500px) {
+  .gen5egg-workspace {
+    grid-template-columns: minmax(250px, 0.72fr) minmax(0, 1.28fr);
+  }
+
+  .gen5egg-filter-section {
+    grid-column: 1 / -1;
+  }
+
+  .gen5egg-filter-fields {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+    align-items: start;
+  }
+
+  .gen5egg-filter-tools {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 1380px) {

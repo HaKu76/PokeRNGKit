@@ -1,6 +1,6 @@
 .gen8egg-panel {
   display: grid;
-  height: clamp(460px, calc(100dvh - 214px), 820px);
+  height: clamp(460px, calc(100dvh - 240px), 820px);
   min-height: 0;
   min-width: 0;
   grid-template-rows: auto auto minmax(260px, 1fr);

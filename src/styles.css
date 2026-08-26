@@ -5258,6 +5258,7 @@ textarea:disabled {
   #root .main-content [class*="-workspace"],
   #root .main-content [class*="-control-grid"],
   #root .main-content [class*="-control-row"],
+  #root .main-content .gen7event-time-parameter-grid,
   #root .main-content .gen4event-controls,
   #root .main-content .gen7stationary-controls,
   #root .main-content > .control-grid {
@@ -5267,8 +5268,28 @@ textarea:disabled {
   #root .main-content [class*="-workspace"] > *,
   #root .main-content [class*="-control-grid"] > *,
   #root .main-content [class*="-control-row"] > *,
+  #root .main-content .gen7event-time-parameter-grid > *,
   #root .main-content .gen4event-controls > *,
   #root .main-content .gen7stationary-controls > *,
+  #root .main-content > .control-grid > * {
+    min-width: 0;
+  }
+}
+
+/* A desktop viewport can still leave a narrow content container once the
+   module rail and utility rail are present. Reflow common three-column module
+   shells before their child minimum tracks overlap adjacent panels. */
+@container pokerngkit-content (min-width: 1081px) and (max-width: 1500px) {
+  #root .main-content [class*="-workspace"],
+  #root .main-content [class*="-control-grid"],
+  #root .main-content [class*="-control-row"],
+  #root .main-content > .control-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #root .main-content [class*="-workspace"] > *,
+  #root .main-content [class*="-control-grid"] > *,
+  #root .main-content [class*="-control-row"] > *,
   #root .main-content > .control-grid > * {
     min-width: 0;
   }

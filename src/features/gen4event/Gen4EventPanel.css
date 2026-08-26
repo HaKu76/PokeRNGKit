@@ -123,6 +123,17 @@
   white-space: nowrap;
 }
 
+/* The side rails make the usable width narrower than the viewport. */
+@container pokerngkit-content (max-width: 1500px) {
+  .gen4event-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gen4event-filter-panel {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 1120px) {
   .gen4event-controls {
     grid-template-columns: repeat(2, minmax(0, 1fr));
