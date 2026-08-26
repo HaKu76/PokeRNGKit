@@ -2287,10 +2287,17 @@ h1 {
 .gen3static-control-grid .static-rng-panel .compact-field-row > .field,
 .gen3static-control-grid .static-settings-panel .static-form-stack > .field {
   display: grid;
-  grid-template-columns: minmax(86px, 1fr) minmax(104px, 150px);
+  grid-template-columns: max-content minmax(104px, 150px);
   align-items: center;
-  justify-content: space-between;
+  justify-content: start;
   column-gap: 8px;
+}
+.gen3static-control-grid .static-rng-panel {
+  display: flex;
+  flex-direction: column;
+}
+.gen3static-control-grid .static-rng-panel .panel-actions {
+  margin-top: auto;
 }
 .static-panel .field input,
 .static-panel .field select {
@@ -2579,6 +2586,13 @@ h1 {
   grid-row: 1;
   margin-top: 6px;
 }
+.gen3static-control-grid .static-filter-panel .iv-filter-header,
+.gen3static-control-grid .static-filter-panel .iv-filter-row {
+  grid-template-columns: minmax(0, 1fr) 52px 52px;
+}
+.gen3static-control-grid .static-filter-panel .iv-filter-row input {
+  min-width: 0;
+}
 .iv-filter-header,
 .iv-filter-row {
   display: grid;
@@ -2632,6 +2646,14 @@ h1 {
 }
 .static-results-panel {
   margin-top: 0;
+}
+.gen3static-results-panel .static-virtual-table,
+.gen3static-results-panel .static-table-header,
+.gen3static-results-panel .static-table-row {
+  grid-template-columns:
+    86px 102px 66px 82px 120px repeat(6, 52px) 92px
+    70px 76px;
+  min-width: 1006px;
 }
 .static-table-shell {
   height: clamp(300px, 52vh, 560px);
@@ -5327,6 +5349,23 @@ textarea:disabled {
   gap: 12px;
 }
 
+/* Gen III Static keeps its three control surfaces together on a desktop
+   content container; narrower containers still use the shared stacked layout. */
+@container pokerngkit-content (min-width: 721px) and (max-width: 1080px) {
+  #root .main-content .gen3static-control-grid {
+    grid-template-columns: minmax(220px, 0.72fr) minmax(220px, 0.72fr) minmax(
+        360px,
+        1.1fr
+      );
+  }
+}
+
+@container pokerngkit-content (max-width: 720px) {
+  #root .main-content .gen3static-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .gen3static-control-grid > .static-panel {
   align-self: stretch;
   height: 100%;
@@ -5417,6 +5456,232 @@ textarea:disabled {
 #root .floating-tool-panel .iv-filter-row input::-webkit-outer-spin-button {
   margin: 0;
   appearance: none;
+}
+
+/* Gen III Static's control surfaces stay compact while keeping every input
+   on a shared left edge. The filter panel uses two explicit columns so the
+   broad IV range controls do not push the categorical filters away. */
+#root .main-content .gen3static-control-grid {
+  width: min(100%, 960px);
+  max-width: 960px;
+  grid-template-columns: minmax(228px, 1fr) minmax(228px, 1fr) minmax(
+      390px,
+      1.45fr
+    );
+  gap: 12px;
+}
+
+#root .main-content .gen3static-control-grid .static-rng-panel .field,
+#root .main-content .gen3static-control-grid .static-settings-panel .field {
+  grid-template-columns: 64px minmax(0, 1fr);
+  column-gap: 8px;
+  justify-content: start;
+}
+
+#root .main-content .gen3static-control-grid .static-rng-panel .field > input,
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-rng-panel
+  .field
+  > .haku-select,
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-settings-panel
+  .field
+  > input,
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-settings-panel
+  .field
+  > .haku-select {
+  width: 100%;
+  max-width: 166px;
+  justify-self: start;
+}
+
+#root .main-content .gen3static-control-grid .static-rng-panel .field > input,
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-rng-panel
+  .field
+  > .haku-select {
+  max-width: 150px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-settings-panel
+  .static-encounter-meta {
+  width: fit-content;
+  max-width: 100%;
+  grid-template-columns: 64px 76px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .filter-controls {
+  grid-template-columns: minmax(194px, 1.05fr) minmax(174px, 0.95fr);
+  gap: 6px 10px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .gen3-filter-selects {
+  grid-column: 2;
+  grid-row: 1;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 0;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .gen3-filter-selects
+  .field {
+  grid-template-columns: 76px minmax(0, 1fr);
+  column-gap: 8px;
+}
+
+#root .main-content .gen3static-control-grid {
+  grid-template-columns:
+    minmax(260px, 0.55fr) minmax(260px, 0.55fr)
+    minmax(420px, 1.35fr);
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .gen3-filter-selects
+  .field
+  > .haku-select,
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .gen3-filter-selects
+  .field
+  > .multi-check-control {
+  width: 100%;
+  max-width: none;
+  justify-self: start;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .perfect-iv-filter-fields {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 0;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .perfect-iv-filter-fields
+  .field {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 8px;
+  min-width: 0;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .perfect-iv-filter-fields
+  input {
+  width: 100%;
+  max-width: none;
+}
+
+#root .main-content .gen3static-control-grid .static-filter-panel .iv-filter {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  margin-top: 0;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .iv-calculator-action {
+  grid-column: 2;
+  grid-row: 3;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .filter-tool-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+#root .main-content .gen3static-control-grid .multi-check-trigger {
+  height: 40px;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .multi-check-trigger
+  > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root
+  .main-content
+  .gen3static-results-panel
+  .static-table-header
+  button:last-child {
+  border-right: 0;
+}
+
+@container pokerngkit-content (max-width: 720px) {
+  #root .main-content .gen3static-control-grid {
+    width: 100%;
+    max-width: none;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  #root .main-content .gen3static-control-grid {
+    width: 100%;
+    max-width: none;
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* Keep the fixed utility Rail outside the active workspace's click area. */
@@ -6030,6 +6295,32 @@ textarea:disabled {
   width: min(360px, calc(100vw - 24px));
 }
 
+#root .main-content .gen3-static-operation-tabs {
+  display: flex;
+  min-width: 0;
+}
+
+#root .main-content .gen3-static-operation-tabs .operation-tabs {
+  width: 254px;
+  margin: 0;
+}
+
+#root .main-content .gen3-static-operation-tabs .operation-tabs button {
+  min-width: 0;
+  padding-inline: 12px;
+}
+
+@media (max-width: 760px) {
+  #root .main-content .gen3-static-operation-tabs {
+    flex: 1 1 100%;
+    order: 3;
+  }
+
+  #root .main-content .gen3-static-operation-tabs .operation-tabs {
+    width: 100%;
+  }
+}
+
 #root .main-content .multi-check-menu,
 #root .floating-tool-panel .multi-check-menu {
   width: min(360px, calc(100vw - 24px));
@@ -6189,6 +6480,139 @@ textarea:disabled {
   }
 }
 
+@container pokerngkit-content (max-width: 960px) {
+  #root .main-content .gen3static-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  #root
+    .main-content
+    .gen3static-control-grid
+    .static-filter-panel
+    .filter-tool-row {
+    width: 100%;
+  }
+}
+
+/* Keep the right filter column stable as its panel grows or shrinks. */
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .gen3-filter-selects
+  .field {
+  grid-template-columns: 76px minmax(0, 1fr);
+  column-gap: 8px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .perfect-iv-filter-fields
+  .field {
+  height: 40px;
+  gap: 0;
+  column-gap: 8px;
+  grid-template-columns: 76px minmax(0, 1fr);
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .perfect-iv-filter-fields
+  .field
+  > span {
+  height: 22px;
+  min-height: 22px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .filter-tool-row {
+  width: 238px;
+  margin-top: 2px;
+  margin-left: auto;
+}
+
+#root .main-content .gen3static-control-grid .filter-bottom-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 238px;
+  grid-auto-rows: 40px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .filter-bottom-row
+  .filter-tool-row {
+  width: auto;
+  grid-column: auto;
+  grid-row: auto;
+  min-height: 40px;
+  margin: 0;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .filter-bottom-row
+  .iv-calculator-action {
+  width: 100%;
+  grid-column: auto;
+  grid-row: auto;
+  margin: 0;
+}
+
+@container pokerngkit-content (max-width: 720px) {
+  #root
+    .main-content
+    .gen3static-control-grid
+    .static-filter-panel
+    .filter-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root
+    .main-content
+    .gen3static-control-grid
+    .static-filter-panel
+    .gen3-filter-selects,
+  #root
+    .main-content
+    .gen3static-control-grid
+    .static-filter-panel
+    .perfect-iv-filter-fields,
+  #root .main-content .gen3static-control-grid .static-filter-panel .iv-filter {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  #root .main-content .gen3static-control-grid .filter-bottom-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root
+    .main-content
+    .gen3static-control-grid
+    .filter-bottom-row
+    .iv-calculator-action {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
 @media (max-width: 700px) {
   #root
     .main-content
@@ -6221,4 +6645,171 @@ textarea:disabled {
 #root .floating-tool-panel .iv-filter-row input::-webkit-outer-spin-button {
   margin: 0;
   appearance: none;
+}
+
+/* Final Gen III Static alignment overrides the shared wide-field defaults. */
+#root .main-content .gen3static-control-grid .static-rng-panel .field > input,
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-rng-panel
+  .field
+  > .haku-select {
+  width: 150px !important;
+  max-width: 100% !important;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-settings-panel
+  .field
+  > input,
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-settings-panel
+  .field
+  > .haku-select {
+  width: 166px !important;
+  max-width: 100% !important;
+}
+
+#root .main-content .gen3static-control-grid .haku-select-trigger {
+  min-height: 40px;
+  height: 40px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-settings-panel
+  .static-encounter-meta {
+  grid-template-columns: 58px 68px;
+}
+
+#root .main-content .gen3static-results-panel {
+  width: min(100%, 960px);
+  max-width: 960px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  input:not([type="checkbox"]):not([type="radio"]),
+#root .main-content .gen3static-control-grid .haku-select-trigger,
+#root .main-content .gen3static-control-grid .iv-calculator-action {
+  height: 40px;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .filter-controls {
+  margin-top: 8px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-settings-panel
+  .static-encounter-meta {
+  width: 238px;
+  margin-left: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#root .main-content .gen3static-control-grid,
+#root .main-content .gen3static-results-panel {
+  width: 100%;
+  max-width: none;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .iv-calculator-action {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--control-bg);
+  color: var(--text);
+  font-size: 14px;
+}
+
+#root
+  .main-content
+  .gen3static-control-grid
+  .static-filter-panel
+  .iv-calculator-action:hover {
+  border-color: var(--brand);
+  background: var(--surface-2);
+}
+
+#root .main-content .gen3static-results-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 20px;
+}
+
+#root .main-content .gen3static-result-alerts {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+#root .main-content .gen3static-result-alerts .alert {
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  #root .main-content .gen3static-control-grid .static-rng-panel .field > input,
+  #root
+    .main-content
+    .gen3static-control-grid
+    .static-rng-panel
+    .field
+    > .haku-select,
+  #root
+    .main-content
+    .gen3static-control-grid
+    .static-settings-panel
+    .field
+    > input,
+  #root
+    .main-content
+    .gen3static-control-grid
+    .static-settings-panel
+    .field
+    > .haku-select {
+    width: 100% !important;
+  }
+
+  #root .main-content .gen3static-results-panel {
+    width: 100%;
+    max-width: none;
+  }
+
+  #root
+    .main-content
+    .gen3static-control-grid
+    .static-settings-panel
+    .static-encounter-meta {
+    width: 100%;
+    margin-left: 0;
+  }
 }

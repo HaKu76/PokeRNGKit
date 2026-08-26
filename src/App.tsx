@@ -2790,6 +2790,12 @@ function App() {
                 </h1>
               </div>
               <div className="page-heading-tools">
+                {activeModule === "static" && (
+                  <div
+                    className="gen3-static-operation-tabs"
+                    id="gen3-static-operation-tabs"
+                  />
+                )}
                 {gen3ProfileScope && (
                   <ProfileSelector
                     disabled={profiles.loading}

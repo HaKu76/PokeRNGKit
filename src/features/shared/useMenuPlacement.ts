@@ -43,7 +43,7 @@ export function useMenuPlacement(
         MENU_MAX_WIDTH,
         Math.max(0, window.innerWidth - VIEWPORT_GUTTER * 2),
       );
-      const width = Math.min(maxWidth, Math.max(rect.width, 220));
+      const width = Math.min(maxWidth, Math.max(rect.width, 1));
       const requiredHeight = Math.min(estimatedHeight, 360);
       const canAlignEnd = rect.right - width >= VIEWPORT_GUTTER;
       const horizontal =

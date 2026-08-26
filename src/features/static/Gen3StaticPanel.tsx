@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import type { Gen3Profile } from "../profiles/domain";
@@ -568,29 +569,39 @@ export function Gen3StaticPanel({
     failed: t("failed"),
   }[status];
 
+  const operationTabs = (
+    <div
+      aria-label={t("staticEngine")}
+      className="operation-tabs"
+      role="tablist"
+    >
+      {(["generator", "searcher"] as const).map((entry) => (
+        <button
+          aria-selected={operation === entry}
+          className={operation === entry ? "active" : ""}
+          disabled={status === "calculating"}
+          key={entry}
+          onClick={() => {
+            if (operation !== entry) resetRunState(entry);
+          }}
+          role="tab"
+          type="button"
+        >
+          {t(entry)}
+        </button>
+      ))}
+    </div>
+  );
+  const operationTabsTarget =
+    typeof document === "undefined"
+      ? null
+      : document.getElementById("gen3-static-operation-tabs");
+
   return (
     <>
-      <div
-        aria-label={t("staticEngine")}
-        className="operation-tabs"
-        role="tablist"
-      >
-        {(["generator", "searcher"] as const).map((entry) => (
-          <button
-            aria-selected={operation === entry}
-            className={operation === entry ? "active" : ""}
-            disabled={status === "calculating"}
-            key={entry}
-            onClick={() => {
-              if (operation !== entry) resetRunState(entry);
-            }}
-            role="tab"
-            type="button"
-          >
-            {t(entry)}
-          </button>
-        ))}
-      </div>
+      {operationTabsTarget
+        ? createPortal(operationTabs, operationTabsTarget)
+        : operationTabs}
 
       <form
         className="static-control-grid gen3static-control-grid"
@@ -602,7 +613,6 @@ export function Gen3StaticPanel({
               <span className="panel-index">01</span>
               <h2>{t("rngInfo")}</h2>
             </div>
-            <span className="panel-note">PokeFinder / Static3</span>
           </div>
           <div className="static-form-stack">
             <label className="field">
@@ -717,9 +727,6 @@ export function Gen3StaticPanel({
               <span className="panel-index">02</span>
               <h2>{t("settings")}</h2>
             </div>
-            <span className="panel-note">
-              {t("game")} / {t("pokemon")}
-            </span>
           </div>
           <div className="static-form-stack">
             <label className="field">
@@ -776,7 +783,6 @@ export function Gen3StaticPanel({
               <span className="panel-index">03</span>
               <h2>{t("filters")}</h2>
             </div>
-            <span className="panel-note">PokeFinder / Filter</span>
           </div>
           <fieldset
             className="filter-controls"
@@ -883,6 +889,8 @@ export function Gen3StaticPanel({
                 </div>
               ))}
             </div>
+          </fieldset>
+          <div className="filter-bottom-row">
             <div className="filter-tool-row">
               <label className="toggle-field">
                 <input
@@ -892,32 +900,50 @@ export function Gen3StaticPanel({
                 />
                 <span>{t("showStats")}</span>
               </label>
-              <button onClick={onOpenIvCalculator} type="button">
-                {t("ivCalculator")}
-              </button>
+              {operation === "generator" && (
+                <label className="toggle-field">
+                  <input
+                    checked={filtersDisabled}
+                    onChange={(event) =>
+                      setFiltersDisabled(event.target.checked)
+                    }
+                    type="checkbox"
+                  />
+                  <span>{t("disableFilters")}</span>
+                </label>
+              )}
             </div>
-          </fieldset>
-          {operation === "generator" && (
-            <label className="toggle-field disable-filters">
-              <input
-                checked={filtersDisabled}
-                onChange={(event) => setFiltersDisabled(event.target.checked)}
-                type="checkbox"
-              />
-              <span>{t("disableFilters")}</span>
-            </label>
-          )}
+            <button
+              className="iv-calculator-action"
+              onClick={onOpenIvCalculator}
+              type="button"
+            >
+              {t("ivCalculator")}
+            </button>
+          </div>
         </section>
       </form>
 
-      <section className="panel results-panel static-results-panel">
-        <div className="results-heading">
+      <section className="panel results-panel static-results-panel gen3static-results-panel">
+        <div className="results-heading gen3static-results-heading">
           <div className="panel-heading compact">
             <div>
               <span className="panel-index">04</span>
               <h2>{t("results")}</h2>
             </div>
             <span className={`run-status ${status}`}>{statusLabel}</span>
+          </div>
+          <div className="gen3static-result-alerts">
+            {error && (
+              <div className="alert error">
+                {error.includes("Wasm") || error.includes("wasm")
+                  ? t("staticWasmMissing")
+                  : error}
+              </div>
+            )}
+            {summary?.resultLimitReached && (
+              <div className="alert warning">{t("limitReached")}</div>
+            )}
           </div>
           <div className="result-actions">
             <span className="result-count">
@@ -960,16 +986,6 @@ export function Gen3StaticPanel({
             </strong>
           </span>
         </div>
-        {error && (
-          <div className="alert error">
-            {error.includes("Wasm") || error.includes("wasm")
-              ? t("staticWasmMissing")
-              : error}
-          </div>
-        )}
-        {summary?.resultLimitReached && (
-          <div className="alert warning">{t("limitReached")}</div>
-        )}
         <div className="table-shell static-table-shell" ref={scrollRef}>
           {sortedResults.length === 0 ? (
             <div className="empty-state">
