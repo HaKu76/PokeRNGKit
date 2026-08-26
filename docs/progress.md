@@ -29,6 +29,29 @@
 - Git：当前分支为 `main`；本轮修改已提交为 `2c24ad1 style: 优化第三世代野生乱数布局` 并推送至 `origin/main`。
 - 下一步：选择下一个尚未迁移的 RNG 面板，按本目标逐个核对、验证、提交并推送。
 
+## 2026-08-26 第三世代孵化乱数紧凑布局迁移
+
+- 优化：第三世代 Egg 的 Emerald、RS/FRLG 模式切换移入存档信息左侧标题栏；乱数信息、设置、筛选三块面板
+  桌面同排，前两块按内容收窄，筛选和结果区共享右边界，窄屏按单列重排。
+- 优化：输入框、下拉框、多选触发器、生成/取消与个体值计算器按钮、下拉菜单选项统一为 `30px`；父母 IV、
+  完美个体值/个体数、六项 IV 和结果列按内容收紧，长文本截断。
+- 修复：结果提示移到标题右侧，结果表首行虚拟偏移与 `40px` 表头一致，最后一列表头取消多余右边界线；移除
+  Egg 面板内 `PokeFinder / Eggs3` 与 `PokeFinder / Filter` 冗余说明。
+- 解耦：新增 `src/features/egg/Gen3EggPanel.css` 并由 `Gen3EggPanel.tsx` 导入，页面通过 `gen3egg-page` 局部变量
+  控制密度；同步清理 `src/styles.css` 中 Egg 专属网格和表格覆盖，共享控件不判断具体模块。
+- 已修改：`src/features/egg/Gen3EggPanel.tsx`、`src/features/egg/Gen3EggPanel.css`、`src/App.tsx`、
+  `src/styles.css`、`docs/modules/gen3egg.md`。
+- 已通过：外部 Chrome `http://127.0.0.1:5173/` 默认视口与 `900×800` 窄视口检查；桌面三块面板尺寸约
+  `240 / 270 / 544px`，两种游戏模式控件均为 `30px`，单选、多选、蛋种类菜单宽度跟随触发框且选项为 `30px`，
+  页面无横向溢出。RS/FRLG 生成 500 条 UI 预览记录后，结果表首行与表头间距为 `0px`，最后一列表头右边界为 `0px`；
+  控制台无 error/warning，窄视口检查后已恢复默认视口。
+- 已通过：`npm run verify`（格式、TypeScript、178 个测试文件共 619 项测试、Vite/PWA 生产构建）；Lint 保留
+  1 条既有 `Gen3StaticPanel.tsx` Hook 依赖 warning，构建保留既有大 chunk warning。
+- 未运行：生产 URL 回归、真实 Emscripten Wasm 构建和 Windows EXE 验收。
+- Git：当前分支为 `main`；本轮修改已提交为 `5913c87 style: 优化第三世代孵化乱数布局`，本地领先
+  `origin/main` 1 个提交。推送尝试因 GitHub HTTPS 连接被重置/超时，网络恢复后需重试。
+- 下一步：先将 `5913c87` 推送至 `origin/main`，再开始下一个面板。
+
 ## 2026-08-26 第三世代定点乱数紧凑密度与筛选器对齐
 
 - 优化：第三世代定点乱数页面的输入框、单选下拉、多选触发器、模式标签、IV 范围、

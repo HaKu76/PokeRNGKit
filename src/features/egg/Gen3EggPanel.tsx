@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import { AutoCompleteComboBox } from "../shared/AutoCompleteComboBox";
@@ -43,6 +44,7 @@ import type {
   Gen3EggSearchSummary,
 } from "./search";
 import { Gen3EggWorkerPool } from "./worker/Gen3EggWorkerPool";
+import "./Gen3EggPanel.css";
 
 type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
 type IvKey =
@@ -236,6 +238,8 @@ export function Gen3EggPanel({
   const [summary, setSummary] = useState<Gen3EggSearchSummary>();
   const [status, setStatus] = useState<RunStatus>("ready");
   const [error, setError] = useState("");
+  const [operationTabsTarget, setOperationTabsTarget] =
+    useState<HTMLElement | null>(null);
   const [sort, setSort] = useState<{
     key: EggSortKey;
     direction: "asc" | "desc";
@@ -281,6 +285,9 @@ export function Gen3EggPanel({
   useEffect(() => {
     if (game === "emerald" && method === "mixed") setMethod("normal");
   }, [game, method]);
+  useEffect(() => {
+    setOperationTabsTarget(document.getElementById("gen3-egg-operation-tabs"));
+  }, []);
 
   const resultPersonal = (state: Gen3EggState) => {
     if (species === 29 && (state.pid & 0x8000) !== 0) {
@@ -528,6 +535,28 @@ export function Gen3EggPanel({
     cancelled: t("cancelled"),
     failed: t("failed"),
   }[status];
+  const operationTabs = (
+    <div aria-label={t("eggModule")} className="operation-tabs" role="tablist">
+      {(["emerald", "rsfrlg"] as const).map((entry) => (
+        <button
+          aria-selected={game === entry}
+          className={game === entry ? "active" : ""}
+          disabled={status === "calculating"}
+          key={entry}
+          onClick={() => {
+            if (game !== entry) {
+              resetRunState();
+              setGame(entry);
+            }
+          }}
+          role="tab"
+          type="button"
+        >
+          {t(entry === "emerald" ? "gameEmerald" : "eggRsFrlg")}
+        </button>
+      ))}
+    </div>
+  );
   const parentPanel = (id: "a" | "b", parent: Gen3EggParent) => (
     <fieldset className="egg-parent-fields" key={id}>
       <legend>{t(id === "a" ? "eggParentA" : "eggParentB")}</legend>
@@ -610,39 +639,17 @@ export function Gen3EggPanel({
 
   return (
     <>
-      <div
-        aria-label={t("eggModule")}
-        className="operation-tabs"
-        role="tablist"
-      >
-        {(["emerald", "rsfrlg"] as const).map((entry) => (
-          <button
-            aria-selected={game === entry}
-            className={game === entry ? "active" : ""}
-            disabled={status === "calculating"}
-            key={entry}
-            onClick={() => {
-              if (game !== entry) {
-                resetRunState();
-                setGame(entry);
-              }
-            }}
-            role="tab"
-            type="button"
-          >
-            {t(entry === "emerald" ? "gameEmerald" : "eggRsFrlg")}
-          </button>
-        ))}
-      </div>
+      {operationTabsTarget
+        ? createPortal(operationTabs, operationTabsTarget)
+        : operationTabs}
 
       <form className="gen3egg-control-grid" onSubmit={generate}>
-        <section className="panel static-panel egg-rng-panel">
+        <section className="panel static-panel egg-rng-panel gen3egg-rng-panel">
           <div className="panel-heading">
             <div>
               <span className="panel-index">01</span>
               <h2>{t("rngInfo")}</h2>
             </div>
-            <span className="panel-note">PokeFinder / Eggs3</span>
           </div>
           <div className="static-form-stack">
             {game === "rsfrlg" && (
@@ -846,7 +853,7 @@ export function Gen3EggPanel({
           </div>
         </section>
 
-        <section className="panel static-panel egg-settings-panel">
+        <section className="panel static-panel egg-settings-panel gen3egg-settings-panel">
           <div className="panel-heading">
             <div>
               <span className="panel-index">02</span>
@@ -879,16 +886,15 @@ export function Gen3EggPanel({
           </div>
         </section>
 
-        <section className="panel static-panel static-filter-panel">
+        <section className="panel static-panel static-filter-panel gen3egg-filter-panel">
           <div className="panel-heading">
             <div>
               <span className="panel-index">03</span>
               <h2>{t("filters")}</h2>
             </div>
-            <span className="panel-note">PokeFinder / Filter</span>
           </div>
           <fieldset className="filter-controls" disabled={filtersDisabled}>
-            <div className="gen3-filter-selects">
+            <div className="gen3-filter-selects gen3egg-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
                 <Select
@@ -1003,6 +1009,8 @@ export function Gen3EggPanel({
                 </div>
               ))}
             </div>
+          </fieldset>
+          <div className="filter-bottom-row gen3egg-filter-bottom-row">
             <div className="filter-tool-row">
               <label className="toggle-field">
                 <input
@@ -1020,30 +1028,42 @@ export function Gen3EggPanel({
                 />
                 <span>{t("showStats")}</span>
               </label>
+              <label className="toggle-field">
+                <input
+                  checked={filtersDisabled}
+                  onChange={(event) => setFiltersDisabled(event.target.checked)}
+                  type="checkbox"
+                />
+                <span>{t("disableFilters")}</span>
+              </label>
               <button onClick={onOpenIvCalculator} type="button">
                 {t("ivCalculator")}
               </button>
             </div>
-          </fieldset>
-          <label className="toggle-field disable-filters">
-            <input
-              checked={filtersDisabled}
-              onChange={(event) => setFiltersDisabled(event.target.checked)}
-              type="checkbox"
-            />
-            <span>{t("disableFilters")}</span>
-          </label>
+          </div>
         </section>
       </form>
 
-      <section className="panel results-panel static-results-panel">
-        <div className="results-heading">
+      <section className="panel results-panel static-results-panel gen3egg-results-panel">
+        <div className="results-heading gen3egg-results-heading">
           <div className="panel-heading compact">
             <div>
               <span className="panel-index">04</span>
               <h2>{t("results")}</h2>
             </div>
             <span className={`run-status ${status}`}>{statusLabel}</span>
+          </div>
+          <div className="gen3egg-result-alerts">
+            {error && (
+              <div className="alert error">
+                {error.includes("Wasm") || error.includes("wasm")
+                  ? t("eggWasmMissing")
+                  : error}
+              </div>
+            )}
+            {summary?.resultLimitReached && (
+              <div className="alert warning">{t("limitReached")}</div>
+            )}
           </div>
           <div className="result-actions">
             <span className="result-count">
@@ -1086,16 +1106,6 @@ export function Gen3EggPanel({
             </strong>
           </span>
         </div>
-        {error && (
-          <div className="alert error">
-            {error.includes("Wasm") || error.includes("wasm")
-              ? t("eggWasmMissing")
-              : error}
-          </div>
-        )}
-        {summary?.resultLimitReached && (
-          <div className="alert warning">{t("limitReached")}</div>
-        )}
         <div className="table-shell static-table-shell" ref={tableRef}>
           {sortedResults.length === 0 ? (
             <div className="empty-state">
@@ -1105,7 +1115,7 @@ export function Gen3EggPanel({
           ) : (
             <div
               className={`static-virtual-table egg-virtual-table egg-table-layout-${game}`}
-              style={{ height: `${rowVirtualizer.getTotalSize() + 38}px` }}
+              style={{ height: `${rowVirtualizer.getTotalSize() + 40}px` }}
             >
               <div className="static-table-header egg-table-header">
                 {columns.map((column) => (
@@ -1140,7 +1150,7 @@ export function Gen3EggPanel({
                     className="static-table-row egg-table-row"
                     key={`${state.advances}-${state.pickupAdvances}-${state.pid}-${virtualRow.index}`}
                     style={{
-                      transform: `translateY(${virtualRow.start + 38}px)`,
+                      transform: `translateY(${virtualRow.start + 40}px)`,
                     }}
                   >
                     {columns.map((column) => (

@@ -20,6 +20,11 @@
 - Ruby、Sapphire、FireRed、LeafGreen：`RSFRLGBred`、`RSFRLGBredSplit`、`RSFRLGBredAlternate`、`RSFRLGBredMixed`，分别接收生成与领取的 16 位 Seed。
 - 支持亲代 IV、性别、Emerald 不变之石与亲代性格、蛋种类、当前存档的 TID/SID、性格/觉醒力量多选、IV、异色、性别和特性槽位筛选。
 - 结果支持进度、取消、固定顺序合并、排序、CSV、能力值和遗传来源显示。
+- UI：第三世代 Egg 使用独立 `Gen3EggPanel.css` 和 `gen3egg-page` 页面作用域；Emerald 与 RS/FRLG
+  模式切换放入标题栏，乱数信息、设置、筛选三块面板桌面同排，前两块按内容收窄，筛选和结果区共享右边界。
+  输入、下拉、多选、操作按钮和菜单选项统一为 `30px`，长文本截断，窄屏按单列重排。
+- UI：完美个体值、完美个体数位于分类筛选下方并采用左右结构；显示遗传来源、显示能力值、取消筛选和个体值
+  计算器共用底部操作行。结果提示位于标题右侧，结果表首行贴合表头，最后一列表头不保留右边界线。
 
 存档版本仅允许 Ruby、Sapphire、FireRed、LeafGreen、Emerald。未选择或不兼容存档时使用应用的默认第三世代掌机存档，不能把 XD 或 Colosseum 的 TID/SID 代入本模块。
 
