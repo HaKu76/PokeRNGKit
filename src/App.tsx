@@ -2555,7 +2555,9 @@ function App() {
                   ? " gen3wild-page"
                   : activeModule === "egg"
                     ? " gen3egg-page"
-                    : ""
+                    : activeModule === "gen4static"
+                      ? " gen4static-page"
+                      : ""
             }`}
           >
             <div className="page-heading">
@@ -2816,6 +2818,12 @@ function App() {
                   <div
                     className="gen3-egg-operation-tabs"
                     id="gen3-egg-operation-tabs"
+                  />
+                )}
+                {activeModule === "gen4static" && (
+                  <div
+                    className="gen4-static-operation-tabs"
+                    id="gen4-static-operation-tabs"
                   />
                 )}
                 {gen3ProfileScope && (

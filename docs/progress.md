@@ -7,6 +7,26 @@
 - 每次迁移同步解耦样式：模块专属布局和密度归入功能目录 CSS，共享控件只保留跨模块语义，
   并清理该面板散落在全局样式中的专属覆盖。
 
+## 2026-08-27 第四世代定点乱数紧凑布局迁移
+
+- 优化：第四世代 Static 的 Generator/Searcher 模式切换移入存档信息左侧标题栏；乱数信息、设置、筛选三块
+  面板桌面同排，前两块按内容收窄，筛选和结果区共享右边界，窄屏按单列重排。
+- 优化：输入框、下拉框、多选触发器、生成/检索与个体值计算器按钮、下拉菜单选项统一为 `30px`；完美个体值/
+  个体数采用左右结构，等级、方法、六项 IV 和结果列按内容收紧，长文本截断。
+- 修复：取消筛选与显示能力值共用底部操作行，结果提示移到标题右侧，结果表首行虚拟偏移与 `40px` 表头一致，
+  最后一列表头取消多余右边界线；移除 `PokeFinder / Static4` 与 `PokeFinder / Filter` 冗余说明。
+- 解耦：新增 `src/features/gen4static/Gen4StaticPanel.css` 并由 `Gen4StaticPanel.tsx` 导入，页面通过
+  `gen4static-page` 局部变量控制密度；清理 `src/styles.css` 中 Gen4 Static 专属结果表覆盖。
+- 已修改：`src/features/gen4static/Gen4StaticPanel.tsx`、`src/features/gen4static/Gen4StaticPanel.css`、
+  `src/App.tsx`、`src/styles.css`、`docs/modules/gen4static.md`。
+- 已通过：`npm run verify`（格式、TypeScript、178 个测试文件共 619 项测试、Vite/PWA 生产构建）；Lint 保留
+  1 条既有 `Gen3StaticPanel.tsx` Hook 依赖 warning，构建保留既有大 chunk warning。
+- 未运行：外部 Chrome 视觉回归；Chrome 扩展标签读取连续超时，Chrome、扩展和 Native Host 只读诊断均正常，
+  待连接恢复后检查桌面、HGSS、Searcher 和窄视口。
+- Git：本轮修改已提交为 `e3408fc style: 优化第四世代定点乱数布局`，本地领先 `origin/main` 1 个提交。
+  推送尝试因 GitHub HTTPS 连接被重置，外部 Chrome 视觉回归也因标签读取超时未运行。
+- 下一步：先将 `e3408fc` 推送至 `origin/main`，再恢复外部 Chrome 完成桌面、HGSS、Searcher 和窄视口检查，之后开始下一个面板。
+
 ## 2026-08-26 第三世代野生乱数紧凑布局迁移
 
 - 优化：第三世代 Wild 的生成器/检索器移入存档信息左侧标题栏；乱数信息、设置、筛选三块面板

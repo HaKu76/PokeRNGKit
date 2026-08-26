@@ -18,8 +18,13 @@
 - 模板：由 EncounterTableGenerator 的 Gen4 encounter 表与 PokeFinder `personal_pt.bin` 生成 99 条记录。
 - 队首：None、Synchronize、Cute Charm 男/女；Method 1 按上游约束只能使用 None。
 - 筛选：Nature、觉醒属性、六项 IV、异色、性别和特性槽。
+- UI：第四世代 Static 使用独立 `Gen4StaticPanel.css` 和 `gen4static-page` 页面作用域；Generator/Searcher
+  模式切换放入标题栏，乱数信息、设置、筛选三块面板桌面同排，前两块按内容收窄，筛选和结果区共享右边界。
+  输入、下拉、多选、操作按钮和菜单选项统一为 `30px`，长文本截断，窄屏按单列重排。
+- UI：完美个体值、完美个体数位于分类筛选下方并采用左右结构；显示能力值、取消筛选和个体值计算器共用底部
+  操作行。结果提示位于标题右侧，结果表首行贴合表头，最后一列表头不保留右边界线。
 
-G4 页面复用 G3 Static 的三栏控制网格、IV 表格、快捷键、结果虚拟表和取消筛选开关的交互方式，但不复用 G3 的请求、Worker、存档或计算器状态。
+G4 页面沿用 G3 Static 的三栏控制网格、IV 表格、快捷键、结果虚拟表和取消筛选开关的交互方式，但不复用 G3 的请求、Worker、存档或计算器状态；布局和密度规则由本模块 CSS 独立维护。
 
 应用侧栏切换到其他模块时，本页面在当前浏览器页面会话内保持挂载，保留 Generator/Searcher 输入、筛选、结果和排序；刷新页面后恢复模块默认状态。
 
