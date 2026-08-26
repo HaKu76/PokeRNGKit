@@ -29,6 +29,7 @@ export function MultiCheckSelect({
   const menuRef = useRef<HTMLDivElement>(null);
   const menuPlacement = useMenuPlacement(
     controlRef,
+    menuRef,
     open && !disabled,
     options.length * 44 + 8,
   );

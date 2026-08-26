@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from "react";
+import { useLayoutEffect, useState, type RefObject } from "react";
 
 const VIEWPORT_GUTTER = 12;
 const MENU_MAX_WIDTH = 360;
@@ -18,6 +18,7 @@ export interface MenuPlacement {
 /** Keep shared option menus inside the viewport when their anchor is near an edge. */
 export function useMenuPlacement(
   anchorRef: RefObject<HTMLElement | null>,
+  menuRef: RefObject<HTMLElement | null>,
   open: boolean,
   estimatedHeight: number,
 ): MenuPlacement {
@@ -30,7 +31,7 @@ export function useMenuPlacement(
     width: 220,
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return;
 
     const updatePlacement = () => {
@@ -39,12 +40,16 @@ export function useMenuPlacement(
       const rect = anchor.getBoundingClientRect();
       const availableBelow = window.innerHeight - rect.bottom - 12;
       const availableAbove = rect.top - 12;
+      const renderedHeight = menuRef.current?.getBoundingClientRect().height;
       const maxWidth = Math.min(
         MENU_MAX_WIDTH,
         Math.max(0, window.innerWidth - VIEWPORT_GUTTER * 2),
       );
       const width = Math.min(maxWidth, Math.max(rect.width, 1));
-      const requiredHeight = Math.min(estimatedHeight, 360);
+      const requiredHeight = Math.min(
+        renderedHeight && renderedHeight > 0 ? renderedHeight : estimatedHeight,
+        360,
+      );
       const canAlignEnd = rect.right - width >= VIEWPORT_GUTTER;
       const horizontal =
         rect.left + width > window.innerWidth - VIEWPORT_GUTTER && canAlignEnd
@@ -68,11 +73,12 @@ export function useMenuPlacement(
         VIEWPORT_GUTTER,
         window.innerHeight - maxHeight - VIEWPORT_GUTTER,
       );
+      const menuHeight = Math.min(requiredHeight, maxHeight);
       const top =
         vertical === "top"
           ? Math.max(
               VIEWPORT_GUTTER,
-              Math.min(rect.top - maxHeight - 6, maxTop),
+              Math.min(rect.top - menuHeight - 6, maxTop),
             )
           : Math.min(rect.bottom + 6, maxTop);
       setPlacement({ horizontal, left, maxHeight, top, vertical, width });
@@ -85,7 +91,7 @@ export function useMenuPlacement(
       window.removeEventListener("resize", updatePlacement);
       window.removeEventListener("scroll", updatePlacement, true);
     };
-  }, [anchorRef, estimatedHeight, open]);
+  }, [anchorRef, estimatedHeight, menuRef, open]);
 
   return open
     ? placement

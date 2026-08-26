@@ -169,15 +169,13 @@ export function Gen3IdSearcherPanel({
   };
 
   return (
-    <>
-      <form className="id-searcher-form" onSubmit={run}>
-        <section className="panel input-panel">
+    <div className="gen3id-searcher-workspace">
+      <form className="id-searcher-form gen3id-searcher-form" onSubmit={run}>
+        <section className="panel input-panel gen3id-searcher-input-panel">
           <div className="panel-heading">
             <div>
-              <span className="panel-index">01</span>
               <h2>{t("input")}</h2>
             </div>
-            <span className="panel-note">RS / C ABI</span>
           </div>
           <div className="advance-row">
             <label className="field">
@@ -235,7 +233,7 @@ export function Gen3IdSearcherPanel({
               <small>HEX / 00000000 - FFFFFFFF</small>
             </label>
           )}
-          <div className="panel-actions">
+          <div className="panel-actions gen3id-panel-actions">
             <button
               className="primary-action"
               disabled={status === "calculating"}
@@ -255,14 +253,27 @@ export function Gen3IdSearcherPanel({
           </div>
         </section>
       </form>
-      <section className="panel results-panel">
+      <section className="panel results-panel gen3id-searcher-results">
         <div className="results-heading">
           <div className="panel-heading compact">
             <div>
-              <span className="panel-index">02</span>
               <h2>{t("results")}</h2>
             </div>
             <span className={`run-status ${status}`}>{t(status)}</span>
+          </div>
+          <div className="metrics-row gen3id-searcher-metrics-row">
+            <span>
+              {t("results")} <strong>{String(progress.resultCount)}</strong>
+            </span>
+            <span>
+              {t("workers")} <strong>{summary?.workerCount ?? "-"}</strong>
+            </span>
+            <span>
+              {t("elapsed")}{" "}
+              <strong>
+                {summary ? `${summary.elapsedMs.toFixed(0)} ms` : "-"}
+              </strong>
+            </span>
           </div>
           <div className="result-actions">
             <span className="result-count">{String(results.length)}</span>
@@ -285,20 +296,6 @@ export function Gen3IdSearcherPanel({
             </button>
           </div>
         </div>
-        <div className="metrics-row">
-          <span>
-            {t("results")} <strong>{String(progress.resultCount)}</strong>
-          </span>
-          <span>
-            {t("workers")} <strong>{summary?.workerCount ?? "-"}</strong>
-          </span>
-          <span>
-            {t("elapsed")}{" "}
-            <strong>
-              {summary ? `${summary.elapsedMs.toFixed(0)} ms` : "-"}
-            </strong>
-          </span>
-        </div>
         {error && (
           <div className="alert error">
             {error.includes("Wasm") || error.includes("wasm")
@@ -306,7 +303,7 @@ export function Gen3IdSearcherPanel({
               : error}
           </div>
         )}
-        <div className="id-searcher-table-wrap">
+        <div className="id-searcher-table-wrap gen3id-searcher-table-wrap">
           {results.length === 0 ? (
             <div className="empty-state compact">
               <span>{copy.empty}</span>
@@ -351,6 +348,6 @@ export function Gen3IdSearcherPanel({
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }

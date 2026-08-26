@@ -1,0 +1,352 @@
+.gen3id-workspace,
+.gen3id-searcher-workspace {
+  --gen3id-control-height: 30px;
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.gen3id-operation-tabs {
+  box-sizing: border-box;
+  height: 40px;
+  width: 240px;
+  margin: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow-x: clip;
+}
+
+.gen3id-workspace :is(.operation-tabs button, .mode-tabs button) {
+  box-sizing: border-box;
+  height: var(--gen3id-control-height);
+  min-height: var(--gen3id-control-height);
+  min-width: 0;
+  padding: 2px 8px;
+  line-height: 20px;
+}
+
+.gen3id-control-grid {
+  width: 100%;
+  grid-template-columns: minmax(320px, 364px) minmax(380px, 1fr);
+  gap: 12px;
+  margin: 0;
+}
+
+.gen3id-workspace .input-panel,
+.gen3id-workspace .filter-panel,
+.gen3id-searcher-input-panel {
+  padding: 14px 16px;
+}
+
+.gen3id-workspace .panel-heading,
+.gen3id-searcher-workspace .panel-heading {
+  min-height: 0;
+  padding-bottom: 8px;
+}
+
+.gen3id-workspace .panel-heading h2,
+.gen3id-searcher-workspace .panel-heading h2 {
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.gen3id-mode-tabs {
+  box-sizing: border-box;
+  height: 40px;
+  min-height: var(--gen3id-control-height);
+  margin: 10px 0;
+}
+
+.gen3id-rng-panel .field,
+.gen3id-filter-panel .field,
+.gen3id-searcher-input-panel .field {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.gen3id-rng-panel .field > span,
+.gen3id-filter-panel .field > span,
+.gen3id-searcher-input-panel .field > span {
+  white-space: nowrap;
+}
+
+.gen3id-rng-panel .field small,
+.gen3id-filter-panel .field small,
+.gen3id-searcher-input-panel .field small {
+  display: none;
+}
+
+#root
+  .main-content
+  .gen3id-workspace
+  input:not([type="checkbox"]):not([type="radio"]),
+#root
+  .main-content
+  .gen3id-searcher-workspace
+  input:not([type="checkbox"]):not([type="radio"]),
+#root .main-content .gen3id-workspace .haku-select-trigger,
+#root .main-content .gen3id-searcher-workspace .haku-select-trigger,
+#root .main-content .gen3id-workspace .prefixed-input,
+#root .main-content .gen3id-searcher-workspace .prefixed-input {
+  min-height: var(--gen3id-control-height);
+  height: var(--gen3id-control-height);
+  padding-block: 3px;
+}
+
+#root .main-content .gen3id-workspace .prefixed-input > input,
+#root .main-content .gen3id-searcher-workspace .prefixed-input > input {
+  min-height: calc(var(--gen3id-control-height) - 2px);
+  height: calc(var(--gen3id-control-height) - 2px);
+}
+
+.gen3id-rng-panel .advance-row {
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.gen3id-rng-panel .rs-inputs {
+  gap: 8px;
+}
+
+.gen3id-rng-panel .toggle-field,
+.gen3id-rng-panel .radio-row,
+.gen3id-searcher-input-panel .radio-row {
+  min-height: var(--gen3id-control-height);
+}
+
+.gen3id-rng-panel .computed-value {
+  min-height: var(--gen3id-control-height);
+  padding-block: 4px;
+}
+
+.gen3id-rng-panel .computed-value code {
+  font-size: 14px;
+}
+
+.gen3id-filter-stack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+
+.gen3id-filter-panel .field {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+.gen3id-panel-actions {
+  margin-top: 12px;
+}
+
+#root .main-content .gen3id-workspace .panel-actions .primary-action,
+#root .main-content .gen3id-workspace .panel-actions .secondary-action,
+#root .main-content .gen3id-searcher-workspace .panel-actions .primary-action,
+#root
+  .main-content
+  .gen3id-searcher-workspace
+  .panel-actions
+  .secondary-action {
+  height: var(--gen3id-control-height);
+  min-height: var(--gen3id-control-height);
+  padding: 4px 10px;
+}
+
+.gen3id-results-panel,
+.gen3id-searcher-results {
+  overflow: hidden;
+}
+
+.gen3id-results-panel .results-heading,
+.gen3id-searcher-results .results-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 8px 14px;
+}
+
+.gen3id-results-panel .results-heading > .panel-heading,
+.gen3id-searcher-results .results-heading > .panel-heading {
+  border: 0;
+  padding: 0;
+}
+
+.gen3id-results-panel .panel-heading > div,
+.gen3id-searcher-results .panel-heading > div {
+  gap: 8px;
+}
+
+.gen3id-result-alerts {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.gen3id-result-alerts .alert {
+  overflow: hidden;
+  margin: 0;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gen3id-metrics-row,
+.gen3id-searcher-metrics-row {
+  gap: 10px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.gen3id-metrics-row {
+  padding: 0 14px 8px;
+}
+
+.gen3id-searcher-metrics-row {
+  justify-content: flex-end;
+}
+
+.gen3id-results-panel .result-actions,
+.gen3id-searcher-results .result-actions {
+  gap: 6px;
+}
+
+#root .main-content .gen3id-results-panel .result-actions .secondary-action,
+#root .main-content .gen3id-searcher-results .result-actions .secondary-action,
+#root .main-content .gen3id-results-panel .result-actions .icon-action,
+#root .main-content .gen3id-searcher-results .result-actions .icon-action {
+  min-height: var(--gen3id-control-height);
+  height: var(--gen3id-control-height);
+  padding-block: 4px;
+}
+
+.gen3id-results-panel .table-shell {
+  height: clamp(260px, calc(100vh - 456px), 620px);
+}
+
+.gen3id-generator-table,
+.gen3id-generator-table .table-header,
+.gen3id-generator-table .table-row {
+  min-width: 472px;
+}
+
+.gen3id-generator-table .table-header,
+.gen3id-generator-table .table-row {
+  grid-template-columns: 100px 76px 76px 68px minmax(112px, 1fr);
+}
+
+.gen3id-generator-table .table-header button:last-child,
+.gen3id-generator-table .table-row span:last-child {
+  border-right: 0;
+}
+
+.gen3id-searcher-workspace {
+  grid-template-columns: minmax(320px, 440px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.gen3id-searcher-form {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.gen3id-searcher-input-panel .advance-row {
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.gen3id-searcher-input-panel .id-searcher-mode {
+  align-self: center;
+  min-height: var(--gen3id-control-height);
+}
+
+.gen3id-searcher-table-wrap {
+  min-height: 260px;
+  max-height: calc(100vh - 310px);
+}
+
+.gen3id-searcher-table th:last-child,
+.gen3id-searcher-table td:last-child {
+  border-right: 0;
+}
+
+body:has(#root .main-content .gen3id-workspace:not([hidden]))
+  .haku-select-menu[data-menu-portal="true"]
+  button {
+  height: 30px;
+  min-height: 30px;
+  padding-block: 3px;
+  line-height: 20px;
+}
+
+body:has(#root .main-content .gen3id-workspace:not([hidden]))
+  .haku-select-menu[data-menu-portal="true"]
+  button
+  > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@container pokerngkit-content (min-width: 721px) {
+  #root .main-content .gen3id-control-grid {
+    grid-template-columns: minmax(320px, 364px) minmax(380px, 1fr);
+  }
+
+  #root .main-content .gen3id-searcher-workspace {
+    grid-template-columns: minmax(320px, 440px) minmax(0, 1fr);
+  }
+}
+
+@container pokerngkit-content (max-width: 720px) {
+  #root .main-content .gen3id-control-grid,
+  #root .main-content .gen3id-searcher-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .gen3id-operation-tabs {
+    width: 100%;
+  }
+
+  .gen3id-filter-stack {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gen3id-results-panel .results-heading,
+  .gen3id-searcher-results .results-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .gen3id-result-alerts,
+  .gen3id-searcher-metrics-row {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .gen3id-results-panel .result-actions,
+  .gen3id-searcher-results .result-actions {
+    justify-self: end;
+  }
+}
+
+@media (max-width: 500px) {
+  .gen3id-rng-panel .field,
+  .gen3id-filter-panel .field,
+  .gen3id-searcher-input-panel .field {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .gen3id-rng-panel .advance-row,
+  .gen3id-searcher-input-panel .advance-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -55,6 +55,7 @@ export function AutoCompleteComboBox<T extends string | number>({
   );
   const menuPlacement = useMenuPlacement(
     rootRef,
+    menuRef,
     open && !disabled,
     filteredOptions.length * 44 + 8,
   );

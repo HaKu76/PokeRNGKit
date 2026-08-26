@@ -98,6 +98,7 @@ export function Select({
   const [open, setOpen] = useState(false);
   const menuPlacement = useMenuPlacement(
     rootRef,
+    menuRef,
     open && !disabled,
     options.length * 44 + 8,
   );

@@ -43,6 +43,7 @@ import {
   type Id3ShinyFilter,
   type Id3State,
 } from "./features/id/domain";
+import "./features/id/Gen3IdPanel.css";
 import { Gen3IdSearcherPanel } from "./features/id/Gen3IdSearcherPanel";
 import { Gen3IdUiPreviewEngine } from "./features/id/preview/Gen3IdUiPreviewEngine";
 import type {
@@ -3090,8 +3091,11 @@ function App() {
             )}
 
             {activeModule === "id" ? (
-              <>
-                <div className="operation-tabs" role="tablist">
+              <div className="gen3id-workspace">
+                <div
+                  className="operation-tabs gen3id-operation-tabs"
+                  role="tablist"
+                >
                   {(["generator", "searcher"] as const).map((entry) => (
                     <button
                       aria-selected={idOperation === entry}
@@ -3113,20 +3117,18 @@ function App() {
                   />
                 )}
                 <form
-                  className="control-grid"
+                  className="control-grid gen3id-control-grid"
                   hidden={idOperation !== "generator"}
                   onSubmit={generate}
                 >
-                  <section className="panel input-panel">
+                  <section className="panel input-panel gen3id-rng-panel">
                     <div className="panel-heading">
                       <div>
-                        <span className="panel-index">01</span>
                         <h2>{t("input")}</h2>
                       </div>
-                      <span className="panel-note">C ABI / uint32</span>
                     </div>
                     <div
-                      className="mode-tabs"
+                      className="mode-tabs gen3id-mode-tabs"
                       role="tablist"
                       aria-label={t("mode")}
                     >
@@ -3283,7 +3285,7 @@ function App() {
                         />
                       </label>
                     </div>
-                    <div className="panel-actions">
+                    <div className="panel-actions gen3id-panel-actions">
                       <button
                         className="primary-action"
                         disabled={status === "calculating"}
@@ -3304,16 +3306,13 @@ function App() {
                     </div>
                   </section>
 
-                  <section className="panel filter-panel">
+                  <section className="panel filter-panel gen3id-filter-panel">
                     <div className="panel-heading">
                       <div>
-                        <span className="panel-index">02</span>
                         <h2>{t("filters")}</h2>
                       </div>
-                      <span className="panel-note">AND / exact</span>
                     </div>
-                    <p className="panel-description">{t("exactFilterHint")}</p>
-                    <div className="filter-stack">
+                    <div className="filter-stack gen3id-filter-stack">
                       <label className="field">
                         <span>{t("tid")}</span>
                         <input
@@ -3402,18 +3401,29 @@ function App() {
                 </form>
 
                 <section
-                  className="panel results-panel"
+                  className="panel results-panel gen3id-results-panel"
                   hidden={idOperation !== "generator"}
                 >
                   <div className="results-heading">
                     <div className="panel-heading compact">
                       <div>
-                        <span className="panel-index">03</span>
                         <h2>{t("results")}</h2>
                       </div>
                       <span className={`run-status ${status}`}>
                         {statusLabel}
                       </span>
+                    </div>
+                    <div className="gen3id-result-alerts">
+                      {error && (
+                        <div className="alert error">
+                          {error.includes("Wasm") || error.includes("wasm")
+                            ? t("wasmMissing")
+                            : error}
+                        </div>
+                      )}
+                      {summary?.resultLimitReached && (
+                        <div className="alert warning">{t("limitReached")}</div>
+                      )}
                     </div>
                     <div className="result-actions">
                       <span className="result-count">
@@ -3439,7 +3449,7 @@ function App() {
                       </button>
                     </div>
                   </div>
-                  <div className="metrics-row">
+                  <div className="metrics-row gen3id-metrics-row">
                     <span>
                       {t("processed")}{" "}
                       <strong>{String(progress.processedStates)}</strong>
@@ -3459,16 +3469,6 @@ function App() {
                       </strong>
                     </span>
                   </div>
-                  {error && (
-                    <div className="alert error">
-                      {error.includes("Wasm") || error.includes("wasm")
-                        ? t("wasmMissing")
-                        : error}
-                    </div>
-                  )}
-                  {summary?.resultLimitReached && (
-                    <div className="alert warning">{t("limitReached")}</div>
-                  )}
                   <div className="table-shell" ref={scrollRef}>
                     {sortedResults.length === 0 ? (
                       <div className="empty-state">
@@ -3477,7 +3477,7 @@ function App() {
                       </div>
                     ) : (
                       <div
-                        className="virtual-table id-generator-table"
+                        className="virtual-table id-generator-table gen3id-generator-table"
                         style={{
                           height: `${rowVirtualizer.getTotalSize() + 38}px`,
                         }}
@@ -3544,7 +3544,7 @@ function App() {
                     )}
                   </div>
                 </section>
-              </>
+              </div>
             ) : activeModule === "gen3seedtools" ? (
               <Gen3SeedToolsPanel
                 activeTab={gen3SeedToolsTab}
