@@ -17,6 +17,7 @@
     "build": "npm run wasm:build && npm run build:web",
     "build:ui": "tsc -b && vite build --mode ui",
     "build:web": "tsc -b && vite build",
+    "build:web:bundle": "vite build",
     "desktop:package": "node scripts/build-desktop.mjs",
     "preview": "vite preview",
     "preview:ui": "npm run build:ui && vite preview --host 127.0.0.1 --port 4173 --strictPort",
@@ -32,7 +33,7 @@
     "wasm:configure": "node scripts/wasm.mjs configure",
     "wasm:build": "node scripts/wasm.mjs build",
     "wasm:test:native": "node scripts/wasm.mjs test-native",
-    "verify": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build:web",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build:web:bundle",
     "verify:full": "npm run verify && npm run wasm:test:native && npm run wasm:build"
   },
   "dependencies": {

@@ -1,5 +1,16 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-08-26 存档编辑器层级修复
+
+- 修复：统一存档信息工具中的 Gen4 编辑器提升到浮动工具面板之上，编辑器输入、按钮和 HGSS 未知图腾字段不再被下一层面板遮挡。
+- 调整：Portal 下拉菜单提升到模态编辑器之上，心金/魂银版本选择可正常打开并点击；嵌套模态继续保持更高层级。
+- 优化：`verify` 在已完成 `typecheck` 后只运行 Vite/PWA 打包，避免经由 `build:web` 重复执行 `tsc -b`；独立 `build:web` 继续保留完整类型检查。
+- 已修改：`src/styles.css`。
+- 已通过：`npm run format:files -- src/styles.css`、`npm run format:check`、`git diff --check`；外部 Chrome `http://127.0.0.1:5173/` 回归确认 Gen4 存档编辑器、心金字段、版本下拉、勾选和取消流程可操作，控制台无 error/warning，页面无横向溢出。
+- 已通过：优化后的 `npm run verify`（格式、Lint、TypeScript、178 个测试文件共 619 项测试、Vite/PWA 生产构建）；Lint 保留 1 条既有 Hook 依赖 warning，构建保留既有大 chunk warning。
+- Git：本轮修改待提交并推送 `origin/main`。
+- 下一步：提交 `fix: 修复存档编辑器浮层层级` 并推送。
+
 ## 2026-08-26 工作区布局错乱修复
 
 - 修复：Gen5 孵化、Gen5 配信、Gen4 配信、Gen7 配信时间检索和 Gen8 静态面板按实际内容容器宽度提前重排，侧栏与工具 Rail 展开时不再让三栏内容互相覆盖。

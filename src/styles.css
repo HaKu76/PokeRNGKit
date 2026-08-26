@@ -1190,7 +1190,7 @@ h1 {
 }
 .modal-backdrop {
   position: fixed;
-  z-index: 50;
+  z-index: 1100;
   inset: 0;
   display: grid;
   place-items: center;
@@ -1198,7 +1198,7 @@ h1 {
   background: rgba(9, 10, 22, 0.66);
 }
 .modal-backdrop .modal-backdrop {
-  z-index: 60;
+  z-index: 1110;
 }
 .profile-modal {
   width: min(920px, 100%);
@@ -6076,7 +6076,7 @@ textarea:disabled {
 .autocomplete-combobox-menu[data-menu-portal="true"],
 .multi-check-menu[data-menu-portal="true"] {
   position: fixed;
-  z-index: 1000;
+  z-index: 1200;
   top: auto;
   right: auto;
   bottom: auto;
