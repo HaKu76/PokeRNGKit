@@ -1,5 +1,39 @@
 # PokeRNGKit 项目进度与交接
 
+## 当前目标
+
+- 逐个优化尚未迁移的 RNG 面板，沿用 `docs/ui-design.md` 已确认的紧凑布局规则；每次只处理
+  一个面板，完成本地验证后独立提交并推送，再开始下一个面板。
+- 每次迁移同步解耦样式：模块专属布局和密度归入功能目录 CSS，共享控件只保留跨模块语义，
+  并清理该面板散落在全局样式中的专属覆盖。
+
+## 2026-08-26 第三世代定点乱数紧凑密度与筛选器对齐
+
+- 优化：第三世代定点乱数页面的输入框、单选下拉、多选触发器、模式标签、IV 范围、
+  生成/检索按钮、个体值计算器及标题区存档选择统一为 `30px`，同步收紧垂直内边距、
+  字段间距、IV 行高和下拉选项行高。
+- 修复：`MultiCheckSelect` 以实际触发控件作为菜单定位锚点，觉醒力量、性格菜单宽度不再
+  把左侧标签计入，且与 `haku-select` 共用边框、状态、截断和宽度规则。
+- 修复：第三世代定点乱数中文界面的 Offset 专用标签改为“校准帧数”，不改变其他模块的
+  通用 Offset 翻译和内部请求字段。
+- 解耦：新增 `src/features/static/Gen3StaticPanel.css` 集中管理该页面紧凑密度，页面通过局部
+  变量声明密度；共享 Select、MultiCheck 与菜单定位不判断具体 RNG 模块。
+- 记录：将第三世代定点乱数布局原则写入 `docs/ui-design.md`、`docs/modules/gen3static.md`
+  和固定 UI 契约，后续 RNG 面板按一次一个面板的顺序迁移；每个面板完成验证后独立提交并推送。
+- 已修改：`src/features/static/Gen3StaticPanel.css`、`Gen3StaticPanel.tsx`、`src/styles.css`、
+  `src/App.tsx`、共享 MultiCheck、`src/i18n.ts` 及上述 UI 文档。
+- 已通过：外部 Chrome `http://127.0.0.1:5173/` 默认视口与 `900×800` 窄视口检查；控件高度
+  均为 `30px`，存档选择和管理按钮均为 `30px`，普通/多选菜单选项均为 `30px`，觉醒力量、
+  性格和存档菜单与各自触发框宽度一致；页面无横向溢出，控制台无 error/warning，窄视口
+  检查后已恢复默认视口。
+- 已通过：本轮最终代码的 `npm run verify`（格式、Lint、TypeScript、178 个测试文件共 619 项
+  测试、Vite/PWA 生产构建）；Lint 保留 1 条既有 Hook 依赖 warning，构建保留既有大 chunk warning。
+- 已通过：HakuStyle Skill 校验。首次因系统 `python` 不可用而退出 `9009`，改用工作区捆绑
+  Python 并安装 `PyYAML 6.0.3` 后输出 `Skill is valid!`；该依赖安装在 Codex 运行时，不属于仓库文件。
+- 未运行：生产 URL 回归、真实 Emscripten Wasm 构建和 Windows EXE 验收。
+- Git：当前分支为 `main`；本轮第三世代定点乱数紧凑密度修改待提交并推送 `origin/main`。
+- 下一步：提交 `style: 收紧第三世代定点乱数控件` 并推送。
+
 ## 2026-08-26 第三世代定点乱数布局收敛
 
 - 优化：生成器/检索器移到存档信息左侧；乱数信息、设置、筛选三块面板在桌面同一行，结果面板位于其下方并与标题区右边界对齐。

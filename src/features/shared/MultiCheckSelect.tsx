@@ -25,9 +25,10 @@ export function MultiCheckSelect({
   const menuId = useId();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const controlRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuPlacement = useMenuPlacement(
-    rootRef,
+    controlRef,
     open && !disabled,
     options.length * 44 + 8,
   );
@@ -65,7 +66,7 @@ export function MultiCheckSelect({
       ref={rootRef}
     >
       <span>{label}</span>
-      <div className="multi-check-control">
+      <div className="multi-check-control" ref={controlRef}>
         <button
           aria-controls={menuId}
           aria-expanded={open}

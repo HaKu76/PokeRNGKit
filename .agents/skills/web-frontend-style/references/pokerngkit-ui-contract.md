@@ -10,7 +10,7 @@ Platform: responsive static Web; desktop primary, touch phone supported
 Product: operational RNG workspace; a result table is the main scroll region
 Foundation: Ant Neutral semantic tokens with HakuStyle rounded geometry
 Theme: light, dark, and system preference; system is the default and persists locally
-Density: standard, 16px / 24px body, 15px / 22px labels, 44px controls, 46px rows
+Density: standard shell; verified dense RNG workspaces use 30px form controls and compact gaps
 Geometry: 10px controls, 16px panels, 18px floating panels
 Motion: 160-220ms control feedback and 220-300ms drawer/panel transitions; reduced-motion fallback
 ```
@@ -37,6 +37,19 @@ Motion: 160-220ms control feedback and 220-300ms drawer/panel transitions; reduc
 - Use filled selected and hover states. Focus may use a `2px` outline. Preserve
   semantic success, warning, error, and information colors without making any of
   them a dominant brand family.
+- Treat Gen III Static as the compact RNG workspace reference. Its inputs,
+  selectors, multi-select triggers, tabs, and inline action buttons use one `30px`
+  height token with compact vertical padding and gaps. Migrate other RNG panels
+  one at a time after visual verification; do not change unrelated modules through
+  one global override.
+- `haku-select` and `multi-check-control` must share trigger geometry, text
+  truncation, focus/disabled states, and a menu width equal to the visible trigger.
+  Long option text truncates or wraps inside that width instead of widening the
+  menu beyond its field.
+- Keep module-only density and layout rules in the owning feature stylesheet.
+  Shared controls must not branch on a specific RNG module; pages opt into compact
+  geometry through a scoped page marker and local CSS variables. Remove legacy
+  global overrides for each module as that module is migrated.
 - Do not show artificial sequence labels such as `01`, `02`, `PANEL STATES`, or
   preview-only explanatory eyebrow copy in product workspaces.
 - Use the shared input-plus-trigger candidate control for searchable or long

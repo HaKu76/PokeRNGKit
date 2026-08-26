@@ -1,4 +1,5 @@
 import { Select } from "../shared/Select";
+import "./Gen3StaticPanel.css";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   type FormEvent,
@@ -678,7 +679,7 @@ export function Gen3StaticPanel({
                   </label>
                 </div>
                 <label className="field">
-                  <span>{t("offset")}</span>
+                  <span>{t("gen3StaticOffset")}</span>
                   <input
                     inputMode="numeric"
                     maxLength={10}

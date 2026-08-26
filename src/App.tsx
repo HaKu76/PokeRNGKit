@@ -2547,7 +2547,9 @@ function App() {
               : activeModule
           }
         >
-          <main className="main-content">
+          <main
+            className={`main-content${activeModule === "static" ? " gen3static-page" : ""}`}
+          >
             <div className="page-heading">
               <div>
                 <div className="eyebrow">

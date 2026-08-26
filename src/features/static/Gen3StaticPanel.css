@@ -1,0 +1,122 @@
+/* Gen III Static is the reference compact RNG workspace. Keep module density
+   here so remaining workspaces can migrate and verify independently. */
+#root .main-content.gen3static-page {
+  --gen3static-control-height: 30px;
+}
+
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  input:not([type="checkbox"]):not([type="radio"]),
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  .haku-select-trigger,
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  .multi-check-trigger,
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  .static-filter-panel
+  .iv-calculator-action,
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  .panel-actions
+  button,
+#root
+  .main-content.gen3static-page
+  .gen3-static-operation-tabs
+  .operation-tabs
+  button,
+#root .main-content.gen3static-page .page-profile-selector .haku-select-trigger,
+#root .main-content.gen3static-page .page-profile-selector > button {
+  height: var(--gen3static-control-height);
+  min-height: var(--gen3static-control-height);
+  padding-block: 3px;
+}
+
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  :is(.haku-select-trigger, .multi-check-trigger),
+#root
+  .main-content.gen3static-page
+  .page-profile-selector
+  .haku-select-trigger {
+  gap: 8px;
+  padding-inline: 9px;
+}
+
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  :is(.haku-select-trigger > span, .multi-check-trigger > span:first-child) {
+  overflow: hidden;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .main-content.gen3static-page .page-profile-selector > button {
+  width: var(--gen3static-control-height);
+  min-width: var(--gen3static-control-height);
+  padding: 0;
+}
+
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  :is(.static-form-stack, .gen3-filter-selects, .perfect-iv-filter-fields) {
+  gap: 4px;
+}
+
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  :is(
+    .perfect-iv-filter-fields .field,
+    .filter-bottom-row,
+    .filter-bottom-row .filter-tool-row
+  ) {
+  height: var(--gen3static-control-height);
+  min-height: var(--gen3static-control-height);
+}
+
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  .filter-bottom-row {
+  grid-auto-rows: var(--gen3static-control-height);
+}
+
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  :is(.iv-filter-header, .iv-filter-row) {
+  min-height: var(--gen3static-control-height);
+  padding-block: 1px;
+}
+
+body:has(#root .main-content.gen3static-page:not([hidden]))
+  :is(
+    .haku-select-menu[data-menu-portal="true"] button,
+    .multi-check-menu[data-menu-portal="true"] label
+  ) {
+  height: 30px;
+  min-height: 30px;
+  padding-block: 3px;
+  line-height: 20px;
+}
+
+body:has(#root .main-content.gen3static-page:not([hidden]))
+  .multi-check-menu[data-menu-portal="true"]
+  label
+  > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,5 +1,16 @@
 # 第三世代 Static Generator / Searcher 算法
 
+## 界面布局基线
+
+- 本模块是后续 RNG 面板逐项优化的紧凑参考；完整规则记录于 `docs/ui-design.md`。
+- 表单输入、单选下拉、多选下拉、模式标签和同行操作按钮统一为 `30px` 高度，垂直
+  间距与 IV 行高同步收紧；该密度只在已核对的模块局部启用。
+- `haku-select` 与 `multi-check-control` 使用相同触发框几何和状态，展开菜单严格跟随
+  实际触发框宽度，不把左侧字段标签计入菜单宽度。
+- 页面专属紧凑密度集中在 `src/features/static/Gen3StaticPanel.css`，共享选择器组件不包含
+  第三世代模块判断；标题区存档选择、管理按钮和 Portal 下拉选项同步使用 `30px`。
+- 中文界面的 Offset 专用标签显示为“校准帧数”，内部请求字段仍保持 `offset`。
+
 ## 完美个体筛选
 
 - 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
