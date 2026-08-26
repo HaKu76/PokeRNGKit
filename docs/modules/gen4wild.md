@@ -122,6 +122,10 @@ TypeScript 测试覆盖包含式分片、IV 笛卡尔积分片、19/22 word ABI�
 
 ## 8. 验证状态
 
-2026-08-25 已通过 `npm run verify`（178 个测试文件、619 项测试、TypeScript 检查和生产 PWA 构建）以及 `$env:POKERNGKIT_WASM_MODULES='gen3static,gen3wild,gen4static,gen4wild'; npm run wasm:test:native`（4/4 native 夹具）。新增六项 `0..31`、`31/5` 的组合索引边界也已通过。Lint 保留 `Gen3StaticPanel.tsx:296` 的既有 Hook 依赖 warning；外部浏览器和生产页面回归仍未运行。
+2026-08-27 已完成紧凑布局迁移：Generator/Searcher 移至存档信息左侧，乱数信息、设置、筛选项在桌面同排，筛选项独占可伸缩宽度；筛选底部操作、结果提示、虚拟表首行偏移和末列表头边界同步收敛。模块专属布局迁入 `src/features/gen4wild/Gen4WildPanel.css`，页面通过 `gen4wild-page` 局部变量控制 `30px` 控件密度，移除 `src/styles.css` 中对应的全局覆盖。
+
+已使用外部 Chrome 的本地 UI 预览 `http://127.0.0.1:5173/` 检查：桌面三栏为约 `270 / 304 / 480px`，页面无横向溢出；`900x800` 时三栏单列、选项字段单列且页面无横向溢出。下拉菜单与触发框同宽，菜单选项高度为 `30px`；生成预览结果表可横向滚动，首行紧贴 `40px` 表头，末列表头右边界为 `0px`。该检查只验证界面和交互，不验证 RNG 结果或性能。
+
+2026-08-27 已通过 `npm run verify`：Prettier、TypeScript、178 个测试文件共 619 项测试，以及 Vite/PWA 生产构建均成功。Lint 保留 `Gen3StaticPanel.tsx:298` 的既有 Hook 依赖 warning，构建保留既有大 chunk warning。2026-08-25 的 `$env:POKERNGKIT_WASM_MODULES='gen3static,gen3wild,gen4static,gen4wild'; npm run wasm:test:native` 4/4 native 夹具，以及六项 `0..31`、`31/5` 的组合索引边界仍已通过。
 
 下一步等待 GitHub Actions 完成部署。部署后再使用项目所有者提供的生产 URL，在外部 Chrome/Edge 对照 PokeFinder 回归 DPPt Method J、HGSS Method K、甜甜蜜树、宝可追踪、捕虫大赛、狩猎地带、取消和结果列。

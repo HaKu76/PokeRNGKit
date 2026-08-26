@@ -1,0 +1,569 @@
+/* Gen IV Wild owns its dense workspace layout. Shared controls remain
+   module-agnostic; this page supplies the compact sizing contract. */
+#root .main-content.gen4wild-page {
+  --control-height: 30px;
+  --gen4wild-control-height: 30px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-settings-stack {
+  gap: 7px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-option-field {
+  display: grid;
+  grid-template-columns: minmax(86px, 1fr) minmax(118px, 166px);
+  align-items: center;
+  gap: 8px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-replacement-row {
+  display: grid;
+  gap: 7px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 7px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-replacement-row .compact-field-row {
+  margin: 0;
+}
+
+#root .main-content.gen4wild-page .gen4wild-sub-option {
+  padding-left: 22px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-block-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 7px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-block-grid .field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px;
+  align-items: center;
+  gap: 5px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-block-grid input {
+  min-width: 0;
+  text-align: center;
+}
+
+#root .main-content.gen4wild-page .gen4wild-control-grid {
+  display: grid;
+  width: 100%;
+  max-width: none;
+  grid-template-columns: minmax(244px, 270px) minmax(272px, 310px) minmax(
+      480px,
+      1fr
+    );
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+#root .main-content.gen4wild-page .gen4wild-control-grid > .static-panel {
+  width: 100%;
+  height: 100%;
+  align-self: stretch;
+}
+
+#root
+  .main-content.gen4wild-page
+  :is(.gen4wild-rng-panel, .gen4wild-settings-panel) {
+  min-width: 0;
+}
+
+#root .main-content.gen4wild-page .gen4wild-rng-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+#root .main-content.gen4wild-page .gen4wild-rng-panel .panel-actions {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-control-grid
+  :is(.static-form-stack, .gen4wild-filter-selects, .perfect-iv-filter-fields) {
+  gap: 4px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-control-grid .static-form-stack {
+  margin-top: 6px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-control-grid
+  :is(.gen4wild-rng-panel, .gen4wild-settings-panel)
+  .field {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  justify-content: start;
+  column-gap: 8px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-rng-panel .compact-field-row {
+  display: contents;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-control-grid
+  :is(.gen4wild-rng-panel, .gen4wild-settings-panel)
+  .field
+  > :is(input, .haku-select, .autocomplete-combobox) {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-control-grid
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]),
+    .haku-select-trigger,
+    .multi-check-trigger,
+    .panel-actions button,
+    .filter-tool-row button,
+    .iv-calculator-action
+  ),
+#root .main-content.gen4wild-page .page-profile-selector .haku-select-trigger,
+#root .main-content.gen4wild-page .page-profile-selector > button,
+#root
+  .main-content.gen4wild-page
+  .gen4-wild-operation-tabs
+  .operation-tabs
+  button {
+  height: var(--gen4wild-control-height);
+  min-height: var(--gen4wild-control-height);
+  padding-block: 3px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-control-grid
+  input:not([type="checkbox"]):not([type="radio"]) {
+  padding-inline: 8px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-control-grid
+  :is(.haku-select-trigger, .multi-check-trigger) {
+  gap: 8px;
+  padding-inline: 9px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-control-grid
+  :is(.haku-select-trigger > span, .multi-check-trigger > span:first-child) {
+  min-width: 0;
+  overflow: hidden;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .main-content.gen4wild-page .page-profile-selector > button {
+  width: var(--gen4wild-control-height);
+  min-width: var(--gen4wild-control-height);
+  padding: 0;
+}
+
+#root .main-content.gen4wild-page .gen4wild-settings-panel .wild-level-display {
+  grid-template-columns: 72px repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 2px;
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-settings-panel
+  .wild-level-display
+  input {
+  width: 100%;
+  min-width: 0;
+  height: var(--gen4wild-control-height);
+  min-height: var(--gen4wild-control-height);
+  padding: 3px 6px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-filter-panel .filter-controls {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.7fr) minmax(300px, 1.3fr);
+  align-items: start;
+  gap: 6px 10px;
+  margin-top: 6px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-panel
+  .gen4wild-filter-selects {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 4px 8px;
+  margin-top: 0;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-panel
+  :is(.gen4wild-filter-selects .field, .perfect-iv-filter-fields .field) {
+  display: grid;
+  height: var(--gen4wild-control-height);
+  min-height: var(--gen4wild-control-height);
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 8px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-panel
+  :is(.gen4wild-filter-selects, .perfect-iv-filter-fields)
+  .field
+  > span {
+  min-width: 0;
+  overflow: hidden;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-panel
+  :is(.gen4wild-filter-selects, .perfect-iv-filter-fields)
+  .field
+  > :is(.haku-select, .multi-check-control, input) {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+
+#root .main-content.gen4wild-page .gen4wild-filter-panel .wild-level-filter {
+  display: grid;
+  height: var(--gen4wild-control-height);
+  min-height: var(--gen4wild-control-height);
+  grid-template-columns: 76px repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-panel
+  .wild-level-filter
+  input {
+  width: 100%;
+  min-width: 0;
+  height: var(--gen4wild-control-height);
+  min-height: var(--gen4wild-control-height);
+  padding: 3px 4px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-panel
+  .perfect-iv-filter-fields {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 0;
+}
+
+#root .main-content.gen4wild-page .gen4wild-filter-panel .iv-filter {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin-top: 0;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-panel
+  :is(.iv-filter-header, .iv-filter-row) {
+  min-height: var(--gen4wild-control-height);
+  grid-template-columns: minmax(0, 1fr) 48px 48px;
+  gap: 4px;
+  padding-block: 1px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-filter-panel .iv-filter-row input {
+  width: 100%;
+  min-width: 0;
+  height: 26px;
+  min-height: 26px;
+  padding: 2px 4px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-filter-bottom-row {
+  display: grid;
+  grid-column: 2;
+  grid-template-columns: minmax(0, 1fr) minmax(118px, 150px);
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-filter-bottom-row .filter-tool-row {
+  display: flex;
+  height: var(--gen4wild-control-height);
+  min-height: var(--gen4wild-control-height);
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 0;
+}
+
+#root .main-content.gen4wild-page .gen4wild-filter-bottom-row .toggle-field {
+  min-width: 0;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-bottom-row
+  .toggle-field
+  span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-bottom-row
+  .iv-calculator-action {
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--control-bg);
+  color: var(--text);
+  padding-inline: 9px;
+  font-size: 14px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-filter-bottom-row
+  .iv-calculator-action:hover {
+  border-color: var(--brand);
+  background: var(--surface-2);
+}
+
+#root .main-content.gen4wild-page .gen4wild-results-panel {
+  width: 100%;
+  max-width: none;
+  margin-top: 12px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-results-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 10px 18px;
+}
+
+#root .main-content.gen4wild-page .gen4wild-result-alerts {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+#root .main-content.gen4wild-page .gen4wild-result-alerts .alert {
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 5px 9px;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .main-content.gen4wild-page .gen4wild-results-panel .table-shell {
+  height: clamp(240px, 42vh, 440px);
+}
+
+#root
+  .main-content.gen4wild-page
+  :is(
+    .gen4wild-table,
+    .gen4wild-table .static-table-header,
+    .gen4wild-table .static-table-row
+  ) {
+  min-width: 0;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-table.generator.dppt
+  :is(.static-table-header, .static-table-row) {
+  grid-template-columns:
+    82px 88px 78px 118px 184px 58px 94px 76px 90px 146px repeat(6, 54px)
+    94px 70px 80px 140px;
+  min-width: 1694px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-table.generator.hgss
+  :is(.static-table-header, .static-table-row) {
+  grid-template-columns:
+    82px 88px 56px 78px 88px 118px 184px 58px 94px 76px 90px 146px repeat(
+      6,
+      54px
+    )
+    94px 70px 80px 140px;
+  min-width: 1750px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-table.searcher
+  :is(.static-table-header, .static-table-row) {
+  grid-template-columns:
+    94px 80px 118px 184px 58px 94px 76px 90px 146px repeat(6, 54px)
+    94px 70px 80px 140px;
+  min-width: 1718px;
+}
+
+#root
+  .main-content.gen4wild-page
+  .gen4wild-results-panel
+  .static-table-header
+  button:last-child {
+  border-right: 0;
+}
+
+#root .main-content.gen4wild-page .gen4-wild-operation-tabs {
+  display: flex;
+  min-width: 0;
+}
+
+#root .main-content.gen4wild-page .gen4-wild-operation-tabs .operation-tabs {
+  width: auto;
+  margin: 0;
+}
+
+body:has(#root .main-content.gen4wild-page:not([hidden]))
+  :is(
+    .haku-select-menu[data-menu-portal="true"] button,
+    .multi-check-menu[data-menu-portal="true"] label
+  ) {
+  height: 30px;
+  min-height: 30px;
+  padding-block: 3px;
+  line-height: 20px;
+}
+
+body:has(#root .main-content.gen4wild-page:not([hidden]))
+  :is(
+    .haku-select-menu[data-menu-portal="true"] button > span,
+    .multi-check-menu[data-menu-portal="true"] label > span
+  ) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@container pokerngkit-content (max-width: 980px) {
+  #root .main-content.gen4wild-page .gen4wild-control-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root .main-content.gen4wild-page .gen4wild-control-grid > .static-panel {
+    height: auto;
+  }
+}
+
+@container pokerngkit-content (max-width: 600px) {
+  #root .main-content.gen4wild-page .gen4wild-filter-panel .filter-controls,
+  #root .main-content.gen4wild-page .gen4wild-filter-bottom-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root
+    .main-content.gen4wild-page
+    .gen4wild-filter-panel
+    :is(
+      .gen4wild-filter-selects,
+      .perfect-iv-filter-fields,
+      .iv-filter,
+      .filter-tool-row
+    ) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  #root .main-content.gen4wild-page .gen4wild-block-grid,
+  #root
+    .main-content.gen4wild-page
+    .gen4wild-control-grid
+    .gen4wild-settings-panel
+    .gen4wild-option-field {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root .main-content.gen4wild-page .gen4wild-sub-option {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  #root
+    .main-content.gen4wild-page
+    .gen4wild-filter-panel
+    :is(.gen4wild-filter-selects, .perfect-iv-filter-fields) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root .main-content.gen4wild-page .gen4wild-filter-bottom-row {
+    align-items: stretch;
+  }
+
+  #root
+    .main-content.gen4wild-page
+    .gen4wild-filter-bottom-row
+    .filter-tool-row {
+    height: auto;
+    min-height: var(--gen4wild-control-height);
+    flex-wrap: wrap;
+  }
+
+  #root
+    .main-content.gen4wild-page
+    .gen4wild-filter-bottom-row
+    .iv-calculator-action {
+    width: 100%;
+  }
+
+  #root .main-content.gen4wild-page .gen4wild-results-heading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

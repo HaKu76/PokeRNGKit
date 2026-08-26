@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import {
@@ -57,6 +58,7 @@ import {
 } from "./domain";
 import { Gen4WildSearcherUiPreviewEngine } from "./preview/Gen4WildSearcherUiPreviewEngine";
 import { Gen4WildUiPreviewEngine } from "./preview/Gen4WildUiPreviewEngine";
+import "./Gen4WildPanel.css";
 import {
   Gen4WildSearcherWorkerPool,
   Gen4WildWorkerPool,
@@ -920,42 +922,50 @@ export function Gen4WildPanel({
     lead === "synchronize" && operation === "generator"
       ? `synchronize-${synchronizeNature}`
       : lead;
+  const operationTabs = (
+    <div
+      aria-label={t("gen4WildEngine")}
+      className="operation-tabs"
+      role="tablist"
+    >
+      {(["generator", "searcher"] as Operation[]).map((entry) => (
+        <button
+          aria-selected={operation === entry}
+          className={operation === entry ? "active" : ""}
+          disabled={status === "calculating"}
+          key={entry}
+          onClick={() => {
+            if (operation !== entry) resetRunState(entry);
+          }}
+          role="tab"
+          type="button"
+        >
+          {t(entry)}
+        </button>
+      ))}
+    </div>
+  );
+  const operationTabsTarget =
+    typeof document === "undefined"
+      ? null
+      : document.getElementById("gen4-wild-operation-tabs");
 
   return (
     <>
-      <div
-        aria-label={t("gen4WildEngine")}
-        className="operation-tabs"
-        role="tablist"
-      >
-        {(["generator", "searcher"] as Operation[]).map((entry) => (
-          <button
-            aria-selected={operation === entry}
-            className={operation === entry ? "active" : ""}
-            disabled={status === "calculating"}
-            key={entry}
-            onClick={() => {
-              if (operation !== entry) resetRunState(entry);
-            }}
-            role="tab"
-            type="button"
-          >
-            {t(entry)}
-          </button>
-        ))}
-      </div>
+      {operationTabsTarget
+        ? createPortal(operationTabs, operationTabsTarget)
+        : operationTabs}
 
       <form
-        className="static-control-grid gen3static-control-grid gen4wild-control-grid"
+        className="static-control-grid gen4wild-control-grid"
         onSubmit={run}
       >
-        <section className="panel static-panel static-rng-panel">
+        <section className="panel static-panel static-rng-panel gen4wild-rng-panel">
           <div className="panel-heading">
             <div>
               <span className="panel-index">01</span>
               <h2>{t("rngInfo")}</h2>
             </div>
-            <span className="panel-note">PokeFinder / Wild4</span>
           </div>
           <div className="static-form-stack">
             <div className="static-encounter-meta compact">
@@ -1186,7 +1196,7 @@ export function Gen4WildPanel({
           </div>
         </section>
 
-        <section className="panel static-panel static-settings-panel">
+        <section className="panel static-panel static-settings-panel gen4wild-settings-panel">
           <div className="panel-heading">
             <div>
               <span className="panel-index">02</span>
@@ -1472,19 +1482,18 @@ export function Gen4WildPanel({
           </div>
         </section>
 
-        <section className="panel static-panel static-filter-panel">
+        <section className="panel static-panel static-filter-panel gen4wild-filter-panel">
           <div className="panel-heading">
             <div>
               <span className="panel-index">03</span>
               <h2>{t("filters")}</h2>
             </div>
-            <span className="panel-note">PokeFinder / Filter</span>
           </div>
           <fieldset
             className="filter-controls"
             disabled={operation === "generator" && filtersDisabled}
           >
-            <div className="gen3-filter-selects">
+            <div className="gen4wild-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
                 <Select
@@ -1624,41 +1633,55 @@ export function Gen4WildPanel({
                 </div>
               ))}
             </div>
-            <div className="filter-tool-row">
-              <label className="toggle-field">
-                <input
-                  checked={showStats}
-                  onChange={(event) => setShowStats(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>{t("showStats")}</span>
-              </label>
-              <button onClick={onOpenIvCalculator} type="button">
+            <div className="filter-bottom-row gen4wild-filter-bottom-row">
+              <div className="filter-tool-row">
+                <label className="toggle-field">
+                  <input
+                    checked={showStats}
+                    onChange={(event) => setShowStats(event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>{t("showStats")}</span>
+                </label>
+                {operation === "generator" && (
+                  <label className="toggle-field">
+                    <input
+                      checked={filtersDisabled}
+                      onChange={(event) =>
+                        setFiltersDisabled(event.target.checked)
+                      }
+                      type="checkbox"
+                    />
+                    <span>{t("disableFilters")}</span>
+                  </label>
+                )}
+              </div>
+              <button
+                className="iv-calculator-action"
+                onClick={onOpenIvCalculator}
+                type="button"
+              >
                 {t("ivCalculator")}
               </button>
             </div>
           </fieldset>
-          {operation === "generator" && (
-            <label className="toggle-field disable-filters">
-              <input
-                checked={filtersDisabled}
-                onChange={(event) => setFiltersDisabled(event.target.checked)}
-                type="checkbox"
-              />
-              <span>{t("disableFilters")}</span>
-            </label>
-          )}
         </section>
       </form>
 
-      <section className="panel results-panel static-results-panel">
-        <div className="results-heading">
+      <section className="panel results-panel static-results-panel gen4wild-results-panel">
+        <div className="results-heading gen4wild-results-heading">
           <div className="panel-heading compact">
             <div>
               <span className="panel-index">04</span>
               <h2>{t("results")}</h2>
             </div>
             <span className={`run-status ${status}`}>{statusLabel}</span>
+          </div>
+          <div className="gen4wild-result-alerts">
+            {error && <div className="alert error">{error}</div>}
+            {summary?.resultLimitReached && (
+              <div className="alert warning">{t("limitReached")}</div>
+            )}
           </div>
           <div className="result-actions">
             <span className="result-count">
@@ -1701,10 +1724,6 @@ export function Gen4WildPanel({
             </strong>
           </span>
         </div>
-        {error && <div className="alert error">{error}</div>}
-        {summary?.resultLimitReached && (
-          <div className="alert warning">{t("limitReached")}</div>
-        )}
         <div className="table-shell static-table-shell" ref={tableRef}>
           {sortedResults.length === 0 ? (
             <div className="empty-state">
@@ -1714,7 +1733,7 @@ export function Gen4WildPanel({
           ) : (
             <div
               className={`static-virtual-table gen4wild-table ${operation} ${hgss ? "hgss" : "dppt"}`}
-              style={{ height: `${rowVirtualizer.getTotalSize() + 38}px` }}
+              style={{ height: `${rowVirtualizer.getTotalSize() + 40}px` }}
             >
               <div className="static-table-header">
                 {columns.map((column) => (
@@ -1749,7 +1768,7 @@ export function Gen4WildPanel({
                     className="static-table-row"
                     key={`${"seed" in state ? state.seed : state.advances}-${state.pid}-${virtualRow.index}`}
                     style={{
-                      transform: `translateY(${virtualRow.start + 38}px)`,
+                      transform: `translateY(${virtualRow.start + 40}px)`,
                     }}
                   >
                     {columns.map((column) => (

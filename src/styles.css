@@ -2702,70 +2702,8 @@ h1 {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.gen4wild-settings-stack {
-  gap: 7px;
-}
 .static-encounter-meta.compact {
   grid-template-columns: minmax(0, 1fr);
-}
-.gen4wild-option-field {
-  display: grid;
-  grid-template-columns: minmax(86px, 1fr) minmax(118px, 166px);
-  align-items: center;
-  gap: 8px;
-}
-.gen4wild-replacement-row {
-  display: grid;
-  gap: 7px;
-  border-top: 1px solid var(--line-soft);
-  padding-top: 7px;
-}
-.gen4wild-replacement-row .compact-field-row {
-  margin: 0;
-}
-.gen4wild-sub-option {
-  padding-left: 22px;
-}
-.gen4wild-block-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  border-top: 1px solid var(--line-soft);
-  padding-top: 7px;
-}
-.gen4wild-block-grid .field {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 54px;
-  align-items: center;
-  gap: 5px;
-}
-.gen4wild-block-grid input {
-  min-width: 0;
-  text-align: center;
-}
-.gen4wild-table.generator.dppt,
-.gen4wild-table.generator.dppt .static-table-header,
-.gen4wild-table.generator.dppt .static-table-row {
-  grid-template-columns:
-    88px 94px 86px 122px 210px 62px 100px 78px 92px 155px
-    repeat(6, 62px) 100px 72px 82px 150px;
-  min-width: 1863px;
-}
-.gen4wild-table.generator.hgss,
-.gen4wild-table.generator.hgss .static-table-header,
-.gen4wild-table.generator.hgss .static-table-row {
-  grid-template-columns:
-    88px 94px 58px 86px 122px 210px 62px 100px 78px 92px 155px
-    repeat(6, 62px) 100px 72px 82px 150px;
-  min-width: 1921px;
-}
-.gen4wild-table.searcher,
-.gen4wild-table.searcher .static-table-header,
-.gen4wild-table.searcher .static-table-row {
-  grid-template-columns:
-    100px 88px 122px 210px 62px 100px 78px 92px 155px repeat(6, 62px)
-    100px 72px 82px 150px;
-  min-width: 1891px;
 }
 .gen4-profile-display dl {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -3878,13 +3816,6 @@ h1 {
   .compact-field-row,
   .gen3-filter-selects {
     grid-template-columns: 1fr;
-  }
-  .gen4wild-block-grid,
-  .gen4wild-option-field {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .gen4wild-sub-option {
-    padding-left: 0;
   }
   .ivtopid-iv-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
