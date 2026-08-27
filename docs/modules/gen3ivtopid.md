@@ -178,3 +178,11 @@ IV 31/31/31/0/31/31, Nature 0, TID 12345
 - `Form/i18n/PokeFinder_ja.ts`
 - `Test/Util/IVToPIDCalculatorTest.cpp`
 - `Test/Util/ivtopidcalculator.json`
+
+## 11. 界面布局
+
+`IVs to PID` 是精确反查工具，六项 IV、性格和 TID 都是计算输入，不能引入 Static、Wild 或 GameCube 的六维范围、完美个体值和完美个体数筛选语义。
+
+布局使用 `Gen3IvToPidPanel.css` 的 `ivtopid-page` 页面作用域：六项 IV 在桌面保持单行紧凑网格，性格、TID 和查找命令按实际内容宽度排列；窄视口再按单列或三列 IV 重排。输入、`haku-select`、查找/取消、结果操作和下拉选项统一为 `30px`，性格选项与触发框同宽并在框内截断。
+
+结果标题将运行状态、错误或统计信息和操作放在同一行；结果表按 Seed、PID、生成方式、性别比例和 SID 的实际内容收窄，最末列不绘制右边框。模块专属的布局、密度和结果列规则只保留在该功能目录中；共享 Select 继续由公共样式负责。

@@ -2562,7 +2562,9 @@ function App() {
                         ? " gen4static-page"
                         : activeModule === "gen4wild"
                           ? " gen4wild-page"
-                          : ""
+                          : activeModule === "ivtopid"
+                            ? " ivtopid-page"
+                            : ""
             }`}
           >
             <div className="page-heading">

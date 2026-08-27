@@ -7,6 +7,18 @@
 - 每次迁移同步解耦样式：模块专属布局和密度归入功能目录 CSS，共享控件只保留跨模块语义，
   并清理该面板散落在全局样式中的专属覆盖。
 
+## 2026-08-27 第三世代个体值查询 PID 紧凑布局迁移
+
+- 优化：六项 IV 在桌面单行紧凑排列，性格、TID 与查找命令按照实际内容宽度收拢；结果状态、统计、错误和操作收进同一标题行，结果列按真实内容宽度收窄。
+- 解耦：新增 `src/features/ivtopid/Gen3IvToPidPanel.css`，页面通过 `ivtopid-page` 局部作用域控制密度；清理 `src/styles.css` 中散落的个体值查询 PID 专属布局、表格和响应式规则。
+- 修复：共享 `useMenuPlacement` 不再将菜单硬限制为 `360px`，Select、MultiCheckSelect 和自动完成菜单会优先匹配触发框宽度，仅在视口两侧保留 `12px` 间距时收窄。
+- 已恢复：外部 Chrome 重新导航本地预览 `http://127.0.0.1:5174/` 在约 `2.7s` 完成，DOM 就绪检查为 `29ms`；此前控制层的偶发等待超时未复现，也没有对应的页面或 Vite 服务阻塞。
+- 已验证：Chrome 桌面预览中，性格菜单与 `473.8px` 触发框同宽；输入、Select、菜单项和查找按钮均为 `30px`，查询 `0/0/0/0/0/0`、勤奋、空 TID 后正常返回 Channel 结果，页面无横向溢出，结果首行紧贴表头且末列右边框为 `0px`。以上仅为本地界面和交互工程证据，不代表算法或项目所有者验收。
+- 已通过：`npm run verify`（Prettier、ESLint、`tsc -b`、179 个 Vitest 文件共 621 项测试、Vite/PWA 生产构建）。ESLint 仅保留 `Gen3StaticPanel.tsx:298` 的既有 Hook 依赖 warning；构建保留既有大 chunk warning。
+- 未运行：生产 URL 算法回归、真实 Emscripten Wasm 构建和 Windows EXE 验收。
+- Git：本轮已作为 `style: 优化第三世代个体值查询PID布局` 单独提交并推送至 `origin/main`。
+- 下一步：选择下一个尚未迁移的 RNG 面板，按当前目标逐个核对、验证、提交并推送。
+
 ## 2026-08-27 第三世代 GameCube RNG 紧凑布局迁移
 
 - 优化：Generator/Searcher 切换移入存档选择左侧；乱数信息、设置、筛选在桌面同排，结果区紧接其下并共享右边界，窄视口再单列重排。

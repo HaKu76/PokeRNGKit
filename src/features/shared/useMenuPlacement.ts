@@ -1,7 +1,6 @@
 import { useLayoutEffect, useState, type RefObject } from "react";
 
 const VIEWPORT_GUTTER = 12;
-const MENU_MAX_WIDTH = 360;
 
 export type MenuVerticalPlacement = "bottom" | "top";
 export type MenuHorizontalPlacement = "start" | "end";
@@ -41,10 +40,7 @@ export function useMenuPlacement(
       const availableBelow = window.innerHeight - rect.bottom - 12;
       const availableAbove = rect.top - 12;
       const renderedHeight = menuRef.current?.getBoundingClientRect().height;
-      const maxWidth = Math.min(
-        MENU_MAX_WIDTH,
-        Math.max(0, window.innerWidth - VIEWPORT_GUTTER * 2),
-      );
+      const maxWidth = Math.max(0, window.innerWidth - VIEWPORT_GUTTER * 2);
       const width = Math.min(maxWidth, Math.max(rect.width, 1));
       const requiredHeight = Math.min(
         renderedHeight && renderedHeight > 0 ? renderedHeight : estimatedHeight,

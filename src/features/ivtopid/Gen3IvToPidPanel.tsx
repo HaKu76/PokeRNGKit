@@ -2,6 +2,7 @@ import { Select } from "../shared/Select";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput } from "../../input";
+import "./Gen3IvToPidPanel.css";
 import {
   gen3IvToPidMethodLabel,
   validateGen3IvToPidRequest,
@@ -225,12 +226,11 @@ export function Gen3IvToPidPanel({ uiPreviewMode }: Gen3IvToPidPanelProps) {
   }[status];
 
   return (
-    <>
+    <div className="ivtopid-workspace">
       <form className="ivtopid-control-grid" onSubmit={find}>
-        <section className="panel compact-module-panel">
+        <section className="panel compact-module-panel ivtopid-input-panel">
           <div className="panel-heading compact">
             <div>
-              <span className="panel-index">01</span>
               <h2>{t("ivToPidInput")}</h2>
             </div>
           </div>
@@ -303,14 +303,35 @@ export function Gen3IvToPidPanel({ uiPreviewMode }: Gen3IvToPidPanelProps) {
         </section>
       </form>
 
-      <section className="panel results-panel">
-        <div className="results-heading">
+      <section className="panel results-panel ivtopid-results-panel">
+        <div className="results-heading ivtopid-results-heading">
           <div className="panel-heading compact">
             <div>
-              <span className="panel-index">02</span>
               <h2>{t("results")}</h2>
             </div>
             <span className={`run-status ${status}`}>{statusLabel}</span>
+          </div>
+          <div className="ivtopid-result-summary">
+            {error ? (
+              <div className="alert error">
+                {error.includes("Wasm") ? t("ivToPidWasmMissing") : error}
+              </div>
+            ) : (
+              <div className="ivtopid-metrics-row">
+                <span>
+                  {t("results")} <strong>{String(progress.resultCount)}</strong>
+                </span>
+                <span>
+                  {t("workers")} <strong>{summary?.workerCount ?? "-"}</strong>
+                </span>
+                <span>
+                  {t("elapsed")}{" "}
+                  <strong>
+                    {summary ? `${summary.elapsedMs.toFixed(0)} ms` : "-"}
+                  </strong>
+                </span>
+              </div>
+            )}
           </div>
           <div className="result-actions">
             <span className="result-count">{String(results.length)}</span>
@@ -333,25 +354,6 @@ export function Gen3IvToPidPanel({ uiPreviewMode }: Gen3IvToPidPanelProps) {
             </button>
           </div>
         </div>
-        <div className="metrics-row">
-          <span>
-            {t("results")} <strong>{String(progress.resultCount)}</strong>
-          </span>
-          <span>
-            {t("workers")} <strong>{summary?.workerCount ?? "-"}</strong>
-          </span>
-          <span>
-            {t("elapsed")}{" "}
-            <strong>
-              {summary ? `${summary.elapsedMs.toFixed(0)} ms` : "-"}
-            </strong>
-          </span>
-        </div>
-        {error && (
-          <div className="alert error">
-            {error.includes("Wasm") ? t("ivToPidWasmMissing") : error}
-          </div>
-        )}
         <div className="table-shell ivtopid-table-shell">
           {sortedResults.length === 0 ? (
             <div className="empty-state">
@@ -423,6 +425,6 @@ export function Gen3IvToPidPanel({ uiPreviewMode }: Gen3IvToPidPanelProps) {
           )}
         </div>
       </section>
-    </>
+    </div>
   );
 }

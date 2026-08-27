@@ -1,0 +1,305 @@
+/* IVs to PID keeps its dense workspace local so shared controls stay module-neutral. */
+#root .main-content.ivtopid-page {
+  --ivtopid-control-height: 30px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-workspace {
+  display: grid;
+  width: min(100%, 920px);
+  min-width: 0;
+  gap: 12px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-control-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+}
+
+#root .main-content.ivtopid-page .ivtopid-input-panel {
+  min-width: 0;
+  padding: 12px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-input-panel .panel-heading {
+  padding-bottom: 8px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-input-panel .panel-heading h2,
+#root .main-content.ivtopid-page .ivtopid-results-panel .panel-heading h2 {
+  font-size: 16px;
+  line-height: 22px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-iv-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-iv-grid .field,
+#root .main-content.ivtopid-page .ivtopid-meta-grid .field {
+  gap: 4px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-iv-grid input {
+  text-align: center;
+}
+
+#root .main-content.ivtopid-page .ivtopid-meta-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(240px, 1fr) minmax(176px, 0.72fr) auto;
+  align-items: end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-actions {
+  align-items: center;
+  margin: 0;
+}
+
+#root
+  .main-content.ivtopid-page
+  .ivtopid-workspace
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]),
+    .haku-select-trigger,
+    .panel-actions button,
+    .result-actions button
+  ) {
+  height: var(--ivtopid-control-height);
+  min-height: var(--ivtopid-control-height);
+  padding-block: 3px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-workspace input {
+  padding-inline: 8px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-workspace .haku-select-trigger {
+  gap: 8px;
+  padding-inline: 9px;
+}
+
+#root
+  .main-content.ivtopid-page
+  .ivtopid-workspace
+  .haku-select-trigger
+  > span {
+  min-width: 0;
+  overflow: hidden;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .main-content.ivtopid-page .ivtopid-results-panel {
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+}
+
+#root .main-content.ivtopid-page .ivtopid-results-heading {
+  display: grid;
+  min-height: 48px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-results-heading .panel-heading {
+  border: 0;
+  padding: 0;
+}
+
+#root .main-content.ivtopid-page .ivtopid-results-heading .panel-heading > div {
+  gap: 8px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-result-summary {
+  min-width: 0;
+  overflow: hidden;
+}
+
+#root .main-content.ivtopid-page .ivtopid-metrics-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+#root .main-content.ivtopid-page .ivtopid-metrics-row strong {
+  margin-left: 4px;
+  color: var(--text);
+  font-family: ui-monospace, monospace;
+  font-weight: 500;
+}
+
+#root .main-content.ivtopid-page .ivtopid-result-summary .alert {
+  overflow: hidden;
+  margin: 0;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .main-content.ivtopid-page .ivtopid-results-panel .result-actions {
+  gap: 6px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-table-shell {
+  height: clamp(240px, calc(100vh - 414px), 440px);
+}
+
+#root .main-content.ivtopid-page .ivtopid-table {
+  width: 100%;
+  min-width: 704px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: var(--text);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-table :is(th, td) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .main-content.ivtopid-page .ivtopid-table th {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  height: 40px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 8px;
+  text-align: left;
+}
+
+#root .main-content.ivtopid-page .ivtopid-table th button {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+}
+
+#root .main-content.ivtopid-page .ivtopid-table th button:hover {
+  color: var(--teal);
+}
+
+#root .main-content.ivtopid-page .ivtopid-table td {
+  height: 40px;
+  border-right: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  padding: 0 8px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-table :is(th, td):nth-child(1),
+#root .main-content.ivtopid-page .ivtopid-table :is(th, td):nth-child(2) {
+  width: 84px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-table :is(th, td):nth-child(3) {
+  width: 150px;
+}
+
+#root .main-content.ivtopid-page .ivtopid-table :is(th, td):nth-child(4) {
+  width: 78px;
+}
+
+#root
+  .main-content.ivtopid-page
+  .ivtopid-table
+  :is(th, td):nth-child(n + 5):nth-child(-n + 8) {
+  width: 54px;
+  text-align: center;
+}
+
+#root .main-content.ivtopid-page .ivtopid-table :is(th, td):last-child {
+  width: 70px;
+  border-right: 0;
+}
+
+body:has(#root .main-content.ivtopid-page:not([hidden]))
+  .haku-select-menu[data-menu-portal="true"]
+  button {
+  height: 30px;
+  min-height: 30px;
+  padding-block: 3px;
+  line-height: 20px;
+}
+
+body:has(#root .main-content.ivtopid-page:not([hidden]))
+  .haku-select-menu[data-menu-portal="true"]
+  button
+  > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@container pokerngkit-content (max-width: 600px) {
+  #root .main-content.ivtopid-page .ivtopid-meta-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root .main-content.ivtopid-page .ivtopid-actions {
+    justify-content: flex-start;
+  }
+
+  #root .main-content.ivtopid-page .ivtopid-results-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  #root .main-content.ivtopid-page .ivtopid-result-summary {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  #root .main-content.ivtopid-page .ivtopid-metrics-row {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 460px) {
+  #root .main-content.ivtopid-page .ivtopid-iv-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  #root .main-content.ivtopid-page .ivtopid-results-heading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #root .main-content.ivtopid-page .ivtopid-results-panel .result-actions {
+    justify-self: start;
+  }
+
+  #root .main-content.ivtopid-page .ivtopid-metrics-row {
+    flex-wrap: wrap;
+  }
+}
