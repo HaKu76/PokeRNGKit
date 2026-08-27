@@ -2550,21 +2550,23 @@ function App() {
         >
           <main
             className={`main-content${
-              activeModule === "static"
-                ? " gen3static-page"
-                : activeModule === "wild"
-                  ? " gen3wild-page"
-                  : activeModule === "egg"
-                    ? " gen3egg-page"
-                    : activeModule === "gamecube"
-                      ? " gen3gamecube-page"
-                      : activeModule === "gen4static"
-                        ? " gen4static-page"
-                        : activeModule === "gen4wild"
-                          ? " gen4wild-page"
-                          : activeModule === "ivtopid"
-                            ? " ivtopid-page"
-                            : ""
+              activeModule === "id"
+                ? " gen3id-page"
+                : activeModule === "static"
+                  ? " gen3static-page"
+                  : activeModule === "wild"
+                    ? " gen3wild-page"
+                    : activeModule === "egg"
+                      ? " gen3egg-page"
+                      : activeModule === "gamecube"
+                        ? " gen3gamecube-page"
+                        : activeModule === "gen4static"
+                          ? " gen4static-page"
+                          : activeModule === "gen4wild"
+                            ? " gen4wild-page"
+                            : activeModule === "ivtopid"
+                              ? " ivtopid-page"
+                              : ""
             }`}
           >
             <div className="page-heading">
@@ -2809,6 +2811,27 @@ function App() {
                 </h1>
               </div>
               <div className="page-heading-tools">
+                {activeModule === "id" && (
+                  <div
+                    aria-label={t("idModule")}
+                    className="operation-tabs gen3id-operation-tabs"
+                    role="tablist"
+                  >
+                    {(["generator", "searcher"] as const).map((entry) => (
+                      <button
+                        aria-selected={idOperation === entry}
+                        className={idOperation === entry ? "active" : ""}
+                        disabled={status === "calculating" || idSearcherRunning}
+                        key={entry}
+                        onClick={() => setIdOperation(entry)}
+                        role="tab"
+                        type="button"
+                      >
+                        {t(entry)}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {activeModule === "static" && (
                   <div
                     className="gen3-static-operation-tabs"
@@ -3102,24 +3125,6 @@ function App() {
 
             {activeModule === "id" ? (
               <div className="gen3id-workspace">
-                <div
-                  className="operation-tabs gen3id-operation-tabs"
-                  role="tablist"
-                >
-                  {(["generator", "searcher"] as const).map((entry) => (
-                    <button
-                      aria-selected={idOperation === entry}
-                      className={idOperation === entry ? "active" : ""}
-                      disabled={status === "calculating" || idSearcherRunning}
-                      key={entry}
-                      onClick={() => setIdOperation(entry)}
-                      role="tab"
-                      type="button"
-                    >
-                      {t(entry)}
-                    </button>
-                  ))}
-                </div>
                 {idOperation === "searcher" && (
                   <Gen3IdSearcherPanel
                     onRunningChange={setIdSearcherRunning}
@@ -3489,7 +3494,7 @@ function App() {
                       <div
                         className="virtual-table id-generator-table gen3id-generator-table"
                         style={{
-                          height: `${rowVirtualizer.getTotalSize() + 38}px`,
+                          height: `${rowVirtualizer.getTotalSize() + 40}px`,
                         }}
                       >
                         <div className="table-header">
@@ -3525,7 +3530,7 @@ function App() {
                               className="table-row"
                               key={`${state.advances}-${virtualRow.index}`}
                               style={{
-                                transform: `translateY(${virtualRow.start + 38}px)`,
+                                transform: `translateY(${virtualRow.start + 40}px)`,
                               }}
                             >
                               <span>{String(state.advances)}</span>
