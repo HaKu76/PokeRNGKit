@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import { formatHex, parseDecimal, parseHex } from "../id/domain";
@@ -35,6 +36,7 @@ import type {
   GameCubeSummary,
 } from "./search";
 import { Gen3GameCubeWorkerPool } from "./worker/GameCubeWorkerPool";
+import "./Gen3GameCubePanel.css";
 
 type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
 type IvText = [string, string, string, string, string, string];
@@ -302,36 +304,43 @@ export function Gen3GameCubePanel({
     }
   };
 
+  const operationTabs = (
+    <div
+      aria-label={t("gameCubeEngine")}
+      className="operation-tabs"
+      role="tablist"
+    >
+      {(["generator", "searcher"] as const).map((entry) => (
+        <button
+          aria-selected={operation === entry}
+          className={operation === entry ? "active" : ""}
+          key={entry}
+          onClick={() => setOperation(entry)}
+          role="tab"
+          type="button"
+        >
+          {t(entry)}
+        </button>
+      ))}
+    </div>
+  );
+  const operationTabsTarget =
+    typeof document === "undefined"
+      ? null
+      : document.getElementById("gen3-gamecube-operation-tabs");
   return (
     <>
-      <div className="operation-switch" role="tablist">
-        <button
-          className={operation === "generator" ? "active" : ""}
-          onClick={() => setOperation("generator")}
-          role="tab"
-          type="button"
-        >
-          {t("generator")}
-        </button>
-        <button
-          className={operation === "searcher" ? "active" : ""}
-          onClick={() => setOperation("searcher")}
-          role="tab"
-          type="button"
-        >
-          {t("searcher")}
-        </button>
-      </div>
-      <form className="gen3static-control-grid" onSubmit={run}>
-        <section className="panel static-panel static-rng-panel">
+      {operationTabsTarget
+        ? createPortal(operationTabs, operationTabsTarget)
+        : operationTabs}
+      <form className="gen3gamecube-control-grid" onSubmit={run}>
+        <section className="panel gen3gamecube-panel gen3gamecube-rng-panel">
           <div className="panel-heading">
             <div>
-              <span className="panel-index">01</span>
               <h2>{t("rngInfo")}</h2>
             </div>
-            <span className="panel-note">XDRNG</span>
           </div>
-          <div className="static-form-stack">
+          <div className="gen3gamecube-form-stack">
             {operation === "generator" && (
               <>
                 <label className="field">
@@ -344,7 +353,7 @@ export function Gen3GameCubePanel({
                     }
                   />
                 </label>
-                <div className="compact-field-row">
+                <div className="gen3gamecube-compact-field-row">
                   <label className="field">
                     <span>{t("initialAdvances")}</span>
                     <input
@@ -428,17 +437,13 @@ export function Gen3GameCubePanel({
             )}
           </div>
         </section>
-        <section className="panel static-panel static-settings-panel">
+        <section className="panel gen3gamecube-panel gen3gamecube-settings-panel">
           <div className="panel-heading">
             <div>
-              <span className="panel-index">02</span>
               <h2>{t("settings")}</h2>
             </div>
-            <span className="panel-note">
-              {game === "xd" ? "XD" : "Colosseum"}
-            </span>
           </div>
-          <div className="static-form-stack">
+          <div className="gen3gamecube-form-stack gen3gamecube-settings-stack">
             <label className="field">
               <span>{t("category")}</span>
               <Select
@@ -467,7 +472,7 @@ export function Gen3GameCubePanel({
                 ))}
               </Select>
             </label>
-            <div className="static-encounter-meta">
+            <div className="gen3gamecube-encounter-meta">
               <div>
                 <span>{t("level")}</span>
                 <strong>{template.level}</strong>
@@ -481,19 +486,17 @@ export function Gen3GameCubePanel({
             </div>
           </div>
         </section>
-        <section className="panel static-panel static-filter-panel">
+        <section className="panel gen3gamecube-panel gen3gamecube-filter-panel">
           <div className="panel-heading">
             <div>
-              <span className="panel-index">03</span>
               <h2>{t("filters")}</h2>
             </div>
-            <span className="panel-note">PokeFinder / Filter</span>
           </div>
           <fieldset
             className="filter-controls"
             disabled={operation === "generator" && filtersDisabled}
           >
-            <div className="gen3-filter-selects">
+            <div className="gen3gamecube-filter-selects">
               <label className="field">
                 <span>{t("ability")}</span>
                 <Select
@@ -606,40 +609,57 @@ export function Gen3GameCubePanel({
                 </div>
               ))}
             </div>
-            <div className="filter-tool-row">
-              <label className="toggle-field">
-                <input
-                  checked={showStats}
-                  onChange={(event) => setShowStats(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>{t("showStats")}</span>
-              </label>
-              <button onClick={onOpenIvCalculator} type="button">
+            <div className="filter-bottom-row gen3gamecube-filter-bottom-row">
+              <div className="filter-tool-row">
+                <label className="toggle-field">
+                  <input
+                    checked={showStats}
+                    onChange={(event) => setShowStats(event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>{t("showStats")}</span>
+                </label>
+                {operation === "generator" && (
+                  <label className="toggle-field">
+                    <input
+                      checked={filtersDisabled}
+                      onChange={(event) =>
+                        setFiltersDisabled(event.target.checked)
+                      }
+                      type="checkbox"
+                    />
+                    <span>{t("disableFilters")}</span>
+                  </label>
+                )}
+              </div>
+              <button
+                className="iv-calculator-action"
+                onClick={onOpenIvCalculator}
+                type="button"
+              >
                 {t("ivCalculator")}
               </button>
             </div>
           </fieldset>
-          {operation === "generator" && (
-            <label className="toggle-field disable-filters">
-              <input
-                checked={filtersDisabled}
-                onChange={(event) => setFiltersDisabled(event.target.checked)}
-                type="checkbox"
-              />
-              <span>{t("disableFilters")}</span>
-            </label>
-          )}
         </section>
       </form>
-      <section className="panel results-panel">
-        <div className="results-heading">
+      <section className="panel results-panel gen3gamecube-results-panel">
+        <div className="results-heading gen3gamecube-results-heading">
           <div className="panel-heading compact">
             <div>
-              <span className="panel-index">04</span>
               <h2>{t("results")}</h2>
             </div>
             <span className={`run-status ${status}`}>{t(status)}</span>
+          </div>
+          <div className="gen3gamecube-result-alerts">
+            {error && (
+              <div className="alert error">
+                {error.includes("Wasm") ? t("gameCubeWasmMissing") : error}
+              </div>
+            )}
+            {summary?.resultLimitReached && (
+              <div className="alert warning">{t("limitReached")}</div>
+            )}
           </div>
           <span className="result-count">{states.length}</span>
         </div>
@@ -657,15 +677,7 @@ export function Gen3GameCubePanel({
             </strong>
           </span>
         </div>
-        {error && (
-          <div className="alert error">
-            {error.includes("Wasm") ? t("gameCubeWasmMissing") : error}
-          </div>
-        )}
-        {summary?.resultLimitReached && (
-          <div className="alert warning">{t("limitReached")}</div>
-        )}
-        <div className="table-shell static-table-shell">
+        <div className="table-shell gen3gamecube-table-shell">
           {states.length === 0 ? (
             <div className="empty-state">
               <span className="empty-cross">+</span>

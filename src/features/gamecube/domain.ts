@@ -1,4 +1,5 @@
 import type { Gen3GameVersion } from "../profiles/domain";
+import { countIvCombinations } from "../shared/perfectIvCombinations";
 import { validatePerfectIvFilter } from "../shared/perfectIvFilter";
 
 export const GEN3_GAMECUBE_API_VERSION = 2;
@@ -76,6 +77,11 @@ export interface GameCubeChunk {
   ivMin: [number, number, number, number, number, number];
   ivMax: [number, number, number, number, number, number];
   stateCount: number;
+}
+
+interface GameCubeIvRange {
+  ivMin: GameCubeFilters["ivMin"];
+  ivMax: GameCubeFilters["ivMax"];
 }
 
 export function categoryToWasm(category: GameCubeCategory) {
@@ -226,14 +232,69 @@ export function validateGameCubeRequest(request: GameCubeRequest): string[] {
     errors.push("perfectIvs");
   if (
     request.operation === "searcher" &&
-    request.filters.ivMin.reduce(
-      (total, minimum, index) =>
-        total * (request.filters.ivMax[index] - minimum + 1),
-      1,
-    ) > GEN3_GAMECUBE_MAX_TOTAL_STATES
+    !errors.some((error) => error === "perfectIvs" || error.startsWith("iv")) &&
+    gameCubeSearcherCombinationCount(request) > GEN3_GAMECUBE_MAX_TOTAL_STATES
   )
     errors.push("searchRange");
   return errors;
+}
+
+export function gameCubeSearcherCombinationCount(request: GameCubeRequest) {
+  return countIvCombinations(
+    request.filters.ivMin,
+    request.filters.ivMax,
+    request.filters.perfectIvValue,
+    request.filters.perfectIvCount,
+  );
+}
+
+function gameCubePerfectIvRanges(filters: GameCubeFilters): GameCubeIvRange[] {
+  if (filters.perfectIvCount === 0) {
+    return [
+      {
+        ivMin: [...filters.ivMin] as GameCubeFilters["ivMin"],
+        ivMax: [...filters.ivMax] as GameCubeFilters["ivMax"],
+      },
+    ];
+  }
+
+  const ranges: GameCubeIvRange[] = [];
+  const appendRange = (
+    dimension: number,
+    perfectCount: number,
+    ivMin: GameCubeFilters["ivMin"],
+    ivMax: GameCubeFilters["ivMax"],
+  ) => {
+    if (perfectCount + 6 - dimension < filters.perfectIvCount) return;
+    if (dimension === 6) {
+      if (perfectCount >= filters.perfectIvCount) ranges.push({ ivMin, ivMax });
+      return;
+    }
+
+    const minimum = filters.ivMin[dimension];
+    const maximum = filters.ivMax[dimension];
+    const ordinaryMaximum = Math.min(maximum, filters.perfectIvValue - 1);
+    if (minimum <= ordinaryMaximum) {
+      const nextMaximum = [...ivMax] as GameCubeFilters["ivMax"];
+      nextMaximum[dimension] = ordinaryMaximum;
+      appendRange(dimension + 1, perfectCount, ivMin, nextMaximum);
+    }
+
+    const perfectMinimum = Math.max(minimum, filters.perfectIvValue);
+    if (perfectMinimum <= maximum) {
+      const nextMinimum = [...ivMin] as GameCubeFilters["ivMin"];
+      nextMinimum[dimension] = perfectMinimum;
+      appendRange(dimension + 1, perfectCount + 1, nextMinimum, ivMax);
+    }
+  };
+
+  appendRange(
+    0,
+    0,
+    [...filters.ivMin] as GameCubeFilters["ivMin"],
+    [...filters.ivMax] as GameCubeFilters["ivMax"],
+  );
+  return ranges;
 }
 
 export function createGameCubeChunks(
@@ -266,11 +327,9 @@ export function createGameCubeChunks(
     }
     return chunks;
   }
-  const minimum = request.filters.ivMin;
-  const maximum = request.filters.ivMax;
   const appendRanges = (
-    ivMin: [number, number, number, number, number, number],
-    ivMax: [number, number, number, number, number, number],
+    ivMin: GameCubeFilters["ivMin"],
+    ivMax: GameCubeFilters["ivMax"],
   ) => {
     const stateCount = ivMax.reduce(
       (total, value, dimension) => total * (value - ivMin[dimension] + 1),
@@ -298,7 +357,8 @@ export function createGameCubeChunks(
     secondMin[dimension] = midpoint + 1;
     appendRanges(secondMin, ivMax);
   };
-  appendRanges([...minimum] as typeof minimum, [...maximum] as typeof maximum);
+  for (const range of gameCubePerfectIvRanges(request.filters))
+    appendRanges(range.ivMin, range.ivMax);
   return chunks;
 }
 

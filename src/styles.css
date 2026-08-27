@@ -2053,14 +2053,6 @@ h1 {
 .pokespot-result-table td {
   white-space: nowrap;
 }
-.gamecube-result-table {
-  min-width: 1260px;
-}
-.gamecube-result-table th,
-.gamecube-result-table td {
-  white-space: nowrap;
-}
-
 .jirachi-action-list {
   display: grid;
   gap: 0;

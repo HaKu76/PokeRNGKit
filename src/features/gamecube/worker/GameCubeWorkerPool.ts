@@ -3,6 +3,7 @@ import {
   decodeGameCubeStates,
   GEN3_GAMECUBE_API_VERSION,
   GEN3_GAMECUBE_MAX_RESULTS,
+  gameCubeSearcherCombinationCount,
   validateGameCubeRequest,
   type GameCubeChunk,
   type GameCubeRequest,
@@ -123,11 +124,7 @@ export class Gen3GameCubeWorkerPool implements GameCubeEngine {
       const totalStates =
         request.operation === "generator"
           ? request.maxAdvances + 1
-          : request.filters.ivMin.reduce(
-              (total, minimum, index) =>
-                total * (request.filters.ivMax[index] - minimum + 1),
-              1,
-            );
+          : gameCubeSearcherCombinationCount(request);
       return {
         processedStates: 0,
         totalStates,

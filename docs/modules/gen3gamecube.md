@@ -32,11 +32,11 @@
 | Nature/Hidden Power                  | `StateFilter`                        | 掩码分别为 `1..0x1FFFFFF` 和 `1..0xFFFF`                        |
 | Shadow locks                         | `LockInfo`                           | 最多 5 条；nature `0..24`、gender `0..2`、gender ratio `0..255` |
 
-Generator 的请求上限为最多 50000000 个闭区间帧；Searcher 的六项 IV 笛卡尔积同样不得超过 50000000，并在 Worker Pool 中继续拆成最多 100000 个组合的 Wasm 分片。`Initial + Offset + Max` 不得超过 `0xFFFFFFFF`。Channel 在 Wasm ABI 中使用上游 `Game::GC = 96`，XD/Colosseum 分别使用 `32/64`。
+Generator 的请求上限为最多 50000000 个闭区间帧；Searcher 先按六项 IV 范围，再按“至少 Count 项大于等于 Value”计算实际组合数，超过 50000000 才拒绝。满足完美个体条件的 IV 组合会拆成互斥范围，并在 Worker Pool 中继续拆成最多 100000 个组合的 Wasm 分片。`Initial + Offset + Max` 不得超过 `0xFFFFFFFF`。Channel 在 Wasm ABI 中使用上游 `Game::GC = 96`，XD/Colosseum 分别使用 `32/64`。
 
 ## Wasm/Worker ABI
 
-API v1 接收固定 55-word 请求，Generator/Searcher 共享输入布局。每条结果为 12 个 `uint32_t`：`advancesOrSeed / pid / 六项 IV / ability / gender / level / nature+shiny`。Nature 在低 8 位，Shiny 在高位；Worker 复制前校验结果数量、指针对齐、IV、能力、性别、等级、性格和闪光范围。
+API v2 接收固定 57-word 请求，Generator/Searcher 共享输入布局；第 55、56 项依次为 Perfect IV Value、Perfect IV Count。每条结果为 12 个 `uint32_t`：`advancesOrSeed / pid / 六项 IV / ability / gender / level / nature+shiny`。Nature 在低 8 位，Shiny 在高位；Worker 复制前校验结果数量、指针对齐、IV、能力、性别、等级、性格和闪光范围。
 
 Generator/Searcher 使用独立 Worker Pool，默认根据 `hardwareConcurrency` 使用最多 8 个 Worker，按 `chunkIndex` 恢复确定顺序；取消会终止并重建 Worker，不依赖 `SharedArrayBuffer` 或 Wasm pthread。
 
@@ -45,3 +45,14 @@ Generator/Searcher 使用独立 Worker Pool，默认根据 `hardwareConcurrency`
 已加入 `wasm/modules/gen3gamecube/tests/gamecube_native_test.cpp`，覆盖 Channel Jirachi Generator 固定结果。2026-08-13 经项目所有者授权，非受限环境的 `npm run verify` 已通过 Prettier、ESLint、TypeScript、28 个 Vitest 文件共 103 项测试、Vite 构建和 PWA 预缓存；模板数据已静态核对为 `69/1/77`。原生夹具、Wasm 构建、性能、浏览器和生产算法回归未运行。
 
 vendored 上游文件、模板数据和 SHA-256 记录见 [`third_party/pokefinder/UPSTREAM.md`](../../third_party/pokefinder/UPSTREAM.md)。
+
+## 紧凑工作区
+
+2026-08-27 起，GameCube Generator/Searcher 使用
+`src/features/gamecube/Gen3GameCubePanel.css` 的局部布局和密度规则：操作切换通过页面标题区的
+Portal 放在存档选择左侧；乱数信息、设置、筛选在桌面同排，窄视口改为单列；结果区与控制区共享右边界。
+
+输入、下拉触发器、多选触发器、操作按钮和下拉选项统一为 `30px`。筛选器先按六项 IV 范围筛选，再按
+“完美个体值 / 完美个体数”应用独立阈值条件；检索时仅枚举同时满足两层条件的互斥 IV 子范围。筛选底部把
+“显示能力值”、Generator 的“取消筛选”和个体值计算器放在同一操作行，结果提示移到标题右侧，表格最后一列
+不再显示右边界。
