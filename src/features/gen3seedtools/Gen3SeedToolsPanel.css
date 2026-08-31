@@ -10,6 +10,16 @@
   gap: var(--gen3seedtools-panel-gap);
 }
 
+#root .main-content .seed-tools-workspace > .seed-tools-tabs {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#root .main-content .seed-tools-workspace > .seed-tools-view {
+  grid-column: 1;
+  grid-row: 2;
+}
+
 #root .main-content .seed-tools-workspace [hidden] {
   display: none !important;
 }

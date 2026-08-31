@@ -9,12 +9,17 @@
 
 ## 2026-08-31 第三世代 Seed 工具外层布局修复
 
-- 修复：Seed 工具工作区明确使用单列外层轨道，外层页签与当前页签内容不再被 Grid 自动放入
-  两个隐式列；初始 Seed、Seed 查询时间、NGC Seed 和 Target Painting Timer 的内部面板布局保持不变。
-- 已验证：外部 Chrome 本地预览 `http://127.0.0.1:4173/` 中，四个页签的外层页签与内容均恢复
-  为单列，初始 Seed 三块面板回到工作区左侧；桌面布局无横向溢出。
+- 修复：公共内容容器在 `1081–1500px` 宽度时的两列规则不再覆盖 Seed 工具；外层页签与当前页签内容
+  显式固定到同一列的上下两行，避免宽屏下被 Grid 自动放入两个隐式列。
+- 保留：初始 Seed、Seed 查询时间、NGC Seed 和 Target Painting Timer 的内部面板布局保持不变。
+- 已验证：外部 Chrome 本地预览 `http://127.0.0.1:4173/` 中，`1895×872` 宽屏、默认桌面尺寸和
+  `390×844` 窄屏的 Seed 工具外层均为单列；宽屏页签与内容左边界一致，初始 Seed 三块面板保持在内容区内，
+  未出现横向溢出。
 - 已通过：`npm run verify`（Prettier、ESLint、`tsc -b`、179 个 Vitest 文件共 621 项测试、
   Vite/PWA 生产构建）；保留既有 ESLint Hook 依赖 warning 和构建大 chunk warning。
+- 已通过：`npx prettier --check src/features/gen3seedtools/Gen3SeedToolsPanel.css src/styles.css` 和
+  `git diff --check`。
+- 未运行：完整 `npm run format:check` 在当前环境超过 60 秒未返回，已终止；本轮修改文件的定向格式检查通过。
 - Git：修复待提交并推送。
 
 ## 2026-08-31 第三世代 Seed 工具紧凑布局预览
