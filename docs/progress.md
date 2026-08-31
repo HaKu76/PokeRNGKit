@@ -7,6 +7,16 @@
 - 每次迁移同步解耦样式：模块专属布局和密度归入功能目录 CSS，共享控件只保留跨模块语义，
   并清理该面板散落在全局样式中的专属覆盖。
 
+## 2026-08-31 第三世代 Seed 工具外层布局修复
+
+- 修复：Seed 工具工作区明确使用单列外层轨道，外层页签与当前页签内容不再被 Grid 自动放入
+  两个隐式列；初始 Seed、Seed 查询时间、NGC Seed 和 Target Painting Timer 的内部面板布局保持不变。
+- 已验证：外部 Chrome 本地预览 `http://127.0.0.1:4173/` 中，四个页签的外层页签与内容均恢复
+  为单列，初始 Seed 三块面板回到工作区左侧；桌面布局无横向溢出。
+- 已通过：`npm run verify`（Prettier、ESLint、`tsc -b`、179 个 Vitest 文件共 621 项测试、
+  Vite/PWA 生产构建）；保留既有 ESLint Hook 依赖 warning 和构建大 chunk warning。
+- Git：修复待提交并推送。
+
 ## 2026-08-31 第三世代 Seed 工具紧凑布局预览
 
 - 优化：初始 Seed、Seed 查询时间、NGC Seed 和 Target Painting Timer 四个页签统一采用

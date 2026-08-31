@@ -5,6 +5,7 @@
   --gen3seedtools-control-height: 30px;
   --gen3seedtools-panel-gap: 12px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   min-width: 0;
   gap: var(--gen3seedtools-panel-gap);
 }
