@@ -82,11 +82,7 @@ export function Gen3SeedToTimePanel({
       <form className="seed-to-time-control-grid" onSubmit={find}>
         <section className="panel compact-module-panel seed-to-time-input-panel">
           <div className="panel-heading compact">
-            <div>
-              <span className="panel-index">01</span>
-              <h2>{t("seedToTimeModule")}</h2>
-            </div>
-            <span className="panel-note">PokeRNGR</span>
+            <h2>{t("seedToTimeModule")}</h2>
           </div>
           <div className="seed-to-time-form-grid">
             <label className="field">
@@ -147,10 +143,7 @@ export function Gen3SeedToTimePanel({
       <section className="panel results-panel seed-to-time-results-panel">
         <div className="results-heading">
           <div className="panel-heading compact">
-            <div>
-              <span className="panel-index">02</span>
-              <h2>{t("results")}</h2>
-            </div>
+            <h2>{t("results")}</h2>
             <span className={`run-status ${status}`}>{statusLabel}</span>
           </div>
           <div className="result-actions">

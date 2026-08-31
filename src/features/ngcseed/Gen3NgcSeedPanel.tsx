@@ -467,10 +467,7 @@ export function Gen3NgcSeedPanel({
           role="tabpanel"
         >
           <div className="panel-heading compact">
-            <div>
-              <span className="panel-index">01</span>
-              <h2>{t("settings")}</h2>
-            </div>
+            <h2>{t("settings")}</h2>
           </div>
           {mode === "gales" && (
             <div className="ngc-seed-form-grid">
@@ -673,10 +670,7 @@ export function Gen3NgcSeedPanel({
       <section className="panel results-panel ngc-seed-results-panel">
         <div className="results-heading">
           <div className="panel-heading compact">
-            <div>
-              <span className="panel-index">02</span>
-              <h2>{t("results")}</h2>
-            </div>
+            <h2>{t("results")}</h2>
             <span className={`run-status ${status}`}>{statusLabel}</span>
           </div>
           <span className="result-count">

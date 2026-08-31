@@ -3,6 +3,7 @@ import { Gen3InitialSeedPanel } from "../initialseed/Gen3InitialSeedPanel";
 import { Gen3NgcSeedPanel } from "../ngcseed/Gen3NgcSeedPanel";
 import { Gen3PaintingPanel } from "../gen3painting/Gen3PaintingPanel";
 import { Gen3SeedToTimePanel } from "../seedtotime/Gen3SeedToTimePanel";
+import "./Gen3SeedToolsPanel.css";
 
 export type Gen3SeedToolTab =
   "initialseed" | "seedtotime" | "ngcseed" | "painting";
@@ -62,7 +63,7 @@ export function Gen3SeedToolsPanel({
       <div
         aria-hidden={activeTab !== "initialseed"}
         aria-labelledby="gen3-seed-tools-tab-initialseed"
-        className="seed-tools-view"
+        className="seed-tools-view seed-tools-view-initialseed"
         hidden={activeTab !== "initialseed"}
         id="gen3-seed-tools-initialseed"
         role="tabpanel"
@@ -72,7 +73,7 @@ export function Gen3SeedToolsPanel({
       <div
         aria-hidden={activeTab !== "seedtotime"}
         aria-labelledby="gen3-seed-tools-tab-seedtotime"
-        className="seed-tools-view"
+        className="seed-tools-view seed-tools-view-seedtotime"
         hidden={activeTab !== "seedtotime"}
         id="gen3-seed-tools-seedtotime"
         role="tabpanel"
@@ -82,7 +83,7 @@ export function Gen3SeedToolsPanel({
       <div
         aria-hidden={activeTab !== "ngcseed"}
         aria-labelledby="gen3-seed-tools-tab-ngcseed"
-        className="seed-tools-view"
+        className="seed-tools-view seed-tools-view-ngcseed"
         hidden={activeTab !== "ngcseed"}
         id="gen3-seed-tools-ngcseed"
         role="tabpanel"
@@ -92,7 +93,7 @@ export function Gen3SeedToolsPanel({
       <div
         aria-hidden={activeTab !== "painting"}
         aria-labelledby="gen3-seed-tools-tab-painting"
-        className="seed-tools-view"
+        className="seed-tools-view seed-tools-view-painting"
         hidden={activeTab !== "painting"}
         id="gen3-seed-tools-painting"
         role="tabpanel"

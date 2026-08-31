@@ -226,11 +226,7 @@ export function Gen3InitialSeedPanel({
       <form className="initial-seed-control-grid" onSubmit={run}>
         <section className="panel static-panel initial-seed-input-panel">
           <div className="panel-heading">
-            <div>
-              <span className="panel-index">01</span>
-              <h2>{t("input")}</h2>
-            </div>
-            <span className="panel-note">PokeRNG / PokeRNGR</span>
+            <h2>{t("input")}</h2>
           </div>
           <div className="static-form-stack">
             {operation === "rs-ids" ? (
@@ -316,11 +312,7 @@ export function Gen3InitialSeedPanel({
 
         <section className="panel static-panel initial-seed-notes-panel">
           <div className="panel-heading">
-            <div>
-              <span className="panel-index">02</span>
-              <h2>{t("information")}</h2>
-            </div>
-            <span className="panel-note">Gen III / API 1</span>
+            <h2>{t("information")}</h2>
           </div>
           <div className="initial-seed-details">
             <div>
@@ -340,10 +332,7 @@ export function Gen3InitialSeedPanel({
       <section className="panel results-panel initial-seed-results-panel">
         <div className="results-heading">
           <div className="panel-heading compact">
-            <div>
-              <span className="panel-index">03</span>
-              <h2>{t("results")}</h2>
-            </div>
+            <h2>{t("results")}</h2>
             <span className={`run-status ${status}`}>{statusLabel}</span>
           </div>
           <div className="result-actions">
