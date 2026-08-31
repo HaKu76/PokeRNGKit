@@ -94,13 +94,17 @@ Gen7StationaryPanel
 
 页头选择 3DSRNGTool 的 Sun、Moon、Ultra Sun 或 Ultra Moon 档案时，同步 GameVersion、TSV、TRV 与 Shiny Charm，并按现有版本切换流程重置起始帧和可用目标模板。同步只在档案 id 或更新时间改变时执行，之后手动修改不会被普通重渲染覆盖。
 
-桌面使用双列 operational workspace：左侧集中 RNG、目标和筛选，右侧结果表占据主要宽度并独立滚动。自定义目标与筛选使用可折叠区域；`1180px` 以下转为单列，移动端继续保留横向结果表滚动。
+桌面使用双列 operational workspace：左侧集中 RNG、目标和筛选，右侧结果表占据主要宽度并独立滚动。自定义目标与筛选使用可折叠区域；内容容器宽度低于 `1280px`（即 `1279px` 及以下）转为单列，移动端继续保留横向结果表滚动。
 
 PokeFinder 已有的简体中文控件词条沿用 `Form/i18n/PokeFinder_zh.ts`，包括“设置”“分类”“御三家”“化石”“同步”“闪耀护符”“性格”“特性”“性别”和“觉醒力量”。PokeFinder 没有对应翻译的 3DSRNGTool 专用标签保留英文源字符串，例如 `Consider Delay`、`Raining`、`Forced Shiny`、`Blink Frame`、`Safe Frame`、`Perfect IV Value` 与 `Perfect IV Count`。
 
 ## 当前验证状态
 
-本轮未获授权运行测试、类型检查、原生夹具、Wasm 构建、Vite 构建或浏览器检查。源码已加入 Domain、UI Preview、Worker 取消和原生会话夹具，但这些文件尚未执行；不能据此声明算法或界面已通过。
+本轮仅进行项目所有者授权的外部 Chrome 本地 UI 检查，未运行测试、类型检查、原生夹具、Wasm 构建或 Vite 构建。
+已验证 `http://127.0.0.1:4173/` 在 `1895×872`、`1280×720`、`1024×768`、`768×1024` 和 `390×844`
+下的布局：宽屏设置区与结果区并排，中等内容宽度自动改为单列，手机端控件恢复 44px 触控高度；所有输入均处于
+所属面板边界内，无文档横向溢出。已实际点击 `HP 最大` 输入框并打开“游戏版本”下拉，五种尺寸均能获得焦点或打开菜单，
+下拉菜单宽度与触发框一致。
 
 生产算法验收仍须等待项目所有者提交、推送并由 GitHub Actions 部署后，使用项目所有者提供的准确生产 URL 执行。
 

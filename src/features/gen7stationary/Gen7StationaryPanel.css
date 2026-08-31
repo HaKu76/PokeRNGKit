@@ -1,8 +1,9 @@
-.gen7stationary-panel {
+#root .main-content .gen7stationary-panel {
+  --gen7stationary-control-height: 30px;
   min-width: 0;
 }
 
-.gen7stationary-workspace {
+#root .main-content .gen7stationary-panel .gen7stationary-workspace {
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(0, 1fr);
@@ -10,42 +11,42 @@
   align-items: stretch;
 }
 
-.gen7stationary-controls,
-.gen7stationary-results {
+#root .main-content .gen7stationary-panel .gen7stationary-controls,
+#root .main-content .gen7stationary-panel .gen7stationary-results {
   min-width: 0;
   min-height: 0;
   overflow: hidden;
 }
 
-.gen7stationary-controls {
+#root .main-content .gen7stationary-panel .gen7stationary-controls {
   height: auto;
   min-height: 0;
 }
 
-.gen7stationary-results {
+#root .main-content .gen7stationary-panel .gen7stationary-results {
   height: clamp(360px, 56vh, 620px);
   min-height: 360px;
 }
 
-.gen7stationary-controls {
+#root .main-content .gen7stationary-panel .gen7stationary-controls {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.15fr) minmax(0, 1fr);
   align-content: start;
 }
 
-.gen7stationary-control-heading,
-.gen7stationary-run-actions {
+#root .main-content .gen7stationary-panel .gen7stationary-control-heading,
+#root .main-content .gen7stationary-panel .gen7stationary-run-actions {
   grid-column: 1 / -1;
 }
 
-.gen7stationary-rng-section {
+#root .main-content .gen7stationary-panel .gen7stationary-rng-section {
   grid-column: 1;
   min-width: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-.gen7stationary-settings-column {
+#root .main-content .gen7stationary-panel .gen7stationary-settings-column {
   grid-column: 2;
   min-width: 0;
   min-height: 0;
@@ -53,7 +54,7 @@
   overscroll-behavior: contain;
 }
 
-.gen7stationary-filter-section {
+#root .main-content .gen7stationary-panel .gen7stationary-filter-section {
   grid-column: 3;
   min-width: 0;
   min-height: 0;
@@ -61,19 +62,19 @@
   overscroll-behavior: contain;
 }
 
-.gen7stationary-control-heading,
-.gen7stationary-results-heading,
-.gen7stationary-control-heading > div,
-.gen7stationary-results-heading > div,
-.gen7stationary-result-actions,
-.gen7stationary-run-actions {
+#root .main-content .gen7stationary-panel .gen7stationary-control-heading,
+#root .main-content .gen7stationary-panel .gen7stationary-results-heading,
+#root .main-content .gen7stationary-panel .gen7stationary-control-heading > div,
+#root .main-content .gen7stationary-panel .gen7stationary-results-heading > div,
+#root .main-content .gen7stationary-panel .gen7stationary-result-actions,
+#root .main-content .gen7stationary-panel .gen7stationary-run-actions {
   display: flex;
   min-width: 0;
   align-items: center;
 }
 
-.gen7stationary-control-heading,
-.gen7stationary-results-heading {
+#root .main-content .gen7stationary-panel .gen7stationary-control-heading,
+#root .main-content .gen7stationary-panel .gen7stationary-results-heading {
   position: sticky;
   z-index: 5;
   top: 0;
@@ -85,13 +86,17 @@
   background: var(--surface);
 }
 
-.gen7stationary-control-heading > div,
-.gen7stationary-results-heading > div {
+#root .main-content .gen7stationary-panel .gen7stationary-control-heading > div,
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-results-heading
+  > div {
   gap: 9px;
 }
 
-.gen7stationary-control-heading h2,
-.gen7stationary-results-heading h2 {
+#root .main-content .gen7stationary-panel .gen7stationary-control-heading h2,
+#root .main-content .gen7stationary-panel .gen7stationary-results-heading h2 {
   margin: 0;
   color: var(--text);
   font-size: 18px;
@@ -99,16 +104,20 @@
   letter-spacing: 0;
 }
 
-.gen7stationary-control-section {
+#root .main-content .gen7stationary-panel .gen7stationary-control-section {
   padding: 13px 14px 14px;
 }
 
-.gen7stationary-control-section + .gen7stationary-control-section,
-.gen7stationary-disclosure {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-control-section
+  + .gen7stationary-control-section,
+#root .main-content .gen7stationary-panel .gen7stationary-disclosure {
   border-top: 1px solid var(--line-soft);
 }
 
-.gen7stationary-control-section h3 {
+#root .main-content .gen7stationary-panel .gen7stationary-control-section h3 {
   margin: 0 0 10px;
   color: var(--muted);
   font-size: 13px;
@@ -118,38 +127,95 @@
   text-transform: uppercase;
 }
 
-.gen7stationary-field-grid {
+#root .main-content .gen7stationary-panel .gen7stationary-field-grid {
   display: grid;
   min-width: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 9px;
 }
 
-.gen7stationary-field-grid.compact {
+#root .main-content .gen7stationary-panel .gen7stationary-field-grid.compact {
   margin-top: 10px;
 }
 
-.gen7stationary-panel .field input,
-.gen7stationary-panel .field select,
-.gen7stationary-panel .multi-check-trigger,
-.gen7stationary-iv-row input {
-  min-height: 44px;
+#root .main-content .gen7stationary-panel .field input,
+#root .main-content .gen7stationary-panel .field select,
+#root .main-content .gen7stationary-panel .haku-select-trigger,
+#root .main-content .gen7stationary-panel .multi-check-trigger,
+#root .main-content .gen7stationary-panel .prefixed-input,
+#root .main-content .gen7stationary-panel .gen7stationary-iv-row input {
+  box-sizing: border-box;
+  height: var(--gen7stationary-control-height);
+  min-height: var(--gen7stationary-control-height);
   border-radius: 10px;
 }
 
-.gen7stationary-panel .prefixed-input input {
-  min-height: 38px;
+#root .main-content .gen7stationary-panel .field input,
+#root .main-content .gen7stationary-panel .field select,
+#root .main-content .gen7stationary-panel .haku-select-trigger,
+#root .main-content .gen7stationary-panel .multi-check-trigger,
+#root .main-content .gen7stationary-panel .prefixed-input {
+  padding-block: 3px;
+  line-height: 20px;
 }
 
-.gen7stationary-panel input:disabled,
-.gen7stationary-panel select:disabled,
-.gen7stationary-panel button:disabled,
-.gen7stationary-panel fieldset:disabled {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-control-section
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-filter-section
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+  height: var(--gen7stationary-control-height);
+  min-height: var(--gen7stationary-control-height);
+  padding-block: 3px;
+}
+
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-disclosure
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+  height: var(--gen7stationary-control-height);
+  min-height: var(--gen7stationary-control-height);
+  padding-block: 3px;
+}
+
+#root .main-content .gen7stationary-panel .field input,
+#root .main-content .gen7stationary-panel .field select {
+  padding-inline: 9px;
+}
+
+#root
+  .main-content
+  .gen7stationary-panel
+  :is(.haku-select-trigger, .multi-check-trigger) {
+  gap: 8px;
+  padding-inline: 9px;
+}
+
+#root
+  .main-content
+  .gen7stationary-panel
+  :is(.haku-select-trigger > span, .multi-check-trigger > span:first-child) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#root .main-content .gen7stationary-panel input:disabled,
+#root .main-content .gen7stationary-panel select:disabled,
+#root .main-content .gen7stationary-panel button:disabled,
+#root .main-content .gen7stationary-panel fieldset:disabled {
   cursor: not-allowed;
   opacity: 0.52;
 }
 
-.gen7stationary-encounter-meta {
+#root .main-content .gen7stationary-panel .gen7stationary-encounter-meta {
   display: grid;
   min-width: 0;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -161,7 +227,7 @@
   background: var(--line-soft);
 }
 
-.gen7stationary-encounter-meta span {
+#root .main-content .gen7stationary-panel .gen7stationary-encounter-meta span {
   min-width: 0;
   display: grid;
   gap: 2px;
@@ -171,7 +237,11 @@
   font-size: 13px;
 }
 
-.gen7stationary-encounter-meta strong {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-encounter-meta
+  strong {
   overflow: hidden;
   color: var(--text);
   font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -181,19 +251,19 @@
   white-space: nowrap;
 }
 
-.gen7stationary-toggle-grid {
+#root .main-content .gen7stationary-panel .gen7stationary-toggle-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 9px 12px;
   margin-top: 11px;
 }
 
-.gen7stationary-disclosure {
+#root .main-content .gen7stationary-panel .gen7stationary-disclosure {
   min-width: 0;
 }
 
-.gen7stationary-disclosure summary {
-  min-height: 44px;
+#root .main-content .gen7stationary-panel .gen7stationary-disclosure summary {
+  min-height: var(--gen7stationary-control-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -205,96 +275,129 @@
   list-style: none;
 }
 
-.gen7stationary-disclosure summary::-webkit-details-marker {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-disclosure
+  summary::-webkit-details-marker {
   display: none;
 }
 
-.gen7stationary-disclosure summary::after {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-disclosure
+  summary::after {
   color: var(--muted);
   content: "+";
   font-family: ui-monospace, monospace;
   font-size: 17px;
 }
 
-.gen7stationary-disclosure[open] summary::after {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-disclosure[open]
+  summary::after {
   content: "-";
 }
 
-.gen7stationary-disclosure summary:hover,
-.gen7stationary-disclosure summary:focus-visible {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-disclosure
+  summary:hover,
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-disclosure
+  summary:focus-visible {
   background: var(--surface-2);
 }
 
-.gen7stationary-disclosure summary:focus-visible {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-disclosure
+  summary:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: -2px;
 }
 
-.gen7stationary-disclosure .disclosure-content {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-disclosure
+  .disclosure-content {
   padding: 0 14px 12px;
 }
 
-.gen7stationary-disclosure .gen7stationary-toggle-grid.disclosure-content {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-disclosure
+  .gen7stationary-toggle-grid.disclosure-content {
   margin-top: 0;
 }
 
-.gen7stationary-filter-controls {
+#root .main-content .gen7stationary-panel .gen7stationary-filter-controls {
   min-width: 0;
   margin: 0;
   border: 0;
   padding: 0;
 }
 
-.gen7stationary-panel .multi-check-field {
+#root .main-content .gen7stationary-panel .multi-check-field {
   position: relative;
 }
 
-.gen7stationary-iv-filter {
+#root .main-content .gen7stationary-panel .gen7stationary-iv-filter {
+  box-sizing: border-box;
   margin: 0 14px 12px;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
 }
 
-.gen7stationary-iv-header,
-.gen7stationary-iv-row {
+#root .main-content .gen7stationary-panel .gen7stationary-iv-header,
+#root .main-content .gen7stationary-panel .gen7stationary-iv-row {
   display: grid;
-  grid-template-columns: minmax(72px, 1fr) 72px 72px;
+  grid-template-columns: minmax(0, 1fr) minmax(44px, 52px) minmax(44px, 52px);
   align-items: center;
-  gap: 6px;
-  min-height: 39px;
+  gap: 4px;
+  min-height: 36px;
   padding: 3px 7px;
 }
 
-.gen7stationary-iv-header {
+#root .main-content .gen7stationary-panel .gen7stationary-iv-header {
   background: var(--surface-2);
   color: var(--muted);
   font-size: 13px;
 }
 
-.gen7stationary-iv-row {
+#root .main-content .gen7stationary-panel .gen7stationary-iv-row {
   border-top: 1px solid var(--line-soft);
   color: var(--text);
   font-size: 13px;
 }
 
-.gen7stationary-iv-row input {
+#root .main-content .gen7stationary-panel .gen7stationary-iv-row input {
   width: 100%;
   min-width: 0;
   border: 1px solid var(--line);
-  padding: 4px 6px;
+  padding: 3px 5px;
   background: var(--control-bg);
   color: var(--text);
   text-align: center;
 }
 
-.gen7stationary-disable-filter {
+#root .main-content .gen7stationary-panel .gen7stationary-disable-filter {
   margin: 0 14px 13px;
   border-top: 1px solid var(--line-soft);
   padding-top: 11px;
 }
 
-.gen7stationary-run-actions {
+#root .main-content .gen7stationary-panel .gen7stationary-run-actions {
   position: sticky;
   z-index: 4;
   bottom: 0;
@@ -305,9 +408,11 @@
   background: var(--surface);
 }
 
-.gen7stationary-primary-action,
-.gen7stationary-icon-button {
-  min-height: 40px;
+#root .main-content .gen7stationary-panel .gen7stationary-primary-action,
+#root .main-content .gen7stationary-panel .gen7stationary-icon-button {
+  box-sizing: border-box;
+  height: var(--gen7stationary-control-height);
+  min-height: var(--gen7stationary-control-height);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -315,10 +420,10 @@
   border-radius: 8px;
 }
 
-.gen7stationary-primary-action {
+#root .main-content .gen7stationary-panel .gen7stationary-primary-action {
   gap: 8px;
   border-color: var(--brand-strong);
-  padding: 7px 14px;
+  padding: 3px 10px;
   background: var(--brand);
   color: #ffffff;
   font: inherit;
@@ -326,66 +431,79 @@
   font-weight: 700;
 }
 
-.gen7stationary-primary-action:hover:not(:disabled) {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-primary-action:hover:not(:disabled) {
   background: var(--brand-strong);
 }
 
-.gen7stationary-icon-button {
-  width: 40px;
-  flex: 0 0 40px;
+#root .main-content .gen7stationary-panel .gen7stationary-icon-button {
+  width: var(--gen7stationary-control-height);
+  flex: 0 0 var(--gen7stationary-control-height);
   border-color: var(--line);
   padding: 0;
   background: var(--control-bg);
   color: var(--text);
 }
 
-.gen7stationary-primary-action:focus-visible,
-.gen7stationary-icon-button:focus-visible {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-primary-action:focus-visible,
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-icon-button:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
-.gen7stationary-results {
+#root .main-content .gen7stationary-panel .gen7stationary-results {
   display: flex;
   flex-direction: column;
 }
 
-.gen7stationary-results-heading {
+#root .main-content .gen7stationary-panel .gen7stationary-results-heading {
   position: relative;
   flex: 0 0 58px;
 }
 
-.gen7stationary-result-actions {
+#root .main-content .gen7stationary-panel .gen7stationary-result-actions {
   gap: 7px;
 }
 
-.gen7stationary-result-actions output {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-result-actions
+  output {
   color: var(--muted);
   font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
-.gen7stationary-metrics {
+#root .main-content .gen7stationary-panel .gen7stationary-metrics {
   flex: 0 0 auto;
   flex-wrap: wrap;
   gap: 8px 16px;
   padding: 9px 14px;
 }
 
-.gen7stationary-table-shell {
+#root .main-content .gen7stationary-panel .gen7stationary-table-shell {
   min-height: 0;
   height: auto;
   flex: 1 1 auto;
 }
 
-.gen7stationary-virtual-table {
+#root .main-content .gen7stationary-panel .gen7stationary-virtual-table {
   position: relative;
   min-width: 1930px;
 }
 
-.gen7stationary-table-header,
-.gen7stationary-table-row {
+#root .main-content .gen7stationary-panel .gen7stationary-table-header,
+#root .main-content .gen7stationary-panel .gen7stationary-table-row {
   display: grid;
   min-width: 1930px;
   grid-template-columns:
@@ -394,19 +512,30 @@
   align-items: center;
 }
 
-.gen7stationary-virtual-table.time-mode {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-virtual-table.time-mode {
   min-width: 2210px;
 }
 
-.gen7stationary-virtual-table.time-mode .gen7stationary-table-header,
-.gen7stationary-virtual-table.time-mode .gen7stationary-table-row {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-virtual-table.time-mode
+  .gen7stationary-table-header,
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-virtual-table.time-mode
+  .gen7stationary-table-row {
   min-width: 2210px;
   grid-template-columns:
     172px 108px 86px 98px 168px 104px 104px repeat(6, 54px) 98px 110px 84px
     108px 82px 92px 64px 72px 72px 58px;
 }
 
-.gen7stationary-table-header {
+#root .main-content .gen7stationary-panel .gen7stationary-table-header {
   position: sticky;
   z-index: 3;
   top: 0;
@@ -415,7 +544,7 @@
   background: var(--surface-3);
 }
 
-.gen7stationary-table-header button {
+#root .main-content .gen7stationary-panel .gen7stationary-table-header button {
   height: 100%;
   overflow: hidden;
   border: 0;
@@ -429,17 +558,25 @@
   white-space: nowrap;
 }
 
-.gen7stationary-table-header button:hover {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-table-header
+  button:hover {
   color: var(--teal);
 }
 
-.gen7stationary-table-header button:focus-visible {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-table-header
+  button:focus-visible {
   z-index: 1;
   outline: 2px solid var(--focus-ring);
   outline-offset: -2px;
 }
 
-.gen7stationary-table-row {
+#root .main-content .gen7stationary-panel .gen7stationary-table-row {
   position: absolute;
   top: 0;
   right: 0;
@@ -452,96 +589,131 @@
   font-variant-numeric: tabular-nums;
 }
 
-.gen7stationary-table-row:nth-child(even) {
+#root
+  .main-content
+  .gen7stationary-panel
+  .gen7stationary-table-row:nth-child(even) {
   background: color-mix(in srgb, var(--surface-2) 55%, transparent);
 }
 
-.gen7stationary-table-row:hover {
+#root .main-content .gen7stationary-panel .gen7stationary-table-row:hover {
   background: var(--teal-soft);
   box-shadow: none;
 }
 
-.gen7stationary-table-row span {
+#root .main-content .gen7stationary-panel .gen7stationary-table-row span {
   overflow: hidden;
   padding: 0 9px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-@media (max-width: 1180px) {
-  .gen7stationary-controls {
+/* Keep the control surface wide enough for its three-column form. The
+   workspace stacks before the controls become narrower than their fields. */
+@container pokerngkit-content (min-width: 1280px) {
+  #root .main-content .gen7stationary-panel .gen7stationary-workspace {
+    grid-template-columns: minmax(660px, 1.05fr) minmax(0, 0.95fr);
+  }
+}
+
+@container pokerngkit-content (max-width: 1279px) {
+  #root .main-content .gen7stationary-panel .gen7stationary-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container pokerngkit-content (max-width: 1080px) {
+  #root .main-content .gen7stationary-panel .gen7stationary-controls {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .gen7stationary-rng-section,
-  .gen7stationary-settings-column,
-  .gen7stationary-filter-section {
+  #root .main-content .gen7stationary-panel .gen7stationary-rng-section,
+  #root .main-content .gen7stationary-panel .gen7stationary-settings-column,
+  #root .main-content .gen7stationary-panel .gen7stationary-filter-section {
     grid-column: 1;
   }
+}
 
-  .gen7stationary-controls {
+@container pokerngkit-content (max-width: 1279px) {
+  #root .main-content .gen7stationary-panel .gen7stationary-controls {
     height: auto;
     min-height: 0;
   }
 
-  .gen7stationary-rng-section,
-  .gen7stationary-settings-column,
-  .gen7stationary-filter-section {
+  #root .main-content .gen7stationary-panel .gen7stationary-rng-section,
+  #root .main-content .gen7stationary-panel .gen7stationary-settings-column,
+  #root .main-content .gen7stationary-panel .gen7stationary-filter-section {
     overflow: visible;
   }
 
-  .gen7stationary-control-heading,
-  .gen7stationary-run-actions {
+  #root .main-content .gen7stationary-panel .gen7stationary-control-heading,
+  #root .main-content .gen7stationary-panel .gen7stationary-run-actions {
     position: relative;
   }
 
-  .gen7stationary-results {
+  #root .main-content .gen7stationary-panel .gen7stationary-results {
     height: auto;
     min-height: 360px;
   }
 
-  .gen7stationary-table-shell {
+  #root .main-content .gen7stationary-panel .gen7stationary-table-shell {
     height: clamp(280px, 52vh, 520px);
     flex: none;
   }
 }
 
 @media (max-width: 620px) {
-  .gen7stationary-panel .field input,
-  .gen7stationary-panel .field select,
-  .gen7stationary-panel .multi-check-trigger,
-  .gen7stationary-iv-row input,
-  .gen7stationary-primary-action,
-  .gen7stationary-icon-button {
+  #root .main-content .gen7stationary-panel .field input,
+  #root .main-content .gen7stationary-panel .field select,
+  #root .main-content .gen7stationary-panel .haku-select-trigger,
+  #root .main-content .gen7stationary-panel .multi-check-trigger,
+  #root .main-content .gen7stationary-panel .prefixed-input,
+  #root .main-content .gen7stationary-panel .gen7stationary-primary-action,
+  #root .main-content .gen7stationary-panel .gen7stationary-icon-button {
+    height: 44px;
     min-height: 44px;
   }
 
-  .gen7stationary-icon-button {
+  #root
+    .main-content
+    .gen7stationary-panel
+    .gen7stationary-filter-section
+    .gen7stationary-iv-row
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+    height: 44px;
+    min-height: 44px;
+  }
+
+  #root .main-content .gen7stationary-panel .gen7stationary-icon-button {
     width: 44px;
     flex-basis: 44px;
   }
 
-  .gen7stationary-field-grid,
-  .gen7stationary-toggle-grid {
+  #root .main-content .gen7stationary-panel .gen7stationary-field-grid,
+  #root .main-content .gen7stationary-panel .gen7stationary-toggle-grid {
     grid-template-columns: 1fr;
   }
 
-  .gen7stationary-encounter-meta {
+  #root .main-content .gen7stationary-panel .gen7stationary-encounter-meta {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .gen7stationary-control-heading,
-  .gen7stationary-results-heading {
+  #root .main-content .gen7stationary-panel .gen7stationary-control-heading,
+  #root .main-content .gen7stationary-panel .gen7stationary-results-heading {
     align-items: flex-start;
     padding-top: 10px;
     padding-bottom: 10px;
   }
 
-  .gen7stationary-results-heading > div:first-child {
+  #root
+    .main-content
+    .gen7stationary-panel
+    .gen7stationary-results-heading
+    > div:first-child {
     flex-wrap: wrap;
   }
 
-  .gen7stationary-metrics {
+  #root .main-content .gen7stationary-panel .gen7stationary-metrics {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
