@@ -83,6 +83,8 @@ Seed 搜索使用独立 Worker 实例，不依赖 `SharedArrayBuffer`、Wasm pth
 
 页头选择 Gen VII 的 3DSRNGTool 档案时同步 GameVersion。普通、ID 与 Time Calculator 的起始帧继续由现有版本和模式 effect 派生；Seed、Clock、NPC 和其他当前输入不从档案覆盖。
 
+桌面端使用上下两行工作区，主乱数控制区占据上方整行，结果区在下方保持同宽；两块面板使用一致的有界高度并各自滚动。模块专属外层轨道固定为单列，避免应用外壳的通用工作区规则把两块面板改回左右布局。
+
 ## 验证记录
 
 - `npm test -- src/features/gen7main`：3 个测试文件、7 项测试通过。

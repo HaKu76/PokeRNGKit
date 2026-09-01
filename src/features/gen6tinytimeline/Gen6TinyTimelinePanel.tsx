@@ -271,7 +271,7 @@ export function Gen6TinyTimelinePanel({
       ? t("gen6TinyTimelineChainLength")
       : t("gen6TinyTimelineEncounterRate");
   return (
-    <div className="gen6tinytimeline-workspace">
+    <div className="gen6tinytimeline-workspace stacked-module-workspace">
       <form className="gen6tinytimeline-controls" onSubmit={run}>
         <section className="panel gen6tinytimeline-panel">
           <div className="panel-heading">

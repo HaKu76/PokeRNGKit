@@ -192,7 +192,7 @@ export function Gen6TinyIndexPanel({
   };
 
   return (
-    <div className="gen6tinyindex-workspace">
+    <div className="gen6tinyindex-workspace stacked-module-workspace">
       <form className="gen6tinyindex-controls" onSubmit={run}>
         <section className="panel gen6tinyindex-panel">
           <div className="panel-heading">

@@ -10,12 +10,45 @@
 - 页面专属紧凑密度集中在 `src/features/static/Gen3StaticPanel.css`，共享选择器组件不包含
   第三世代模块判断；标题区存档选择、管理按钮和 Portal 下拉选项同步使用 `30px`。
 - 中文界面的 Offset 专用标签显示为“校准帧数”，内部请求字段仍保持 `offset`。
+- Generator、Searcher、绿宝石新档御三家三个标题区入口固定为单行；空间不足时由入口容器横向
+  滚动，不把第三个入口折到下一行。新档 TID 的 Seed 说明与输入框同宽，最多显示两行。
+
+## 绿宝石新档御三家
+
+Generator 页签在游戏版本为 Emerald、分类为 Starters 时提供独立的“绿宝石新档御三家”入口。
+普通 Generator/Searcher 的参数语义保持不变；该入口把御三家目标和 ID 检索拆为两个可验证阶段：
+
+- “御三家 Seed”提供 `TID（建档后不重启）`与 `0000（重启后）`两条明确路径。前者对应命名
+  确认时读取 Timer 1，把同一个 16 位值写入 TID 并作为 PokeRNG 初始 Seed；后者对应完成 ID
+  生成后重启游戏，御三家生成器从 `0x0000` 重新开始，TID/SID 只参与异色判定。
+- TID 接受 `0..65535` 的十进制值。TID Seed 路径允许留空：输入 TID 时按该 Seed 快速前向
+  扫描，留空时从目标 IV 状态反推所有可行的 16 位 TID。Seed 0000 路径中目标 Seed 与 TID 已
+  解耦，因此要求先输入 TID，再由 ID Generator 为目标 PID 检索兼容 SID。
+- TID 留空默认检索 `0..1000000` 帧，`Perfect IV Value / Count` 为 `31 / 6`，异色为
+  `Star/Square`。异色设为 `Any` 时只要求高 V；设为 Star、Square 或 Star/Square 时，还要求同一
+  RNG 流在御三家目标帧之前实际生成过兼容的 SID。
+- 结果表显示 TID、御三家帧、完美个体数、PID、标准
+  `PSV = ((PID high XOR PID low) >> 3)`、六项 IV 和其他派生字段。每个高 V 异色目标只保留一行，
+  不按 8 个原始闪光 XOR 重复展示。
+- 点击 PSV 后跳转第三世代 ID Generator，自动带入 TID、PID 与御三家目标帧。ID Generator 只
+  在 TID Seed 路径扫描 `0..targetAdvance-1`，按 Star/Square 过滤同一 RNG 流中实际出现的 SID。
+  Seed 0000 路径的 ID 生成与重启后的御三家生成属于两段独立 RNG，默认改为扫描 `0..1000000`
+  ID 帧，不再错误要求 ID 帧小于御三家帧。两条路径都显示 SID、TSV、异色类型和 ID 帧。
+- 从 ID 结果继续返回 Static 时，才带入选定的 TID/SID 和精确御三家帧进行单帧验证。数学上与
+  PID 兼容、但未在各自 ID 搜索边界内实际生成的 SID 不会进入这个闭环。Seed 0000 路径会原样
+  保留目标 Seed `0x0000`，不会在返回时误写成 TID。
+
+输入 TID 的路径复用 `gen3static_generate`；TID 留空的路径使用 `gen3static_search_emerald`，按 IV
+组合拆给独立 Worker，并在 C++ 内反推候选 TID。单批执行量最多 25,000,000 个状态，总任务最多
+250,000,000 个状态：`31/5` 与一百万帧为 187,000,187，可执行；`31/4` 与同一范围为
+14,602,014,602，会在启动前拒绝并要求提高完美个体数或缩短帧数。
 
 ## 完美个体筛选
 
 - 控件：Perfect IV Value / Perfect IV Count；中文界面显示“完美个体值 / 完美个体数”。
 - 默认：Value 为 `31`，Count 为 `0`；Value 范围 `0..31`，Count 范围 `0..6`。
 - 语义：六项 IV 中大于等于 Value 的项目数量必须至少达到 Count；Count 为 `0` 时不缩小结果。
+- UI 预览与生产 Wasm 使用相同的数量判断；预览不再漏掉 Perfect IV 条件。
 - Searcher 先将六项 IV 的闭区间与完美个体条件求交，再按 `HP -> Atk -> Def -> SpA -> SpD -> Spe` 编号；例如六项 `0..31`、`31/5` 只产生 `187` 个候选，不会按 `32^6` 计数。六项范围和完美条件仍是 AND 关系，不是互斥模式。
 - 上游依据：3DSRNGTool_CHN revision `359bdd7a9ff7c145fec12302cf43da932923fa62` 的 `3DSRNGTool/MainForm.Designer.cs` 与 `3DSRNGTool/Core/RNGFilters.cs`。
 
@@ -138,11 +171,11 @@ Searcher 不扫描完整 `2^32` Seed 空间，而是枚举六项 IV 范围与完
 
 对每个候选状态使用 `PokeRNGR` 反向读取 PID，再计算性格、特性、性别和闪光并应用筛选。通过筛选后继续反推一次，得到结果表中的 Seed。
 
-Searcher 结果第一列是 Seed；Generator 结果第一列是 Advances。两者复用 48 字节 C ABI 记录时，只改变第一个 32 位字段的语义。
+Searcher 结果第一列是 Seed；Generator 结果第一列是 Advances。两者复用 48 字节 C ABI 记录时，只改变第一个 32 位字段的语义。绿宝石新档固定 TID 使用 Generator 记录；空 TID 反推使用 60 字节 Emerald 记录，其中包含目标帧、TID，以及可选的 ID 帧、SID 和闪光 XOR。React 统一由 PID 计算 PSV；第二阶段使用 ID 模块的 12 字节结果记录。
 
 ## 9. 筛选与快捷设置
 
-IV、完美个体、性格、觉醒力量、特性、性别和异色筛选在 C++ bridge 中执行，不会改变 RNG 序列或候选 Seed。`gen3static` API 4 使用 25 位性格掩码和 16 位觉醒力量掩码；界面没有勾选或全部勾选时均按 PokeFinder `CheckList` 的 `Any` 语义提交完整掩码。
+IV、完美个体、性格、觉醒力量、特性、性别和异色筛选在 C++ bridge 中执行，不会改变 RNG 序列或候选 Seed。`gen3static` API 6 使用 25 位性格掩码和 16 位觉醒力量掩码；界面没有勾选或全部勾选时均按 PokeFinder `CheckList` 的 `Any` 语义提交完整掩码。
 
 筛选器布局复用上游 `Form/Controls/Filter.ui`：桌面端左侧放六项 IV 与工具，右侧以紧凑行排列 Ability、Gender、Hidden Power、Nature、Shiny；窄屏降为单列。该结构与 `gen3wild` 复用同一 React 多选控件和网格，Wild 仅在上游对应位置额外插入 Encounter Slot 与 Level。
 
@@ -191,10 +224,15 @@ power     = 30 + floor(powerBits * 40 / 63)
 | Offset           | `Advance32Bit`，`0..4294967295`，10 位十进制 | 只保留十进制                             |
 | TID / SID        | `TIDSID`，`0..65535`，5 位十进制             | 从当前存档信息读取                       |
 | IV min / max     | `0..31`                                      | 最小值不得大于最大值                     |
-| Nature           | `CheckList`，25 项多选                       | API 4 使用 25 位掩码；空选择按完整掩码   |
-| Hidden Power     | `CheckList`，16 项多选                       | API 4 使用 16 位掩码；空选择按完整掩码   |
+| Nature           | `CheckList`，25 项多选                       | API 6 使用 25 位掩码；空选择按完整掩码   |
+| Hidden Power     | `CheckList`，16 项多选                       | API 6 使用 16 位掩码；空选择按完整掩码   |
 
 Generator 还要求 `Initial Advances + Offset + Max Advances <= 0xFFFFFFFF`。Searcher 的交集候选总数不得超过 50,000,000；Web 初始值为六项 `31..31`，保证首次检索可以运行，用户仍可按上游范围规则扩大搜索空间。每次 C ABI 调用最多处理 100,000 个状态或 IV 组合。
+
+绿宝石新档入口复用 TID 的 `0..65535` 十进制边界。TID Seed 下空值表示自动寻找 TID，非空值
+同时作为 16 位 Seed；Seed 0000 下 TID 必填，目标 Seed 固定为 `0x0000`。固定 TID 的第一阶段按
+Any 生成目标，再由 ID Generator 验证异色；空 TID 的反推路径可用 Any 只找高 V，也可在第一阶段
+要求 Star/Square 并验证目标帧之前存在兼容 SID。
 
 ## 12. 结果与固定夹具
 
@@ -218,7 +256,11 @@ Searcher 的 Groudon、Method 4、`31/31/31/31/31/31` 固定夹具恢复 4 个�
 
 ## 13. Web 执行边界
 
-Generator 按 Advances 范围分片，Searcher 按 IV 组合索引分片，每片最多 100,000。两个 Pool 都使用多个独立单线程 Wasm 实例，以 `chunkIndex` 恢复批次顺序，并通过 transferable `ArrayBuffer` 返回结果。
+Generator 按 Advances 范围分片，Searcher 按 IV 组合索引分片，每片最多 100,000。绿宝石新档
+固定 TID 使用 Generator Pool；TID 留空使用 Emerald Pool，并按每组 IV 的目标帧工作量动态缩小
+分片；点击 PSV 后改由 Gen3 ID Pool 扫描 ID 推进。TID Seed 将 ID 推进限制在御三家目标帧之前，
+Seed 0000 默认扫描一百万 ID 帧并在返回时继续使用 Seed `0x0000`。各 Pool 都使用独立单线程
+Wasm 实例，以 `chunkIndex` 恢复批次顺序，并通过 transferable `ArrayBuffer` 返回结果。
 
 Worker Pool、批次排序、进度、取消和 250,000 条结果上限属于浏览器编排层，不属于 RNG 算法；调整 Worker 数量不能改变相同输入对应的结果内容。
 
@@ -239,6 +281,9 @@ Worker Pool、批次排序、进度、取消和 250,000 条结果上限属于浏
 - `Core/Resources/Embed/embed_gen3.py`
 - `Core/Resources/Embed/embed_personal.py`
 - `Core/Resources/i18n/{en,zh,ja}/abilities_*.txt`
+- `pret/pokeemerald src/main.c`：`SeedRngAndSetTrainerId`
+- `pret/pokeemerald src/new_game.c`：`InitPlayerTrainerId`
+- `pret/pokeemerald src/battle_setup.c`：`CB2_GiveStarter`
 
 仓库验证入口：
 

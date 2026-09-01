@@ -2,9 +2,9 @@
   min-height: 0;
 }
 
-.gen6wild-workspace {
+#root .main-content .gen6wild-panel .gen6wild-workspace {
   display: grid;
-  grid-template-columns: minmax(420px, 0.9fr) minmax(560px, 1.4fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   min-height: 0;
 }
@@ -15,7 +15,7 @@
   min-height: 0;
 }
 
-.gen6wild-controls {
+#root .main-content .gen6wild-panel .gen6wild-controls {
   max-height: calc(100vh - 180px);
   overflow: auto;
 }
@@ -243,12 +243,12 @@
   position: absolute;
 }
 
-@media (max-width: 1120px) {
-  .gen6wild-workspace {
+@container pokerngkit-content (max-width: 719px) {
+  #root .main-content .gen6wild-panel .gen6wild-workspace {
     grid-template-columns: 1fr;
   }
 
-  .gen6wild-controls {
+  #root .main-content .gen6wild-panel .gen6wild-controls {
     max-height: none;
   }
 }

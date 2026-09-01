@@ -1,10 +1,10 @@
 .gen7main-panel {
   min-width: 0;
 }
-.gen7main-workspace {
+#root .main-content .gen7main-panel .gen7main-workspace {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(420px, 0.78fr) minmax(600px, 1.22fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
 }
@@ -409,8 +409,8 @@
   outline: 2px solid var(--focus-ring);
   outline-offset: -2px;
 }
-@media (max-width: 1160px) {
-  .gen7main-workspace {
+@container pokerngkit-content (max-width: 719px) {
+  #root .main-content .gen7main-panel .gen7main-workspace {
     grid-template-columns: 1fr;
   }
   .gen7main-controls,

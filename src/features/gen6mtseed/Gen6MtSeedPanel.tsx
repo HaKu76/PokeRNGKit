@@ -211,7 +211,7 @@ export function Gen6MtSeedPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
           : "standard";
   const cancel = () => engine.cancel();
   return (
-    <div className="gen6mtseed-workspace">
+    <div className="gen6mtseed-workspace stacked-module-workspace">
       <form className="gen6mtseed-controls" onSubmit={run}>
         <section className="panel gen6mtseed-panel">
           <div className="panel-heading">

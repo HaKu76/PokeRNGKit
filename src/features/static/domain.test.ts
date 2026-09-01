@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
   createGen3StaticChunks,
+  createGen3StaticEmeraldChunks,
   createGen3StaticSearcherChunks,
+  decodeGen3StaticEmeraldStates,
   decodeGen3StaticStates,
   gen3StaticSearcherCombinationCount,
+  gen3StaticEmeraldWorkCount,
   gen3HiddenPower,
   validateGen3StaticRequest,
+  validateGen3StaticEmeraldRequest,
   type Gen3StaticRequest,
   type Gen3StaticSearcherRequest,
 } from "./domain";
@@ -91,6 +95,73 @@ describe("Gen3 Static domain", () => {
     ]);
   });
 
+  it("decodes the Emerald new-game ID and starter state schema", () => {
+    const words = new Uint32Array([
+      12345,
+      234,
+      54321,
+      1234,
+      0x84ea0b71,
+      31,
+      31,
+      31,
+      31,
+      31,
+      31,
+      1,
+      0,
+      5,
+      15 | (1 << 8) | (7 << 16),
+    ]);
+
+    expect(decodeGen3StaticEmeraldStates(words.buffer)).toEqual([
+      {
+        advances: 12345,
+        targetAdvances: 12345,
+        idAdvances: 234,
+        tid: 54321,
+        sid: 1234,
+        pid: 0x84ea0b71,
+        ivs: [31, 31, 31, 31, 31, 31],
+        ability: 1,
+        gender: 0,
+        level: 5,
+        nature: 15,
+        shiny: 1,
+        shinyXor: 7,
+      },
+    ]);
+  });
+
+  it("decodes a high-IV-only Emerald target without a derived ID", () => {
+    const words = new Uint32Array([
+      54321,
+      0xffff_ffff,
+      12345,
+      0xffff_ffff,
+      0x84ea0b71,
+      31,
+      31,
+      31,
+      31,
+      31,
+      30,
+      1,
+      0,
+      5,
+      15 | 0xffff_0000,
+    ]);
+
+    expect(decodeGen3StaticEmeraldStates(words.buffer)[0]).toMatchObject({
+      targetAdvances: 54321,
+      tid: 12345,
+      sid: undefined,
+      idAdvances: undefined,
+      shinyXor: undefined,
+      shiny: 0,
+    });
+  });
+
   it("rejects invalid IV ranges and advance overflow", () => {
     expect(
       validateGen3StaticRequest({
@@ -149,6 +220,49 @@ describe("Gen3 Static domain", () => {
     expect(createGen3StaticSearcherChunks(perfectRequest, 200)).toEqual([
       { index: 0, startIndex: 0, stateCount: 187 },
     ]);
+  });
+
+  it("bounds the Emerald new-game joint IV and advance search", () => {
+    const emeraldRequest = {
+      initialAdvances: 0,
+      maxAdvances: 99_999,
+      offset: 0,
+      method: request.method,
+      template: GEN3_STATIC_TEMPLATES[0],
+      tid: null,
+      filters: {
+        ...request.filters,
+        shiny: "star-square" as const,
+        perfectIvValue: 31,
+        perfectIvCount: 6,
+      },
+    };
+    expect(validateGen3StaticEmeraldRequest(emeraldRequest)).toEqual([]);
+    expect(
+      validateGen3StaticEmeraldRequest({
+        ...emeraldRequest,
+        filters: { ...emeraldRequest.filters, shiny: "any" as const },
+      }),
+    ).toEqual([]);
+    expect(gen3StaticEmeraldWorkCount(emeraldRequest)).toBe(100_000);
+    const fiveIvRequest = {
+      ...emeraldRequest,
+      maxAdvances: 1_000_000,
+      filters: { ...emeraldRequest.filters, perfectIvCount: 5 },
+    };
+    const chunks = createGen3StaticEmeraldChunks(fiveIvRequest);
+    expect(chunks[0]).toEqual({ index: 0, startIndex: 0, stateCount: 24 });
+    expect(chunks.at(-1)).toEqual({
+      index: 7,
+      startIndex: 168,
+      stateCount: 19,
+    });
+    expect(
+      validateGen3StaticEmeraldRequest({
+        ...fiveIvRequest,
+        maxAdvances: 2_000_000,
+      }),
+    ).toContain("emeraldSearchRange");
   });
 
   it("calculates the Generation III Hidden Power type and strength", () => {

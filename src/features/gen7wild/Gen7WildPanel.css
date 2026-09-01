@@ -2,10 +2,10 @@
   min-width: 0;
 }
 
-.gen7wild-workspace {
+#root .main-content .gen7wild-panel .gen7wild-workspace {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(420px, 0.8fr) minmax(620px, 1.2fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 
@@ -17,7 +17,7 @@
   overflow: hidden;
 }
 
-.gen7wild-controls {
+#root .main-content .gen7wild-panel .gen7wild-controls {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -386,8 +386,8 @@
   font-size: 14px;
 }
 
-@media (max-width: 1120px) {
-  .gen7wild-workspace {
+@container pokerngkit-content (max-width: 719px) {
+  #root .main-content .gen7wild-panel .gen7wild-workspace {
     grid-template-columns: 1fr;
   }
 
@@ -397,7 +397,7 @@
     min-height: 0;
   }
 
-  .gen7wild-controls {
+  #root .main-content .gen7wild-panel .gen7wild-controls {
     overflow: visible;
   }
 

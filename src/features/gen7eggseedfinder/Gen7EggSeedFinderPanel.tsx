@@ -134,7 +134,7 @@ export function Gen7EggSeedFinderPanel({
   };
   return (
     <div className="gen7eggseedfinder-panel">
-      <div className="gen7eggseedfinder-workspace">
+      <div className="gen7eggseedfinder-workspace stacked-module-workspace">
         <section className="panel gen7eggseedfinder-controls">
           <div className="panel-heading">
             <div>

@@ -51,6 +51,8 @@ TRV = (TID XOR SID) & 0xF
 - Wasm bridge：`wasm/modules/gen6id/bridge/gen6id_bridge.cpp`
 - 原生夹具：`wasm/modules/gen6id/tests/gen6id_native_test.cpp`
 
+页面外层固定使用“输入与筛选在上 / 结果在下”的两行结构，两块面板保持同宽；设置区内部继续保留 RNG Info 与 Filters 两栏，并使用面板内滚动。窄屏时内部控制区再回落为单栏。
+
 ## 固定夹具
 
 初始状态 `[11111111, 22222222, 33333333, 44444444]`（结果按 `[3]..[0]` 显示）从 Frame 0 开始：

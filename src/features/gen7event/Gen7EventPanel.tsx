@@ -1,6 +1,6 @@
 import { Select } from "../shared/Select";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { Download, FileUp, Play, Square, Trash2 } from "lucide-react";
+import { Download, FileUp, RotateCcw, Square, Trash2 } from "lucide-react";
 import {
   type Dispatch,
   type FormEvent,
@@ -17,6 +17,10 @@ import {
   type ThreeDsProfile,
 } from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
+import {
+  ThreeDsRngInfoCard,
+  type ThreeDsRngInfoMode,
+} from "../shared/ThreeDsRngInfoCard";
 import { GEN7_EVENT_NATURES, GEN7_EVENT_SPECIES } from "./data";
 import {
   formatGen7EventHex32,
@@ -166,6 +170,9 @@ export function Gen7EventPanel({
   const [seed, setSeed] = useState("0");
   const [minFrame, setMinFrame] = useState("478");
   const [maxFrame, setMaxFrame] = useState("50000");
+  const [rngInfoMode, setRngInfoMode] = useState<ThreeDsRngInfoMode>("range");
+  const [targetFrame, setTargetFrame] = useState("5000");
+  const [timelineSeconds, setTimelineSeconds] = useState("3600");
   const [tsv, setTsv] = useState("0");
   const [trv, setTrv] = useState("0");
   const [npc, setNpc] = useState("0");
@@ -391,6 +398,15 @@ export function Gen7EventPanel({
   };
 
   const readRequest = () => {
+    const parsedTargetFrame = parseGen7EventDecimal(targetFrame);
+    const requestMinFrame =
+      rngInfoMode === "around"
+        ? Math.max(gen7EventStartingFrame(version), parsedTargetFrame - 100)
+        : parseGen7EventDecimal(minFrame);
+    const requestMaxFrame =
+      rngInfoMode === "around"
+        ? parsedTargetFrame + 100
+        : parseGen7EventDecimal(maxFrame);
     const event: Gen7EventSettings = {
       ...settings,
       level: parseGen7EventDecimal(level),
@@ -404,8 +420,8 @@ export function Gen7EventPanel({
     const request: Gen7EventRequest = {
       version,
       seed: parseGen7EventHex(seed),
-      minFrame: parseGen7EventDecimal(minFrame),
-      maxFrame: parseGen7EventDecimal(maxFrame),
+      minFrame: requestMinFrame,
+      maxFrame: requestMaxFrame,
       tsv: parseGen7EventDecimal(tsv),
       trv: parseGen7EventHex(trv),
       npc: parseGen7EventDecimal(npc),
@@ -428,6 +444,17 @@ export function Gen7EventPanel({
       resultLimit: 100_000,
     };
     return validateGen7EventRequest(request);
+  };
+
+  const resetRngInfo = () => {
+    setRngInfoMode("range");
+    setMinFrame(String(gen7EventStartingFrame(version)));
+    setMaxFrame("50000");
+    setTargetFrame("5000");
+    setTimelineSeconds("3600");
+    setNpc("0");
+    setDelay(String(gen7EventDefaultDelay(version, settings)));
+    setConsiderDelay(true);
   };
 
   const run = async (event: FormEvent) => {
@@ -533,7 +560,7 @@ export function Gen7EventPanel({
 
   return (
     <div className="gen7event-panel">
-      <div className="gen7event-workspace">
+      <div className="gen7event-workspace stacked-module-workspace">
         <form className="panel gen7event-controls" onSubmit={run}>
           <div className="gen7event-control-heading">
             <div>
@@ -544,8 +571,21 @@ export function Gen7EventPanel({
           </div>
 
           <section className="gen7event-control-section">
-            <h3>{t("rngInfo")}</h3>
-            <div className="gen7event-field-grid">
+            <div className="gen7event-section-title">
+              <h3>{t("rngInfo")}</h3>
+              <button
+                aria-label={t("gen7RngReset")}
+                className="gen7event-rng-reset"
+                disabled={status === "calculating"}
+                onClick={resetRngInfo}
+                title={t("gen7RngReset")}
+                type="button"
+              >
+                <RotateCcw aria-hidden="true" size={15} />
+              </button>
+            </div>
+
+            <div className="gen7event-rng-state-grid">
               <label className="field">
                 <span>{t("gen7GameVersion")}</span>
                 <Select
@@ -577,43 +617,6 @@ export function Gen7EventPanel({
                 </div>
               </label>
               <label className="field">
-                <span>{t("gen7StationaryMinFrame")}</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={GEN7_EVENT_MAX_FRAME}
-                  min={gen7EventStartingFrame(version)}
-                  onChange={(event) =>
-                    setMinFrame(
-                      normalizeDecimalInput(
-                        event.target.value,
-                        GEN7_EVENT_MAX_FRAME,
-                        10,
-                      ),
-                    )
-                  }
-                  value={minFrame}
-                />
-              </label>
-              <label className="field">
-                <span>{t("gen7StationaryMaxFrame")}</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={GEN7_EVENT_MAX_FRAME}
-                  onChange={(event) =>
-                    setMaxFrame(
-                      normalizeDecimalInput(
-                        event.target.value,
-                        GEN7_EVENT_MAX_FRAME,
-                        10,
-                      ),
-                    )
-                  }
-                  value={maxFrame}
-                />
-              </label>
-              <label className="field">
                 <span>TSV</span>
                 <input
                   disabled={status === "calculating" || !settings.yourId}
@@ -640,55 +643,65 @@ export function Gen7EventPanel({
                   />
                 </div>
               </label>
-              <label className="field">
-                <span>NPC</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={100}
-                  onChange={(event) => {
-                    const value = normalizeDecimalInput(
-                      event.target.value,
-                      100,
-                      3,
-                    );
-                    setNpc(value);
-                    if (
-                      parseGen7EventDecimal(value) === 0 &&
-                      blinkFilter === "safe"
-                    )
-                      setBlinkFilter("any");
-                    if (
-                      parseGen7EventDecimal(value) !== 0 &&
-                      blinkFilter === "blink"
-                    )
-                      setBlinkFilter("any");
-                  }}
-                  value={npc}
-                />
-              </label>
-              <label className="field">
-                <span>{t("delay")}</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={4000}
-                  onChange={(event) =>
-                    setDelay(normalizeDecimalInput(event.target.value, 4000, 4))
-                  }
-                  value={delay}
-                />
-              </label>
             </div>
-            <label className="checkbox-field gen7event-inline-toggle">
-              <input
-                checked={considerDelay}
-                disabled={status === "calculating"}
-                onChange={(event) => setConsiderDelay(event.target.checked)}
-                type="checkbox"
-              />
-              <span>{t("gen7EventConsiderDelay")}</span>
-            </label>
+
+            <ThreeDsRngInfoCard
+              considerDelay={considerDelay}
+              delay={delay}
+              disabled={status === "calculating"}
+              generation={7}
+              maxFrame={maxFrame}
+              maxFrameLimit={GEN7_EVENT_MAX_FRAME}
+              minFrame={minFrame}
+              minFrameLimit={gen7EventStartingFrame(version)}
+              mode={rngInfoMode}
+              npc={npc}
+              onConsiderDelayChange={setConsiderDelay}
+              onDelayChange={(value) =>
+                setDelay(normalizeDecimalInput(value, 4000, 4))
+              }
+              onMaxFrameChange={(value) =>
+                setMaxFrame(
+                  normalizeDecimalInput(value, GEN7_EVENT_MAX_FRAME, 10),
+                )
+              }
+              onMinFrameChange={(value) =>
+                setMinFrame(
+                  normalizeDecimalInput(value, GEN7_EVENT_MAX_FRAME, 10),
+                )
+              }
+              onModeChange={setRngInfoMode}
+              onNpcChange={(value) => {
+                const nextNpc = normalizeDecimalInput(value, 100, 3);
+                setNpc(nextNpc);
+                if (
+                  parseGen7EventDecimal(nextNpc) === 0 &&
+                  blinkFilter === "safe"
+                )
+                  setBlinkFilter("any");
+                if (
+                  parseGen7EventDecimal(nextNpc) !== 0 &&
+                  blinkFilter === "blink"
+                )
+                  setBlinkFilter("any");
+              }}
+              onTargetFrameChange={(value) =>
+                setTargetFrame(
+                  normalizeDecimalInput(value, GEN7_EVENT_MAX_FRAME, 10),
+                )
+              }
+              onTimelineSecondsChange={(value) =>
+                setTimelineSeconds(
+                  normalizeDecimalInput(value, GEN7_EVENT_MAX_FRAME, 10),
+                )
+              }
+              showCalculate
+              showNpc
+              showTimeline
+              showTimelineLeap
+              targetFrame={targetFrame}
+              timelineSeconds={timelineSeconds}
+            />
           </section>
 
           <section className="gen7event-control-section">
@@ -1250,26 +1263,19 @@ export function Gen7EventPanel({
             </label>
           </details>
 
-          <div className="gen7event-run-actions">
-            <button
-              className="gen7event-primary-action"
-              disabled={status === "calculating"}
-              type="submit"
-            >
-              <Play aria-hidden="true" size={17} />
-              {t("generate")}
-            </button>
-            <button
-              aria-label={t("cancel")}
-              className="gen7event-icon-button"
-              disabled={status !== "calculating"}
-              onClick={() => engine.cancel()}
-              title={t("cancel")}
-              type="button"
-            >
-              <Square aria-hidden="true" size={16} />
-            </button>
-          </div>
+          {status === "calculating" && (
+            <div className="gen7event-run-actions">
+              <button
+                aria-label={t("cancel")}
+                className="gen7event-icon-button"
+                onClick={() => engine.cancel()}
+                title={t("cancel")}
+                type="button"
+              >
+                <Square aria-hidden="true" size={16} />
+              </button>
+            </div>
+          )}
         </form>
 
         <section className="panel gen7event-results">

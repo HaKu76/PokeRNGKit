@@ -61,6 +61,10 @@
 
 Emscripten 6.0.6 定向构建已通过：`public/wasm/gen6egg.mjs` 为 7547 bytes，SHA-256 `7BB1E3CC00E5C98208EB14A82403C3220CAB9CE5C637D835F73EABCC3CF399F6`；`public/wasm/gen6egg.wasm` 为 10475 bytes，SHA-256 `D1980DE45AFD7376BC998E4BE8B9712F492F79039996347D538EFCDA4FFAC868`。构建过程仅有 CMake 4.3.1 与 Emscripten shared-library 支持提示，不影响本模块 executable 产物。
 
+## 界面布局
+
+桌面端使用上下两行工作区，亲代/筛选控制区占据上方整行，结果区在下方保持同宽；两块面板的高度限制在视口相关范围内，长表单和结果表分别在面板内部滚动。窄屏继续使用同一纵向顺序并为结果表保留独立有界滚动区。
+
 ## 上游与许可
 
 主要来源：

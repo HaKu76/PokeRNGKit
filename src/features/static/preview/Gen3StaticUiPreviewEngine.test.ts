@@ -64,4 +64,25 @@ describe("Gen3StaticUiPreviewEngine", () => {
     expect(summary.cancelled).toBe(true);
     expect(summary.processedStates).toBeLessThan(summary.totalStates);
   });
+
+  it("applies the perfect IV value and count filter", async () => {
+    const engine = new Gen3StaticUiPreviewEngine(0);
+    const states: number[][] = [];
+
+    await engine.search(
+      {
+        ...request,
+        maxAdvances: 499,
+        filters: {
+          ...request.filters,
+          perfectIvValue: 31,
+          perfectIvCount: 1,
+        },
+      },
+      { onBatch: (batch) => states.push(...batch.map((state) => state.ivs)) },
+    );
+
+    expect(states.length).toBeGreaterThan(0);
+    expect(states.every((ivs) => ivs.some((iv) => iv === 31))).toBe(true);
+  });
 });

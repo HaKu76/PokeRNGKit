@@ -1,6 +1,20 @@
-.gen6id-workspace {
+#root main.main-content .gen6id-workspace {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
+}
+
+.gen6id-controls,
+.gen6id-results-panel {
+  min-width: 0;
+  height: clamp(460px, calc(100dvh - 220px), 760px);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.gen6id-controls {
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .gen6id-controls {
@@ -118,7 +132,20 @@
   text-align: left;
 }
 
-@media (max-width: 1180px) {
+@container pokerngkit-content (max-width: 719px) {
+  #root main.main-content .gen6id-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .gen6id-controls,
+  .gen6id-results-panel {
+    height: auto;
+  }
+
+  .gen6id-controls {
+    overflow: visible;
+  }
+
   .gen6id-controls {
     grid-template-columns: 1fr;
   }

@@ -412,7 +412,7 @@ export function Gen6EggPanel({
           {t(status)}
         </div>
       </header>
-      <div className="gen6egg-workspace">
+      <div className="gen6egg-workspace stacked-module-workspace">
         <section className="panel gen6egg-controls">
           <div className="gen6egg-heading">
             <h2>{t("gen6EggSetup")}</h2>

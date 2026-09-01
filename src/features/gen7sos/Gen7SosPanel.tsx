@@ -723,7 +723,7 @@ export function Gen7SosPanel({
           {t("gen7SosCallsMode")}
         </button>
       </div>
-      <div className="gen7sos-workspace">
+      <div className="gen7sos-workspace stacked-module-workspace">
         <section className="panel gen7sos-controls">
           <header className="gen7sos-heading">
             <div>

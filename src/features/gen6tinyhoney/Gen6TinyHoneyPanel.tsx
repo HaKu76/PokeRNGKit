@@ -224,7 +224,7 @@ export function Gen6TinyHoneyPanel({
   };
 
   return (
-    <div className="gen6tinyhoney-workspace">
+    <div className="gen6tinyhoney-workspace stacked-module-workspace">
       <form className="gen6tinyhoney-controls" onSubmit={run}>
         <section className="panel gen6tinyhoney-panel">
           <div className="panel-heading">

@@ -1,5 +1,6 @@
-.gen6tinytimeline-workspace {
+#root main.main-content .gen6tinytimeline-workspace {
   display: grid;
+  min-height: 0;
   gap: 16px;
 }
 .gen6tinytimeline-controls {
@@ -92,6 +93,38 @@
 .gen6tinytimeline-virtual-table span:nth-child(12) {
   font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
   font-variant-numeric: tabular-nums;
+}
+
+@container pokerngkit-content (min-width: 720px) {
+  #root main.main-content .gen6tinytimeline-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .gen6tinytimeline-controls,
+  .gen6tinytimeline-results-panel {
+    height: clamp(460px, calc(100dvh - 220px), 760px);
+    min-height: 0;
+  }
+
+  .gen6tinytimeline-controls {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+
+  .gen6tinytimeline-panel {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .gen6tinytimeline-results-panel {
+    overflow: hidden;
+  }
+
+  .gen6tinytimeline-table-shell {
+    min-height: 0;
+  }
 }
 @media (max-width: 900px) {
   .gen6tinytimeline-state-grid {

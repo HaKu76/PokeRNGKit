@@ -11,7 +11,7 @@
 - 支持 IV、性格、觉醒属性、性别、特性、异色、方块异色、完美 IV 数量和 Blink 筛选。
 - 提供单 Dedicated Worker、分批进度、取消、结果上限、虚拟滚动、排序和 CSV。
 
-本模块不实现 `Around Target`、Timeline、Timeline Leap 或 Main RNG Tool。这些流程依赖不同的时间线交互和搜索语义，不并入本模块的普通连续帧会话。
+本模块已把 `Around Target` 的目标帧 ±100 映射到普通连续帧请求。Timeline 控件按上游 Stationary 可见性保留，但在专用时间线算法接入前保持禁用；`Timeline Leap` 仍仅属于 Gen VII Event，Main RNG Tool 继续使用独立工作区。
 
 生产 RNG 只在 `gen7stationary` Worker 内的 WebAssembly 执行。React/TypeScript 负责输入、模板权限、请求校验、结果解码和展示；UI 预览引擎只生成布局样例，不能作为算法结果证据。
 
@@ -94,17 +94,19 @@ Gen7StationaryPanel
 
 页头选择 3DSRNGTool 的 Sun、Moon、Ultra Sun 或 Ultra Moon 档案时，同步 GameVersion、TSV、TRV 与 Shiny Charm，并按现有版本切换流程重置起始帧和可用目标模板。同步只在档案 id 或更新时间改变时执行，之后手动修改不会被普通重渲染覆盖。
 
-桌面使用双列 operational workspace：左侧集中 RNG、目标和筛选，右侧结果表占据主要宽度并独立滚动。自定义目标与筛选使用可折叠区域；内容容器宽度低于 `1280px`（即 `1279px` 及以下）转为单列，移动端继续保留横向结果表滚动。
+桌面端使用上下两行 operational workspace：上方设置区、下方结果表各占整行。设置区内部由 RNG Info 独占首行，目标设置与筛选并列在下一行；整个设置面板只保留一条纵向滚动区域，不再把三列分别裁剪和滚动。RNG Info 与 Gen VII Event、Wild 复用同一组件，显示检索范围、目标帧 ±100、Consider Delay、Delay `+4F`、NPC 与 Timeline；Stationary 不显示 Timeline Leap。自定义目标与筛选使用可折叠区域，移动端继续保留横向结果表滚动。
 
 PokeFinder 已有的简体中文控件词条沿用 `Form/i18n/PokeFinder_zh.ts`，包括“设置”“分类”“御三家”“化石”“同步”“闪耀护符”“性格”“特性”“性别”和“觉醒力量”。PokeFinder 没有对应翻译的 3DSRNGTool 专用标签保留英文源字符串，例如 `Consider Delay`、`Raining`、`Forced Shiny`、`Blink Frame`、`Safe Frame`、`Perfect IV Value` 与 `Perfect IV Count`。
 
 ## 当前验证状态
 
-本轮仅进行项目所有者授权的外部 Chrome 本地 UI 检查，未运行测试、类型检查、原生夹具、Wasm 构建或 Vite 构建。
+2026-09-01 已在项目所有者授权下运行 `npm run build:web`，TypeScript 与 Vite/PWA 生产构建通过；未运行算法测试、原生夹具或生产页面回归。
 已验证 `http://127.0.0.1:4173/` 在 `1895×872`、`1280×720`、`1024×768`、`768×1024` 和 `390×844`
-下的布局：宽屏设置区与结果区并排，中等内容宽度自动改为单列，手机端控件恢复 44px 触控高度；所有输入均处于
+下的既有响应式布局；2026-09-01 另在 `http://127.0.0.1:4181/`、约 `1478×679` 的外部 Chrome 中确认设置区与结果区同宽上下排列。手机端控件恢复 44px 触控高度；所有输入均处于
 所属面板边界内，无文档横向溢出。已实际点击 `HP 最大` 输入框并打开“游戏版本”下拉，五种尺寸均能获得焦点或打开菜单，
-下拉菜单宽度与触发框一致。
+下拉菜单宽度与触发框一致。另在 `http://127.0.0.1:4183/` 确认 Stationary 的共用 RNG Info 包含 Timeline、NPC 与 `+4F`，且不包含 Timeline Leap；控制台无 warning 或 error。
+
+2026-09-01 在 `http://127.0.0.1:4186/`、`1478×679` CSS 视口、`devicePixelRatio ≈ 1.3` 的外部 Chrome 中重新验证：侧栏展开时工作区宽约 `1078px`，收起时约 `1238px`，两种状态均为设置在上、结果在下；收起状态下设置内部为约 `611px + 611px` 两列，RNG Info 占据整行。DOM 几何检查未发现横向裁剪控件，设置区只有根面板一条纵向滚动区域。
 
 生产算法验收仍须等待项目所有者提交、推送并由 GitHub Actions 部署后，使用项目所有者提供的准确生产 URL 执行。
 

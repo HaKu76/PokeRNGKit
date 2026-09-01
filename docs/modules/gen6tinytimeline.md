@@ -33,6 +33,10 @@
 - 请求 / 结果：22 / 16 个 `uint32` 字
 - 执行：单 Dedicated Worker；取消通过终止并重建 Worker 实例完成。
 
+## 界面布局与入口
+
+Gen VI Seed 相关导航可打开独立时间线工作区；不新增 `3DSRNGTOOL` 侧栏快捷组。Stationary、Wild 的共用 RNG Info 只显示诚实标记为待接入的 Timeline 控件，不冒充本模块的完整时间线生成流程。桌面端使用上下两行结构，时间线设置占据上方整行，结果区位于下方；控制区和结果区各自保持有界高度，窄屏沿用相同顺序。
+
 ## 验证状态
 
 已通过 `npm run typecheck`、`npm run lint`、定向 Vitest 3/3、原生 C++ 夹具 1/1、Emscripten 6.0.6 定向 Wasm 构建和 `npm run build:web`。原生夹具第一次因 C++ 十六进制字面量编译失败，修正后重新运行通过。产物为 `gen6tinytimeline.mjs` 7,640 bytes，SHA-256 `50E8D20E03359015C8CC28FA5E557499E0A369AB791B602D07158434A29F5208`；`gen6tinytimeline.wasm` 23,892 bytes，SHA-256 `8FC36396E136498DAE09390B85B2A76668054D0B4C81D05E5DF2E6CACDFC5D3C`。

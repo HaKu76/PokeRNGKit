@@ -177,7 +177,7 @@ export function Gen6TinyAmbushPanel({
   };
 
   return (
-    <div className="gen6tinyambush-workspace">
+    <div className="gen6tinyambush-workspace stacked-module-workspace">
       <form className="gen6tinyambush-controls" onSubmit={run}>
         <section className="panel gen6tinyambush-panel">
           <div className="panel-heading">

@@ -227,7 +227,7 @@ export function Gen6DexNavPanel({
           {t(status)}
         </div>
       </header>
-      <div className="gen6dexnav-workspace">
+      <div className="gen6dexnav-workspace stacked-module-workspace">
         <section className="panel gen6dexnav-controls">
           <div className="gen6dexnav-heading">
             <h2>{t("gen6DexNavSetup")}</h2>

@@ -4967,7 +4967,7 @@ textarea:disabled {
 /* The available content width is smaller than the viewport when the rail is
    expanded. Stack dense workspaces before fixed minimum tracks can clip them. */
 @container pokerngkit-content (max-width: 1080px) {
-  #root .main-content [class*="-workspace"],
+  #root .main-content :where([class*="-workspace"]),
   #root .main-content [class*="-control-grid"],
   #root .main-content [class*="-control-row"],
   #root .main-content .gen7event-time-parameter-grid,
@@ -4977,7 +4977,7 @@ textarea:disabled {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  #root .main-content [class*="-workspace"] > *,
+  #root .main-content :where([class*="-workspace"]) > *,
   #root .main-content [class*="-control-grid"] > *,
   #root .main-content [class*="-control-row"] > *,
   #root .main-content .gen7event-time-parameter-grid > *,
@@ -4992,14 +4992,21 @@ textarea:disabled {
    module rail and utility rail are present. Reflow common three-column module
    shells before their child minimum tracks overlap adjacent panels. */
 @container pokerngkit-content (min-width: 1081px) and (max-width: 1500px) {
-  #root .main-content [class*="-workspace"]:not(.seed-tools-workspace),
+  #root
+    .main-content
+    :where(
+      [class*="-workspace"]:not(
+        .seed-tools-workspace,
+        .stacked-module-workspace
+      )
+    ),
   #root .main-content [class*="-control-grid"],
   #root .main-content [class*="-control-row"],
   #root .main-content > .control-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  #root .main-content [class*="-workspace"] > *,
+  #root .main-content :where([class*="-workspace"]) > *,
   #root .main-content [class*="-control-grid"] > *,
   #root .main-content [class*="-control-row"] > *,
   #root .main-content > .control-grid > * {

@@ -33,6 +33,7 @@ export function Gen3WorkflowTipsPanel({
     >
       <div className="floating-tool-panel-body workflow-tips-body">
         <ol className="workflow-tips-list">
+          <li>{t("gen3WorkflowStepNewGame")}</li>
           <li>{t("gen3WorkflowStepSearcher")}</li>
           <li>
             {t("gen3WorkflowStepId")}

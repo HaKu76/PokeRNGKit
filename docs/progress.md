@@ -7,6 +7,69 @@
 - 每次迁移同步解耦样式：模块专属布局和密度归入功能目录 CSS，共享控件只保留跨模块语义，
   并清理该面板散落在全局样式中的专属覆盖。
 
+## 2026-09-01 绿宝石新档高V异色御三家
+
+- 调整：第三世代定点 Generator 的“绿宝石新档御三家”改为两段式流程。第一阶段要求输入十进制
+  TID，并以 `Seed = TID` 顺序生成御三家 PID、PSV 与 IV；第二阶段点击 PSV 跳转第三世代 ID
+  Generator，只检索目标帧之前真实出现的异色 SID/TSV。
+- 默认：入口使用 `0..1000000` 帧与 `Perfect IV Value / Count = 31 / 4`，同时覆盖至少 4V、5V、
+  6V，并按完美个体数降序显示。Static 第一阶段不提前指定 SID，也不显示无依据的异色结果。
+- 结果：候选表显示御三家帧、完美个体数、PID、标准 PSV、六项 IV 和派生字段；点击 PSV 自动带入
+  TID、PID、Star/Square 与 `0..targetAdvance-1` 到 ID Generator。选定 ID 结果后仍可带着精确
+  TID/SID 和目标帧返回 Static 单帧验证。
+- 补充：御三家工作流新增 `TID（建档后不重启）` 与 `0000（重启后）` 两种 Seed 路径。重启路径仍使用
+  当前 TID/SID 判断异色，但 ID 生成与御三家目标属于两段独立 RNG 流，不再错误要求 ID 帧早于御三家帧；
+  ID 与 Static 往返上下文保存真实目标 Seed。
+- 界面：Generator、Searcher、绿宝石新档御三家切换保持单行；第三世代 ID Generator 在桌面保持
+  “乱数信息 / 筛选项 / 结果”单行三栏，“表 ID 同时作为 16 位 Seed”提示限制在输入列宽内。
+- 修复：`gen3static_search_emerald` 的 65,536 项距离表由 Wasm 栈迁到堆内存，不再触发
+  `memory access out of bounds`；Gen3 Static UI 预览同时保留 Perfect IV Value / Count 判断。
+- 已验证：本地生产 Wasm 对 `TID 59476`、Method 1、木守宫、`0..1000000`、至少 4V 返回 11 个
+  御三家目标，均为 4V；ID Generator 在各目标帧之前共返回 618 条异色 ID 记录。首个目标为帧
+  `83552`、PID `3B1AD6F6`、PSV `7613`，其中 SID `1470` 在 ID 帧 `1858` 可用。
+- 已通过：项目所有者授权后运行完整 `npm run build`；全部已配置 Wasm 模块与 2337 个前端模块完成
+  生产构建，PWA 生成 245 个预缓存条目。保留 CMake 4.3.1 共享库支持警告和 Vite 大 chunk 警告，
+  均未阻止构建。
+- 已验证：最新本机生产预览继续使用 `http://127.0.0.1:4174/`；首页、`gen3static.wasm` 与
+  `gen3id.wasm` 均返回 HTTP 200。外部 Chrome/Edge 的界面交互与项目所有者最终验收仍待确认。
+- 此前已通过：`npm run typecheck`、两个定向 Vitest 文件共 11 项、`gen3static_native_parity` 1/1、
+  定向 ESLint 0 error；保留 `Gen3StaticPanel.tsx` 原有 Hook 依赖 warning。
+
+## 2026-09-01 3DSRNGTool 乱数信息入口与面板布局修复
+
+- 更正：删除未经项目所有者要求而新增的 `3DSRNGTOOL` 侧栏快捷组；Gen VI、Gen VII 原有模块入口不变，
+  3DS 档案仍从存档信息管理入口访问。
+- 源码复核：`MainForm.cs` 把同一个 `RNGInfo` 加入当前 Method 页，Stationary、Event、Wild 共用检索范围、
+  目标帧与 Delay 区域；Gen VII 显示 NPC，Timeline 按世代和方法条件显示，只有 Gen VII Event 显示
+  `Timeline Leap`。不再把截图中的乱数信息误判为配信专属。
+- 功能：Gen VI Stationary、Event、Wild 与 Gen VII Stationary、Event、Wild 复用同一个 React 乱数信息
+  组件；普通闭区间与目标帧 ±100 已接入各模块现有 Worker 请求。Timeline 与 Timeline Leap 暂以禁用控件
+  明确标记为待接入，不能把普通连续帧搜索冒充上游时间线。
+- 调整：全部 25 个 Gen VI、Gen VII 外层工作区显式使用 `.stacked-module-workspace`，统一保持“设置在上、
+  结果在下”，不再被公共 `1081..1500px` 容器规则改回左右两列。图鉴导航、宝可雷达、TinyMT Timeline、
+  Gen VII Egg、Egg Seed Finder、Battle Tree 与 Festival Plaza 原有的模块级左右两列规则同步改为单列。
+- 修复：Gen VII Stationary 的 RNG Info 改为设置区首行，目标设置与筛选位于下一行；移除三列各自的滚动区域，
+  设置面板只保留一条纵向滚动条，目标帧、Delay、NPC、Timeline 和筛选控件不再越过裁剪边界。
+- 已通过：项目所有者授权后运行最新 `npm run build:web`；2341 个模块完成生产构建，PWA 生成 245 个
+  预缓存条目，仅保留既有大 chunk 警告。
+- 已验证：外部 Chrome 本地预览 `http://127.0.0.1:4186/`，CSS 视口 `1478×679`、
+  `devicePixelRatio ≈ 1.3`。18 个 Gen VI 入口与 14 个 Gen VII 入口的可见工作区均未出现外层左右并排；
+  侧栏收起后的 Gen VII Stationary、Gen VI TinyMT Timeline、Gen VI DexNav 继续保持单列。Stationary 在
+  `1078px` 与 `1238px` 工作区宽度下均无横向裁剪控件，且设置区只有一条纵向滚动区域。
+- 保留：Gen VII Stationary、Event、Wild 均显示共用乱数信息，只有 Event 显示 Timeline Leap；Gen VI
+  Stationary、Wild 显示 Timeline，Event 不显示。侧栏不存在 `3DSRNGTOOL` 分组。
+- 修复：公共 `1081..1500px` 工作区断点在追加两个 `:not(...)` 后提高了选择器权重，再次把第三世代 ID
+  Generator 改回两列。公共 `[class*="-workspace"]` 规则现统一包装在低优先级 `:where(...)` 中，模块 CSS
+  继续负责实际行列结构，不再通过逐页提高选择器权重互相覆盖。
+- 标准：第三世代定点乱数继续作为紧凑密度、面板对齐、实体边界和单一滚动责任的参考；布局角色由
+  各模块明确声明。第三世代 ID 固定桌面单行三栏，第三世代定点保持三块控制面板在上、结果在下，
+  Gen VI、Gen VII 完整工作区保持设置在上、结果在下。
+- 已验证：外部 Chrome 本地预览 `http://127.0.0.1:4187/`，CSS 视口 `1478×679`、
+  `devicePixelRatio ≈ 1.3`。第三世代 ID 在侧栏展开时为约 `360 / 260 / 434px`，收起时为约
+  `360 / 260 / 594px`，三块面板顶边均约为 `192.8px`；第三世代定点仍为三块控制面板同排、结果在下；
+  Gen VII Stationary 在两种侧栏状态下仍为上下两行且没有被裁剪的控件。以上为工程证据，不代表
+  项目所有者最终验收。
+
 ## 2026-08-31 第七世代定点乱数响应式布局优化
 
 - 优化：第七代定点乱数在宽屏下将设置区与结果区保持并排；内容容器收窄到 `1279px` 以下时，
@@ -2004,6 +2067,17 @@ npm run wasm:build
 - 控件名和输入限制必须重新核对 PokeFinder Form、Core、测试和翻译文件。
 - README、进度、提交、构建和发布说明使用 `hakuhiro-project-style`。
 
-# Progress Update
+## 绿宝石新档高 V 御三家（2026-09-01）
 
-- Gen III workflow refinement: added target PID plus star/square shiny filtering to the ID Generator, visible/right-click PID actions in Static Searcher results, the emulator-only Emerald Target Painting Timer with decimal calibration default `30`, and a global Emerald 6V shiny workflow Tips panel. No real-console Painting Reseeding or Battle Video flow is included.
+- 新增：绿宝石新档御三家允许 TID 留空，从高 V 目标反推可用 TID；输入 TID 时继续使用快速前向扫描。
+- 新增：空 TID 下 `Shiny = Any` 只筛高 V，Star、Square、Star/Square 会额外验证目标帧之前存在兼容 SID；结果显示 TID、目标帧、完美个体数、PID、PSV 与 IV，点击 PSV 继续进入 ID Generator。
+- 优化：默认条件改为 `31/6 + Star/Square + 0..1000000`。`31/5` 的一百万帧任务按 IV 组合动态拆为 8 批，可使用最多 8 个独立 Worker；单批上限为 25,000,000，总评估上限为 250,000,000，4V 超限时在启动前提示收窄。
+- 更新：`gen3static` Wasm API 升级为 6；高 V-only 结果使用同一 60 字节记录，以哨兵值表示未预选 SID/ID 帧。
+- 已通过：激活本机 emsdk 后运行 `npm run build`；`gen3static` API 6 Wasm、TypeScript、2339 个前端模块、Vite 生产包和 245 项 PWA 预缓存均成功生成。保留 CMake 4.3.1 shared-library 与 Vite 大分块两条非阻断警告。
+- 已验证：本地生产预览运行于 `http://127.0.0.1:4174/`；首页、`gen3static.wasm`（16,284 bytes）与 `gen3id.wasm`（10,328 bytes）均返回 HTTP 200。
+- 未运行：原生夹具、Vitest、外部 Chrome/Edge 视觉检查与生产页面算法回归；本地构建和 HTTP 证据不替代 GitHub Pages 回归及项目所有者验收。
+- 新增：御三家 Seed 可在 `TID（建档后不重启）`与 `0000（重启后）`之间选择。Seed 0000 要求输入 TID，目标生成固定使用 `0x0000`；ID 生成器默认检索 `0..1000000`，不再沿用连续新档流程的“ID 帧必须早于御三家帧”约束。
+- 修复：从 ID 结果返回 Static 时携带真实目标 Seed 与 Seed 模式；重启路径不会把 Seed 0000 覆盖成 TID。
+- 优化：Static 的三个标题入口固定为单行，TID Seed 说明与输入框同宽且最多两行；Gen3 ID Generator 在内容宽度 `721px` 以上固定保持乱数信息、筛选项、结果三块单行，侧边栏展开/收起不再触发结果换行。
+- 已通过：完成 Seed 0000 与单行布局改动后重新激活本机 emsdk 运行 `npm run build`；全部 Wasm、TypeScript、2339 个前端模块、Vite 生产包和 245 项 PWA 预缓存均构建成功，仅保留既有 CMake shared-library 与 Vite 大分块警告。
+- 已验证：刷新后的本地生产预览继续运行于 `http://127.0.0.1:4174/`；首页为 557 bytes、`gen3static.wasm` 为 16,284 bytes、`gen3id.wasm` 为 10,328 bytes，三者均返回 HTTP 200。当前未连接外部 Chrome/Edge，因此本轮不宣称视觉布局已自动验收。

@@ -103,14 +103,16 @@ Poke Pelago 生成已按 3DSRNGTool `Stationary7` 的特殊分支纳入 `Station
 
 以下归类是界面入口规划，不改变算法模块、Worker 或 Wasm 的独立边界：
 
-| 类型       | 保留独立工作区                                                                                              | 可收纳到悬浮工具菜单或模块内辅助入口                                                                                         |
-| ---------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| PokeFinder | 各世代 IDs、Eggs、Event、Raids、Static、Underground、Wild、GameCube、Dream Radar、Hidden Grotto、Researcher | Profile Manager、IV Calculator、Encounter Lookup、Seed/Advance 辅助工具、Den Map、Spinda Painter、PokeSpot、Jirachi Advancer |
-| 3DSRNGTool | Gen VI / Gen VII Stationary、Event、Wild、Egg、ID，以及主 Seed / Main RNG 工作区                            | Profile Manager、KeyBV、Misc. RNG Tool、TSV List、IV Range / Template、TinyMT Timeline、Egg Seed Finder                      |
+| 类型       | 保留独立工作区                                                                                                                                                       | 可收纳到悬浮工具菜单或模块内辅助入口                                                                                         |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| PokeFinder | 各世代 IDs、Eggs、Event、Raids、Static、Underground、Wild、GameCube、Dream Radar、Hidden Grotto、Researcher                                                          | Profile Manager、IV Calculator、Encounter Lookup、Seed/Advance 辅助工具、Den Map、Spinda Painter、PokeSpot、Jirachi Advancer |
+| 3DSRNGTool | Gen VI / Gen VII Stationary、Event、Wild、Egg、ID，以及主 Seed / Main RNG 工作区；侧栏提供 Profile、Main Seed、TinyMT Timeline、Main RNG 与 Egg Seed Finder 快捷入口 | KeyBV、Misc. RNG Tool、TSV List、IV Range / Template 等轻量公共工具                                                          |
 
 收纳规则：
 
 - 核心生成与检索流程始终保留可直接访问的模块入口。
+- 不新增独立 `3DSRNGTOOL` 侧栏分组；相关模块继续归入 Gen VI、Gen VII，档案管理和全局辅助工具保留在悬浮工具菜单。
+- 3DSRNGTool 核心工作区统一使用“设置在上、结果在下”的两行外层结构；设置区内部仍可按模块实际字段使用多列网格和折叠项。
 - 只在工具具有全局性、轻量输入或明显依附于当前模块时收纳；不能为了减少导航项而把多个无关任务塞进同一弹层。
 - PC 端参数与主要操作尽量位于首屏，页面本身默认不滚动；结果表使用独立滚动区域。内容过多时使用标签和折叠高级设置，不缩小字体或触控目标。
 - 移动端使用抽屉、单列重排或专用面板，不要求复刻 PC 的无页面滚动布局。

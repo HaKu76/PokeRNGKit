@@ -1,4 +1,9 @@
-import type { Gen3StaticRequest, Gen3StaticState } from "./domain";
+import type {
+  Gen3StaticEmeraldRequest,
+  Gen3StaticEmeraldState,
+  Gen3StaticRequest,
+  Gen3StaticState,
+} from "./domain";
 
 export interface Gen3StaticSearchProgress {
   processedStates: number;
@@ -21,6 +26,22 @@ export interface Gen3StaticSearchOptions {
   maxResults?: number;
   onBatch?(states: Gen3StaticState[]): void;
   onProgress?(progress: Gen3StaticSearchProgress): void;
+}
+
+export interface Gen3StaticEmeraldSearchOptions extends Omit<
+  Gen3StaticSearchOptions,
+  "onBatch"
+> {
+  onBatch?(states: Gen3StaticEmeraldState[]): void;
+}
+
+export interface Gen3StaticEmeraldSearchEngine {
+  searchEmerald(
+    request: Gen3StaticEmeraldRequest,
+    options?: Gen3StaticEmeraldSearchOptions,
+  ): Promise<Gen3StaticSearchSummary>;
+  cancel(): void;
+  dispose(): void;
 }
 
 export interface Gen3StaticSearchEngine {

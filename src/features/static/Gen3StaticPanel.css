@@ -6,6 +6,24 @@
 
 #root
   .main-content.gen3static-page
+  .gen3-static-operation-tabs
+  .operation-tabs {
+  width: max-content;
+  grid-template-columns: repeat(3, max-content);
+  overflow-x: auto;
+}
+
+#root
+  .main-content.gen3static-page
+  .gen3-static-operation-tabs
+  .operation-tabs
+  button {
+  min-width: max-content;
+  padding-inline: 10px;
+}
+
+#root
+  .main-content.gen3static-page
   .gen3static-control-grid
   input:not([type="checkbox"]):not([type="radio"]),
 #root
@@ -36,6 +54,25 @@
   height: var(--gen3static-control-height);
   min-height: var(--gen3static-control-height);
   padding-block: 3px;
+}
+
+#root
+  .main-content.gen3static-page
+  .gen3static-control-grid
+  .emerald-tid-field
+  small {
+  display: -webkit-box;
+  width: 100%;
+  min-width: 0;
+  grid-column: 2;
+  margin-top: 1px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  line-height: 17px;
+  overflow-wrap: anywhere;
+  text-transform: none;
 }
 
 #root
@@ -119,4 +156,29 @@ body:has(#root .main-content.gen3static-page:not([hidden]))
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.gen3static-results-panel .static-virtual-table.emerald-targets,
+.gen3static-results-panel
+  .static-virtual-table.emerald-targets
+  :is(.static-table-header, .static-table-row) {
+  min-width: 1168px;
+}
+
+.gen3static-results-panel
+  .static-virtual-table.emerald-targets
+  :is(.static-table-header, .static-table-row) {
+  grid-template-columns:
+    76px 90px 84px 100px 66px 82px 120px repeat(6, 52px) 92px
+    70px 76px;
+}
+
+@media (max-width: 700px) {
+  #root
+    .main-content.gen3static-page
+    .gen3static-control-grid
+    .emerald-tid-field
+    small {
+    grid-column: 1;
+  }
 }

@@ -134,7 +134,7 @@ export function Gen6MtSeedTimePanel({
   };
   const busy = status === "calculating";
   return (
-    <div className="gen6mtseedtime-workspace">
+    <div className="gen6mtseedtime-workspace stacked-module-workspace">
       <form className="gen6mtseedtime-controls" onSubmit={run}>
         <section className="panel gen6mtseedtime-panel">
           <div className="panel-heading">

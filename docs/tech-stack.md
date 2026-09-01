@@ -464,7 +464,7 @@ public/wasm/                        # 生成物，忽略
 
 ### 7.3 C ABI
 
-当前 `gen3id` 与 `gen8id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7egg`、`gen7battletree`、`gen7event`、`gen7main`、`gen7eggseedfinder`、`gen7festivalplaza`、`gen7id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground`、`gen8wild` 与 `pokerusfinder` API 版本为 1，`gen3static` 与 `gen3wild` API 版本为 3。
+当前 `gen3static` API 版本为 6，`gen3wild` API 版本为 5，`gen3id` 与 `gen8id` API 版本为 2，`gen3initialseed`、`gen3seedtotime`、`gen3ngcseed`、`gen3pidtoiv`、`gen3gamecube`、`gen3pokespot`、`gen3jirachi`、`gen3ivtopid`、`gen3egg`、`gen4static`、`gen4wild`、`gen4chainedsid`、`gen7stationary`、`gen7wild`、`gen7sos`、`gen7egg`、`gen7battletree`、`gen7event`、`gen7main`、`gen7eggseedfinder`、`gen7festivalplaza`、`gen7id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground`、`gen8wild` 与 `pokerusfinder` API 版本为 1。
 
 `gen7stationary` 使用连续会话 C ABI，57 个 32 位请求字在 `begin()` 时初始化 SFMT、NPC 模型状态和长帧快照，`step()` 每批推进有限状态并返回 9 个 `uint32_t` 的结果记录：
 
@@ -658,7 +658,7 @@ uint32_t gen3egg_last_error();
 
 记录布局为 `heldAdvances / pickupAdvances / redraws / pid / ability / gender / nature / shiny / hp / atk / def / spa / spd / spe / inheritanceHP / inheritanceAtk / inheritanceDef / inheritanceSpA / inheritanceSpD / inheritanceSpe / hiddenPower / hiddenPowerStrength`。每次 Wasm 调用最多处理 100,000 个 Held/Pickup/Redraw 组合；浏览器任务总组合上限为 `150,060,006`，以覆盖上游 Emerald 默认范围。
 
-Static C ABI 使用同一结果生命周期，并提供 `gen3static_generate` 与 `gen3static_search`。Generator 传入 Seed、推进范围、Offset、Method、预设属性、TID/SID 和筛选；Searcher 传入 IV 组合 `startIndex`、`stateCount`、Method、预设属性、TID/SID 和筛选。两者都返回连续 48 字节记录：
+Static C ABI 提供 `gen3static_generate`、`gen3static_search` 与 `gen3static_search_emerald`。Generator 传入 Seed、推进范围、Offset、Method、预设属性、TID/SID 和筛选；Searcher 传入 IV 组合 `startIndex`、`stateCount`、Method、预设属性、TID/SID 和筛选。两者共用 48 字节结果生命周期：
 
 ```text
 uint32 advancesOrSeed  # Generator 为 Advances，Searcher 为 Seed
@@ -669,6 +669,21 @@ uint32 gender
 uint32 level
 uint32 natureShiny  # low 8 bits nature, remaining bits shiny type
 ```
+
+`gen3static_search_emerald` 保留独立的 60 字节结果生命周期：
+
+```text
+uint32 targetAdvances / idAdvances / tid / sid / pid
+uint32 ivHP / ivAtk / ivDef / ivSpA / ivSpD / ivSpe
+uint32 ability / gender / level
+uint32 natureShiny  # nature / shiny type / shiny XOR
+```
+
+当前绿宝石新档产品流程按 TID 是否为空选择路径：输入 TID 时以其作为 Seed，使用
+`gen3static_generate` 顺序生成目标；留空时使用 `gen3static_search_emerald` 从高 V 状态反推 16 位
+TID。异色为 Any 时只返回高 V 目标；其他异色条件会同时验证目标帧之前存在兼容 SID。点击 PSV 后
+切换到 `gen3id_generate`，按目标 TID/PID 再列出实际 SID、TSV、异色类型和 ID 帧。Emerald Pool
+按 IV 组合与目标帧工作量动态分片，总评估量限制为 250,000,000。
 
 Wild C ABI v3 提供 `gen3wild_generate` 与 `gen3wild_search`。Generator 传入紧凑槽位数组、Seed、推进范围、Offset、Method、Lead、Encounter、遭遇率、RSE/Feebas/Safari/Rock Smash 特殊规则、TID/SID 和完整筛选；Searcher 传入 IV 组合 `startIndex`、`stateCount`、相同的遭遇规则与筛选，并通过逆推恢复候选 Seed。两者返回连续 60 字节记录：
 

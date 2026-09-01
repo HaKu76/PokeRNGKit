@@ -189,7 +189,7 @@ export function Gen6TinyRockSmashPanel({
   };
 
   return (
-    <div className="gen6tinyrocksmash-workspace">
+    <div className="gen6tinyrocksmash-workspace stacked-module-workspace">
       <form className="gen6tinyrocksmash-controls" onSubmit={run}>
         <section className="panel gen6tinyrocksmash-panel">
           <div className="panel-heading">

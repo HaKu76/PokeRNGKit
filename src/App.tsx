@@ -413,12 +413,6 @@ const moduleNavigationGroups: readonly ModuleNavigationGroup[] = [
     ],
   },
   {
-    id: "3ds",
-    label: "3DSRNGTOOL",
-    marker: "3D",
-    items: [],
-  },
-  {
     id: "gen8",
     label: "GEN VIII",
     marker: "8",
@@ -664,9 +658,22 @@ function App() {
   const [filterPid, setFilterPid] = useState("");
   const [filterIdShiny, setFilterIdShiny] =
     useState<Id3ShinyFilter>("star-square");
+  const [gen3IdTargetContext, setGen3IdTargetContext] = useState<{
+    tid: number;
+    targetSeed: number;
+    starterSeedMode: "tid" | "zero";
+    sid?: number;
+    targetAdvances: number;
+    idAdvances?: number;
+    shinyXor?: number;
+  }>();
   const [gen3StaticTransfer, setGen3StaticTransfer] = useState<{
     seed: number;
     requestId: number;
+    tid?: number;
+    sid?: number;
+    targetAdvances?: number;
+    starterSeedMode?: "tid" | "zero";
   }>();
   const gen3WorkflowRequestId = useRef(0);
   const [results, setResults] = useState<Id3State[]>([]);
@@ -820,10 +827,43 @@ function App() {
 
   const openGen4IvCalculator = openIvCalculator;
 
-  const openGen3IdForPid = (pid: number, seed: number) => {
+  const openGen3IdForPid = (
+    pid: number,
+    seed: number,
+    context?: {
+      tid: number;
+      targetSeed: number;
+      starterSeedMode: "tid" | "zero";
+      sid?: number;
+      targetAdvances: number;
+      idAdvances?: number;
+      shinyXor?: number;
+    },
+  ) => {
     void seed;
+    setGen3IdTargetContext(context);
     setFilterPid(formatHex(pid, 8));
-    setFilterIdShiny("star-square");
+    setFilterIdShiny(
+      context?.shinyXor === undefined
+        ? "star-square"
+        : context.shinyXor === 0
+          ? "square"
+          : "star",
+    );
+    if (context) {
+      setFrlgTid(String(context.tid));
+      setFilterTid(String(context.tid));
+      setFilterSid(context.sid === undefined ? "" : String(context.sid));
+      setFilterTsv("");
+      setInitialAdvances(String(context.idAdvances ?? 0));
+      setMaxAdvances(
+        context.idAdvances === undefined
+          ? context.starterSeedMode === "zero"
+            ? "1000000"
+            : String(Math.max(0, context.targetAdvances - 1))
+          : "0",
+      );
+    }
     setMode("fr-lg");
     setIdOperation("generator");
     setActiveModule("id");
@@ -834,6 +874,7 @@ function App() {
 
   const applyPaintingSeedToStatic = (seed: number) => {
     gen3WorkflowRequestId.current += 1;
+    setGen3IdTargetContext(undefined);
     setGen3StaticTransfer({
       seed,
       requestId: gen3WorkflowRequestId.current,
@@ -841,6 +882,24 @@ function App() {
     closeFloatingTools();
     setActiveModule("static");
     setOpenModuleGroups(new Set(["gen3"]));
+  };
+
+  const applyGen3IdTargetToStatic = (state: Id3State) => {
+    if (!gen3IdTargetContext) return;
+    gen3WorkflowRequestId.current += 1;
+    setGen3StaticTransfer({
+      seed: gen3IdTargetContext.targetSeed,
+      tid: state.tid,
+      sid: state.sid,
+      targetAdvances: gen3IdTargetContext.targetAdvances,
+      starterSeedMode: gen3IdTargetContext.starterSeedMode,
+      requestId: gen3WorkflowRequestId.current,
+    });
+    setGen3IdTargetContext(undefined);
+    setActiveModule("static");
+    setOpenModuleGroups(new Set(["gen3"]));
+    setModuleRailOpen(false);
+    closeFloatingTools();
   };
 
   const readRequest = (): Id3Request | undefined => {
@@ -2333,25 +2392,6 @@ function App() {
                 <small>{t("gen7FestivalPlazaVersion")}</small>
               </span>
             </button>
-            <div className="rail-section-label">3DSRNGTOOL</div>
-            <button
-              className={
-                activeModule === "threedsprofiles"
-                  ? "module-entry active"
-                  : "module-entry"
-              }
-              onClick={() => {
-                setActiveModule("threedsprofiles");
-                setModuleRailOpen(false);
-              }}
-              type="button"
-            >
-              <span className="module-index">45</span>
-              <span>
-                <strong>{t("threeDsProfilesModule")}</strong>
-                <small>{t("threeDsProfilesVersion")}</small>
-              </span>
-            </button>
             <div className="rail-section-label">GEN VIII</div>
             <button
               className={
@@ -2823,7 +2863,11 @@ function App() {
                         className={idOperation === entry ? "active" : ""}
                         disabled={status === "calculating" || idSearcherRunning}
                         key={entry}
-                        onClick={() => setIdOperation(entry)}
+                        onClick={() => {
+                          setIdOperation(entry);
+                          if (entry === "searcher")
+                            setGen3IdTargetContext(undefined);
+                        }}
                         role="tab"
                         type="button"
                       >
@@ -3153,7 +3197,12 @@ function App() {
                             mode === entry.id ? "mode-tab active" : "mode-tab"
                           }
                           key={entry.id}
-                          onClick={() => setMode(entry.id)}
+                          onClick={() => {
+                            setMode(entry.id);
+                            if (entry.id !== "fr-lg") {
+                              setGen3IdTargetContext(undefined);
+                            }
+                          }}
                           role="tab"
                           type="button"
                         >
@@ -3492,7 +3541,7 @@ function App() {
                       </div>
                     ) : (
                       <div
-                        className="virtual-table id-generator-table gen3id-generator-table"
+                        className={`virtual-table id-generator-table gen3id-generator-table${gen3IdTargetContext ? " has-static-target" : ""}`}
                         style={{
                           height: `${rowVirtualizer.getTotalSize() + 40}px`,
                         }}
@@ -3522,6 +3571,7 @@ function App() {
                               {sortLabel(key)}
                             </button>
                           ))}
+                          {gen3IdTargetContext && <span />}
                         </div>
                         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                           const state = sortedResults[virtualRow.index];
@@ -3552,6 +3602,31 @@ function App() {
                                       : "shinyNone",
                                 )}
                               </span>
+                              {gen3IdTargetContext && (
+                                <span>
+                                  {state.tid === gen3IdTargetContext.tid &&
+                                    (gen3IdTargetContext.sid === undefined ||
+                                      state.sid === gen3IdTargetContext.sid) &&
+                                    (gen3IdTargetContext.idAdvances ===
+                                    undefined
+                                      ? gen3IdTargetContext.starterSeedMode ===
+                                          "zero" ||
+                                        state.advances <
+                                          gen3IdTargetContext.targetAdvances
+                                      : state.advances ===
+                                        gen3IdTargetContext.idAdvances) && (
+                                      <button
+                                        className="secondary-action gen3id-continue-action"
+                                        onClick={() =>
+                                          applyGen3IdTargetToStatic(state)
+                                        }
+                                        type="button"
+                                      >
+                                        {t("continueToStatic")}
+                                      </button>
+                                    )}
+                                </span>
+                              )}
                             </div>
                           );
                         })}

@@ -5,10 +5,12 @@ import type { Gen3StaticCategory } from "./encounters";
 
 export { gen3HiddenPower } from "../shared/gen3HiddenPower";
 
-export const GEN3_STATIC_API_VERSION = 4;
+export const GEN3_STATIC_API_VERSION = 6;
 export const GEN3_STATIC_CHUNK_SIZE = 100_000;
 export const GEN3_STATIC_MAX_TOTAL_STATES = 50_000_000;
 export const GEN3_STATIC_MAX_RESULTS = 250_000;
+export const GEN3_STATIC_EMERALD_MAX_CHUNK_WORK_STATES = 25_000_000;
+export const GEN3_STATIC_EMERALD_MAX_TOTAL_WORK_STATES = 250_000_000;
 
 export type Gen3StaticMethod = "method1" | "method4";
 export type Gen3StaticShinyFilter = "any" | "star" | "square" | "star-square";
@@ -58,6 +60,16 @@ export interface Gen3StaticSearcherRequest {
   filters: Gen3StaticFilters;
 }
 
+export interface Gen3StaticEmeraldRequest {
+  initialAdvances: number;
+  maxAdvances: number;
+  offset: number;
+  method: Gen3StaticMethod;
+  template: Gen3StaticTemplate;
+  tid: number | null;
+  filters: Gen3StaticFilters;
+}
+
 export interface Gen3StaticState {
   advances: number;
   pid: number;
@@ -67,6 +79,14 @@ export interface Gen3StaticState {
   level: number;
   nature: number;
   shiny: number;
+}
+
+export interface Gen3StaticEmeraldState extends Gen3StaticState {
+  tid: number;
+  sid?: number;
+  shinyXor?: number;
+  idAdvances?: number;
+  targetAdvances: number;
 }
 
 export interface Gen3StaticSearcherState {
@@ -93,6 +113,8 @@ export interface Gen3StaticSearcherChunk {
   stateCount: number;
 }
 
+export type Gen3StaticEmeraldChunk = Gen3StaticSearcherChunk;
+
 export function staticMethodToWasm(method: Gen3StaticMethod): number {
   return method === "method4" ? 4 : 1;
 }
@@ -111,6 +133,62 @@ export function staticAbilityFilterToWasm(
   filter: Gen3StaticAbilityFilter,
 ): number {
   return { any: 0, first: 1, second: 2 }[filter];
+}
+
+export function shinyXorsForFilter(filter: Gen3StaticShinyFilter): number[] {
+  if (filter === "square") return [0];
+  if (filter === "star") return [1, 2, 3, 4, 5, 6, 7];
+  if (filter === "star-square") return [0, 1, 2, 3, 4, 5, 6, 7];
+  return [];
+}
+
+export function matchingEmeraldSid(
+  tid: number,
+  pid: number,
+  shinyXor: number,
+): number {
+  const psv = ((pid >>> 16) ^ (pid & 0xffff)) & 0xffff;
+  return (tid ^ psv ^ shinyXor) & 0xffff;
+}
+
+export function gen3StaticEmeraldTargetMaxAdvance(
+  request: Gen3StaticEmeraldRequest,
+) {
+  return request.initialAdvances + request.offset + request.maxAdvances;
+}
+
+export function gen3StaticEmeraldWorkCount(request: Gen3StaticEmeraldRequest) {
+  return (
+    gen3StaticSearcherCombinationCount({
+      method: request.method,
+      template: request.template,
+      tid: request.tid ?? 0,
+      sid: 0,
+      filters: request.filters,
+    }) *
+    (gen3StaticEmeraldTargetMaxAdvance(request) + 1)
+  );
+}
+
+export function gen3StaticEmeraldMaxAdvances(
+  request: Gen3StaticEmeraldRequest,
+) {
+  const combinationCount = gen3StaticSearcherCombinationCount({
+    method: request.method,
+    template: request.template,
+    tid: request.tid ?? 0,
+    sid: 0,
+    filters: request.filters,
+  });
+  if (combinationCount === 0) return 0;
+  const maximumTargetStates = Math.min(
+    GEN3_STATIC_EMERALD_MAX_CHUNK_WORK_STATES,
+    Math.floor(GEN3_STATIC_EMERALD_MAX_TOTAL_WORK_STATES / combinationCount),
+  );
+  return Math.max(
+    0,
+    maximumTargetStates - request.initialAdvances - request.offset - 1,
+  );
 }
 
 export function validateGen3StaticRequest(
@@ -234,6 +312,41 @@ export function validateGen3StaticSearcherRequest(
   return errors;
 }
 
+export function validateGen3StaticEmeraldRequest(
+  request: Gen3StaticEmeraldRequest,
+): string[] {
+  const generatorShape: Gen3StaticRequest = {
+    ...request,
+    seed: 0,
+    tid: request.tid ?? 0,
+    sid: 0,
+  };
+  const errors = validateGen3StaticRequest(generatorShape).filter(
+    (error) => error !== "seed" && error !== "sid",
+  );
+  if (request.tid !== null && errors.includes("tid")) return errors;
+  if (errors.length > 0) return errors;
+
+  const combinationCount = gen3StaticSearcherCombinationCount({
+    method: request.method,
+    template: request.template,
+    tid: request.tid ?? 0,
+    sid: 0,
+    filters: request.filters,
+  });
+  const targetStateCount = BigInt(
+    gen3StaticEmeraldTargetMaxAdvance(request) + 1,
+  );
+  if (
+    targetStateCount > BigInt(GEN3_STATIC_EMERALD_MAX_CHUNK_WORK_STATES) ||
+    BigInt(combinationCount) * targetStateCount >
+      BigInt(GEN3_STATIC_EMERALD_MAX_TOTAL_WORK_STATES)
+  ) {
+    errors.push("emeraldSearchRange");
+  }
+  return errors;
+}
+
 export function createGen3StaticChunks(
   request: Gen3StaticRequest,
   chunkSize = GEN3_STATIC_CHUNK_SIZE,
@@ -285,6 +398,27 @@ export function createGen3StaticSearcherChunks(
   return chunks;
 }
 
+export function createGen3StaticEmeraldChunks(
+  request: Gen3StaticEmeraldRequest,
+  chunkSize = GEN3_STATIC_CHUNK_SIZE,
+): Gen3StaticEmeraldChunk[] {
+  const workPerCombination = gen3StaticEmeraldTargetMaxAdvance(request) + 1;
+  const maxCombinationsPerChunk = Math.max(
+    1,
+    Math.floor(GEN3_STATIC_EMERALD_MAX_CHUNK_WORK_STATES / workPerCombination),
+  );
+  return createGen3StaticSearcherChunks(
+    {
+      method: request.method,
+      template: request.template,
+      tid: request.tid ?? 0,
+      sid: 0,
+      filters: request.filters,
+    },
+    Math.min(chunkSize, maxCombinationsPerChunk),
+  );
+}
+
 export function decodeGen3StaticStates(buffer: ArrayBuffer): Gen3StaticState[] {
   const words = new Uint32Array(buffer);
   if (words.length % 12 !== 0)
@@ -322,4 +456,47 @@ export function decodeGen3StaticSearcherStates(
 ): Gen3StaticSearcherState[] {
   const generated = decodeGen3StaticStates(buffer);
   return generated.map(({ advances: seed, ...state }) => ({ seed, ...state }));
+}
+
+export function decodeGen3StaticEmeraldStates(
+  buffer: ArrayBuffer,
+): Gen3StaticEmeraldState[] {
+  const words = new Uint32Array(buffer);
+  if (words.length % 15 !== 0)
+    throw new RangeError("Invalid Gen3 Emerald result buffer length.");
+  const states = new Array<Gen3StaticEmeraldState>(words.length / 15);
+  for (
+    let source = 0, target = 0;
+    source < words.length;
+    source += 15, target++
+  ) {
+    const natureShiny = words[source + 14];
+    const targetAdvances = words[source];
+    const rawIdAdvances = words[source + 1];
+    const rawSid = words[source + 3];
+    const rawShinyXor = natureShiny >>> 16;
+    states[target] = {
+      advances: targetAdvances,
+      targetAdvances,
+      idAdvances: rawIdAdvances === 0xffff_ffff ? undefined : rawIdAdvances,
+      tid: words[source + 2],
+      sid: rawSid === 0xffff_ffff ? undefined : rawSid,
+      pid: words[source + 4],
+      ivs: [
+        words[source + 5],
+        words[source + 6],
+        words[source + 7],
+        words[source + 8],
+        words[source + 9],
+        words[source + 10],
+      ],
+      ability: words[source + 11],
+      gender: words[source + 12],
+      level: words[source + 13],
+      nature: natureShiny & 0xff,
+      shiny: (natureShiny >>> 8) & 0xff,
+      shinyXor: rawShinyXor === 0xffff ? undefined : rawShinyXor,
+    };
+  }
+  return states;
 }

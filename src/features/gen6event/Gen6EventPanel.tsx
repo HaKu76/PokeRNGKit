@@ -7,6 +7,10 @@ import type { ThreeDsProfile } from "../3dsprofiles/domain";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import {
+  ThreeDsRngInfoCard,
+  type ThreeDsRngInfoMode,
+} from "../shared/ThreeDsRngInfoCard";
+import {
   formatGen6EventHex,
   gen6EventDefaultSettings,
   gen6EventProfile,
@@ -164,6 +168,9 @@ export function Gen6EventPanel({
   const [endDate, setEndDate] = useState("2000-01-01T00:01:00");
   const [minFrame, setMinFrame] = useState("0");
   const [maxFrame, setMaxFrame] = useState("1000");
+  const [rngInfoMode, setRngInfoMode] = useState<ThreeDsRngInfoMode>("range");
+  const [targetFrame, setTargetFrame] = useState("5000");
+  const [timelineSeconds, setTimelineSeconds] = useState("3600");
   const [tsv, setTsv] = useState(String(profileInfo.tsv));
   const [trv, setTrv] = useState(profileInfo.trv.toString(16).toUpperCase());
   const [delay, setDelay] = useState("0");
@@ -239,19 +246,28 @@ export function Gen6EventPanel({
     [engine, timeEngine],
   );
 
-  const request = (): Gen6EventRequest => ({
-    version,
-    seed: parseGen6EventHex(seed),
-    minFrame: parseGen6EventDecimal(minFrame),
-    maxFrame: parseGen6EventDecimal(maxFrame),
-    tsv: parseGen6EventDecimal(tsv),
-    trv: parseGen6EventHex(trv),
-    delay: parseGen6EventDecimal(delay),
-    considerDelay,
-    event: settings,
-    filters,
-    resultLimit: parseGen6EventDecimal(resultLimit),
-  });
+  const request = (): Gen6EventRequest => {
+    const parsedTargetFrame = parseGen6EventDecimal(targetFrame);
+    return {
+      version,
+      seed: parseGen6EventHex(seed),
+      minFrame:
+        !timeFinderMode && rngInfoMode === "around"
+          ? Math.max(0, parsedTargetFrame - 100)
+          : parseGen6EventDecimal(minFrame),
+      maxFrame:
+        !timeFinderMode && rngInfoMode === "around"
+          ? parsedTargetFrame + 100
+          : parseGen6EventDecimal(maxFrame),
+      tsv: parseGen6EventDecimal(tsv),
+      trv: parseGen6EventHex(trv),
+      delay: parseGen6EventDecimal(delay),
+      considerDelay,
+      event: settings,
+      filters,
+      resultLimit: parseGen6EventDecimal(resultLimit),
+    };
+  };
   const timeRequest = (): Gen6EventTimeRequest => {
     const startEpoch = gen6EventTimeEpochFromInput(startDate);
     const endEpoch = gen6EventTimeEpochFromInput(endDate);
@@ -398,7 +414,7 @@ export function Gen6EventPanel({
 
   return (
     <div className="gen6event-panel">
-      <div className="gen6event-workspace">
+      <div className="gen6event-workspace stacked-module-workspace">
         <form className="panel gen6event-controls" onSubmit={run}>
           <div className="gen6event-heading">
             <div>
@@ -471,34 +487,46 @@ export function Gen6EventPanel({
                   </div>
                 </label>
               )}
-              <label className="field">
-                <span>{t("gen6StationaryFrameRange")}</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={5_000_000}
-                  value={minFrame}
-                  onChange={(event) =>
-                    setMinFrame(
-                      normalizeDecimalInput(event.target.value, 5_000_000, 10),
-                    )
-                  }
-                />
-              </label>
-              <label className="field">
-                <span>{t("gen7StationaryMaxFrame")}</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={5_000_000}
-                  value={maxFrame}
-                  onChange={(event) =>
-                    setMaxFrame(
-                      normalizeDecimalInput(event.target.value, 5_000_000, 10),
-                    )
-                  }
-                />
-              </label>
+              {timeFinderMode && (
+                <>
+                  <label className="field">
+                    <span>{t("gen6StationaryFrameRange")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="numeric"
+                      max={5_000_000}
+                      value={minFrame}
+                      onChange={(event) =>
+                        setMinFrame(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            5_000_000,
+                            10,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("gen7StationaryMaxFrame")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="numeric"
+                      max={5_000_000}
+                      value={maxFrame}
+                      onChange={(event) =>
+                        setMaxFrame(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            5_000_000,
+                            10,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                </>
+              )}
               <label className="field">
                 <span>TSV</span>
                 <input
@@ -526,18 +554,22 @@ export function Gen6EventPanel({
                   />
                 </div>
               </label>
-              <label className="field">
-                <span>{t("delay")}</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={4000}
-                  value={delay}
-                  onChange={(event) =>
-                    setDelay(normalizeDecimalInput(event.target.value, 4000, 4))
-                  }
-                />
-              </label>
+              {timeFinderMode && (
+                <label className="field">
+                  <span>{t("delay")}</span>
+                  <input
+                    disabled={status === "calculating"}
+                    inputMode="numeric"
+                    max={4000}
+                    value={delay}
+                    onChange={(event) =>
+                      setDelay(
+                        normalizeDecimalInput(event.target.value, 4000, 4),
+                      )
+                    }
+                  />
+                </label>
+              )}
               <label className="field">
                 <span>{t("gen6StationaryResultLimit")}</span>
                 <input
@@ -553,16 +585,52 @@ export function Gen6EventPanel({
                   }
                 />
               </label>
-              <label className="checkbox-field gen6event-inline-toggle">
-                <input
-                  checked={considerDelay}
-                  disabled={status === "calculating"}
-                  type="checkbox"
-                  onChange={(event) => setConsiderDelay(event.target.checked)}
-                />
-                <span>{t("gen6EventConsiderDelay")}</span>
-              </label>
+              {timeFinderMode && (
+                <label className="checkbox-field gen6event-inline-toggle">
+                  <input
+                    checked={considerDelay}
+                    disabled={status === "calculating"}
+                    type="checkbox"
+                    onChange={(event) => setConsiderDelay(event.target.checked)}
+                  />
+                  <span>{t("gen6EventConsiderDelay")}</span>
+                </label>
+              )}
             </div>
+            {!timeFinderMode && (
+              <ThreeDsRngInfoCard
+                considerDelay={considerDelay}
+                delay={delay}
+                disabled={status === "calculating"}
+                generation={6}
+                maxFrame={maxFrame}
+                maxFrameLimit={5_000_000}
+                minFrame={minFrame}
+                mode={rngInfoMode}
+                onConsiderDelayChange={setConsiderDelay}
+                onDelayChange={(value) =>
+                  setDelay(normalizeDecimalInput(value, 4000, 4))
+                }
+                onMaxFrameChange={(value) =>
+                  setMaxFrame(normalizeDecimalInput(value, 5_000_000, 10))
+                }
+                onMinFrameChange={(value) =>
+                  setMinFrame(normalizeDecimalInput(value, 5_000_000, 10))
+                }
+                onModeChange={setRngInfoMode}
+                onTargetFrameChange={(value) =>
+                  setTargetFrame(normalizeDecimalInput(value, 5_000_000, 10))
+                }
+                onTimelineSecondsChange={(value) =>
+                  setTimelineSeconds(
+                    normalizeDecimalInput(value, 5_000_000, 10),
+                  )
+                }
+                showNpc={false}
+                targetFrame={targetFrame}
+                timelineSeconds={timelineSeconds}
+              />
+            )}
           </section>
 
           <section className="gen6event-section">

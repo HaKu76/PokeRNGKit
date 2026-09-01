@@ -149,7 +149,7 @@ export function Gen6PokeRadarPanel({
           {t(status)}
         </div>
       </header>
-      <div className="gen6pokeradar-workspace">
+      <div className="gen6pokeradar-workspace stacked-module-workspace">
         <section className="panel gen6pokeradar-controls">
           <div className="gen6pokeradar-heading">
             <h2>{t("gen6PokeRadarSetup")}</h2>

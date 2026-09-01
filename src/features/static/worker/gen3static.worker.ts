@@ -77,8 +77,43 @@ interface Gen3StaticEmscriptenModule {
     perfectIvValue: number,
     perfectIvCount: number,
   ): number;
+  _gen3static_search_emerald(
+    startIndex: number,
+    stateCount: number,
+    initialAdvances: number,
+    maxAdvances: number,
+    offset: number,
+    filterTid: number,
+    tid: number,
+    method: number,
+    species: number,
+    level: number,
+    genderRatio: number,
+    buggedRoamer: number,
+    shinyFilter: number,
+    genderFilter: number,
+    abilityFilter: number,
+    natureFilter: number,
+    hiddenPowerFilter: number,
+    hpMin: number,
+    attackMin: number,
+    defenseMin: number,
+    specialAttackMin: number,
+    specialDefenseMin: number,
+    speedMin: number,
+    hpMax: number,
+    attackMax: number,
+    defenseMax: number,
+    specialAttackMax: number,
+    specialDefenseMax: number,
+    speedMax: number,
+    perfectIvValue: number,
+    perfectIvCount: number,
+  ): number;
   _gen3static_result_ptr(): number;
   _gen3static_result_count(): number;
+  _gen3static_emerald_result_ptr(): number;
+  _gen3static_emerald_result_count(): number;
   _gen3static_last_error(): number;
 }
 
@@ -217,13 +252,70 @@ function search(message: Extract<Gen3StaticWorkerRequest, { type: "search" }>) {
   );
 }
 
+function searchEmerald(
+  message: Extract<Gen3StaticWorkerRequest, { type: "emerald-search" }>,
+) {
+  if (!wasm) throw new Error("Gen3 static Wasm module is not initialized.");
+  const { request } = message;
+  const { filters, template } = request;
+  const startedAt = performance.now();
+  const resultCount = wasm._gen3static_search_emerald(
+    message.chunk.startIndex,
+    message.chunk.stateCount,
+    request.initialAdvances,
+    request.maxAdvances,
+    request.offset,
+    request.tid === null ? 0 : 1,
+    request.tid ?? 0,
+    staticMethodToWasm(request.method),
+    template.species,
+    template.level,
+    template.genderRatio,
+    template.buggedRoamer ? 1 : 0,
+    staticShinyFilterToWasm(filters.shiny),
+    staticGenderFilterToWasm(filters.gender),
+    staticAbilityFilterToWasm(filters.ability),
+    filters.natureMask,
+    filters.hiddenPowerMask,
+    ...filters.ivMin,
+    ...filters.ivMax,
+    filters.perfectIvValue,
+    filters.perfectIvCount,
+  );
+  const errorCode = wasm._gen3static_last_error();
+  if (errorCode !== 0)
+    throw new Error(`Gen3 Emerald Wasm core returned error ${errorCode}.`);
+  if (resultCount !== wasm._gen3static_emerald_result_count()) {
+    throw new Error(
+      "Gen3 Emerald Wasm result count changed before the buffer was copied.",
+    );
+  }
+  const pointer = wasm._gen3static_emerald_result_ptr() >>> 2;
+  const words = wasm.HEAPU32.slice(pointer, pointer + resultCount * 15);
+  post(
+    {
+      type: "batch",
+      taskId: message.taskId,
+      chunkIndex: message.chunk.index,
+      stateCount:
+        message.chunk.stateCount *
+        (request.initialAdvances + request.offset + request.maxAdvances + 1),
+      resultCount,
+      elapsedMs: performance.now() - startedAt,
+      buffer: words.buffer,
+    },
+    [words.buffer],
+  );
+}
+
 workerScope.onmessage = async ({
   data,
 }: MessageEvent<Gen3StaticWorkerRequest>) => {
   try {
     if (data.type === "init") await initialize(data.moduleUrl);
     else if (data.type === "run") run(data);
-    else search(data);
+    else if (data.type === "search") search(data);
+    else searchEmerald(data);
   } catch (error) {
     post({
       type: "error",

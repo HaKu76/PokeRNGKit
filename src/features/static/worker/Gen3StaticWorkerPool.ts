@@ -4,6 +4,8 @@ import {
   GEN3_STATIC_CHUNK_SIZE,
   GEN3_STATIC_MAX_RESULTS,
   type Gen3StaticChunk,
+  type Gen3StaticEmeraldChunk,
+  type Gen3StaticEmeraldRequest,
   type Gen3StaticRequest,
   type Gen3StaticSearcherChunk,
   type Gen3StaticSearcherRequest,
@@ -77,6 +79,20 @@ export class Gen3StaticWorkerClient {
     return new Promise((resolve, reject) => {
       this.pending = { taskId, resolve, reject };
       this.post({ type: "search", taskId, chunk, request });
+    });
+  }
+
+  async searchEmerald(
+    taskId: string,
+    request: Gen3StaticEmeraldRequest,
+    chunk: Gen3StaticEmeraldChunk,
+  ): Promise<Gen3StaticWorkerBatchMessage> {
+    await this.ready;
+    if (this.pending)
+      throw new Error("Gen3 static Worker received overlapping chunks.");
+    return new Promise((resolve, reject) => {
+      this.pending = { taskId, resolve, reject };
+      this.post({ type: "emerald-search", taskId, chunk, request });
     });
   }
 

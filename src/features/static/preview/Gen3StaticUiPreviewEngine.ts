@@ -79,6 +79,8 @@ function matches(request: Gen3StaticRequest, state: Gen3StaticState) {
     abilityMatch &&
     (filters.natureMask & (1 << state.nature)) !== 0 &&
     (filters.hiddenPowerMask & (1 << gen3HiddenPower(state.ivs).type)) !== 0 &&
+    state.ivs.filter((value) => value >= filters.perfectIvValue).length >=
+      filters.perfectIvCount &&
     state.ivs.every(
       (value, index) =>
         value >= filters.ivMin[index] && value <= filters.ivMax[index],

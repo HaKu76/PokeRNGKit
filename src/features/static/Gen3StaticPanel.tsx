@@ -21,11 +21,17 @@ import { getGen3SpeciesName } from "../shared/gen3Species";
 import { computeGen3Stats } from "../shared/gen3Stats";
 import {
   gen3HiddenPower,
+  gen3StaticEmeraldMaxAdvances,
+  gen3StaticEmeraldWorkCount,
   gen3StaticSearcherCombinationCount,
+  GEN3_STATIC_EMERALD_MAX_TOTAL_WORK_STATES,
   GEN3_STATIC_MAX_TOTAL_STATES,
+  validateGen3StaticEmeraldRequest,
   validateGen3StaticRequest,
   validateGen3StaticSearcherRequest,
   type Gen3StaticAbilityFilter,
+  type Gen3StaticEmeraldRequest,
+  type Gen3StaticEmeraldState,
   type Gen3StaticGenderFilter,
   type Gen3StaticFilters,
   type Gen3StaticMethod,
@@ -40,25 +46,32 @@ import {
   gen3StaticTemplatesForVersion,
   type Gen3StaticCategory,
 } from "./encounters";
+import { Gen3StaticEmeraldUiPreviewEngine } from "./preview/Gen3StaticEmeraldUiPreviewEngine";
 import { Gen3StaticSearcherUiPreviewEngine } from "./preview/Gen3StaticSearcherUiPreviewEngine";
 import { Gen3StaticUiPreviewEngine } from "./preview/Gen3StaticUiPreviewEngine";
 import type {
+  Gen3StaticEmeraldSearchEngine,
   Gen3StaticSearchEngine,
   Gen3StaticSearchProgress,
   Gen3StaticSearchSummary,
 } from "./search";
 import type { Gen3StaticSearcherEngine } from "./searcher";
+import { Gen3StaticEmeraldWorkerPool } from "./worker/Gen3StaticEmeraldWorkerPool";
 import { Gen3StaticSearcherWorkerPool } from "./worker/Gen3StaticSearcherWorkerPool";
 import { Gen3StaticWorkerPool } from "./worker/Gen3StaticWorkerPool";
 
 type RunStatus = "ready" | "calculating" | "completed" | "cancelled" | "failed";
 type StaticOperation = "generator" | "searcher";
+type EmeraldStarterSeedMode = "tid" | "zero";
 type IvKey =
   "hp" | "attack" | "defense" | "specialAttack" | "specialDefense" | "speed";
 type StaticSortKey =
   | "advances"
   | "seed"
+  | "tid"
   | "pid"
+  | "psv"
+  | "perfectIvs"
   | IvKey
   | "ability"
   | "gender"
@@ -66,7 +79,8 @@ type StaticSortKey =
   | "shiny"
   | "hiddenPower"
   | "hiddenPowerStrength";
-type StaticResultState = Gen3StaticState | Gen3StaticSearcherState;
+type StaticResultState =
+  Gen3StaticState | Gen3StaticSearcherState | Gen3StaticEmeraldState;
 type IvTextValues = [string, string, string, string, string, string];
 
 interface IvRanges {
@@ -78,8 +92,27 @@ interface Gen3StaticPanelProps {
   profile: Gen3Profile;
   uiPreviewMode: boolean;
   onOpenIvCalculator(): void;
-  onFindCompatibleId(pid: number, seed: number): void;
-  initialTransfer?: { seed: number; requestId: number };
+  onFindCompatibleId(
+    pid: number,
+    seed: number,
+    context?: {
+      tid: number;
+      targetSeed: number;
+      starterSeedMode: EmeraldStarterSeedMode;
+      sid?: number;
+      targetAdvances: number;
+      idAdvances?: number;
+      shinyXor?: number;
+    },
+  ): void;
+  initialTransfer?: {
+    seed: number;
+    requestId: number;
+    tid?: number;
+    sid?: number;
+    targetAdvances?: number;
+    starterSeedMode?: EmeraldStarterSeedMode;
+  };
 }
 
 const NATURE_MASK_ALL = 0x1ff_ffff;
@@ -153,7 +186,22 @@ const commonStaticColumns: Array<{ key: StaticSortKey; label: string }> = [
   { key: "gender", label: "gender" },
 ];
 
-function staticColumns(operation: StaticOperation) {
+function staticColumns(
+  operation: StaticOperation,
+  emeraldCandidateMode: boolean,
+) {
+  if (emeraldCandidateMode) {
+    return [
+      { key: "tid" as const, label: "rowTid" },
+      { key: "advances" as const, label: "emeraldTargetAdvance" },
+      { key: "perfectIvs" as const, label: "perfectIvCount" },
+      { key: "pid" as const, label: "rowPid" },
+      { key: "psv" as const, label: "rowPsv" },
+      ...commonStaticColumns.filter(
+        (column) => column.key !== "pid" && column.key !== "shiny",
+      ),
+    ];
+  }
   return [
     operation === "generator"
       ? { key: "advances" as const, label: "rowAdvance" }
@@ -205,6 +253,13 @@ export function Gen3StaticPanel({
         : new Gen3StaticSearcherWorkerPool(),
     [uiPreviewMode],
   );
+  const emeraldEngine = useMemo<Gen3StaticEmeraldSearchEngine>(
+    () =>
+      uiPreviewMode
+        ? new Gen3StaticEmeraldUiPreviewEngine()
+        : new Gen3StaticEmeraldWorkerPool(),
+    [uiPreviewMode],
+  );
   const [operation, setOperation] = useState<StaticOperation>("generator");
   const [category, setCategory] = useState<Gen3StaticCategory>("starters");
   const [templateId, setTemplateId] = useState("");
@@ -213,6 +268,13 @@ export function Gen3StaticPanel({
   const [initialAdvances, setInitialAdvances] = useState("0");
   const [maxAdvances, setMaxAdvances] = useState("100000");
   const [offset, setOffset] = useState("0");
+  const [emeraldSeedMode, setEmeraldSeedMode] = useState<"profile" | "tid">(
+    "profile",
+  );
+  const [emeraldStarterSeedMode, setEmeraldStarterSeedMode] =
+    useState<EmeraldStarterSeedMode>("tid");
+  const [emeraldTid, setEmeraldTid] = useState("");
+  const [emeraldDerivedSid, setEmeraldDerivedSid] = useState<number>();
   const [filtersDisabled, setFiltersDisabled] = useState(false);
   const [shiny, setShiny] = useState<Gen3StaticShinyFilter>("any");
   const [gender, setGender] = useState<Gen3StaticGenderFilter>("any");
@@ -247,12 +309,24 @@ export function Gen3StaticPanel({
     seed: number;
     x: number;
     y: number;
+    context?: {
+      tid: number;
+      targetSeed: number;
+      starterSeedMode: EmeraldStarterSeedMode;
+      sid?: number;
+      targetAdvances: number;
+      idAdvances?: number;
+      shinyXor?: number;
+    };
   }>();
   const [sort, setSort] = useState<{
     key: StaticSortKey;
     direction: "asc" | "desc";
   }>({ key: "advances", direction: "asc" });
   const scrollRef = useRef<HTMLDivElement>(null);
+  const activeCalculation = useRef<"generator" | "emerald" | "searcher">(
+    "generator",
+  );
 
   const categories = useMemo(
     () => gen3StaticCategoriesForVersion(profile.version),
@@ -261,13 +335,28 @@ export function Gen3StaticPanel({
   const activeCategory = categories.includes(category)
     ? category
     : categories[0];
+  const emeraldLinkedAvailable =
+    operation === "generator" &&
+    profile.version === "emerald" &&
+    activeCategory === "starters";
+  const emeraldCandidateMode =
+    emeraldLinkedAvailable &&
+    emeraldSeedMode === "tid" &&
+    emeraldDerivedSid === undefined;
+  const emeraldReverseTidMode =
+    emeraldCandidateMode &&
+    emeraldStarterSeedMode === "tid" &&
+    emeraldTid.trim() === "";
   const templates = useMemo(
     () => gen3StaticTemplatesForVersion(profile.version, activeCategory),
     [activeCategory, profile.version],
   );
   const template =
     templates.find((entry) => entry.id === templateId) ?? templates[0];
-  const columns = useMemo(() => staticColumns(operation), [operation]);
+  const columns = useMemo(
+    () => staticColumns(operation, emeraldCandidateMode),
+    [emeraldCandidateMode, operation],
+  );
   const natureOptions = natureKeys.map((key, value) => ({
     label: t(key),
     value,
@@ -284,8 +373,9 @@ export function Gen3StaticPanel({
     () => () => {
       generatorEngine.dispose();
       searcherEngine.dispose();
+      emeraldEngine.dispose();
     },
-    [generatorEngine, searcherEngine],
+    [emeraldEngine, generatorEngine, searcherEngine],
   );
   useEffect(() => {
     if (profile.deadBattery) setSeed("5A0");
@@ -294,7 +384,22 @@ export function Gen3StaticPanel({
     if (!initialTransfer) return;
     resetRunState("generator");
     setSeed(formatHex(initialTransfer.seed, 4));
-    setInitialAdvances("0");
+    if (
+      initialTransfer.tid !== undefined &&
+      initialTransfer.sid !== undefined
+    ) {
+      setEmeraldSeedMode("tid");
+      setEmeraldStarterSeedMode(initialTransfer.starterSeedMode ?? "tid");
+      setEmeraldTid(String(initialTransfer.tid));
+      setEmeraldDerivedSid(initialTransfer.sid);
+      setInitialAdvances(String(initialTransfer.targetAdvances ?? 0));
+      setMaxAdvances("0");
+      setOffset("0");
+    } else {
+      setEmeraldSeedMode("profile");
+      setEmeraldDerivedSid(undefined);
+      setInitialAdvances("0");
+    }
   }, [initialTransfer?.requestId]);
   useEffect(() => {
     if (!pidMenu) return;
@@ -312,6 +417,12 @@ export function Gen3StaticPanel({
   useEffect(() => {
     if (category !== activeCategory) setCategory(activeCategory);
   }, [activeCategory, category]);
+  useEffect(() => {
+    if (!emeraldLinkedAvailable) {
+      setEmeraldSeedMode("profile");
+      setEmeraldDerivedSid(undefined);
+    }
+  }, [emeraldLinkedAvailable]);
   useEffect(() => {
     if (template.id !== templateId) setTemplateId(template.id);
     if (template.buggedRoamer) setMethod("method1");
@@ -331,6 +442,18 @@ export function Gen3StaticPanel({
     }
     if (key === "advances") return "advances" in state ? state.advances : 0;
     if (key === "seed") return "seed" in state ? state.seed : 0;
+    if (key === "tid") {
+      return "tid" in state
+        ? state.tid
+        : (parseDecimal(emeraldTid) ?? profile.tid);
+    }
+    if (key === "psv") {
+      return (((state.pid >>> 16) ^ (state.pid & 0xffff)) >>> 3) & 0x1fff;
+    }
+    if (key === "perfectIvs") {
+      const value = parseDecimal(perfectIvValue) ?? 31;
+      return state.ivs.filter((iv) => iv >= value).length;
+    }
     if (key === "hiddenPower") return gen3HiddenPower(state.ivs).type;
     if (key === "hiddenPowerStrength") return gen3HiddenPower(state.ivs).power;
     return state[
@@ -346,7 +469,7 @@ export function Gen3StaticPanel({
     );
     // The selected encounter and display mode change the derived stat columns.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [personal, results, showStats, sort]);
+  }, [perfectIvValue, personal, results, showStats, sort]);
 
   // TanStack Virtual exposes an imperative virtualizer object by design.
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -409,8 +532,11 @@ export function Gen3StaticPanel({
     }));
   };
 
-  const readFilters = (disabled = false): Gen3StaticFilters => ({
-    shiny: disabled ? "any" : shiny,
+  const readFilters = (
+    disabled = false,
+    shinyOverride?: Gen3StaticShinyFilter,
+  ): Gen3StaticFilters => ({
+    shiny: disabled ? "any" : (shinyOverride ?? shiny),
     gender: disabled ? "any" : gender,
     ability: disabled ? "any" : ability,
     natureMask: disabled ? NATURE_MASK_ALL : natureMask || NATURE_MASK_ALL,
@@ -433,16 +559,23 @@ export function Gen3StaticPanel({
     perfectIvCount: disabled ? 0 : (parseDecimal(perfectIvCount) ?? Number.NaN),
   });
 
-  const readRequest = (): Gen3StaticRequest => ({
-    seed: parseHex(seed) ?? Number.NaN,
+  const readRequest = (
+    linkedIdentity?: {
+      seed: number;
+      tid: number;
+      sid: number;
+    },
+    shinyOverride?: Gen3StaticShinyFilter,
+  ): Gen3StaticRequest => ({
+    seed: linkedIdentity?.seed ?? parseHex(seed) ?? Number.NaN,
     initialAdvances: parseDecimal(initialAdvances) ?? Number.NaN,
     maxAdvances: parseDecimal(maxAdvances) ?? Number.NaN,
     offset: parseDecimal(offset) ?? Number.NaN,
     method,
     template,
-    tid: profile.tid,
-    sid: profile.sid,
-    filters: readFilters(filtersDisabled),
+    tid: linkedIdentity?.tid ?? profile.tid,
+    sid: linkedIdentity?.sid ?? profile.sid,
+    filters: readFilters(filtersDisabled, shinyOverride),
   });
 
   const readSearcherRequest = (): Gen3StaticSearcherRequest => ({
@@ -453,26 +586,89 @@ export function Gen3StaticPanel({
     filters: readFilters(),
   });
 
+  const readEmeraldRequest = (): Gen3StaticEmeraldRequest => ({
+    initialAdvances: parseDecimal(initialAdvances) ?? Number.NaN,
+    maxAdvances: parseDecimal(maxAdvances) ?? Number.NaN,
+    offset: parseDecimal(offset) ?? Number.NaN,
+    method,
+    template,
+    tid: null,
+    filters: readFilters(),
+  });
+
+  const selectEmeraldNewGame = () => {
+    resetRunState("generator");
+    setEmeraldSeedMode("tid");
+    setEmeraldStarterSeedMode("tid");
+    setEmeraldDerivedSid(undefined);
+    setEmeraldTid("");
+    setFiltersDisabled(false);
+    setShiny("star-square");
+    setInitialAdvances("0");
+    setMaxAdvances("1000000");
+    setOffset("0");
+    setPerfectIvValue("31");
+    setPerfectIvCount("6");
+    setSort({ key: "perfectIvs", direction: "desc" });
+  };
+
   const runCalculation = async (event: FormEvent) => {
     event.preventDefault();
     if (status === "calculating") return;
+    const emeraldTargetMode =
+      emeraldLinkedAvailable && emeraldSeedMode === "tid";
+    const tid = emeraldTargetMode ? parseDecimal(emeraldTid) : undefined;
+    if (
+      emeraldTargetMode &&
+      emeraldStarterSeedMode === "zero" &&
+      tid === undefined
+    ) {
+      setError(t("emeraldZeroSeedTidRequired"));
+      setStatus("failed");
+      return;
+    }
+    const emeraldReverseMode =
+      emeraldTargetMode &&
+      emeraldStarterSeedMode === "tid" &&
+      tid === undefined;
+    const linkedIdentity =
+      emeraldTargetMode && tid !== undefined
+        ? {
+            seed: emeraldStarterSeedMode === "zero" ? 0 : tid,
+            tid,
+            sid: emeraldDerivedSid ?? 0,
+          }
+        : undefined;
+    const emeraldRequest = emeraldReverseMode
+      ? readEmeraldRequest()
+      : undefined;
     const generatorRequest =
-      operation === "generator" ? readRequest() : undefined;
+      operation === "generator" && !emeraldRequest
+        ? readRequest(linkedIdentity, emeraldCandidateMode ? "any" : undefined)
+        : undefined;
     const searcherRequest =
       operation === "searcher" ? readSearcherRequest() : undefined;
-    const validationErrors = generatorRequest
-      ? validateGen3StaticRequest(generatorRequest)
-      : validateGen3StaticSearcherRequest(searcherRequest!);
+    const validationErrors = emeraldRequest
+      ? validateGen3StaticEmeraldRequest(emeraldRequest)
+      : generatorRequest
+        ? validateGen3StaticRequest(generatorRequest)
+        : validateGen3StaticSearcherRequest(searcherRequest!);
     if (validationErrors.length > 0) {
       setError(
-        validationErrors.includes("searchRange")
-          ? t("staticSearchRangeTooLarge", {
-              count: String(
-                gen3StaticSearcherCombinationCount(searcherRequest!),
-              ),
-              limit: String(GEN3_STATIC_MAX_TOTAL_STATES),
+        validationErrors.includes("emeraldSearchRange") && emeraldRequest
+          ? t("emeraldSearchRangeTooLarge", {
+              count: String(gen3StaticEmeraldWorkCount(emeraldRequest)),
+              limit: String(GEN3_STATIC_EMERALD_MAX_TOTAL_WORK_STATES),
+              maxAdvances: String(gen3StaticEmeraldMaxAdvances(emeraldRequest)),
             })
-          : t("invalidStaticInput"),
+          : validationErrors.includes("searchRange")
+            ? t("staticSearchRangeTooLarge", {
+                count: String(
+                  gen3StaticSearcherCombinationCount(searcherRequest!),
+                ),
+                limit: String(GEN3_STATIC_MAX_TOTAL_STATES),
+              })
+            : t("invalidStaticInput"),
       );
       setStatus("failed");
       return;
@@ -482,26 +678,41 @@ export function Gen3StaticPanel({
     resultPersonal.current = personal;
     setResults([]);
     setSummary(undefined);
+    const totalStates = emeraldRequest
+      ? gen3StaticEmeraldWorkCount(emeraldRequest)
+      : generatorRequest
+        ? generatorRequest.maxAdvances + 1
+        : gen3StaticSearcherCombinationCount(searcherRequest!);
     setProgress({
       processedStates: 0,
-      totalStates: generatorRequest
-        ? generatorRequest.maxAdvances + 1
-        : gen3StaticSearcherCombinationCount(searcherRequest!),
+      totalStates,
       resultCount: 0,
       percent: 0,
     });
+    activeCalculation.current = emeraldRequest
+      ? "emerald"
+      : generatorRequest
+        ? "generator"
+        : "searcher";
     setStatus("calculating");
 
     try {
-      const nextSummary = generatorRequest
-        ? await generatorEngine.search(generatorRequest, {
+      const nextSummary = emeraldRequest
+        ? await emeraldEngine.searchEmerald(emeraldRequest, {
             onBatch: (batch) => setResults((current) => current.concat(batch)),
             onProgress: setProgress,
           })
-        : await searcherEngine.search(searcherRequest!, {
-            onBatch: (batch) => setResults((current) => current.concat(batch)),
-            onProgress: setProgress,
-          });
+        : generatorRequest
+          ? await generatorEngine.search(generatorRequest, {
+              onBatch: (batch) =>
+                setResults((current) => current.concat(batch)),
+              onProgress: setProgress,
+            })
+          : await searcherEngine.search(searcherRequest!, {
+              onBatch: (batch) =>
+                setResults((current) => current.concat(batch)),
+              onProgress: setProgress,
+            });
       setSummary(nextSummary);
       setStatus(nextSummary.cancelled ? "cancelled" : "completed");
     } catch (cause) {
@@ -513,6 +724,12 @@ export function Gen3StaticPanel({
   const displayStateValue = (state: StaticResultState, key: StaticSortKey) => {
     if (key === "pid" || key === "seed") {
       return formatHex(stateValue(state, key), 8);
+    }
+    if (key === "tid") {
+      return String(stateValue(state, key)).padStart(5, "0");
+    }
+    if (key === "psv") {
+      return String(stateValue(state, key)).padStart(4, "0");
     }
     if (key === "gender") {
       return t(
@@ -578,12 +795,26 @@ export function Gen3StaticPanel({
     >
       {(["generator", "searcher"] as const).map((entry) => (
         <button
-          aria-selected={operation === entry}
-          className={operation === entry ? "active" : ""}
+          aria-selected={
+            operation === entry &&
+            (entry !== "generator" || emeraldSeedMode === "profile")
+          }
+          className={
+            operation === entry &&
+            (entry !== "generator" || emeraldSeedMode === "profile")
+              ? "active"
+              : ""
+          }
           disabled={status === "calculating"}
           key={entry}
           onClick={() => {
-            if (operation !== entry) resetRunState(entry);
+            if (
+              operation !== entry ||
+              (entry === "generator" && emeraldSeedMode !== "profile")
+            ) {
+              resetRunState(entry);
+            }
+            if (entry === "generator") setEmeraldSeedMode("profile");
           }}
           role="tab"
           type="button"
@@ -591,6 +822,24 @@ export function Gen3StaticPanel({
           {t(entry)}
         </button>
       ))}
+      <button
+        aria-selected={operation === "generator" && emeraldSeedMode === "tid"}
+        className={
+          operation === "generator" && emeraldSeedMode === "tid" ? "active" : ""
+        }
+        disabled={
+          status === "calculating" ||
+          profile.version !== "emerald" ||
+          activeCategory !== "starters"
+        }
+        onClick={() => {
+          selectEmeraldNewGame();
+        }}
+        role="tab"
+        type="button"
+      >
+        {t("emeraldNewGameDemo")}
+      </button>
     </div>
   );
   const operationTabsTarget =
@@ -632,16 +881,74 @@ export function Gen3StaticPanel({
             </label>
             {operation === "generator" && (
               <>
-                <label className="field">
-                  <span>{t("seed")}</span>
-                  <input
-                    maxLength={8}
-                    onChange={(event) =>
-                      setSeed(normalizeHexInput(event.target.value, 8))
-                    }
-                    value={seed}
-                  />
-                </label>
+                {emeraldLinkedAvailable && emeraldSeedMode === "tid" ? (
+                  <>
+                    <label className="field">
+                      <span>{t("emeraldStarterSeed")}</span>
+                      <Select
+                        onChange={(event) => {
+                          setEmeraldStarterSeedMode(
+                            event.target.value as EmeraldStarterSeedMode,
+                          );
+                          setEmeraldDerivedSid(undefined);
+                        }}
+                        value={emeraldStarterSeedMode}
+                      >
+                        <option value="tid">
+                          {t("emeraldStarterSeedTid")}
+                        </option>
+                        <option value="zero">
+                          {t("emeraldStarterSeedZero")}
+                        </option>
+                      </Select>
+                    </label>
+                    <label className="field emerald-tid-field">
+                      <span>{t("tid")}</span>
+                      <input
+                        inputMode="numeric"
+                        maxLength={5}
+                        onChange={(event) => {
+                          setEmeraldTid(
+                            normalizeDecimalInput(event.target.value, 0xffff),
+                          );
+                          setEmeraldDerivedSid(undefined);
+                        }}
+                        placeholder={
+                          emeraldStarterSeedMode === "zero"
+                            ? t("emeraldTidRequired")
+                            : t("emeraldTidOptional")
+                        }
+                        value={emeraldTid}
+                      />
+                      <small>
+                        {emeraldStarterSeedMode === "zero"
+                          ? t("emeraldZeroSeedHint")
+                          : emeraldTid.trim() === ""
+                            ? t("emeraldAnyTid")
+                            : `${t("emeraldSeedEqualsTid")} · ${formatHex(parseDecimal(emeraldTid) ?? 0, 4)}`}
+                      </small>
+                    </label>
+                    {emeraldDerivedSid !== undefined && (
+                      <div className="computed-value">
+                        <span>{t("emeraldDerivedSid")}</span>
+                        <strong>
+                          {String(emeraldDerivedSid).padStart(5, "0")}
+                        </strong>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <label className="field">
+                    <span>{t("seed")}</span>
+                    <input
+                      maxLength={8}
+                      onChange={(event) =>
+                        setSeed(normalizeHexInput(event.target.value, 8))
+                      }
+                      value={seed}
+                    />
+                  </label>
+                )}
                 <div className="compact-field-row">
                   <label className="field">
                     <span>{t("initialAdvances")}</span>
@@ -709,11 +1016,15 @@ export function Gen3StaticPanel({
             {status === "calculating" && (
               <button
                 className="secondary-action"
-                onClick={() =>
-                  operation === "generator"
-                    ? generatorEngine.cancel()
-                    : searcherEngine.cancel()
-                }
+                onClick={() => {
+                  if (activeCalculation.current === "emerald") {
+                    emeraldEngine.cancel();
+                  } else if (activeCalculation.current === "generator") {
+                    generatorEngine.cancel();
+                  } else {
+                    searcherEngine.cancel();
+                  }
+                }}
                 type="button"
               >
                 {t("cancel")}
@@ -835,6 +1146,11 @@ export function Gen3StaticPanel({
               <label className="field">
                 <span>{t("shiny")}</span>
                 <Select
+                  disabled={
+                    emeraldCandidateMode &&
+                    emeraldStarterSeedMode === "tid" &&
+                    !emeraldReverseTidMode
+                  }
                   onChange={(event) =>
                     setShiny(event.target.value as Gen3StaticShinyFilter)
                   }
@@ -901,7 +1217,7 @@ export function Gen3StaticPanel({
                 />
                 <span>{t("showStats")}</span>
               </label>
-              {operation === "generator" && (
+              {operation === "generator" && !emeraldCandidateMode && (
                 <label className="toggle-field">
                   <input
                     checked={filtersDisabled}
@@ -995,7 +1311,7 @@ export function Gen3StaticPanel({
             </div>
           ) : (
             <div
-              className="static-virtual-table"
+              className={`static-virtual-table${emeraldCandidateMode ? " emerald-targets" : ""}`}
               style={{ height: `${rowVirtualizer.getTotalSize() + 38}px` }}
             >
               <div className="static-table-header">
@@ -1035,25 +1351,59 @@ export function Gen3StaticPanel({
                     }}
                   >
                     {columns.map((column) => {
-                      const searchablePid =
-                        operation === "searcher" &&
-                        column.key === "pid" &&
-                        "seed" in state;
+                      const searcherState = "seed" in state ? state : undefined;
+                      const emeraldState =
+                        "targetAdvances" in state ? state : undefined;
+                      const emeraldTidValue =
+                        emeraldState?.tid ?? parseDecimal(emeraldTid);
+                      const context =
+                        emeraldCandidateMode &&
+                        emeraldTidValue !== undefined &&
+                        "advances" in state
+                          ? {
+                              tid: emeraldTidValue,
+                              targetSeed:
+                                emeraldStarterSeedMode === "zero"
+                                  ? 0
+                                  : emeraldTidValue,
+                              starterSeedMode: emeraldStarterSeedMode,
+                              targetAdvances:
+                                emeraldState?.targetAdvances ?? state.advances,
+                              shinyXor:
+                                shiny === "square"
+                                  ? 0
+                                  : shiny === "star"
+                                    ? (emeraldState?.shinyXor ?? 1)
+                                    : undefined,
+                            }
+                          : undefined;
+                      const searchableValue =
+                        (column.key === "psv" && context !== undefined) ||
+                        (column.key === "pid" &&
+                          operation === "searcher" &&
+                          searcherState !== undefined);
+                      const resultSeed =
+                        context?.targetSeed ?? searcherState?.seed;
                       return (
                         <span key={column.key}>
-                          {searchablePid ? (
+                          {searchableValue && resultSeed !== undefined ? (
                             <button
                               className="static-result-link"
                               onClick={() =>
-                                onFindCompatibleId(state.pid, state.seed)
+                                onFindCompatibleId(
+                                  state.pid,
+                                  resultSeed,
+                                  context,
+                                )
                               }
                               onContextMenu={(event) => {
                                 event.preventDefault();
                                 setPidMenu({
                                   pid: state.pid,
-                                  seed: state.seed,
+                                  seed: resultSeed,
                                   x: event.clientX,
                                   y: event.clientY,
+                                  context,
                                 });
                               }}
                               title={t("findCompatibleId")}
@@ -1083,7 +1433,7 @@ export function Gen3StaticPanel({
         >
           <button
             onClick={() => {
-              onFindCompatibleId(pidMenu.pid, pidMenu.seed);
+              onFindCompatibleId(pidMenu.pid, pidMenu.seed, pidMenu.context);
               setPidMenu(undefined);
             }}
             role="menuitem"

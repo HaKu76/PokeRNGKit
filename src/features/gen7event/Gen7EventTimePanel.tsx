@@ -548,7 +548,7 @@ export function Gen7EventTimePanel({
   const eventDisabled = status === "calculating";
   return (
     <div className="gen7event-time-panel">
-      <div className="gen7event-time-workspace">
+      <div className="gen7event-time-workspace stacked-module-workspace">
         <form className="gen7event-time-controls" onSubmit={run}>
           <div className="gen7event-time-parameter-grid">
             <section className="panel gen7event-time-column">

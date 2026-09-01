@@ -242,7 +242,7 @@ export function Gen7BattleTreePanel({
 
   return (
     <div className="gen7battletree-panel">
-      <div className="gen7battletree-workspace">
+      <div className="gen7battletree-workspace stacked-module-workspace">
         <form className="panel gen7battletree-controls" onSubmit={generate}>
           <div className="gen7battletree-heading">
             <span className="panel-index">01</span>

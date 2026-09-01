@@ -313,7 +313,7 @@ export function Gen7FestivalPlazaPanel({
 
   return (
     <div className="gen7festivalplaza-panel">
-      <div className="gen7festivalplaza-workspace">
+      <div className="gen7festivalplaza-workspace stacked-module-workspace">
         <form className="panel gen7festivalplaza-controls" onSubmit={generate}>
           <div className="gen7festivalplaza-heading">
             <span className="panel-index">01</span>

@@ -2,10 +2,12 @@
   --gen3id-control-height: 30px;
 }
 
-.gen3id-workspace {
+#root main.main-content.gen3id-page .gen3id-workspace {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns:
+    minmax(280px, 360px) minmax(210px, 260px)
+    minmax(0, 1fr);
   gap: 12px;
 }
 
@@ -270,6 +272,18 @@
   grid-template-columns: 80px 66px 66px 58px minmax(96px, 1fr);
 }
 
+#root
+  .main-content.gen3id-page
+  .gen3id-generator-table.has-static-target
+  .table-header,
+#root
+  .main-content.gen3id-page
+  .gen3id-generator-table.has-static-target
+  .table-row {
+  grid-template-columns: 80px 66px 66px 58px minmax(96px, 1fr) 132px;
+  min-width: 512px;
+}
+
 #root .main-content.gen3id-page .gen3id-generator-table .table-header button,
 #root .main-content.gen3id-page .gen3id-generator-table .table-row span {
   padding-inline: 8px;
@@ -278,6 +292,13 @@
 .gen3id-generator-table .table-header button:last-child,
 .gen3id-generator-table .table-row span:last-child {
   border-right: 0;
+}
+
+.gen3id-continue-action {
+  height: var(--gen3id-control-height);
+  min-height: var(--gen3id-control-height);
+  padding: 4px 8px;
+  white-space: nowrap;
 }
 
 .gen3id-searcher-workspace {
@@ -352,29 +373,14 @@ body:has(#root .main-content .gen3id-workspace:not([hidden]))
   white-space: nowrap;
 }
 
-@container pokerngkit-content (min-width: 721px) and (max-width: 994px) {
-  #root .main-content.gen3id-page .gen3id-workspace {
-    grid-template-columns: minmax(300px, 1fr) minmax(260px, 0.82fr);
-  }
-
-  #root .main-content.gen3id-page .gen3id-results-panel {
-    grid-column: 1 / -1;
-  }
-}
-
-@container pokerngkit-content (min-width: 995px) {
-  #root .main-content.gen3id-page .gen3id-workspace {
-    grid-template-columns:
-      minmax(320px, 360px) minmax(240px, 260px)
-      minmax(410px, 1fr);
-  }
-
+@container pokerngkit-content (min-width: 721px) {
   #root .main-content.gen3id-page .gen3id-searcher-workspace {
     grid-template-columns: minmax(320px, 440px) minmax(0, 1fr);
   }
 }
 
 @container pokerngkit-content (max-width: 720px) {
+  #root main.main-content.gen3id-page .gen3id-workspace,
   #root .main-content.gen3id-page .gen3id-searcher-workspace {
     align-items: start;
     grid-template-columns: minmax(0, 1fr);

@@ -1,11 +1,13 @@
 #include "gen3static_bridge.h"
 
+#include <Core/RNG/LCRNG.hpp>
+
 #include <cassert>
 #include <cstdint>
 
 int main()
 {
-    assert(gen3static_api_version() == 4);
+    assert(gen3static_api_version() == 6);
 
     const auto count = gen3static_generate(0x12345678, 0, 0, 0, 1, 150, 70, 255, 0, 0, 0, 0, 0, 0, 0x1ffffff, 0xffff,
                                            0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31, 31, 0);
@@ -70,5 +72,38 @@ int main()
     const auto filtered = gen3static_generate(0x12345678, 0, 0, 0, 1, 150, 70, 255, 0, 0, 0, 0, 0, 0,
                                               1u << 15, 1u << 11, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 31, 31, 0);
     assert(filtered == 1);
+
+    const auto emeraldCount = gen3static_search_emerald(
+        0, 1, 1, 999999, 0, 0, 0, 1, 252, 5, 31, 0, 3, 0, 0, 0x1ffffff, 0xffff,
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 6);
+    assert(emeraldCount > 0);
+    assert(emeraldCount == gen3static_emerald_result_count());
+    const auto *emeraldState
+        = reinterpret_cast<const Gen3StaticEmeraldPackedState *>(gen3static_emerald_result_ptr());
+    assert(emeraldState->tid <= 0xffff);
+    assert(emeraldState->sid <= 0xffff);
+    assert(emeraldState->idAdvances < emeraldState->targetAdvances);
+
+    PokeRNG idRng(emeraldState->tid, emeraldState->idAdvances);
+    assert(idRng.nextUShort() == emeraldState->sid);
+    PokeRNG targetRng(emeraldState->tid, emeraldState->targetAdvances);
+    std::uint32_t emeraldPid = targetRng.nextUShort();
+    emeraldPid |= static_cast<std::uint32_t>(targetRng.nextUShort()) << 16;
+    assert(emeraldPid == emeraldState->pid);
+    const std::uint16_t firstIv = targetRng.nextUShort();
+    const std::uint16_t secondIv = targetRng.nextUShort();
+    assert((firstIv & 0x7fff) == 0x7fff);
+    assert((secondIv & 0x7fff) == 0x7fff);
+    const std::uint32_t shinyXor = emeraldState->tid ^ emeraldState->sid ^ (emeraldPid >> 16) ^ (emeraldPid & 0xffff);
+    assert(shinyXor < 8);
+
+    const auto highIvOnlyCount = gen3static_search_emerald(
+        0, 1, 0, 999999, 0, 0, 0, 1, 252, 5, 31, 0, 0, 0, 0, 0x1ffffff, 0xffff,
+        31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 6);
+    assert(highIvOnlyCount > 0);
+    emeraldState = reinterpret_cast<const Gen3StaticEmeraldPackedState *>(gen3static_emerald_result_ptr());
+    assert(emeraldState->idAdvances == 0xffffffff);
+    assert(emeraldState->sid == 0xffffffff);
+    assert((emeraldState->natureShiny >> 16) == 0xffff);
     return 0;
 }

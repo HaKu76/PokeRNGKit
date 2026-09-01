@@ -708,16 +708,37 @@ const resources = {
       rowTid: "TID",
       rowSid: "SID",
       rowTsv: "TSV",
+      rowPsv: "PSV",
       targetPid: "Target PID",
       idTargetPidShinyHint: "Filter IDs compatible with this PID",
       findCompatibleId: "Find compatible ID",
       openPaintingReseeding: "Open Target Painting Timer",
       gen3WorkflowTitle: "Tips",
-      gen3WorkflowSubtitle: "Emerald / 6V Shiny Static",
+      gen3WorkflowSubtitle: "Emerald / high-IV shiny starter",
+      emeraldNewGameDemo: "Emerald new starter",
+      emeraldStarterSeed: "Starter Seed",
+      emeraldStarterSeedTid: "TID (no restart)",
+      emeraldStarterSeedZero: "0000 (after restart)",
+      emeraldSeedEqualsTid: "The TID is also the 16-bit Seed",
+      emeraldAnyTid: "Leave blank to find a TID; enter one to keep it fixed",
+      emeraldTidOptional: "Blank = find TID",
+      emeraldTidRequired: "Enter a TID",
+      emeraldZeroSeedHint:
+        "Starter Seed is fixed to 0000; TID is used only to generate a compatible SID.",
+      emeraldZeroSeedTidRequired:
+        "Seed 0000 mode requires a TID before searching for a compatible SID.",
+      emeraldTargetAdvance: "Starter advance",
+      emeraldSearchRangeTooLarge:
+        "The reverse search is {{count}} states; increase the perfect-IV count or set Max Advances to {{maxAdvances}} or less ({{limit}}-state limit).",
+      emeraldDerivedSid: "Derived SID",
+      emeraldIdAdvance: "ID advance",
+      continueToStatic: "Continue to Static",
+      gen3WorkflowStepNewGame:
+        "Choose TID Seed for the uninterrupted new-game path, or 0000 after a restart. TID Seed can find a blank TID automatically; Seed 0000 needs a TID. Use Shiny = Any for high IV only, then click a PSV to continue in the ID Generator.",
       gen3WorkflowStepSearcher:
-        "Use the Static Searcher to find a target PID and 32-bit Seed with 6V and shiny filters.",
+        "For a post-reset or Painting workflow, use the Static Searcher to find a target PID and 32-bit Seed with 6V and shiny filters.",
       gen3WorkflowStepId:
-        "Find a compatible TID/SID and TSV for the target PID, including star/square shiny filtering.",
+        "For TID Seed, the ID Generator searches before the starter target; for Seed 0000, it searches the separate pre-restart ID range. Both list SID/TSV combinations that make the target PID shiny.",
       gen3WorkflowOpenId: "Open ID Generator",
       gen3WorkflowStepSave:
         "Save the selected TID/SID in the Emerald profile before checking the Static result.",
@@ -1733,6 +1754,14 @@ const resources = {
       gen4WildWasmMissing:
         "Gen 4 Wild Wasm artifacts are not built. Run npm run wasm:build after activating Emscripten.",
       rngInfo: "RNG INFO",
+      gen7RngFrameRange: "Search Range",
+      gen7RngTargetFrame: "Target Frame",
+      gen7RngAroundTarget: "±100 Frame",
+      gen7RngCreateTimeline: "Create Timeline/s",
+      gen7RngTimelineLeap: "Timeline Leap",
+      gen7RngReset: "Reset RNG Info",
+      gen7RngTimelinePending:
+        "Timeline generation is visible for layout review; its dedicated search path is not connected yet.",
       settings: "SETTINGS",
       pokemon: "Pokemon",
       category: "Category",
@@ -2604,16 +2633,37 @@ const resources = {
       rowTid: "TID",
       rowSid: "SID",
       rowTsv: "TSV",
+      rowPsv: "PSV",
       targetPid: "Target PID",
       idTargetPidShinyHint: "この PID に合う ID を検索",
       findCompatibleId: "対応する ID を検索",
       openPaintingReseeding: "Target Painting Timer を開く",
       gen3WorkflowTitle: "Tips",
-      gen3WorkflowSubtitle: "Emerald / 6V Shiny Static",
+      gen3WorkflowSubtitle: "Emerald / 高個体色違い御三家",
+      emeraldNewGameDemo: "Emerald 新規ゲーム御三家",
+      emeraldStarterSeed: "御三家 Seed",
+      emeraldStarterSeedTid: "TID（作成後に再起動しない）",
+      emeraldStarterSeedZero: "0000（再起動後）",
+      emeraldSeedEqualsTid: "TID が 16-bit Seed になります",
+      emeraldAnyTid: "空欄なら TID を検索し、入力すると固定します",
+      emeraldTidOptional: "空欄 = TID を検索",
+      emeraldTidRequired: "TID を入力",
+      emeraldZeroSeedHint:
+        "御三家 Seed は 0000 に固定され、TID は対応する SID の生成にのみ使用されます。",
+      emeraldZeroSeedTidRequired:
+        "Seed 0000 モードでは、対応する SID を検索する前に TID を入力してください。",
+      emeraldTargetAdvance: "御三家の消費数",
+      emeraldSearchRangeTooLarge:
+        "逆算量は {{count}} 状態です。完璧な個体値の数を増やすか、Max Advances を {{maxAdvances}} 以下にしてください（上限 {{limit}} 状態）。",
+      emeraldDerivedSid: "計算された SID",
+      emeraldIdAdvance: "ID 消費数",
+      continueToStatic: "Static を続ける",
+      gen3WorkflowStepNewGame:
+        "新規ゲームを続ける場合は TID Seed、再起動後は 0000 を選びます。TID Seed は空欄の TID を自動検索できますが、Seed 0000 では TID が必要です。高個体のみなら Shiny を Any にし、PSV をクリックして ID Generator に進みます。",
       gen3WorkflowStepSearcher:
-        "Static Searcher で 6V と色違い条件を指定し、目標 PID と 32-bit Seed を探します。",
+        "リセット後またはペインティングを使う場合は、定点検索で 6V と色違い条件から目標 PID と 32 ビット Seed を探します。",
       gen3WorkflowStepId:
-        "目標 PID に合う TID/SID と TSV を、星・四角色違い条件を含めて ID Generator で探します。",
+        "TID Seed では御三家の目標消費数より前、Seed 0000 では再起動前の独立した ID 範囲を検索し、目標 PID が色違いになる SID / TSV を表示します。",
       gen3WorkflowOpenId: "ID Generator を開く",
       gen3WorkflowStepSave:
         "Static の判定に使う TID/SID を Emerald プロファイルに保存します。",
@@ -3636,6 +3686,14 @@ const resources = {
       gen4WildWasmMissing:
         "Gen 4 Wild Wasm が生成されていません。Emscripten を有効にして npm run wasm:build を実行してください。",
       rngInfo: "乱数情報",
+      gen7RngFrameRange: "検索範囲",
+      gen7RngTargetFrame: "目標Frame",
+      gen7RngAroundTarget: "±100 Frame",
+      gen7RngCreateTimeline: "Create Timeline/s",
+      gen7RngTimelineLeap: "Timeline Leap",
+      gen7RngReset: "乱数情報をリセット",
+      gen7RngTimelinePending:
+        "タイムライン生成はレイアウト確認用です。専用検索はまだ接続されていません。",
       settings: "設定",
       pokemon: "Pokemon",
       category: "Category",
@@ -4575,16 +4633,37 @@ const resources = {
       rowTid: "TID",
       rowSid: "SID",
       rowTsv: "TSV",
+      rowPsv: "PSV",
       targetPid: "目标 PID",
       idTargetPidShinyHint: "筛选与此 PID 兼容的 ID",
       findCompatibleId: "查找对应 ID",
       openPaintingReseeding: "打开 Target Painting Timer",
       gen3WorkflowTitle: "Tips",
-      gen3WorkflowSubtitle: "绿宝石 / 6V 异色定点",
+      gen3WorkflowSubtitle: "绿宝石 / 高V异色御三家",
+      emeraldNewGameDemo: "绿宝石新档御三家",
+      emeraldStarterSeed: "御三家 Seed",
+      emeraldStarterSeedTid: "TID（建档后不重启）",
+      emeraldStarterSeedZero: "0000（重启后）",
+      emeraldSeedEqualsTid: "表 ID 同时作为 16 位 Seed",
+      emeraldAnyTid: "留空自动寻找表 ID；输入数值则固定表 ID",
+      emeraldTidOptional: "留空自动寻找",
+      emeraldTidRequired: "请输入表 ID",
+      emeraldZeroSeedHint:
+        "御三家 Seed 固定为 0000；表 ID 只用于生成兼容的里 ID。",
+      emeraldZeroSeedTidRequired:
+        "Seed 0000 模式需要先输入表 ID，才能检索兼容的里 ID。",
+      emeraldTargetAdvance: "御三家帧数",
+      emeraldSearchRangeTooLarge:
+        "当前反推量为 {{count}} 个状态；请提高完美个体数，或将最大帧数设为 {{maxAdvances}} 以下（上限 {{limit}}）。",
+      emeraldDerivedSid: "计算出的 SID",
+      emeraldIdAdvance: "里 ID 帧数",
+      continueToStatic: "继续定点乱数",
+      gen3WorkflowStepNewGame:
+        "建档后不中断时选择 TID Seed，重启后选择 0000。TID Seed 可留空自动找表 ID；Seed 0000 需输入表 ID。只要高 V 时将异色设为 Any，点击 PSV 可继续进入 ID 生成器。",
       gen3WorkflowStepSearcher:
-        "先在定点检索器用 6V 和异色条件找到目标 PID 与 32 位 Seed。",
+        "如果是软重启或绘画流程，先在定点检索器用 6V 和异色条件找到目标 PID 与 32 位 Seed。",
       gen3WorkflowStepId:
-        "在 ID 生成器按目标 PID 搜索兼容的 TID/SID 与 TSV，并同时筛选星闪或方块闪。",
+        "TID Seed 检索御三家目标帧之前的 ID 帧；Seed 0000 检索重启前独立的 ID 范围。两者都会列出能让目标 PID 异色的里 ID / TSV。",
       gen3WorkflowOpenId: "打开 ID 生成器",
       gen3WorkflowStepSave:
         "将选定的 TID/SID 保存到绿宝石存档信息，后续定点结果会使用该身份。",
@@ -5593,6 +5672,14 @@ const resources = {
       gen4WildWasmMissing:
         "尚未生成第四世代野生乱数 Wasm 产物。请激活 Emscripten 后运行 npm run wasm:build。",
       rngInfo: "乱数信息",
+      gen7RngFrameRange: "检索范围",
+      gen7RngTargetFrame: "目标帧",
+      gen7RngAroundTarget: "±100帧",
+      gen7RngCreateTimeline: "生成时间线/秒",
+      gen7RngTimelineLeap: "时间线跳跃",
+      gen7RngReset: "重置乱数信息",
+      gen7RngTimelinePending:
+        "时间线控件当前用于布局验收，专用检索路径尚未接入。",
       settings: "设置",
       pokemon: "宝可梦",
       category: "分类",

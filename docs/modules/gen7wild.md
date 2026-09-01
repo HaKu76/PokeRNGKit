@@ -98,7 +98,7 @@ Gen7WildPanel
 
 页头选择 3DSRNGTool 的 Gen VII 档案时，同步 GameVersion、TSV、TRV 与 Shiny Charm；版本变化沿用现有起始帧和遭遇数据联动。同步只在档案对象切换或更新时执行。
 
-桌面使用双列 operational workspace：左侧按 RNG Info、Encounter、Lead 和 Filters 分组，右侧结果表占据主要宽度并独立滚动；窄屏重排为单列。图标按钮使用可访问名称和 tooltip，计算、取消、错误、空结果和结果上限保持稳定布局。
+桌面端使用上下两行 operational workspace：上方设置区按 RNG Info、Encounter、Lead 和 Filters 分组，下方结果表占据整行并独立滚动；窄屏保持相同先设置后结果的顺序。RNG Info 与 Gen VII Stationary、Event 复用同一组件，闭区间与目标帧 ±100 均接入现有请求，并显示 Delay `+4F`、NPC 和禁用的 Timeline 占位；Wild 不显示 Event 专属 Timeline Leap。参数面板拥有独立滚动区域，图标按钮使用可访问名称和 tooltip，计算、取消、错误、空结果和结果上限保持稳定布局。
 
 `1120px` 以下单列布局将虚拟表固定为 `520px` 高并取消 flex 拉伸。结果区本身可以随页面内容增高，但承载 TanStack Virtual 的 `.gen7wild-table` 必须保持确定高度，避免 100,000 条结果反向撑开滚动容器。
 
@@ -106,7 +106,7 @@ Gen7WildPanel
 
 ## 当前验证状态
 
-本轮未获授权运行测试、类型检查、原生夹具、Wasm 构建、Vite 构建或浏览器检查。源码已加入 Domain、UI Preview、Worker 协议和原生会话夹具，但这些文件尚未执行；不能据此声明算法或界面已通过。
+2026-09-01 已在项目所有者授权下运行 `npm run build:web`，TypeScript 与 Vite/PWA 生产构建通过；外部 Chrome `http://127.0.0.1:4183/` 确认 Wild 显示共用 RNG Info、Timeline 与 NPC，不显示 Timeline Leap，控制台无 warning 或 error。未运行算法测试、原生夹具或生产页面回归。
 
 2026-08-18 横查 Gen 8 Static 滚动卡死问题时，本模块被确认具有相同的响应式自动高度风险并已补充虚拟表固定高度。外部 Chrome 在 `1120x900` 下确认结果区为 `620px`，虚拟表计算高度为 `520px`、`flex: 0 0 auto`、`overflow: auto`；控制台无 warning 或 error。
 

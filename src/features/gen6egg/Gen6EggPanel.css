@@ -1,19 +1,19 @@
-.gen6egg-workspace {
+#root main.main-content .gen6egg-workspace {
   min-height: 0;
   flex: 1 1 auto;
   display: grid;
-  grid-template-columns: minmax(440px, 0.42fr) minmax(0, 0.58fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 
 .gen6egg-controls,
 .gen6egg-results {
   min-height: 0;
-  height: 100%;
+  height: clamp(460px, calc(100dvh - 220px), 760px);
   overflow: hidden;
 }
 
-.gen6egg-controls {
+#root main.main-content .gen6egg-controls {
   overflow: auto;
 }
 
@@ -237,8 +237,8 @@
   color: var(--muted);
 }
 
-@media (max-width: 1380px) {
-  .gen6egg-workspace {
+@container pokerngkit-content (max-width: 719px) {
+  #root main.main-content .gen6egg-workspace {
     grid-template-columns: 1fr;
   }
 

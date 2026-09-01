@@ -267,7 +267,7 @@ export function Gen6MainSeedPanel({
         ];
 
   return (
-    <div className="gen6mainseed-workspace">
+    <div className="gen6mainseed-workspace stacked-module-workspace">
       <form className="gen6mainseed-controls" onSubmit={run}>
         <section className="panel gen6mainseed-panel">
           <div className="panel-heading">

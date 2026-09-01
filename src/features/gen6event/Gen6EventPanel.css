@@ -1,10 +1,10 @@
 .gen6event-panel {
   min-width: 0;
 }
-.gen6event-workspace {
+#root .main-content .gen6event-panel .gen6event-workspace {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(430px, 0.82fr) minmax(620px, 1.18fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
 }
@@ -15,7 +15,7 @@
   min-height: 0;
   overflow: hidden;
 }
-.gen6event-controls {
+#root .main-content .gen6event-panel .gen6event-controls {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -354,8 +354,8 @@
   background: var(--teal-soft);
   box-shadow: none;
 }
-@media (max-width: 1180px) {
-  .gen6event-workspace {
+@container pokerngkit-content (max-width: 719px) {
+  #root .main-content .gen6event-panel .gen6event-workspace {
     grid-template-columns: 1fr;
   }
   .gen6event-controls,
@@ -363,7 +363,7 @@
     height: auto;
     min-height: 0;
   }
-  .gen6event-controls {
+  #root .main-content .gen6event-panel .gen6event-controls {
     overflow: visible;
   }
   .gen6event-heading,

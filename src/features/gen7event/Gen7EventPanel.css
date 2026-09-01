@@ -2,10 +2,10 @@
   min-width: 0;
 }
 
-.gen7event-workspace {
+#root .main-content .gen7event-panel .gen7event-workspace {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(430px, 0.82fr) minmax(620px, 1.18fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
 }
@@ -18,7 +18,7 @@
   overflow: hidden;
 }
 
-.gen7event-controls {
+#root .main-content .gen7event-panel .gen7event-controls {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -89,11 +89,19 @@
   margin-bottom: 10px;
 }
 
-.gen7event-field-grid {
+.gen7event-field-grid,
+.gen7event-rng-state-grid {
   display: grid;
   min-width: 0;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 9px;
+}
+
+.gen7event-field-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gen7event-rng-state-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .gen7event-span-two {
@@ -124,6 +132,28 @@
 
 .gen7event-inline-toggle {
   margin-top: 10px;
+}
+
+.gen7event-rng-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--control-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.gen7event-rng-reset {
+  width: 32px;
+  min-height: 30px;
+  flex: 0 0 32px;
+  padding: 0;
+}
+
+.gen7event-rng-reset:hover:not(:disabled) {
+  background: var(--surface-2);
 }
 
 .gen7event-import-button {
@@ -317,7 +347,6 @@
   background: var(--surface);
 }
 
-.gen7event-primary-action,
 .gen7event-icon-button {
   min-height: 40px;
   display: inline-flex;
@@ -325,21 +354,6 @@
   justify-content: center;
   border: 1px solid;
   border-radius: 8px;
-}
-
-.gen7event-primary-action {
-  gap: 8px;
-  border-color: var(--brand-strong);
-  padding: 7px 14px;
-  background: var(--brand);
-  color: #ffffff;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.gen7event-primary-action:hover:not(:disabled) {
-  background: var(--brand-strong);
 }
 
 .gen7event-icon-button {
@@ -351,7 +365,6 @@
   color: var(--text);
 }
 
-.gen7event-primary-action:focus-visible,
 .gen7event-icon-button:focus-visible,
 .gen7event-import-button:focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -469,14 +482,14 @@
   white-space: nowrap;
 }
 
-@media (min-width: 1181px) and (max-width: 1380px) {
-  .gen7event-workspace {
-    grid-template-columns: minmax(390px, 0.8fr) minmax(500px, 1.2fr);
+@container pokerngkit-content (max-width: 839px) {
+  .gen7event-rng-state-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 1180px) {
-  .gen7event-workspace {
+@container pokerngkit-content (max-width: 719px) {
+  #root .main-content .gen7event-panel .gen7event-workspace {
     grid-template-columns: 1fr;
   }
 
@@ -486,7 +499,7 @@
     min-height: 0;
   }
 
-  .gen7event-controls {
+  #root .main-content .gen7event-panel .gen7event-controls {
     overflow: visible;
   }
 
@@ -512,7 +525,6 @@
   .gen7event-iv-row input,
   .gen7event-fixed-iv-grid input,
   .gen7event-lock-field select,
-  .gen7event-primary-action,
   .gen7event-icon-button,
   .gen7event-import-button,
   .gen7event-panel .checkbox-field {
@@ -529,6 +541,7 @@
   }
 
   .gen7event-field-grid,
+  .gen7event-rng-state-grid,
   .gen7event-lock-grid,
   .gen7event-toggle-grid {
     grid-template-columns: 1fr;

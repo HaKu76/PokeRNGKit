@@ -3,7 +3,7 @@
 }
 .gen7eggseedfinder-workspace {
   display: grid;
-  grid-template-columns: minmax(360px, 0.9fr) minmax(420px, 1.1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   min-height: 0;
 }

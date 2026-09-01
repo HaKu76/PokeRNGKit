@@ -5,7 +5,7 @@
 .gen7battletree-workspace {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(390px, 0.72fr) minmax(620px, 1.28fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
 }

@@ -7,6 +7,11 @@ import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import type { ThreeDsProfile } from "../3dsprofiles/domain";
 import { GEN6_STATIONARY_NATURES } from "../gen6stationary/data";
 import {
+  ThreeDsRngInfoCard,
+  type ThreeDsRngInfoMode,
+} from "../shared/ThreeDsRngInfoCard";
+import {
+  GEN6_WILD_BROWSER_MAX_FRAME,
   GEN6_WILD_SLOT_COUNT,
   gen6WildAreas,
   gen6WildDefaultFilters,
@@ -129,6 +134,9 @@ export function Gen6WildPanel({
   const [seed, setSeed] = useState("0");
   const [minFrame, setMinFrame] = useState("0");
   const [maxFrame, setMaxFrame] = useState("50000");
+  const [rngInfoMode, setRngInfoMode] = useState<ThreeDsRngInfoMode>("range");
+  const [targetFrame, setTargetFrame] = useState("5000");
+  const [timelineSeconds, setTimelineSeconds] = useState("3600");
   const [delay, setDelay] = useState("0");
   const [tinySeed, setTinySeed] = useState("0");
   const [tinyFrame, setTinyFrame] = useState("0");
@@ -272,12 +280,19 @@ export function Gen6WildPanel({
   }
 
   function buildRequest() {
+    const parsedTargetFrame = parseDecimal(targetFrame);
     const request = {
       version,
       encounterType,
       seed: parseHex(seed),
-      minFrame: parseDecimal(minFrame),
-      maxFrame: parseDecimal(maxFrame),
+      minFrame:
+        rngInfoMode === "around"
+          ? Math.max(0, parsedTargetFrame - 100)
+          : parseDecimal(minFrame),
+      maxFrame:
+        rngInfoMode === "around"
+          ? parsedTargetFrame + 100
+          : parseDecimal(maxFrame),
       delay: parseDecimal(delay),
       considerDelay,
       tsv: parseDecimal(tsv),
@@ -449,7 +464,7 @@ export function Gen6WildPanel({
 
   return (
     <form className="gen6wild-panel" onSubmit={submit}>
-      <div className="gen6wild-workspace">
+      <div className="gen6wild-workspace stacked-module-workspace">
         <section className="panel gen6wild-controls">
           <header className="gen6wild-heading">
             <div>
@@ -486,26 +501,6 @@ export function Gen6WildPanel({
                 />
               </label>
               <label className="field">
-                <span>{t("gen6StationaryFrameRange")}</span>
-                <input
-                  inputMode="numeric"
-                  value={minFrame}
-                  onChange={(event) =>
-                    setMinFrame(normalizeDecimalInput(event.target.value, 10))
-                  }
-                />
-              </label>
-              <label className="field">
-                <span>{t("gen6WildMaxFrame")}</span>
-                <input
-                  inputMode="numeric"
-                  value={maxFrame}
-                  onChange={(event) =>
-                    setMaxFrame(normalizeDecimalInput(event.target.value, 10))
-                  }
-                />
-              </label>
-              <label className="field">
                 <span>TSV</span>
                 <input
                   inputMode="numeric"
@@ -526,16 +521,6 @@ export function Gen6WildPanel({
                 />
               </label>
               <label className="field">
-                <span>{t("gen6WildDelay")}</span>
-                <input
-                  inputMode="numeric"
-                  value={delay}
-                  onChange={(event) =>
-                    setDelay(normalizeDecimalInput(event.target.value, 4))
-                  }
-                />
-              </label>
-              <label className="field">
                 <span>{t("gen6WildResultLimit")}</span>
                 <input
                   inputMode="numeric"
@@ -546,6 +531,44 @@ export function Gen6WildPanel({
                 />
               </label>
             </div>
+            <ThreeDsRngInfoCard
+              considerDelay={considerDelay}
+              delay={delay}
+              generation={6}
+              maxFrame={maxFrame}
+              maxFrameLimit={GEN6_WILD_BROWSER_MAX_FRAME}
+              minFrame={minFrame}
+              mode={rngInfoMode}
+              onConsiderDelayChange={setConsiderDelay}
+              onDelayChange={(value) =>
+                setDelay(normalizeDecimalInput(value, 4000, 4))
+              }
+              onMaxFrameChange={(value) =>
+                setMaxFrame(
+                  normalizeDecimalInput(value, GEN6_WILD_BROWSER_MAX_FRAME, 7),
+                )
+              }
+              onMinFrameChange={(value) =>
+                setMinFrame(
+                  normalizeDecimalInput(value, GEN6_WILD_BROWSER_MAX_FRAME, 7),
+                )
+              }
+              onModeChange={setRngInfoMode}
+              onTargetFrameChange={(value) =>
+                setTargetFrame(
+                  normalizeDecimalInput(value, GEN6_WILD_BROWSER_MAX_FRAME, 7),
+                )
+              }
+              onTimelineSecondsChange={(value) =>
+                setTimelineSeconds(
+                  normalizeDecimalInput(value, GEN6_WILD_BROWSER_MAX_FRAME, 7),
+                )
+              }
+              showNpc={false}
+              showTimeline={encounterType !== "horde"}
+              targetFrame={targetFrame}
+              timelineSeconds={timelineSeconds}
+            />
             <div className="gen6wild-checks">
               <label>
                 <input
@@ -554,14 +577,6 @@ export function Gen6WildPanel({
                   type="checkbox"
                 />
                 {t("gen6WildShinyCharm")}
-              </label>
-              <label>
-                <input
-                  checked={considerDelay}
-                  onChange={(event) => setConsiderDelay(event.target.checked)}
-                  type="checkbox"
-                />
-                {t("gen6WildConsiderDelay")}
               </label>
             </div>
           </div>

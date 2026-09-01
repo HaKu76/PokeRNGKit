@@ -152,7 +152,7 @@ export function Gen6IdPanel({ uiPreviewMode }: { uiPreviewMode: boolean }) {
   };
 
   return (
-    <div className="gen6id-workspace">
+    <div className="gen6id-workspace stacked-module-workspace">
       <form className="gen6id-controls" onSubmit={run}>
         <section className="panel gen6id-panel">
           <div className="panel-heading">

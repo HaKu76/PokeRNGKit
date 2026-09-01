@@ -35,7 +35,7 @@
   min-height: 0;
   flex: 1 1 auto;
   display: grid;
-  grid-template-columns: minmax(430px, 0.4fr) minmax(0, 0.6fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 
@@ -493,7 +493,7 @@
 
 @media (max-width: 1200px) {
   .gen7egg-workspace {
-    grid-template-columns: minmax(390px, 0.44fr) minmax(0, 0.56fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .gen7egg-state-grid {

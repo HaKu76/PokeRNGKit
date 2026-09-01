@@ -52,6 +52,10 @@ Bank 目标在当前宝可梦生成前调用 `Stationary6.Generate_Once`：Johto
 
 `scripts/generate_gen6_stationary_data.mjs` 从 `Gen6/PKM6.cs`、`Resources/bytes/personal_ao`、三语 Species/Natures 文本生成 `src/features/gen6stationary/data.ts`。生成器保留源模板的类别、版本、Delay、性格和 Bank 标记，并推导 ORAS Personal 的基础种族值、性别比、Undiscovered Egg Group、3V、Ability `4 -> 3` 与 Transporter Mew/Celebi 5V。`data.ts` 不手工编辑，数据改变时重新运行生成脚本。
 
+## 界面布局
+
+桌面端使用上下两行工作区：设置区占据上方整行，结果区在下方保持同宽；两块面板各自使用有界高度，长设置和结果表分别在面板内部滚动。普通生成模式使用与 Event、Wild 共用的 `RNGInfo` 卡片，闭区间与目标帧 ±100 均接入现有请求；Gen VI 使用 `F` Delay 后缀，不显示 NPC。按上游 `gen6timeline_available` 条件，非 Always Sync 的 Stationary 显示禁用的 Timeline 占位；独立 `gen6tinytimeline` 工作区继续保留在 Gen VI Seed 相关导航。
+
 ## 上游与许可
 
 主要来源：

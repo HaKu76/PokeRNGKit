@@ -18,6 +18,10 @@ import {
 } from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import {
+  ThreeDsRngInfoCard,
+  type ThreeDsRngInfoMode,
+} from "../shared/ThreeDsRngInfoCard";
+import {
   GEN7_STATIONARY_NATURES,
   GEN7_STATIONARY_TEMPLATES,
   type Gen7StationaryGameVersion,
@@ -218,6 +222,9 @@ export function Gen7StationaryPanel({
   const [seed, setSeed] = useState("0");
   const [minFrame, setMinFrame] = useState("478");
   const [maxFrame, setMaxFrame] = useState(timeFinderMode ? "500" : "50000");
+  const [rngInfoMode, setRngInfoMode] = useState<ThreeDsRngInfoMode>("range");
+  const [targetFrame, setTargetFrame] = useState("5000");
+  const [timelineSeconds, setTimelineSeconds] = useState("3600");
   const [startDate, setStartDate] = useState("2024-01-01T00:00");
   const [endDate, setEndDate] = useState("2024-01-01T00:01");
   const [tick, setTick] = useState("041D9CB9");
@@ -428,11 +435,23 @@ export function Gen7StationaryPanel({
   };
 
   const readRequest = () => {
+    const parsedTargetFrame = parseGen7StationaryDecimal(targetFrame);
+    const requestMinFrame =
+      !timeFinderMode && rngInfoMode === "around"
+        ? Math.max(
+            gen7StationaryStartingFrame(version),
+            parsedTargetFrame - 100,
+          )
+        : parseGen7StationaryDecimal(minFrame);
+    const requestMaxFrame =
+      !timeFinderMode && rngInfoMode === "around"
+        ? parsedTargetFrame + 100
+        : parseGen7StationaryDecimal(maxFrame);
     const request: Gen7StationaryRequest = {
       version,
       seed: parseGen7StationaryHex(seed),
-      minFrame: parseGen7StationaryDecimal(minFrame),
-      maxFrame: parseGen7StationaryDecimal(maxFrame),
+      minFrame: requestMinFrame,
+      maxFrame: requestMaxFrame,
       tsv: parseGen7StationaryDecimal(tsv),
       trv: parseGen7StationaryHex(trv),
       shinyCharm,
@@ -608,7 +627,7 @@ export function Gen7StationaryPanel({
 
   return (
     <div className="gen7stationary-panel">
-      <div className="gen7stationary-workspace">
+      <div className="gen7stationary-workspace stacked-module-workspace">
         <form className="panel gen7stationary-controls" onSubmit={run}>
           <div className="gen7stationary-control-heading">
             <div>
@@ -715,42 +734,46 @@ export function Gen7StationaryPanel({
                   </div>
                 </label>
               )}
-              <label className="field">
-                <span>{t("gen7StationaryMinFrame")}</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={GEN7_STATIONARY_MAX_FRAME}
-                  onChange={(event) =>
-                    setMinFrame(
-                      normalizeDecimalInput(
-                        event.target.value,
-                        GEN7_STATIONARY_MAX_FRAME,
-                        10,
-                      ),
-                    )
-                  }
-                  value={minFrame}
-                />
-              </label>
-              <label className="field">
-                <span>{t("gen7StationaryMaxFrame")}</span>
-                <input
-                  disabled={status === "calculating"}
-                  inputMode="numeric"
-                  max={GEN7_STATIONARY_MAX_FRAME}
-                  onChange={(event) =>
-                    setMaxFrame(
-                      normalizeDecimalInput(
-                        event.target.value,
-                        GEN7_STATIONARY_MAX_FRAME,
-                        10,
-                      ),
-                    )
-                  }
-                  value={maxFrame}
-                />
-              </label>
+              {timeFinderMode && (
+                <>
+                  <label className="field">
+                    <span>{t("gen7StationaryMinFrame")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="numeric"
+                      max={GEN7_STATIONARY_MAX_FRAME}
+                      onChange={(event) =>
+                        setMinFrame(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            GEN7_STATIONARY_MAX_FRAME,
+                            10,
+                          ),
+                        )
+                      }
+                      value={minFrame}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("gen7StationaryMaxFrame")}</span>
+                    <input
+                      disabled={status === "calculating"}
+                      inputMode="numeric"
+                      max={GEN7_STATIONARY_MAX_FRAME}
+                      onChange={(event) =>
+                        setMaxFrame(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            GEN7_STATIONARY_MAX_FRAME,
+                            10,
+                          ),
+                        )
+                      }
+                      value={maxFrame}
+                    />
+                  </label>
+                </>
+              )}
               <label className="field">
                 <span>TSV</span>
                 <input
@@ -779,6 +802,53 @@ export function Gen7StationaryPanel({
                 </div>
               </label>
             </div>
+            {!timeFinderMode && (
+              <ThreeDsRngInfoCard
+                considerDelay={considerDelay}
+                delay={delayText}
+                delayMinimum={minimumDelay}
+                disabled={status === "calculating"}
+                generation={7}
+                maxFrame={maxFrame}
+                maxFrameLimit={GEN7_STATIONARY_MAX_FRAME}
+                minFrame={minFrame}
+                minFrameLimit={gen7StationaryStartingFrame(version)}
+                mode={rngInfoMode}
+                npc={String(encounter.npc)}
+                onConsiderDelayChange={setConsiderDelay}
+                onDelayChange={(value) => {
+                  if (/^-?\d*$/.test(value)) setDelayText(value);
+                }}
+                onMaxFrameChange={(value) =>
+                  setMaxFrame(
+                    normalizeDecimalInput(value, GEN7_STATIONARY_MAX_FRAME, 10),
+                  )
+                }
+                onMinFrameChange={(value) =>
+                  setMinFrame(
+                    normalizeDecimalInput(value, GEN7_STATIONARY_MAX_FRAME, 10),
+                  )
+                }
+                onModeChange={setRngInfoMode}
+                onNpcChange={(value) =>
+                  changeNpc(normalizeDecimalInput(value, 100, 3))
+                }
+                onTargetFrameChange={(value) =>
+                  setTargetFrame(
+                    normalizeDecimalInput(value, GEN7_STATIONARY_MAX_FRAME, 10),
+                  )
+                }
+                onTimelineSecondsChange={(value) =>
+                  setTimelineSeconds(
+                    normalizeDecimalInput(value, GEN7_STATIONARY_MAX_FRAME, 10),
+                  )
+                }
+                showNpc
+                showTimeline
+                targetFrame={targetFrame}
+                timelineSeconds={timelineSeconds}
+              />
+            )}
           </section>
 
           <div className="gen7stationary-settings-column">
@@ -853,34 +923,6 @@ export function Gen7StationaryPanel({
                     ))}
                   </Select>
                 </label>
-                <label className="field">
-                  <span>NPC</span>
-                  <input
-                    disabled={status === "calculating"}
-                    inputMode="numeric"
-                    max={100}
-                    onChange={(event) =>
-                      changeNpc(
-                        normalizeDecimalInput(event.target.value, 100, 3),
-                      )
-                    }
-                    value={encounter.npc}
-                  />
-                </label>
-                <label className="field">
-                  <span>{t("delay")}</span>
-                  <input
-                    disabled={status === "calculating"}
-                    inputMode="numeric"
-                    max={4000}
-                    min={minimumDelay}
-                    onChange={(event) => {
-                      const value = event.target.value;
-                      if (/^-?\d*$/.test(value)) setDelayText(value);
-                    }}
-                    value={delayText}
-                  />
-                </label>
                 {encounter.pelago && (
                   <label className="field">
                     <span>Poke Pelago Shift</span>
@@ -911,15 +953,6 @@ export function Gen7StationaryPanel({
                     type="checkbox"
                   />
                   <span>{t("gen7StationaryShinyCharm")}</span>
-                </label>
-                <label className="checkbox-field">
-                  <input
-                    checked={considerDelay}
-                    disabled={status === "calculating"}
-                    onChange={(event) => setConsiderDelay(event.target.checked)}
-                    type="checkbox"
-                  />
-                  <span>Consider Delay</span>
                 </label>
                 <label className="checkbox-field">
                   <input

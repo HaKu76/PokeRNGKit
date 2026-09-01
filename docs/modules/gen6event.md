@@ -52,6 +52,10 @@ PID Type 保留上游四种行为：Random、Nonshiny、Shiny、Specified。Rand
 
 固定夹具位于 `wasm/modules/gen6event/tests/gen6event_native_test.cpp`，覆盖 API、空指针错误、XY、ORAS 双生成、固定 EC/PID/Ability/Nature/Gender/IV、结果上限和无效请求。TypeScript 夹具覆盖 54-word 编码、性别比、结果解码、Hidden Power、`.wc6` / `.wc6full` 和浏览器输入保护。
 
+## 界面布局
+
+桌面端使用上下两行工作区：控制区占据上方整行，结果区在下方保持同宽；控制面板和结果面板使用有界高度并分别滚动。普通生成模式使用与 Stationary、Wild 共用的 `RNGInfo` 卡片，闭区间与目标帧 ±100 均接入现有请求；Gen VI Event 按上游条件不显示 Timeline、Timeline Leap 或 NPC。模块专属选择器固定外层单列轨道，避免应用外壳的通用 `*-workspace` 规则把两块面板重新排成左右两栏。
+
 ## 上游与许可
 
 主要来源：

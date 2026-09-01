@@ -64,6 +64,10 @@ Static / Magnet Pull 的队首随机判定已保留在输入契约中；由于 `
 - `npm run format:check`、`git diff --check`：通过
 - 激活本机 Emscripten 后 `$env:POKERNGKIT_WASM_MODULES='gen6wild'; npm run wasm:build`：通过；`public/wasm/gen6wild.mjs` 7440 bytes，SHA-256 `5490544C909FADF410F0A2F3D292354C520269DC1A5041FE1598DDA7B907419C`；`public/wasm/gen6wild.wasm` 14225 bytes，SHA-256 `C5082B38815D6434008656477A574E61980EF675DC0BA2258A974D885152F9DD`
 
+## 界面布局
+
+桌面端使用上下两行工作区，参数区占据上方整行，结果区在下方保持同宽；参数区和结果表分别在自身面板内滚动。RNG Info 与 Stationary、Event 复用同一组件，闭区间与目标帧 ±100 均接入现有请求；普通 Wild 显示禁用的 Timeline 占位，Horde 按上游 `Method == 2 && !IsHorde` 条件隐藏。Gen VI 不显示 NPC 或 Timeline Leap。布局选择器使用模块作用域，避免应用外壳的通用 `*-workspace` 规则把外层单列轨道覆盖为左右两栏。
+
 ## 上游与许可
 
 主要来源：

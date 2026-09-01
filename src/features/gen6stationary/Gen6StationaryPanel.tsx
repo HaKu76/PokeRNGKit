@@ -7,6 +7,10 @@ import type { ThreeDsProfile } from "../3dsprofiles/domain";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import {
+  ThreeDsRngInfoCard,
+  type ThreeDsRngInfoMode,
+} from "../shared/ThreeDsRngInfoCard";
+import {
   GEN6_STATIONARY_GENDER_RATIOS,
   gen6StationaryDefaultFilters,
   gen6StationaryProfile,
@@ -230,6 +234,9 @@ export function Gen6StationaryPanel({
   const [endDate, setEndDate] = useState("2000-01-01T00:01:00");
   const [minFrame, setMinFrame] = useState("0");
   const [maxFrame, setMaxFrame] = useState("1000");
+  const [rngInfoMode, setRngInfoMode] = useState<ThreeDsRngInfoMode>("range");
+  const [targetFrame, setTargetFrame] = useState("5000");
+  const [timelineSeconds, setTimelineSeconds] = useState("3600");
   const [delay, setDelay] = useState("0");
   const [considerDelay, setConsiderDelay] = useState(true);
   const [syncNature, setSyncNature] = useState("255");
@@ -330,24 +337,33 @@ export function Gen6StationaryPanel({
     [engine, timeEngine],
   );
 
-  const request = (): Gen6StationaryRequest => ({
-    version: profileInfo.version,
-    seed: Number.parseInt(seed || "0", 16),
-    minFrame: parseDecimal(minFrame),
-    maxFrame: parseDecimal(maxFrame),
-    delay: parseDecimal(delay),
-    considerDelay,
-    tsv: profileInfo.tsv,
-    trv: profileInfo.trv,
-    shinyCharm: profileInfo.shinyCharm,
-    syncNature: Number(syncNature) === 255 ? null : Number(syncNature),
-    assumeSync,
-    template,
-    bankTarget: parseDecimal(bankTarget),
-    bankGenderList,
-    filters,
-    resultLimit: parseDecimal(resultLimit),
-  });
+  const request = (): Gen6StationaryRequest => {
+    const parsedTargetFrame = parseDecimal(targetFrame);
+    return {
+      version: profileInfo.version,
+      seed: Number.parseInt(seed || "0", 16),
+      minFrame:
+        !timeFinderMode && rngInfoMode === "around"
+          ? Math.max(0, parsedTargetFrame - 100)
+          : parseDecimal(minFrame),
+      maxFrame:
+        !timeFinderMode && rngInfoMode === "around"
+          ? parsedTargetFrame + 100
+          : parseDecimal(maxFrame),
+      delay: parseDecimal(delay),
+      considerDelay,
+      tsv: profileInfo.tsv,
+      trv: profileInfo.trv,
+      shinyCharm: profileInfo.shinyCharm,
+      syncNature: Number(syncNature) === 255 ? null : Number(syncNature),
+      assumeSync,
+      template,
+      bankTarget: parseDecimal(bankTarget),
+      bankGenderList,
+      filters,
+      resultLimit: parseDecimal(resultLimit),
+    };
+  };
   const timeRequest = (): Gen6StationaryTimeRequest => {
     const startEpoch = gen6StationaryTimeEpochFromInput(startDate);
     const endEpoch = gen6StationaryTimeEpochFromInput(endDate);
@@ -473,7 +489,7 @@ export function Gen6StationaryPanel({
     <div
       className={`gen6stationary-panel${timeFinderMode ? " gen6stationary-time-mode" : ""}`}
     >
-      <div className="gen6stationary-workspace">
+      <div className="gen6stationary-workspace stacked-module-workspace">
         <form className="panel gen6stationary-controls" onSubmit={run}>
           <div className="gen6stationary-heading">
             <div>
@@ -583,49 +599,63 @@ export function Gen6StationaryPanel({
                   />
                 </label>
               )}
-              <label className="field">
-                <span>{t("gen6StationaryFrameRange")}</span>
-                <input
-                  disabled={disabled}
-                  inputMode="numeric"
-                  max={5_000_000}
-                  maxLength={7}
-                  onChange={(event) =>
-                    setMinFrame(
-                      normalizeDecimalInput(event.target.value, 5_000_000, 7),
-                    )
-                  }
-                  value={minFrame}
-                />
-              </label>
-              <label className="field">
-                <span>{t("maxAdvance")}</span>
-                <input
-                  disabled={disabled}
-                  inputMode="numeric"
-                  max={5_000_000}
-                  maxLength={7}
-                  onChange={(event) =>
-                    setMaxFrame(
-                      normalizeDecimalInput(event.target.value, 5_000_000, 7),
-                    )
-                  }
-                  value={maxFrame}
-                />
-              </label>
-              <label className="field">
-                <span>{t("delay")}</span>
-                <input
-                  disabled={disabled}
-                  inputMode="numeric"
-                  max={4000}
-                  maxLength={4}
-                  onChange={(event) =>
-                    setDelay(normalizeDecimalInput(event.target.value, 4000, 4))
-                  }
-                  value={delay}
-                />
-              </label>
+              {timeFinderMode && (
+                <>
+                  <label className="field">
+                    <span>{t("gen6StationaryFrameRange")}</span>
+                    <input
+                      disabled={disabled}
+                      inputMode="numeric"
+                      max={5_000_000}
+                      maxLength={7}
+                      onChange={(event) =>
+                        setMinFrame(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            5_000_000,
+                            7,
+                          ),
+                        )
+                      }
+                      value={minFrame}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("maxAdvance")}</span>
+                    <input
+                      disabled={disabled}
+                      inputMode="numeric"
+                      max={5_000_000}
+                      maxLength={7}
+                      onChange={(event) =>
+                        setMaxFrame(
+                          normalizeDecimalInput(
+                            event.target.value,
+                            5_000_000,
+                            7,
+                          ),
+                        )
+                      }
+                      value={maxFrame}
+                    />
+                  </label>
+                  <label className="field">
+                    <span>{t("delay")}</span>
+                    <input
+                      disabled={disabled}
+                      inputMode="numeric"
+                      max={4000}
+                      maxLength={4}
+                      onChange={(event) =>
+                        setDelay(
+                          normalizeDecimalInput(event.target.value, 4000, 4),
+                        )
+                      }
+                      value={delay}
+                    />
+                  </label>
+                </>
+              )}
               <label className="field">
                 <span>{t("gen6StationarySynchronize")}</span>
                 <Select
@@ -661,6 +691,39 @@ export function Gen6StationaryPanel({
                 />
               </label>
             </div>
+            {!timeFinderMode && (
+              <ThreeDsRngInfoCard
+                considerDelay={considerDelay}
+                delay={delay}
+                disabled={disabled}
+                generation={6}
+                maxFrame={maxFrame}
+                maxFrameLimit={5_000_000}
+                minFrame={minFrame}
+                mode={rngInfoMode}
+                onConsiderDelayChange={setConsiderDelay}
+                onDelayChange={(value) =>
+                  setDelay(normalizeDecimalInput(value, 4000, 4))
+                }
+                onMaxFrameChange={(value) =>
+                  setMaxFrame(normalizeDecimalInput(value, 5_000_000, 7))
+                }
+                onMinFrameChange={(value) =>
+                  setMinFrame(normalizeDecimalInput(value, 5_000_000, 7))
+                }
+                onModeChange={setRngInfoMode}
+                onTargetFrameChange={(value) =>
+                  setTargetFrame(normalizeDecimalInput(value, 5_000_000, 7))
+                }
+                onTimelineSecondsChange={(value) =>
+                  setTimelineSeconds(normalizeDecimalInput(value, 5_000_000, 7))
+                }
+                showNpc={false}
+                showTimeline={!template.alwaysSync && !bankOnly}
+                targetFrame={targetFrame}
+                timelineSeconds={timelineSeconds}
+              />
+            )}
             <div className="gen6stationary-meta">
               <span>
                 {t("level")} <strong>{template.level || "-"}</strong>
@@ -679,15 +742,17 @@ export function Gen6StationaryPanel({
               </span>
             </div>
             <div className="gen6stationary-toggle-grid">
-              <label className="checkbox-field">
-                <input
-                  checked={considerDelay}
-                  disabled={disabled}
-                  onChange={(event) => setConsiderDelay(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>{t("gen6StationaryConsiderDelay")}</span>
-              </label>
+              {timeFinderMode && (
+                <label className="checkbox-field">
+                  <input
+                    checked={considerDelay}
+                    disabled={disabled}
+                    onChange={(event) => setConsiderDelay(event.target.checked)}
+                    type="checkbox"
+                  />
+                  <span>{t("gen6StationaryConsiderDelay")}</span>
+                </label>
+              )}
               <label className="checkbox-field">
                 <input
                   checked={profileInfo.shinyCharm}

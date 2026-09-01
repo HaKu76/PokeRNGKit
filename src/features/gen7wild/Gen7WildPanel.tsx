@@ -18,6 +18,10 @@ import {
 } from "../3dsprofiles/domain";
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import {
+  ThreeDsRngInfoCard,
+  type ThreeDsRngInfoMode,
+} from "../shared/ThreeDsRngInfoCard";
+import {
   GEN7_WILD_NATURES,
   type Gen7WildCategory,
   type Gen7WildGameVersion,
@@ -25,6 +29,7 @@ import {
 import {
   formatGen7WildHex32,
   formatGen7WildHex64,
+  GEN7_WILD_MAX_FRAME,
   GEN7_WILD_MAX_RESULTS,
   gen7WildAreas,
   gen7WildAreasForSpecial,
@@ -259,6 +264,9 @@ export function Gen7WildPanel({
   const [seed, setSeed] = useState("0");
   const [minFrame, setMinFrame] = useState("478");
   const [maxFrame, setMaxFrame] = useState("50000");
+  const [rngInfoMode, setRngInfoMode] = useState<ThreeDsRngInfoMode>("range");
+  const [targetFrame, setTargetFrame] = useState("5000");
+  const [timelineSeconds, setTimelineSeconds] = useState("3600");
   const [tsv, setTsv] = useState("0");
   const [trv, setTrv] = useState("0");
   const [shinyCharm, setShinyCharm] = useState(false);
@@ -266,6 +274,7 @@ export function Gen7WildPanel({
   const [syncNature, setSyncNature] = useState("");
   const [considerDelay, setConsiderDelay] = useState(true);
   const [npc, setNpc] = useState("0");
+  const [delayTime, setDelayTime] = useState("0");
   const [correction, setCorrection] = useState("1");
   const [raining, setRaining] = useState(false);
   const [levelMin, setLevelMin] = useState("1");
@@ -391,6 +400,7 @@ export function Gen7WildPanel({
   useEffect(() => {
     if (!baseEncounter) return;
     setNpc(String(baseEncounter.npc));
+    setDelayTime(String(baseEncounter.delayTime));
     setCorrection(String(baseEncounter.correction));
     setRaining(baseEncounter.raining);
     setLevelMin(String(baseEncounter.levelMin));
@@ -455,9 +465,11 @@ export function Gen7WildPanel({
 
   function buildRequest() {
     if (!baseEncounter) throw new Error(t("invalidGen7WildInput"));
+    const parsedTargetFrame = parseGen7WildDecimal(targetFrame);
     const encounter = {
       ...baseEncounter,
       npc: parseGen7WildDecimal(npc),
+      delayTime: parseGen7WildDecimal(delayTime),
       correction: parseGen7WildDecimal(correction),
       raining,
       levelMin: parseGen7WildDecimal(levelMin),
@@ -469,8 +481,14 @@ export function Gen7WildPanel({
     return validateGen7WildRequest({
       version,
       seed: parseGen7WildHex(seed),
-      minFrame: parseGen7WildDecimal(minFrame),
-      maxFrame: parseGen7WildDecimal(maxFrame),
+      minFrame:
+        rngInfoMode === "around"
+          ? Math.max(gen7WildStartingFrame(version), parsedTargetFrame - 100)
+          : parseGen7WildDecimal(minFrame),
+      maxFrame:
+        rngInfoMode === "around"
+          ? parsedTargetFrame + 100
+          : parseGen7WildDecimal(maxFrame),
       tsv: parseGen7WildDecimal(tsv),
       trv: parseGen7WildHex(trv),
       shinyCharm,
@@ -628,7 +646,7 @@ export function Gen7WildPanel({
 
   return (
     <form className="gen7wild-panel" onSubmit={submit}>
-      <div className="gen7wild-workspace">
+      <div className="gen7wild-workspace stacked-module-workspace">
         <section className="panel gen7wild-controls">
           <header className="gen7wild-heading">
             <div>
@@ -667,26 +685,6 @@ export function Gen7WildPanel({
                 />
               </label>
               <label className="field">
-                <span>{t("gen7StationaryMinFrame")}</span>
-                <input
-                  inputMode="numeric"
-                  value={minFrame}
-                  onChange={(event) =>
-                    setMinFrame(normalizeDecimalInput(event.target.value, 8))
-                  }
-                />
-              </label>
-              <label className="field">
-                <span>{t("gen7StationaryMaxFrame")}</span>
-                <input
-                  inputMode="numeric"
-                  value={maxFrame}
-                  onChange={(event) =>
-                    setMaxFrame(normalizeDecimalInput(event.target.value, 8))
-                  }
-                />
-              </label>
-              <label className="field">
                 <span>TSV</span>
                 <input
                   inputMode="numeric"
@@ -708,6 +706,51 @@ export function Gen7WildPanel({
                 />
               </label>
             </div>
+            <ThreeDsRngInfoCard
+              considerDelay={considerDelay}
+              delay={delayTime}
+              delayLimit={5002}
+              disabled={status === "calculating"}
+              generation={7}
+              maxFrame={maxFrame}
+              maxFrameLimit={GEN7_WILD_MAX_FRAME}
+              minFrame={minFrame}
+              minFrameLimit={gen7WildStartingFrame(version)}
+              mode={rngInfoMode}
+              npc={npc}
+              onConsiderDelayChange={setConsiderDelay}
+              onDelayChange={(value) =>
+                setDelayTime(normalizeDecimalInput(value, 5002, 4))
+              }
+              onMaxFrameChange={(value) =>
+                setMaxFrame(
+                  normalizeDecimalInput(value, GEN7_WILD_MAX_FRAME, 8),
+                )
+              }
+              onMinFrameChange={(value) =>
+                setMinFrame(
+                  normalizeDecimalInput(value, GEN7_WILD_MAX_FRAME, 8),
+                )
+              }
+              onModeChange={setRngInfoMode}
+              onNpcChange={(value) =>
+                setNpc(normalizeDecimalInput(value, 100, 3))
+              }
+              onTargetFrameChange={(value) =>
+                setTargetFrame(
+                  normalizeDecimalInput(value, GEN7_WILD_MAX_FRAME, 8),
+                )
+              }
+              onTimelineSecondsChange={(value) =>
+                setTimelineSeconds(
+                  normalizeDecimalInput(value, GEN7_WILD_MAX_FRAME, 8),
+                )
+              }
+              showNpc
+              showTimeline
+              targetFrame={targetFrame}
+              timelineSeconds={timelineSeconds}
+            />
           </div>
 
           <div className="gen7wild-section">
@@ -822,14 +865,6 @@ export function Gen7WildPanel({
               </label>
               <label className="check-row">
                 <input
-                  checked={considerDelay}
-                  onChange={(event) => setConsiderDelay(event.target.checked)}
-                  type="checkbox"
-                />
-                <span>{t("gen7WildConsiderDelay")}</span>
-              </label>
-              <label className="check-row">
-                <input
                   checked={shinyCharm}
                   onChange={(event) => setShinyCharm(event.target.checked)}
                   type="checkbox"
@@ -838,16 +873,6 @@ export function Gen7WildPanel({
               </label>
             </div>
             <div className="gen7wild-grid compact">
-              <label className="field">
-                <span>{t("gen7WildNpc")}</span>
-                <input
-                  inputMode="numeric"
-                  value={npc}
-                  onChange={(event) =>
-                    setNpc(normalizeDecimalInput(event.target.value, 3))
-                  }
-                />
-              </label>
               <label className="field">
                 <span>{t("gen7WildCorrection")}</span>
                 <input

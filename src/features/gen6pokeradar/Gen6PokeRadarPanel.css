@@ -1,6 +1,6 @@
 .gen6pokeradar-workspace {
   display: grid;
-  grid-template-columns: minmax(380px, 0.72fr) minmax(660px, 1.5fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   min-height: 0;
 }

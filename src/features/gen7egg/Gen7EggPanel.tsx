@@ -685,7 +685,7 @@ export function Gen7EggPanel({
           </button>
         ))}
       </div>
-      <div className="gen7egg-workspace">
+      <div className="gen7egg-workspace stacked-module-workspace">
         <form className="panel gen7egg-controls" onSubmit={run}>
           <div className="gen7egg-heading">
             <h2>{t("gen7EggEngine")}</h2>

@@ -5,7 +5,7 @@
 .gen7festivalplaza-workspace {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(430px, 0.76fr) minmax(650px, 1.24fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   align-items: stretch;
 }

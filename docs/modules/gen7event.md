@@ -34,23 +34,25 @@
 
 下列限制来自上游 WinForms 控件初始化和 Core 参数类型。空 Seed、TRV、EC 与 PID 按 `HexMaskedTextBox.Value` 读取为 `0`；浏览器空十进制输入同样规范化为 `0`，随后执行领域校验。
 
-| 输入                | 上游依据                                     | 范围与行为                                                                      |
-| ------------------- | -------------------------------------------- | ------------------------------------------------------------------------------- |
-| Game Version        | `Gameversion`、`FuncUtil.getstartingframe()` | Sun、Moon、Ultra Sun、Ultra Moon；SM 起始帧 `418`，USUM 起始帧 `478`            |
-| Seed                | `Seed.Mask = "AAAAAAAA"`、`SFMT(uint)`       | 8 位十六进制，`0..FFFFFFFF`；空值按 `0`                                         |
-| Initial / Max Frame | `Frame_min / Frame_max`、`FuncUtil.MAXFRAME` | 十进制 `0..1,000,000,000`；Event 最小值不得低于版本起始帧，Initial 不得大于 Max |
-| TSV                 | `TSV.Maximum`、`ushort TSV`                  | 十进制 `0..4095`；仅 `自ID` 时使用                                              |
-| TRV                 | `TRV.Mask = "A"`、`byte TRV`                 | 1 位十六进制，`0..F`；仅 `自ID` 时使用                                          |
-| NPC                 | 默认 `NumericUpDown`、`NPC + 1` 模型数       | 十进制 `0..100`；内部模型数为 `NPC + 1`                                         |
-| Delay               | `Timedelay.Maximum = 4000`、`EventDelay`     | 十进制 `0..4000`；SM 默认 `62`，USUM 默认 `42`；时间步使用整数 `Delay / 2 + 2`  |
-| Species             | `Event_Species`、版本物种列表                | SM `0..802`，USUM `0..807`；`0` 显示为 `-`                                      |
-| Form                | `PersonalTable.getFormeEntry()`              | `0..FormeCount - 1`；物种只有一个形态时禁用选择                                 |
-| Level               | `Filter_Lv` 默认 `NumericUpDown`             | 十进制 `0..100`                                                                 |
-| Fixed IV            | `Event_IV_Fix*`、`EventIV[i]`                | 每项未锁定时为 `-1`，锁定时 `0..31`                                             |
-| Random perfect IVs  | `IVsCount.Maximum = 5`                       | `0..5`；固定项数量加保底随机 V 数在非零时不得超过 `5`                           |
-| TID / SID           | `Event_TID / Event_SID.Maximum`              | 十进制 `0..65535`；非 `自ID` 时决定 TSV/TRV                                     |
-| EC / PID            | `Mask = "AAAAAAAA"`、`uint`                  | 8 位十六进制，`0..FFFFFFFF`；EC 为 `0` 时随机，PID 仅 `Specified` 使用          |
-| Result Limit        | `MainForm.MAX_RESULTS_NUM`                   | `1..100,000`；当前 UI 固定为 `100,000`                                          |
+| 输入                | 上游依据                                     | 范围与行为                                                                                                    |
+| ------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Game Version        | `Gameversion`、`FuncUtil.getstartingframe()` | Sun、Moon、Ultra Sun、Ultra Moon；SM 起始帧 `418`，USUM 起始帧 `478`                                          |
+| Seed                | `Seed.Mask = "AAAAAAAA"`、`SFMT(uint)`       | 8 位十六进制，`0..FFFFFFFF`；空值按 `0`                                                                       |
+| Initial / Max Frame | `Frame_min / Frame_max`、`FuncUtil.MAXFRAME` | 十进制 `0..1,000,000,000`；Event 最小值不得低于版本起始帧，Initial 不得大于 Max                               |
+| Target Frame        | `TargetFrame`、`Increment = 100`             | 十进制 `0..1,000,000,000`；默认 `5000`；`±100帧` 模式检索闭区间 `max(版本起始帧, Target - 100)..Target + 100` |
+| Timeline Seconds    | `TimeSpan`、`FuncUtil.MAXFRAME`              | 十进制 `0..1,000,000,000`；默认 `3600`；当前仅展示上游控件，专用 Timeline 搜索尚未接入                        |
+| TSV                 | `TSV.Maximum`、`ushort TSV`                  | 十进制 `0..4095`；仅 `自ID` 时使用                                                                            |
+| TRV                 | `TRV.Mask = "A"`、`byte TRV`                 | 1 位十六进制，`0..F`；仅 `自ID` 时使用                                                                        |
+| NPC                 | 默认 `NumericUpDown`、`NPC + 1` 模型数       | 十进制 `0..100`；内部模型数为 `NPC + 1`                                                                       |
+| Delay               | `Timedelay.Maximum = 4000`、`EventDelay`     | 十进制 `0..4000`；SM 默认 `62`，USUM 默认 `42`；时间步使用整数 `Delay / 2 + 2`                                |
+| Species             | `Event_Species`、版本物种列表                | SM `0..802`，USUM `0..807`；`0` 显示为 `-`                                                                    |
+| Form                | `PersonalTable.getFormeEntry()`              | `0..FormeCount - 1`；物种只有一个形态时禁用选择                                                               |
+| Level               | `Filter_Lv` 默认 `NumericUpDown`             | 十进制 `0..100`                                                                                               |
+| Fixed IV            | `Event_IV_Fix*`、`EventIV[i]`                | 每项未锁定时为 `-1`，锁定时 `0..31`                                                                           |
+| Random perfect IVs  | `IVsCount.Maximum = 5`                       | `0..5`；固定项数量加保底随机 V 数在非零时不得超过 `5`                                                         |
+| TID / SID           | `Event_TID / Event_SID.Maximum`              | 十进制 `0..65535`；非 `自ID` 时决定 TSV/TRV                                                                   |
+| EC / PID            | `Mask = "AAAAAAAA"`、`uint`                  | 8 位十六进制，`0..FFFFFFFF`；EC 为 `0` 时随机，PID 仅 `Specified` 使用                                        |
+| Result Limit        | `MainForm.MAX_RESULTS_NUM`                   | `1..100,000`；当前 UI 固定为 `100,000`                                                                        |
 
 上游允许帧值达到 `1,000,000,000`。当前静态浏览器会话把绝对最大帧限制为 `5,000,000`，避免初始化 SFMT、Blink 标记和长连续帧时产生无界阻塞；该保护不改写上游输入记录。
 
@@ -106,7 +108,9 @@ gen7event_last_error()
 
 页头选择 Gen VII 的 3DSRNGTool 档案时，同步 GameVersion、TSV 与 TRV，并沿用现有版本切换流程更新起始帧、版本限定物种和默认 Delay。Shiny Charm 不属于 Event 请求，不从档案写入。
 
-桌面端使用紧凑参数区与结果区双列工作台，结果表是主要滚动区域；`1181..1380px` 使用较窄双列，`1180px` 以下重排为单列。移动端输入、命令、复选标签和结果表头保持至少 44px 触控目标。界面逐字复用上游简体中文词条：`配信乱数`、`配信设置`、`固定特性`、`固定性格`、`固定性别`、`自ID`、`蛋`、`未登入图鉴`、`其他信息`、`保底随机V数` 与 `考虑时间延迟`。
+桌面端使用上下两行工作台：设置区占据上方整行，结果区在下方保持同宽，二者分别使用有界滚动区域。设置区的 `乱数信息` 与 Gen VII Stationary、Wild 复用同一组件，并按桌面四列显示 `检索范围`、`目标帧 / ±100帧`、`考虑时间延迟 / +4F / NPC`、`生成时间线/秒 / 时间线跳跃 / 计算`；只有 Gen VII Event 启用 Timeline Leap 的可见性。内容宽度低于 `840px` 时卡片改为两列，移动端再改为单列并保持至少 44px 触控目标。`检索范围` 和 `±100帧` 已接入现有连续帧搜索；Timeline 与 Timeline Leap 仍以禁用控件明确标记为待接入，不能视为算法完成。
+
+界面逐字复用上游简体中文词条：`配信乱数`、`配信设置`、`乱数信息`、`检索范围`、`目标帧`、`±100帧`、`生成时间线/秒`、`时间线跳跃`、`计算`、`固定特性`、`固定性格`、`固定性别`、`自ID`、`蛋`、`未登入图鉴`、`其他信息`、`保底随机V数` 与 `考虑时间延迟`。
 
 结果显示 Frame、Realtime、Random Number、EC、PID、六项 IV、Nature、Ability、Gender、Hidden Power、Shiny、Blink、Delay、PSV 与 PRV，并支持列排序、CSV、清空和取消。
 
@@ -118,6 +122,7 @@ gen7event_last_error()
 - `npm run verify` 中的 Prettier、ESLint、TypeScript 与 109 个 Vitest 文件共 418 项测试；ESLint 0 error，保留 6 条既有 TanStack Virtual / React Compiler 非阻断 warning。
 - 非受限 `npm run build:web`：2113 个模块转换，生成 139 项、约 16.8 MiB 的 PWA 预缓存；仅保留既有大 chunk 警告。
 - 外部 Chrome UI Preview：`http://127.0.0.1:5174/`；验证 43 条结果、首帧 478、错误、清空、Your ID / Other Information 联动，以及 390 / 768 / 1280 / 1536 / 1920px 布局。页面无横向溢出，虚拟表首行与表头间距为 0，控制台无 warning 或 error。
+- 2026-09-01 外部 Chrome UI Preview：`http://127.0.0.1:4183/`；共用乱数信息卡片完整显示四列，Event 单独显示 Timeline Leap，`计算` 是唯一启动按钮，控制台无 warning 或 error。
 
 `npm run verify` 的最后一个 `build:web` 在受限环境复制既有 `public/wasm/gen3egg.mjs` 时返回 `EPERM`，因此完整命令本身没有以 0 退出；独立非受限 Web 构建随后通过。
 

@@ -79,7 +79,7 @@ The Calls result table supports row selection and `Find Path for index`. The imp
 
 Selecting a Sun, Moon, Ultra Sun or Ultra Moon 3DSRNGTool profile synchronizes GameVersion, TSV, TRV and Shiny Charm. The existing version effect updates the starting frame; unrelated renders do not replace later manual edits.
 
-`Gen7SosPanel` uses a segmented Pokemon Generation / Call Prediction workspace, compact encounter and battle controls, filter disclosure, virtualized results, sorting, CSV export, cancellation, selected-call Path Finder output, and explicit empty/error/limit states.
+`Gen7SosPanel` uses a segmented Pokemon Generation / Call Prediction workspace, compact encounter and battle controls, filter disclosure, virtualized results, sorting, CSV export, cancellation, selected-call Path Finder output, and explicit empty/error/limit states. Controls occupy the full upper row and results occupy the full lower row at a bounded viewport-relative height; the long control surface scrolls inside its own panel.
 
 Below `1120px`, the virtualized `.gen7sos-table` keeps a fixed `520px` height and does not flex with its contents. The surrounding results panel may grow in the single-column layout, but the TanStack Virtual scroll element must retain a bounded viewport for result sets up to 100,000 rows.
 

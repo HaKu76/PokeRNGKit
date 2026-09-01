@@ -25,8 +25,10 @@
 
 namespace
 {
-    constexpr std::uint32_t apiVersion = 4;
+    constexpr std::uint32_t apiVersion = 6;
     constexpr std::uint32_t maxStatesPerCall = 100000;
+    constexpr std::uint64_t maxEmeraldWorkStates = 25000000;
+    constexpr std::size_t maxEmeraldResultsPerCall = 250001;
 
     enum ErrorCode : std::uint32_t
     {
@@ -36,6 +38,7 @@ namespace
     };
 
     thread_local std::vector<Gen3StaticPackedState> results;
+    thread_local std::vector<Gen3StaticEmeraldPackedState> emeraldResults;
     thread_local std::uint32_t lastError = ErrorCode::None;
 
     std::uint8_t getGender(std::uint32_t pid, std::uint32_t genderRatio)
@@ -201,6 +204,7 @@ namespace
 }
 
 static_assert(sizeof(Gen3StaticPackedState) == 48);
+static_assert(sizeof(Gen3StaticEmeraldPackedState) == 60);
 
 extern "C"
 {
@@ -370,6 +374,170 @@ extern "C"
         return static_cast<std::uint32_t>(results.size());
     }
 
+    POKERNGKIT_KEEPALIVE std::uint32_t gen3static_search_emerald(
+        std::uint32_t startIndex, std::uint32_t stateCount, std::uint32_t initialAdvances,
+        std::uint32_t maxAdvances, std::uint32_t offset, std::uint32_t filterTid, std::uint32_t tid,
+        std::uint32_t method, std::uint32_t species, std::uint32_t level, std::uint32_t genderRatio,
+        std::uint32_t buggedRoamer, std::uint32_t shinyFilter, std::uint32_t genderFilter,
+        std::uint32_t abilityFilter, std::uint32_t natureFilter, std::uint32_t hiddenPowerFilter,
+        std::uint32_t hpMin, std::uint32_t attackMin, std::uint32_t defenseMin,
+        std::uint32_t specialAttackMin, std::uint32_t specialDefenseMin, std::uint32_t speedMin,
+        std::uint32_t hpMax, std::uint32_t attackMax, std::uint32_t defenseMax,
+        std::uint32_t specialAttackMax, std::uint32_t specialDefenseMax, std::uint32_t speedMax,
+        std::uint32_t perfectIvValue, std::uint32_t perfectIvCount)
+    {
+        emeraldResults.clear();
+        lastError = ErrorCode::None;
+
+        const std::uint64_t targetMinAdvances = static_cast<std::uint64_t>(initialAdvances) + offset;
+        const std::uint64_t targetMaxAdvances = targetMinAdvances + maxAdvances;
+        if (stateCount == 0 || stateCount > maxStatesPerCall || targetMaxAdvances > 0xffffffffULL
+            || static_cast<std::uint64_t>(stateCount) * (targetMaxAdvances + 1) > maxEmeraldWorkStates
+            || filterTid > 1 || tid > 0xffff || species == 0 || species > 1025 || level == 0 || level > 100
+            || genderRatio > 255
+            || (method != static_cast<std::uint32_t>(Gen3StaticMethod::Method1)
+                && method != static_cast<std::uint32_t>(Gen3StaticMethod::Method4))
+            || shinyFilter > ShinyStarSquare || genderFilter > GenderFemale
+            || abilityFilter > AbilitySecond || natureFilter == 0 || natureFilter > 0x1ffffff
+            || hiddenPowerFilter == 0 || hiddenPowerFilter > 0xffff || perfectIvValue > 31
+            || perfectIvCount > 6)
+        {
+            lastError = ErrorCode::InvalidInput;
+            return 0;
+        }
+
+        const std::array<std::uint32_t, 6> minimum
+            = { hpMin, attackMin, defenseMin, specialAttackMin, specialDefenseMin, speedMin };
+        const std::array<std::uint32_t, 6> maximum
+            = { hpMax, attackMax, defenseMax, specialAttackMax, specialDefenseMax, speedMax };
+        for (std::size_t index = 0; index < minimum.size(); index++)
+        {
+            if (minimum[index] > 31 || maximum[index] > 31 || minimum[index] > maximum[index])
+            {
+                lastError = ErrorCode::InvalidInput;
+                return 0;
+            }
+        }
+        const std::uint64_t totalStates
+            = pokerngkit::countIvCombinations(minimum, maximum, perfectIvValue, perfectIvCount);
+        if (static_cast<std::uint64_t>(startIndex) + stateCount > totalStates)
+        {
+            lastError = ErrorCode::InvalidInput;
+            return 0;
+        }
+
+        emeraldResults.reserve(std::min<std::size_t>(maxEmeraldResultsPerCall, static_cast<std::size_t>(stateCount) * 64));
+        std::vector<std::uint32_t> latestDistances;
+        std::vector<std::uint32_t> distanceGenerations;
+        std::uint32_t distanceGeneration = 0;
+        if (shinyFilter != ShinyAny)
+        {
+            latestDistances.resize(0x10000);
+            distanceGenerations.assign(0x10000, 0);
+        }
+        for (std::uint32_t combinationOffset = 0; combinationOffset < stateCount; combinationOffset++)
+        {
+            const auto recoveredIvs = pokerngkit::ivCombinationAtIndex(
+                static_cast<std::uint64_t>(startIndex) + combinationOffset, minimum, maximum, perfectIvValue,
+                perfectIvCount);
+            const RecoverySeeds recovered = method == static_cast<std::uint32_t>(Gen3StaticMethod::Method4)
+                ? recoverMethod4(recoveredIvs)
+                : recoverMethod1(recoveredIvs);
+            for (std::uint32_t recoveredIndex = 0; recoveredIndex < recovered.count; recoveredIndex++)
+            {
+                PokeRNGR pidRng(recovered.seeds[recoveredIndex]);
+                std::uint32_t pid = static_cast<std::uint32_t>(pidRng.nextUShort()) << 16;
+                pid |= pidRng.nextUShort();
+                const std::uint32_t targetSeed = pidRng.next();
+                const std::uint8_t nature = static_cast<std::uint8_t>(pid % 25);
+                const std::uint8_t ability = static_cast<std::uint8_t>(pid & 1);
+                const std::uint8_t gender = getGender(pid, genderRatio);
+                const std::array<std::uint8_t, 6> displayedIvs = buggedRoamer
+                    ? std::array<std::uint8_t, 6> { recoveredIvs[0], static_cast<std::uint8_t>(recoveredIvs[1] & 7),
+                                                   0, 0, 0, 0 }
+                    : recoveredIvs;
+                if (!matchesGender(gender, genderFilter) || !matchesAbility(ability, abilityFilter)
+                    || !matchesStateFilters(displayedIvs, nature, natureFilter, hiddenPowerFilter)
+                    || !matchesPerfectIvs(displayedIvs, perfectIvValue, perfectIvCount))
+                {
+                    continue;
+                }
+
+                if (shinyFilter != ShinyAny)
+                {
+                    distanceGeneration++;
+                }
+                PokeRNGR reverse(targetSeed);
+                std::uint32_t currentSeed = targetSeed;
+                for (std::uint32_t distance = 0; distance <= targetMaxAdvances; distance++)
+                {
+                    if (distance >= targetMinAdvances && currentSeed <= 0xffff
+                        && (!filterTid || currentSeed == tid))
+                    {
+                        const std::uint32_t candidateTid = currentSeed;
+                        if (shinyFilter == ShinyAny)
+                        {
+                            emeraldResults.push_back(
+                                { distance, 0xffffffff, candidateTid, 0xffffffff, pid, displayedIvs[0],
+                                  displayedIvs[1], displayedIvs[2], displayedIvs[3], displayedIvs[4],
+                                  displayedIvs[5], ability, gender, level,
+                                  static_cast<std::uint32_t>(nature) | 0xffff0000 });
+                        }
+                        else if (distance != 0)
+                        {
+                            const std::uint32_t psv = (pid >> 16) ^ (pid & 0xffff);
+                            const auto append = [&](std::uint32_t shinyXor) {
+                                const std::uint32_t candidateSid = (candidateTid ^ psv ^ shinyXor) & 0xffff;
+                                const std::uint32_t reverseDistance = latestDistances[candidateSid];
+                                if (distanceGenerations[candidateSid] != distanceGeneration
+                                    || reverseDistance >= distance)
+                                {
+                                    return false;
+                                }
+                                const std::uint32_t idAdvances = distance - reverseDistance - 1;
+                                const std::uint32_t shiny = shinyXor == 0 ? 2 : 1;
+                                emeraldResults.push_back(
+                                    { distance, idAdvances, candidateTid, candidateSid, pid, displayedIvs[0],
+                                      displayedIvs[1], displayedIvs[2], displayedIvs[3], displayedIvs[4],
+                                      displayedIvs[5], ability, gender, level,
+                                      static_cast<std::uint32_t>(nature) | (shiny << 8) | (shinyXor << 16) });
+                                return true;
+                            };
+                            bool appended = false;
+                            if ((shinyFilter & ShinySquare) != 0)
+                            {
+                                appended = append(0);
+                            }
+                            if (!appended && (shinyFilter & ShinyStar) != 0)
+                            {
+                                for (std::uint32_t shinyXor = 1; shinyXor < 8 && !appended; shinyXor++)
+                                {
+                                    appended = append(shinyXor);
+                                }
+                            }
+                        }
+                        if (emeraldResults.size() >= maxEmeraldResultsPerCall)
+                        {
+                            return static_cast<std::uint32_t>(emeraldResults.size());
+                        }
+                    }
+                    if (distance == targetMaxAdvances)
+                    {
+                        break;
+                    }
+                    if (shinyFilter != ShinyAny)
+                    {
+                        const std::uint32_t sid = currentSeed >> 16;
+                        latestDistances[sid] = distance;
+                        distanceGenerations[sid] = distanceGeneration;
+                    }
+                    currentSeed = reverse.next();
+                }
+            }
+        }
+        return static_cast<std::uint32_t>(emeraldResults.size());
+    }
+
     POKERNGKIT_KEEPALIVE std::uintptr_t gen3static_result_ptr()
     {
         return reinterpret_cast<std::uintptr_t>(results.data());
@@ -378,6 +546,16 @@ extern "C"
     POKERNGKIT_KEEPALIVE std::uint32_t gen3static_result_count()
     {
         return static_cast<std::uint32_t>(results.size());
+    }
+
+    POKERNGKIT_KEEPALIVE std::uintptr_t gen3static_emerald_result_ptr()
+    {
+        return reinterpret_cast<std::uintptr_t>(emeraldResults.data());
+    }
+
+    POKERNGKIT_KEEPALIVE std::uint32_t gen3static_emerald_result_count()
+    {
+        return static_cast<std::uint32_t>(emeraldResults.size());
     }
 
     POKERNGKIT_KEEPALIVE std::uint32_t gen3static_last_error()
