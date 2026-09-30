@@ -15,7 +15,7 @@ import type { PokemonEdit } from "./PokemonEditor";
 
 export const MAX_ENTITY_BYTES = 1024 * 1024;
 export interface StandalonePokemonReport {
-  apiVersion: 77;
+  apiVersion: 78;
   format: string;
   extension: string;
   party: boolean;

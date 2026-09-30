@@ -55,6 +55,8 @@ export class SaveEditorClient {
       | "exportWorkingCopy"
       | "trainer"
       | "inventory"
+      | "rtc"
+      | "rtcEdit"
       | "opowers"
       | "opowersEdit"
       | "food"

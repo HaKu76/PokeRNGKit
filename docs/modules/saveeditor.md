@@ -3,6 +3,18 @@
 2026-09-22 开始开发。入口位于悬浮工具菜单，使用本地 `PKHeX.Core` 26.08.26 源码；
 来源、归属与逐文件哈希见 [UPSTREAM](../../third_party/pkhex/UPSTREAM.md)。
 
+## 第三世代存档时钟
+
+API 78 增加红／蓝宝石与绿宝石的存档时钟入口，覆盖初始时钟、已过去时间、两组归零及树果修复日期推进。
+SAV3RS／SAV3E 的 SmallBlock 在 0x098、0x0A0 各保存一个 8 字节 RTC3；其第 0–1 字节为小端 UInt16 天数，第 2／3／4 字节为时／分／秒，第 5–7 字节保留。
+WinForms NumericUpDown 的最小值为 0，天数上限 65535，小时上限 23，分／秒上限 59；网页分别接受最多 5／3 位十进制整数，拒绝空值、负数、小数及新增越界值。
+读取保留原始 byte 时间值；超出常规范围的现值可原位保持，主动变更必须进入常规范围，避免桌面 LoadData 的显示截断影响无关修改。
+普通编辑完整提交两组各四个字段，先验证两组再写入；通过 ClockInitial／ClockElapsed 的副本与属性回写更新，保留六个保留字节。
+归零只将八个具名字段设为 0；树果修复沿用 B_BerryFix_Click，把已过去天数设为 Max(734, 当前天数)，其余字段保持。两者拒绝夹带草稿数据。
+仅 SAV3RS／SAV3E 开放，火红／叶绿及其他格式不提供该入口。读写运行于独立存档 Worker，复用工作副本、撤销、原件下载与校验和回读，写出后核对两组完整 8 字节。
+界面按两组时钟显示双列字段，异常原值带说明，批量操作在草稿未应用时禁用；保留三语与浮动工具 44px 控件基线。
+上游依据：WinForms Subforms/Save Editors/Gen3/SAV_RTC3.cs／Designer.cs 的 LoadData、SaveData、B_Reset_Click、B_BerryFix_Click；Core Saves/Substructures/Gen3/RTC3.cs、Saves/Blocks/Gen3/SaveBlock3SmallRS.cs、SaveBlock3SmallE.cs 与 ISaveBlock3SmallHoenn.cs。
+
 ## 第六世代 O 力量
 
 API 77 在存档工具中增加 XY／ORAS 的 O 力量入口，读取与编辑复用本地 Worker、工作副本、撤销及导出。

@@ -49,6 +49,8 @@ import type { PokemonEdit } from "./PokemonEditor";
 import { SavePokemonBrowser } from "./SavePokemonBrowser";
 import { SaveInventoryBrowser } from "./SaveInventoryBrowser";
 import { TrainerGeographyFields } from "./TrainerGeographyFields";
+import { RtcEditor } from "./RtcEditor";
+import { supportsRtc, rtcWords } from "./rtc";
 import { OPowerEditor } from "./OPowerEditor";
 import { supportsOPowers, opowerWords } from "./opowers";
 import { SaveFoodEditor } from "./SaveFoodEditor";
@@ -82,6 +84,7 @@ export function SaveEditorPanel(
     | "pokemon"
     | "trainer"
     | "inventory"
+    | "rtc"
     | "opowers"
     | "food"
     | "records"
@@ -192,7 +195,8 @@ export function SaveEditorPanel(
         (previous === "pokedex" && !result.report.pokedex) ||
         (previous === "records" && !result.report.trainer.canRecords) ||
         (previous === "food" && !supportsFood(result.report.format)) ||
-        (previous === "opowers" && !supportsOPowers(result.report.format))
+        (previous === "opowers" && !supportsOPowers(result.report.format)) ||
+        (previous === "rtc" && !supportsRtc(result.report.format))
           ? "trainer"
           : previous,
       );
@@ -562,6 +566,22 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readRtc = async () => {
+    let catalog: import("./rtc").RtcCatalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "rtc",
+      );
+      if (id !== operation.current) return;
+      if (!result.rtc) throw new Error("No clock catalog was returned.");
+      catalog = result.rtc;
+    });
+    return catalog;
+  };
+
   const readOPowers = async () => {
     let catalog: import("./opowers").OPowerCatalog | undefined;
     await perform(async (id) => {
@@ -730,6 +750,7 @@ export function SaveEditorPanel(
       | import("./gen5Pokedex").Dex5Edit
       | import("./gen4Pokedex").Dex4Edit
       | import("./simplePokedex").SimpleDexEdit
+      | import("./rtc").RtcEdit
       | import("./opowers").OPowerEdit
       | import("./saveFood").SaveFoodEdit
       | import("./domain").SaveRecordEdit
@@ -757,6 +778,7 @@ export function SaveEditorPanel(
       | "pokedex5Edit"
       | "pokedex4Edit"
       | "pokedexEdit"
+      | "rtcEdit"
       | "opowersEdit"
       | "foodEdit"
       | "recordEdit"
@@ -1004,6 +1026,15 @@ export function SaveEditorPanel(
                 {words.pokedexTitle}
               </button>
             )}
+            {supportsRtc(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "rtc"}
+                onClick={() => setSection("rtc")}
+              >
+                {rtcWords[batchLang].title}
+              </button>
+            )}
             {supportsOPowers(report.format) && (
               <button
                 type="button"
@@ -1151,6 +1182,15 @@ export function SaveEditorPanel(
               busy={busy}
               onRead={readPokedex}
               onApply={(edit) => applyWorkingEdit(edit, "pokedexEdit")}
+            />
+          ) : section === "rtc" && supportsRtc(report.format) ? (
+            <RtcEditor
+              revision={workingRevision}
+              busy={busy}
+              canEdit={report.canEdit}
+              lang={batchLang}
+              onRead={readRtc}
+              onApply={(edit) => applyWorkingEdit(edit, "rtcEdit")}
             />
           ) : section === "opowers" && supportsOPowers(report.format) ? (
             <OPowerEditor

@@ -333,7 +333,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen3/PokeBlock3CaseEditor.cs`                          | API 75：逐格／批量与三语目录已接入；工程检查通过，浏览器待核验     |
 | `Subforms/Save Editors/Gen3/SAV_HallOfFame3.cs`                               | 待核对                                                             |
 | `Subforms/Save Editors/Gen3/SAV_Misc3.cs`                                     | 待核对                                                             |
-| `Subforms/Save Editors/Gen3/SAV_RTC3.cs`                                      | 待核对                                                             |
+| `Subforms/Save Editors/Gen3/SAV_RTC3.cs`                                      | API 78：两组时钟／归零／树果修复工程检查通过；浏览器待核验         |
 | `Subforms/Save Editors/Gen3/SAV_Roamer3.cs`                                   | 待核对                                                             |
 | `Subforms/Save Editors/Gen3/SAV_SecretBase3.cs`                               | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/PoffinCase4Editor.cs`                             | API 75：逐格／批量与三语目录已接入；工程检查通过，浏览器待核验     |
