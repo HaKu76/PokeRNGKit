@@ -379,7 +379,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen6/SAV_PokedexORAS.cs`                               | 已接入；字段及批量工程检查通过，浏览器待核验                       |
 | `Subforms/Save Editors/Gen6/SAV_PokedexXY.cs`                                 | 已接入；字段及批量工程检查通过，浏览器待核验                       |
 | `Subforms/Save Editors/Gen6/SAV_Pokepuff.cs`                                  | API 73 逐项／批量编辑工程检查通过；浏览器与真实存档待核验          |
-| `Subforms/Save Editors/Gen6/SAV_Roamer6.cs`                                   | 待核对                                                             |
+| `Subforms/Save Editors/Gen6/SAV_Roamer6.cs`                                   | API 79：种类／次数／状态与显式推导已接入；浏览器待核验             |
 | `Subforms/Save Editors/Gen6/SAV_SecretBase.cs`                                | 待核对                                                             |
 | `Subforms/Save Editors/Gen6/SAV_SuperTrain.cs`                                | 待核对                                                             |
 | `Subforms/Save Editors/Gen6/SAV_Trainer.cs`                                   | 基础/性别/时间/语言/地区/徽章/对应点数已接入；其他字段待接入       |

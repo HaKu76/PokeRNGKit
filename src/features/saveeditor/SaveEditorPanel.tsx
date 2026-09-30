@@ -49,6 +49,8 @@ import type { PokemonEdit } from "./PokemonEditor";
 import { SavePokemonBrowser } from "./SavePokemonBrowser";
 import { SaveInventoryBrowser } from "./SaveInventoryBrowser";
 import { TrainerGeographyFields } from "./TrainerGeographyFields";
+import { RoamerEditor } from "./RoamerEditor";
+import { supportsRoamer, roamerWords } from "./roamer";
 import { RtcEditor } from "./RtcEditor";
 import { supportsRtc, rtcWords } from "./rtc";
 import { OPowerEditor } from "./OPowerEditor";
@@ -84,6 +86,7 @@ export function SaveEditorPanel(
     | "pokemon"
     | "trainer"
     | "inventory"
+    | "roamer"
     | "rtc"
     | "opowers"
     | "food"
@@ -196,6 +199,7 @@ export function SaveEditorPanel(
         (previous === "records" && !result.report.trainer.canRecords) ||
         (previous === "food" && !supportsFood(result.report.format)) ||
         (previous === "opowers" && !supportsOPowers(result.report.format)) ||
+        (previous === "roamer" && !supportsRoamer(result.report.format)) ||
         (previous === "rtc" && !supportsRtc(result.report.format))
           ? "trainer"
           : previous,
@@ -566,6 +570,22 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readRoamer = async () => {
+    let catalog: import("./roamer").RoamerCatalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "roamer",
+      );
+      if (id !== operation.current) return;
+      if (!result.roamer) throw new Error("No roamer catalog was returned.");
+      catalog = result.roamer;
+    });
+    return catalog;
+  };
+
   const readRtc = async () => {
     let catalog: import("./rtc").RtcCatalog | undefined;
     await perform(async (id) => {
@@ -750,6 +770,7 @@ export function SaveEditorPanel(
       | import("./gen5Pokedex").Dex5Edit
       | import("./gen4Pokedex").Dex4Edit
       | import("./simplePokedex").SimpleDexEdit
+      | import("./roamer").RoamerEdit
       | import("./rtc").RtcEdit
       | import("./opowers").OPowerEdit
       | import("./saveFood").SaveFoodEdit
@@ -778,6 +799,7 @@ export function SaveEditorPanel(
       | "pokedex5Edit"
       | "pokedex4Edit"
       | "pokedexEdit"
+      | "roamerEdit"
       | "rtcEdit"
       | "opowersEdit"
       | "foodEdit"
@@ -1026,6 +1048,15 @@ export function SaveEditorPanel(
                 {words.pokedexTitle}
               </button>
             )}
+            {supportsRoamer(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "roamer"}
+                onClick={() => setSection("roamer")}
+              >
+                {roamerWords[batchLang].title}
+              </button>
+            )}
             {supportsRtc(report.format) && (
               <button
                 type="button"
@@ -1182,6 +1213,15 @@ export function SaveEditorPanel(
               busy={busy}
               onRead={readPokedex}
               onApply={(edit) => applyWorkingEdit(edit, "pokedexEdit")}
+            />
+          ) : section === "roamer" && supportsRoamer(report.format) ? (
+            <RoamerEditor
+              revision={workingRevision}
+              busy={busy}
+              canEdit={report.canEdit}
+              lang={batchLang}
+              onRead={readRoamer}
+              onApply={(edit) => applyWorkingEdit(edit, "roamerEdit")}
             />
           ) : section === "rtc" && supportsRtc(report.format) ? (
             <RtcEditor
