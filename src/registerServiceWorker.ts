@@ -1,3 +1,5 @@
+import { appUpdater } from "./appUpdate";
+
 const UPDATE_CHECK_INTERVAL = 5 * 60 * 1000;
 
 export function registerServiceWorker() {
@@ -9,6 +11,7 @@ export function registerServiceWorker() {
   void navigator.serviceWorker
     .register(serviceWorkerUrl, { updateViaCache: "none" })
     .then((registration) => {
+      appUpdater.connect(registration, navigator.serviceWorker);
       const checkForUpdate = () => {
         void registration.update().catch(() => undefined);
       };

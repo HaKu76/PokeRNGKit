@@ -4,6 +4,11 @@ import { saveEditorResources } from "./features/saveeditor/locales";
 const resources = {
   en: {
     translation: {
+      appUpdate: "Update page",
+      appUpdateRetry: "Retry update",
+      appUpdateApplying: "Updating…",
+      appUpdateConfirm:
+        "Reload this page to use the new version? Export any edited saves first. Unsaved edits and current results in this window will be lost. Other windows will not reload automatically.",
       saveEditor: saveEditorResources.en,
       // Shared labels used by multiple module workspaces.
       form: "Form",
@@ -2016,6 +2021,11 @@ const resources = {
   },
   ja: {
     translation: {
+      appUpdate: "ページを更新",
+      appUpdateRetry: "更新を再試行",
+      appUpdateApplying: "更新中…",
+      appUpdateConfirm:
+        "新しいバージョンを使うために、このページを再読み込みしますか？先に編集したセーブデータをエクスポートしてください。このウィンドウの未保存の編集と現在の結果は失われます。他のウィンドウは自動的に再読み込みされません。",
       saveEditor: saveEditorResources.ja,
       // Shared labels used by multiple module workspaces.
       form: "Form",
@@ -3963,6 +3973,11 @@ const resources = {
   },
   zh: {
     translation: {
+      appUpdate: "更新页面",
+      appUpdateRetry: "重试更新",
+      appUpdateApplying: "正在更新…",
+      appUpdateConfirm:
+        "重新加载此页面以使用新版？请先导出编辑后的存档；当前窗口未保存的修改和结果将丢失。其他窗口不会自动刷新。",
       saveEditor: saveEditorResources.zh,
       // Shared labels used by multiple module workspaces.
       form: "Form",

@@ -76,7 +76,7 @@ export default defineConfig(({ mode }) => ({
       : [
           VitePWA({
             injectRegister: false,
-            registerType: "autoUpdate",
+            registerType: "prompt",
             includeAssets: ["favicon.ico"],
             manifest: {
               name: "PokeRNGKit",
@@ -95,7 +95,8 @@ export default defineConfig(({ mode }) => ({
               ],
             },
             workbox: {
-              importScripts: ["sw-update.js"],
+              skipWaiting: false,
+              clientsClaim: true,
               navigateFallback: "index.html",
               globPatterns: ["**/*.{js,css,html,ico,mjs,wasm,txt,md,png,jpg}"],
               globIgnores: ["pkhex/**", "save-art/**"],

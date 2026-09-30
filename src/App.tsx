@@ -1,4 +1,5 @@
 import { RESULT_TABLE_HEADER_HEIGHT } from "./features/shared/tableLayout";
+import { AppUpdateButton } from "./AppUpdateButton";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   cloneElement,
@@ -1290,10 +1291,12 @@ function App() {
           </div>
         </div>
         <div className="topbar-meta">
-          <span className="app-status">
-            <Check aria-hidden="true" size={14} />
-            {t(uiPreviewMode ? "uiPreview" : "ready")}
-          </span>
+          <AppUpdateButton>
+            <span className="app-status">
+              <Check aria-hidden="true" size={14} />
+              {t(uiPreviewMode ? "uiPreview" : "ready")}
+            </span>
+          </AppUpdateButton>
           <div aria-label={t("themeMode")} className="theme-switch">
             {[
               { value: "light" as const, label: "themeLight", Icon: Sun },
