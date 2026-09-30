@@ -3,6 +3,19 @@
 2026-09-22 开始开发。入口位于悬浮工具菜单，使用本地 `PKHeX.Core` 26.08.26 源码；
 来源、归属与逐文件哈希见 [UPSTREAM](../../third_party/pkhex/UPSTREAM.md)。
 
+## 心金／魂银球果盒
+
+API 76 在背包分类中增加球果盒，不把独立存储的球果伪装成普通背包格位。
+七类球果固定使用红、黄、蓝、绿、粉、白、黑的存档顺序；物品编号依次为 485、487、486、488、489、490、491。
+三语名称来自 Core GameStrings.Item，本地图像复用对应 bitem 资源。
+每项为 General[0xE558 + index] 的一个 byte，输入为 1–3 位十进制整数，范围 0–255；拒绝空值、负数、小数和越界，不按桌面文本框失败时归零或负数转换为 byte 的行为静默修正。
+全部设为 99／清空沿用 SAV_Apricorn 的批量默认值；不将补满值误认为逐项上限。
+读取通过 GetApricornCount，写入通过 SetApricornCount；请求使用独立动作和七项数组，普通背包操作拒绝混入球果数据。
+仅 SAV4HGSS 提供目录与操作，拒绝不适用游戏、错误数量／数组长度及普通背包标记混用。导出沿用原件保持、工作副本、撤销及完整背包／球果回读验证。
+表单沿用双列字段、44px 控件和本地物品图像；有草稿时禁止切换分类或批量覆盖。
+上游依据：WinForms Subforms/Save Editors/Gen4/SAV_Apricorn.cs／Designer.cs 的 ItemNameOffset、Setup、B_All_Click、B_None_Click、B_Save_Click，及 Core Saves/SAV4HGSS.cs 的 GetApricornCount／SetApricornCount。
+本项覆盖球果盒窗口；球果汁与宝可全能竞技赛记录仍按各自窗口单独接入。
+
 ## 宝芙蕾与宝可豆
 
 API 73 接入 XY／ORAS 的宝芙蕾、SM／USUM 的宝可豆，入口为存档工具中的“宝可梦食物”。

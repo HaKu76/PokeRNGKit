@@ -7,7 +7,7 @@ public sealed record BagItem(int Slot, int Id, LocalizedText Name, int Count, in
     bool? Favorite, bool? IsNew, bool? FreeSpace, uint? FreeSpaceIndex, bool? NewShop, bool? Held, string Sprite);
 public sealed record BagChoice(int Id, LocalizedText Name, int MaxCount, string Sprite);
 public sealed record BagPouch(int Index, string Type, int MaxCount, BagItem[] Items, BagChoice[] Choices, bool CanGive, bool IsCramped);
-public sealed record BagReport(BagPouch[] Pouches, BagChoice[] AdvancedChoices);
+public sealed record BagReport(BagPouch[] Pouches, BagChoice[] AdvancedChoices, ApricornItem[]? Apricorns = null);
 
 internal static class InventoryReader
 {
@@ -50,6 +50,7 @@ internal static class InventoryReader
                 new BagChoice(id, new(Name(zh,id),Name(en,id),Name(ja,id)), id == 0 ? 0 : bag.GetMaxCount(pouch.Type,id), Sprite(id,save.Context))).ToArray(),
             InventoryBatch.CanGive(save,pouch),pouch.IsCramped)).ToArray(),
             Enumerable.Range(0,en.Length).Select(id => new BagChoice(id,
-                new(Name(zh,id),Name(en,id),Name(ja,id)),bag.MaxQuantityHaX,Sprite(id,save.Context))).ToArray());
+                new(Name(zh,id),Name(en,id),Name(ja,id)),bag.MaxQuantityHaX,Sprite(id,save.Context))).ToArray(),
+            save is SAV4HGSS hgss ? ApricornInventory.Read(hgss) : null);
     }
 }

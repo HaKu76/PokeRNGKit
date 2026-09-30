@@ -138,7 +138,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 75;
+    public const int ApiVersion = 76;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)

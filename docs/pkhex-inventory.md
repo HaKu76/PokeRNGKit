@@ -344,7 +344,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonEventTrainer4Editor.cs`      | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonParticipant4Editor.cs`       | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonSpeciesForm4Editor.cs`       | 待核对                                                             |
-| `Subforms/Save Editors/Gen4/SAV_Apricorn.cs`                                  | 待核对                                                             |
+| `Subforms/Save Editors/Gen4/SAV_Apricorn.cs`                                  | API 76：数量／批量／三语图像工程检查通过；浏览器待核验             |
 | `Subforms/Save Editors/Gen4/SAV_BattlePass.cs`                                | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_DLC4.cs`                                      | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_Gear.cs`                                      | 待核对                                                             |

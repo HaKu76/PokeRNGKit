@@ -51,6 +51,7 @@
     <Compile Include="../TrainerSpatialPosition.cs" Link="TrainerSpatialPosition.cs" />
     <Compile Include="../TrainerPosition.cs" Link="TrainerPosition.cs" />
     <Compile Include="../SaveRecords.cs" Link="SaveRecords.cs" />
+    <Compile Include="../ApricornInventory.cs" Link="ApricornInventory.cs" />
     <Compile Include="../InventoryReader.cs" Link="InventoryReader.cs" />
     <Compile Include="../InventoryEditing.cs" Link="InventoryEditing.cs" />
     <Compile Include="../InventoryBatch.cs" Link="InventoryBatch.cs" />

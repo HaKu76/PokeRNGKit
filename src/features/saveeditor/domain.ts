@@ -59,7 +59,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 75;
+  apiVersion: 76;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -826,6 +826,15 @@ export interface BagItem {
   held: boolean | null;
 }
 export interface BagReport {
+  apricorns?:
+    | {
+        index: number;
+        id: number;
+        name: LocalizedText;
+        count: number;
+        sprite: string;
+      }[]
+    | null;
   advancedChoices: {
     id: number;
     name: LocalizedText;
@@ -862,9 +871,13 @@ export interface BagEdit {
   held?: boolean | null;
 }
 export interface BagOperation {
+  apricornValues?: number[];
   advanced?: boolean;
   pouch: number;
   action:
+    | "apricornEdit"
+    | "apricornFill"
+    | "apricornClear"
     | "sortName"
     | "sortNameReverse"
     | "sortCount"

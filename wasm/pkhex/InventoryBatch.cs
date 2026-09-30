@@ -3,7 +3,7 @@ using PKHeX.Core;
 
 namespace PokeRNGKit.SaveEditor;
 
-public sealed record BagOperation(int Pouch, string Action, int? Count = null, string Language = "en", bool Shuffle = false, bool Advanced = false);
+public sealed record BagOperation(int Pouch, string Action, int? Count = null, string Language = "en", bool Shuffle = false, bool Advanced = false, int[]? ApricornValues = null);
 
 internal static class InventoryBatch
 {
@@ -11,6 +11,12 @@ internal static class InventoryBatch
 
     public static string Apply(SaveFile save, BagOperation edit)
     {
+        if (edit.Action is "apricornEdit" or "apricornFill" or "apricornClear")
+        {
+            ApricornInventory.Apply(save, edit);
+            return InventoryEditing.Snapshot(save);
+        }
+        if (edit.ApricornValues is not null) throw new ArgumentException("Apricorn values require an apricorn action.");
         var bag = save.Inventory;
         if ((uint)edit.Pouch >= bag.Pouches.Count) throw new ArgumentException("Inventory pouch is out of range.");
         var pouch = bag.Pouches[edit.Pouch];
