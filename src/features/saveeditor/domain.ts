@@ -59,7 +59,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 85;
+  apiVersion: 86;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -769,6 +769,7 @@ export interface SaveEditorResult {
   pokedex?: import("./simplePokedex").SimpleDexCatalog;
   events?: import("./events").EventCatalog;
   eventDiff?: import("./events").EventDiff;
+  gsBall2?: import("./gsBall2").GsBall2Catalog;
   hall1?: import("./hall1").Hall1Catalog;
   eventReset?: import("./eventReset").EventResetCatalog;
   roamer?: import("./roamer").RoamerCatalog;

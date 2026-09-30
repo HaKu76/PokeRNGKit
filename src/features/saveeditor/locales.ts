@@ -1,3 +1,4 @@
+import { gsBall2Words } from "./gsBall2";
 import { saveEditorCopy } from "./copy";
 import { fileBatchWords } from "./fileBatch";
 import { boxArchiveWords } from "./boxArchive";
@@ -6,6 +7,7 @@ import { boxBinaryWords } from "./boxBinary";
 
 export const saveEditorResources = {
   zh: {
+    gsBallError: gsBall2Words.zh.error,
     pokedexResetOnly:
       "此格式已开放图鉴、事件重置与殿堂记录，训练家编辑仍在接入中。",
     pokedexEventsOnly: "此格式已开放图鉴与事件编辑，训练家编辑仍在接入中。",
@@ -545,6 +547,7 @@ export const saveEditorResources = {
     },
   },
   en: {
+    gsBallError: gsBall2Words.en.error,
     pokedexResetOnly:
       "Pokédex editing, event resets and Hall of Fame editing are available for this format. Trainer editing is still in development.",
     pokedexEventsOnly:
@@ -1121,6 +1124,7 @@ export const saveEditorResources = {
     },
   },
   ja: {
+    gsBallError: gsBall2Words.ja.error,
     pokedexResetOnly:
       "この形式は図鑑、イベントのリセット、殿堂入り記録の編集に対応しています。トレーナー編集は開発中です。",
     pokedexEventsOnly:
@@ -1724,6 +1728,7 @@ export function localizeSaveError(
     )
   )
     return words.eventError;
+  if (/GS Ball/i.test(message)) return words.gsBallError;
   if (/Hall of Fame/i.test(message)) return words.hallError;
   if (/^Storage /.test(message)) return words.storageError;
   if (/Box batch|Invalid box batch values/.test(message))

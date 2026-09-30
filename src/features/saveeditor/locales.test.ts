@@ -27,6 +27,12 @@ describe("save editor localization", () => {
       );
       expect(words.trainerName).toBe(saveEditorResources[lang].trainerName);
       expect(
+        localizeSaveError(
+          "GS Ball event is unavailable for this format.",
+          words,
+        ),
+      ).toBe(words.gsBallError);
+      expect(
         localizeSaveError("Box archive contains no eligible Pokemon.", words),
       ).toBe(words.boxArchiveEmpty);
       expect(localizeSaveError("Box archive options are invalid.", words)).toBe(

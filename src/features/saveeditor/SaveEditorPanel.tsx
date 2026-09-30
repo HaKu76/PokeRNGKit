@@ -51,6 +51,8 @@ import { SaveInventoryBrowser } from "./SaveInventoryBrowser";
 import { TrainerGeographyFields } from "./TrainerGeographyFields";
 import { EventEditor } from "./EventEditor";
 import { supportsEvents, eventWords, validateEventFiles } from "./events";
+import { GsBall2Editor } from "./GsBall2Editor";
+import { supportsGsBall2, gsBall2Words } from "./gsBall2";
 import { Hall1Editor } from "./Hall1Editor";
 import { supportsHall1, hall1Words } from "./hall1";
 import { EventResetEditor } from "./EventResetEditor";
@@ -93,6 +95,7 @@ export function SaveEditorPanel(
     | "trainer"
     | "inventory"
     | "events"
+    | "gsBall2"
     | "hall1"
     | "eventReset"
     | "roamer"
@@ -209,6 +212,8 @@ export function SaveEditorPanel(
         (previous === "food" && !supportsFood(result.report.format)) ||
         (previous === "opowers" && !supportsOPowers(result.report.format)) ||
         (previous === "events" && !supportsEvents(result.report.format)) ||
+        (previous === "gsBall2" &&
+          !supportsGsBall2(result.report.format, result.report.version)) ||
         (previous === "hall1" && !supportsHall1(result.report.format)) ||
         (previous === "eventReset" &&
           !supportsEventReset(result.report.format)) ||
@@ -621,6 +626,21 @@ export function SaveEditorPanel(
     });
     return diff;
   };
+  const readGsBall2 = async () => {
+    let catalog: import("./gsBall2").GsBall2Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "gsBall2",
+      );
+      if (id !== operation.current) return;
+      if (!result.gsBall2) throw new Error("No GS Ball catalog was returned.");
+      catalog = result.gsBall2;
+    });
+    return catalog;
+  };
   const readHall1 = async () => {
     let catalog: import("./hall1").Hall1Catalog | undefined;
     await perform(async (id) => {
@@ -854,6 +874,7 @@ export function SaveEditorPanel(
       | import("./gen4Pokedex").Dex4Edit
       | import("./simplePokedex").SimpleDexEdit
       | import("./events").EventEdit
+      | import("./gsBall2").GsBall2Edit
       | import("./hall1").Hall1Edit
       | import("./eventReset").EventResetEdit
       | import("./roamer").RoamerEdit
@@ -886,6 +907,7 @@ export function SaveEditorPanel(
       | "pokedex4Edit"
       | "pokedexEdit"
       | "eventsEdit"
+      | "gsBall2Edit"
       | "hall1Edit"
       | "eventResetEdit"
       | "roamerEdit"
@@ -1147,6 +1169,16 @@ export function SaveEditorPanel(
                 {eventWords[batchLang].title}
               </button>
             )}
+            {supportsGsBall2(report.format, report.version) && (
+              <button
+                type="button"
+                disabled={busy}
+                aria-pressed={section === "gsBall2"}
+                onClick={() => setSection("gsBall2")}
+              >
+                {gsBall2Words[batchLang].title}
+              </button>
+            )}
             {supportsHall1(report.format) && (
               <button
                 type="button"
@@ -1341,6 +1373,17 @@ export function SaveEditorPanel(
               onRead={readEvents}
               onApply={(edit) => applyWorkingEdit(edit, "eventsEdit")}
               onCompare={compareEvents}
+            />
+          ) : section === "gsBall2" &&
+            supportsGsBall2(report.format, report.version) ? (
+            <GsBall2Editor
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readGsBall2}
+              onEnable={() =>
+                applyWorkingEdit({ action: "enableGsBall" }, "gsBall2Edit")
+              }
             />
           ) : section === "hall1" && supportsHall1(report.format) ? (
             <Hall1Editor

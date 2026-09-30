@@ -58,6 +58,8 @@ export class SaveEditorClient {
       | "events"
       | "eventsEdit"
       | "eventsCompare"
+      | "gsBall2"
+      | "gsBall2Edit"
       | "hall1"
       | "hall1Edit"
       | "eventReset"
