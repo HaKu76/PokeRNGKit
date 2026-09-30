@@ -221,6 +221,45 @@
   gap: 20px;
   align-items: start;
 }
+.save-storage-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr));
+  align-items: start;
+  gap: 8px;
+  min-width: 0;
+}
+.save-storage-tools > details[open] {
+  grid-column: 1 / -1;
+}
+.save-storage-tools > details > summary {
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+}
+.save-storage-tools > details > summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+}
+.save-storage-tools > details[open] > summary::before {
+  transform: rotate(45deg);
+}
+.save-storage-tools > details > summary:hover {
+  border-color: var(--brand);
+}
+.save-storage-tools > details > summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
 .save-pokemon-storage,
 .save-pokemon-detail {
   min-width: 0;

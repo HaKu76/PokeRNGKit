@@ -154,65 +154,67 @@ export function SavePokemonBrowser({
           ))}
         </Select>
       </label>
-      {box >= 0 && report.canEdit && (
-        <BoxEditor
-          key={JSON.stringify([
-            box,
-            report.boxes[box],
-            report.boxOptions,
-            revision,
-          ])}
-          report={report}
-          box={box}
+      <div className="save-storage-tools">
+        {box >= 0 && report.canEdit && (
+          <BoxEditor
+            key={JSON.stringify([
+              box,
+              report.boxes[box],
+              report.boxOptions,
+              revision,
+            ])}
+            report={report}
+            box={box}
+            busy={busy}
+            onApply={onApplyBox}
+          />
+        )}
+        {report.boxCount > 0 && report.checksumsValid && (
+          <BoxArchiveEditor
+            key={`archive-${box}:${revision}`}
+            box={box}
+            busy={busy}
+            onExport={onExportBoxes}
+          />
+        )}
+        {report.boxCount > 0 && report.canEdit && report.checksumsValid && (
+          <BoxImportEditor
+            key={`import-${box}:${revision}:${lang}`}
+            report={report}
+            box={box}
+            busy={busy}
+            lang={lang}
+            onPreview={onPreviewBoxImport}
+            onApply={onApplyBoxImport}
+            onDiscard={onDiscardBoxImport}
+          />
+        )}
+        {report.boxCount > 0 && report.checksumsValid && (
+          <BoxBinaryEditor
+            key={`binary-${box}:${revision}:${lang}`}
+            box={box}
+            canEdit={report.canEdit}
+            busy={busy}
+            lang={lang}
+            onPreviewBoxBinary={onPreviewBoxBinary}
+            onApplyBoxBinary={onApplyBoxBinary}
+            onDiscardBoxBinary={onDiscardBoxBinary}
+            onExportBoxBinary={onExportBoxBinary}
+          />
+        )}
+        <PokemonFileTools
+          key={`file-${box}:${filePosition.slot}`}
+          position={filePosition}
+          canImport={report.canEdit}
+          canExport={report.checksumsValid && !!selected?.valid}
           busy={busy}
-          onApply={onApplyBox}
+          onImport={async (position, file) => {
+            await onImport(position, file);
+            setSlot(position.slot);
+          }}
+          onExport={onExport}
         />
-      )}
-      {report.boxCount > 0 && report.checksumsValid && (
-        <BoxArchiveEditor
-          key={`${box}:${revision}`}
-          box={box}
-          busy={busy}
-          onExport={onExportBoxes}
-        />
-      )}
-      {report.boxCount > 0 && report.canEdit && report.checksumsValid && (
-        <BoxImportEditor
-          key={`${box}:${revision}:${lang}`}
-          report={report}
-          box={box}
-          busy={busy}
-          lang={lang}
-          onPreview={onPreviewBoxImport}
-          onApply={onApplyBoxImport}
-          onDiscard={onDiscardBoxImport}
-        />
-      )}
-      {report.boxCount > 0 && report.checksumsValid && (
-        <BoxBinaryEditor
-          key={`${box}:${revision}:${lang}`}
-          box={box}
-          canEdit={report.canEdit}
-          busy={busy}
-          lang={lang}
-          onPreviewBoxBinary={onPreviewBoxBinary}
-          onApplyBoxBinary={onApplyBoxBinary}
-          onDiscardBoxBinary={onDiscardBoxBinary}
-          onExportBoxBinary={onExportBoxBinary}
-        />
-      )}
-      <PokemonFileTools
-        key={`${box}:${filePosition.slot}`}
-        position={filePosition}
-        canImport={report.canEdit}
-        canExport={report.checksumsValid && !!selected?.valid}
-        busy={busy}
-        onImport={async (position, file) => {
-          await onImport(position, file);
-          setSlot(position.slot);
-        }}
-        onExport={onExport}
-      />
+      </div>
       <div className="save-pokemon-workspace">
         <div className="save-pokemon-storage">
           <div
@@ -340,7 +342,7 @@ export function SavePokemonBrowser({
               </dl>
               {report.canEdit && (
                 <StorageEditor
-                  key={JSON.stringify(selected)}
+                  key={`storage-${JSON.stringify(selected)}`}
                   report={report}
                   source={selected}
                   busy={busy}
@@ -354,7 +356,7 @@ export function SavePokemonBrowser({
                 onAnalyze={onAnalyze}
               />
               <PokemonEditor
-                key={JSON.stringify(selected)}
+                key={`pokemon-${JSON.stringify(selected)}`}
                 pokemon={selected}
                 moveChoices={report.moveChoices}
                 attributeChoices={report.attributeChoices}
