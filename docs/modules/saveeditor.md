@@ -18,7 +18,7 @@ PuffCount 为独立 Int32 字段，新增编辑范围 0–100，不根据非零�
 界面沿用 Ant Neutral 浮动面板、44px 控件与双列响应式字段，宝芙蕾通过格位选择器避免同时展开 100 行；不新增主题或装饰面板。
 上游依据：WinForms Subforms/Save Editors/Gen6/SAV_Pokepuff.cs、Gen7/SAV_Pokebean.cs，
 Core Saves/Substructures/Gen6/Puff6.cs（前 100 字节与后续数量）、Gen7/ResortSave7.cs（0x564C 起 15 字节）及 BeanColor7。
-宝可豆标签按上游枚举顺序提供三语描述。其他世代树果／宝可方块、宝芬、宝可度假地其他记录仍为独立待接入项。
+宝可豆标签按上游枚举顺序提供三语描述。其他世代树果和宝可度假地其他记录仍为独立待接入项。
 
 API 74 接入 ORAS 宝可方块及该上游窗口的树果田重置操作，在同一食物入口内分区切换；有未应用草稿时禁止切换，应用／撤销后保持所选分区。
 12 类宝可方块使用 Contest6.CountBlock 与 GameStrings.pokeblocks[94..106] 的原生顺序、三语名称。
@@ -30,6 +30,25 @@ API 74 接入 ORAS 宝可方块及该上游窗口的树果田重置操作，在�
 界面展示有树果的格位数（排除 0／0xFFFF），使用展开说明与明确确认按钮提示重置范围；确认后修改工作副本，可撤销。
 依据 Core Saves/Substructures/Gen6/Contest6.cs、BerryField6AO.cs，以及 WinForms Subforms/Save Editors/Gen6/SAV_PokeBlockORAS.cs／Designer.cs。
 本批不扩展为任意树果生长字段编辑器；清单覆盖的是该上游窗口实际提供的全部操作。
+
+API 75 增加 RSE 宝可方块盒、DP／Pt 宝芬盒与 BDSP 宝芬盒，沿用同一食物入口。
+第三世代固定 40 格，每格 8 字节；第四世代固定 100 格，每格 8 字节；BDSP 固定 100 格，每格 16 字节。
+种类目录使用 PokeBlock3Color（0–14）、PoffinFlavor4（0–30，包含枚举中的 FLAVOR_MAX=29）和 BDSP 的 poffin8b 名称表（编号 0–29，空位 255）。
+三语文字来自 Core 的 pokeblock3／poffin4／poffin8b 资源；第四世代 29 的资源为空，显示带编号的未定义口味描述。
+第三／四世代 0x00 为种类，0x01–0x05 为五项口味，0x06 为口感／光滑度，0x07 为保留字节；所有可编辑数值为 byte，范围 0–255。
+两代等级只读，按 Core Level 为五项口味的最大值，不包括口感；第四世代另读取 IsManyStat、StatPrimary、StatSecondary，展示保存后的口味信息。
+BDSP 种类／等级／光滑度分别位于 0x00／0x01／0x02，五项口味位于 0x08–0x0C，均为 0–255；新增标记为 0x04 的 UInt32 == 1。
+新增标记不变时保留原始四字节，避免把已有异常值规范化；主动切换时调用 IsNew 写入 0／1。逐格编辑保留其余字节与其他条目。
+原有未列出的种类可原位保留，新种类必须来自目录。请求必须包含 index／type，口味数组长度为 6；旧两代拒绝可编辑等级或新增标记。
+RSE 补满调用 MaximizeAll(true)：40 格金色、六项数值 255；DeleteAll 清空完整 8 字节。
+DP／Pt 补满调用 FillCase：100 格浓郁宝芬、六项数值 255；DeleteAll 设置 None=30 与六项 0，两者保留 0x07。
+BDSP 补满沿用 SAV_Poffin8b：种类 28、等级 60、六项 255，保留新增标记；清空只调用 ToNull 设置种类 255。
+BDSP 所有保存调用 SetPoffins，稳定按 IsNull 再 IsNew 排序；界面明确提示格位会变化，并提供独立整理命令。烹饪次数（0x640 的 Int32）保持不变。
+列表支持按格位、种类编号、等级、口味及新增标记升降序显示，显示排序不修改存档地址；有草稿时禁止换格位／排序或批量覆盖。
+第三／四世代显示格位从 1 开始，BDSP 沿用上游 0–99；请求统一使用真实的零起始地址。表单沿用 44px 控件与双列响应式布局。
+依据 WinForms Gen3/PokeBlock3CaseEditor.cs、Gen4/PoffinCase4Editor.cs、Gen8/SAV_Poffin8b.cs，
+及 Core 的 PokeBlock3／PokeBlock3Case／Poffin4／PoffinCase4／PoffinSaveData8b 与相应枚举、资源文件。
+写出回读核对完整盒子字节（BDSP 包含烹饪次数）；原件、工作副本、撤销和导出路径保持一致。
 
 ## 独立宝可梦文件（开发中）
 

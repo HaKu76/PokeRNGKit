@@ -76,7 +76,7 @@ internal static class SaveFoodTests
             }
             Console.WriteLine($"PASS {version}: complete food catalog, all values, bulk operations, full-file Core comparison, rejection and original preservation");
         }
-        foreach (var version in new[] { "E", "D", "B", "BD", "GP" })
+        foreach (var version in new[] { "HG", "B", "B2", "GP" })
         {
             var data = File.ReadAllBytes($".tmp/pkhex-fixtures/{version}.sav");
             try { SaveService.ReadFood(data); throw new Exception("Unsupported food read accepted"); } catch (ArgumentException) { }

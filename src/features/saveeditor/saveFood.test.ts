@@ -62,9 +62,19 @@ describe("food editing", () => {
     expect(() => validateFood(beans, ["0"], "0")).toThrow();
   });
   it("only exposes games with the corresponding Core blocks", () => {
-    for (const format of ["SAV6XY", "SAV6AO", "SAV7SM", "SAV7USUM"])
+    for (const format of [
+      "SAV3RS",
+      "SAV3E",
+      "SAV4DP",
+      "SAV4Pt",
+      "SAV8BS",
+      "SAV6XY",
+      "SAV6AO",
+      "SAV7SM",
+      "SAV7USUM",
+    ])
       expect(supportsFood(format)).toBe(true);
-    for (const format of ["SAV6AODemo", "SAV7b", "SAV8BS", "SAV3E"])
+    for (const format of ["SAV6AODemo", "SAV7b", "SAV4HGSS", "SAV3FRLG"])
       expect(supportsFood(format)).toBe(false);
   });
 });

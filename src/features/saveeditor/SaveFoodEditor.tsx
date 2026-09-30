@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Select } from "../shared/Select";
 import { PokeBlocks6Editor } from "./PokeBlocks6Editor";
+import { FoodCaseEditor } from "./FoodCaseEditor";
 import {
   foodWords,
   pokeBlockWords,
@@ -27,6 +28,7 @@ export function SaveFoodEditor({
 }) {
   const reader = useRef(onRead);
   const [mode, setMode] = useState<"food" | "blocks">("food");
+  const [caseIndex, setCaseIndex] = useState(0);
   const [hasDraft, setHasDraft] = useState(false);
   const [loaded, setLoaded] = useState<{
     revision: number;
@@ -70,7 +72,18 @@ export function SaveFoodEditor({
               </button>
             </div>
           )}
-          {mode === "blocks" && loaded.catalog.blocks ? (
+          {loaded.catalog.case ? (
+            <FoodCaseEditor
+              key={revision}
+              catalog={loaded.catalog.case}
+              index={caseIndex}
+              onIndex={setCaseIndex}
+              disabled={busy || !canEdit}
+              lang={lang}
+              onApply={onApply}
+              onDirty={setHasDraft}
+            />
+          ) : mode === "blocks" && loaded.catalog.blocks ? (
             <PokeBlocks6Editor
               key={revision}
               catalog={loaded.catalog.blocks}

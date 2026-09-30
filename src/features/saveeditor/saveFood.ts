@@ -1,9 +1,10 @@
 export interface SaveFoodCatalog {
-  kind: "puffs" | "beans";
+  kind: "puffs" | "beans" | "case";
   values: number[];
   count: number | null;
   names: { zh: string; en: string; ja: string }[];
   blocks?: PokeBlocks6Catalog | null;
+  case?: import("./foodCases").FoodCaseCatalog | null;
 }
 export interface PokeBlocks6Catalog {
   values: number[];
@@ -14,7 +15,17 @@ export interface PokeBlocks6Catalog {
 export type FoodAction =
   "edit" | "fill" | "best" | "reset" | "sort" | "reverse" | "clear";
 export interface SaveFoodEdit {
-  action: FoodAction | "blocksEdit" | "blocksFill" | "blocksClear" | "berries";
+  action:
+    | FoodAction
+    | "blocksEdit"
+    | "blocksFill"
+    | "blocksClear"
+    | "berries"
+    | "caseEdit"
+    | "caseFill"
+    | "caseClear"
+    | "caseSort";
+  case?: import("./foodCases").FoodCaseEdit;
   values?: number[];
   count?: number;
   blockValues?: number[];
@@ -35,7 +46,17 @@ export function validatePokeBlocks(
   return { action: "blocksEdit", blockValues: counts };
 }
 export const supportsFood = (format: string) =>
-  ["SAV6XY", "SAV6AO", "SAV7SM", "SAV7USUM"].includes(format);
+  [
+    "SAV3RS",
+    "SAV3E",
+    "SAV4DP",
+    "SAV4Pt",
+    "SAV8BS",
+    "SAV6XY",
+    "SAV6AO",
+    "SAV7SM",
+    "SAV7USUM",
+  ].includes(format);
 export function validateFood(
   catalog: SaveFoodCatalog,
   values: string[],
@@ -67,6 +88,7 @@ export const foodWords = {
   zh: {
     title: "宝可梦食物",
     puffs: "宝芙蕾",
+    case: "宝可方块／宝芬",
     beans: "宝可豆",
     slot: "格位",
     value: "宝芙蕾种类",
@@ -90,6 +112,7 @@ export const foodWords = {
   en: {
     title: "Pokémon food",
     puffs: "Poké Puffs",
+    case: "Pokéblocks / Poffins",
     beans: "Poké Beans",
     slot: "Slot",
     value: "Puff type",
@@ -113,6 +136,7 @@ export const foodWords = {
   ja: {
     title: "ポケモンの食べ物",
     puffs: "ポフレ",
+    case: "ポロック／ポフィン",
     beans: "ポケマメ",
     slot: "スロット",
     value: "ポフレの種類",

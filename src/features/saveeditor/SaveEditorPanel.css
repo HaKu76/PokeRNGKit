@@ -121,6 +121,18 @@
   margin-bottom: 12px;
   font-weight: 600;
 }
+.save-food-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-food-toggle input[type="checkbox"] {
+  width: 20px;
+  min-height: 20px;
+  height: 20px;
+  margin: 0;
+}
 .save-editor-fields.save-trainer-dates {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
 }
