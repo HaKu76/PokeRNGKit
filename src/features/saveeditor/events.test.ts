@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   eventDraft,
+  eventGroup,
   eventIndex,
   validateEvents,
   validateEventFiles,
@@ -15,9 +16,90 @@ const catalog: EventCatalog = {
   workLabels: [],
   updatesQr: false,
   maximumValue: 65535,
+  minimumValue: 0,
+  flagGroups: [],
+  workGroups: [],
   canEdit: true,
 };
 describe("event editing boundaries", () => {
+  it("preserves signed Int32 values including negative drafts and rejects truncation", () => {
+    const c: EventCatalog = {
+      ...catalog,
+      minimumValue: -2147483648,
+      maximumValue: 2147483647,
+      values: [0, -1, -2147483648],
+    };
+    for (const value of [
+      -2147483648, -2147483647, -65536, -1, 1, 65535, 65536, 2147483647,
+    ]) {
+      const d = eventDraft(c);
+      d.values[0] = String(value);
+      expect(validateEvents(c, d).values).toEqual([{ index: 0, value }]);
+    }
+    for (const value of [
+      "-2147483649",
+      "2147483648",
+      "4294967295",
+      "-",
+      "",
+      "1.5",
+      "1e3",
+      "0x10",
+      "+1",
+      " 1",
+      "00000000001",
+    ]) {
+      const d = eventDraft(c);
+      d.values[2] = value;
+      expect(() => validateEvents(c, d)).toThrow();
+    }
+    expect(() =>
+      validateEvents({ ...c, minimumValue: 0 }, eventDraft(c)),
+    ).toThrow();
+    expect(() =>
+      validateEvents({ ...catalog, minimumValue: -1 }, eventDraft(catalog)),
+    ).toThrow();
+    for (const lang of ["zh", "en", "ja"] as const)
+      expect(
+        eventDiffText(
+          {
+            setFlags: [],
+            clearedFlags: [],
+            values: [{ index: 999, before: -2147483648, after: 2147483647 }],
+          },
+          lang,
+        ),
+      ).toContain("999: -2147483648 → 2147483647");
+  });
+  it("maps raw split-group edges and all 72 unclassified work slots without crossing groups", () => {
+    const c: EventCatalog = {
+      ...catalog,
+      flagGroups: [
+        { category: 200, start: 0, count: 128 },
+        { category: 201, start: 128, count: 512 },
+        { category: 202, start: 640, count: 1536 },
+        { category: 203, start: 2176, count: 1920 },
+      ],
+      workGroups: [
+        { category: 200, start: 0, count: 32 },
+        { category: 201, start: 32, count: 128 },
+        { category: 202, start: 160, count: 512 },
+        { category: 203, start: 672, count: 256 },
+        { category: 204, start: 928, count: 72 },
+      ],
+    };
+    for (const mode of ["flags", "values"] as const) {
+      const groups = mode === "flags" ? c.flagGroups : c.workGroups;
+      for (const g of groups)
+        for (let i = g.start; i < g.start + g.count; i++)
+          expect(eventGroup(c, mode, i)).toBe(g);
+      const count = mode === "flags" ? 4096 : 1000;
+      expect(eventGroup(c, mode, -1)).toBeUndefined();
+      expect(eventGroup(c, mode, count)).toBeUndefined();
+      expect(eventIndex(String(count - 1), count)).toBe(count - 1);
+      expect(() => eventIndex(String(count), count)).toThrow();
+    }
+  });
   it("keeps Gen2 values byte-sized while preserving the five-digit decimal input", () => {
     const gen2: EventCatalog = {
       ...catalog,
@@ -138,9 +220,10 @@ describe("event editing boundaries", () => {
       "SAV6AO",
       "SAV7SM",
       "SAV7USUM",
+      "SAV7b",
     ])
       expect(supportsEvents(f)).toBe(true);
-    for (const f of ["SAV7b", "SAV8BS", "SAV3XD", "SAV9SV"])
+    for (const f of ["SAV8BS", "SAV3XD", "SAV9SV"])
       expect(supportsEvents(f)).toBe(false);
   });
   it("reports additions, removals and both values in all UI languages", () => {

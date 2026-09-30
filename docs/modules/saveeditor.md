@@ -3,6 +3,28 @@
 2026-09-22 开始开发。入口位于悬浮工具菜单，使用本地 `PKHeX.Core` 26.08.26 源码；
 来源、归属与逐文件哈希见 [UPSTREAM](../../third_party/pkhex/UPSTREAM.md)。
 
+## Let’s Go 事件标记与数值
+
+API 82 接入 SAV_EventWork，覆盖皮卡丘／伊布两版本。沿用事件工作区的具名项目、预设、搜索、按原始编号定位、草稿、应用／撤销与双文件比较。
+全部 4096 个标记与 1000 个 Int32 数值可读写，原始编号分别为 0–4095、0–999；数值范围为 −2147483648–2147483647。
+上游 NumericUpDown 的 DecimalPlaces 为默认 0，Minimum／Maximum 使用 Int32 两端；网页使用十进制整数文本，最多 10 位数字及负号，允许前导零，拒绝空值、小数、指数、十六进制与越界值。
+第二至第七世代已有事件保留各自 byte／UInt16 范围与五位输入；协议新增 minimumValue、分组范围，数值 DTO 统一为 Int32，不对旧格式放宽写入。
+
+| 数据 | 分组                           | 原始起点             | 数量                  |
+| ---- | ------------------------------ | -------------------- | --------------------- |
+| 标记 | 区域／系统／隐藏对象／事件     | 0／128／640／2176    | 128／512／1536／1920  |
+| 数值 | 区域／系统／场景／事件／未分类 | 0／32／160／672／928 | 32／128／512／256／72 |
+
+具名资源通过 SplitEventEditor<int> 与 gg 三语资源读取，保留 Core 的原始编号和选项值；自定义哨兵不作为预设，但 Int32 最小值仍可手动填写。
+分组筛选覆盖无名称项目，关闭“仅显示具名项目”可浏览所有槽位，当前项目显示组内编号；最后 72 项可直接读取、编辑和比较，不因 Core 未定义其组名而隐藏。
+写入使用 EventWork7b.GetFlag／SetFlag、GetWork／SetWork；整个请求先验证，再应用修改。资源组内编号使用严格小于数量的校验，不沿用 Core 相对编号允许等于数量的越界边界。
+事件块在 0x1200，数值为其前 4000 字节的小端 Int32，标记从绝对 0x21A0 开始占 512 字节；剩余块数据保持。大师训练家称号位位于块内 0x1298，由 SAV_Trainer7GG 负责，仍在该窗口清单内，不通过事件编辑附带解锁。
+比较使用 EventWorkDiff7b 的类型化编号结果及原始前后值，不使用其文本汇总的分组推断；两文件必须为同一版本，每个不超过 1 MiB。
+保存后复核游戏版本、校验、全部事件数组，再进入工作副本；原件保持、撤销与精确副本下载复用现有流程。独立事件权限不开放未完成的训练家编辑。
+
+上游依据：WinForms/Subforms/Save Editors/SAV_EventWork.cs 与 .Designer.cs；Core 的 Saves/Substructures/Gen7/LGPE/EventWork7b.cs、SaveBlockAccessor7b.cs、Editing/Saves/Editors/EventWork/SplitEventEditor.cs、EventWork.cs、Diff/EventWorkDiff7b.cs，以及 Resources 中 gg flags／const 三语资源。
+两版本全部编号、分组边界、正负 Int32 两端、原始字节与完整文件对照、未分类槽位、称号保留、原子拒绝、比较与导出专项通过，原有第二至第七世代事件专项通过。21 项前端检查及定向 Lint 通过；完整检查状态见进度，浏览器和真实存档待核验。
+
 ## 第二世代事件标记与数值
 
 API 81 接入 SAV_EventFlags2，覆盖国际版／日文版金银与水晶、韩文版金银五种布局。
@@ -42,7 +64,7 @@ SM／USUM 有实际变化时沿用 EventWorkspace.Save 的 UpdateQrConstants 联
 
 研究比较接受两个同游戏版本的非空存档，各最大 1 MiB；核对类型、版本与数组布局后调用 EventBlockDiff，输出新增标记、清除标记及每个数值的前后值，可查看和下载文本。
 比较在存档 Worker 内运行，不替换当前工作副本，也不应用编辑草稿；对第二个文件的 Base64 与请求长度同时设限。
-第二世代对应窗口见上节；Let’s Go 的 SAV_EventWork 与后续世代不同结构的事件窗口仍待接入。
+第二世代对应窗口见上节；Let’s Go 的 SAV_EventWork 见本文首节，后续世代不同结构的事件窗口仍待接入。
 12 布局专项已覆盖三语资源、每个编号、位边界／UInt16 边界、全文件 Core 对照、请求原子性、未改 QR 保持、QR 组合及差异方向；真实存档与浏览器检查仍待完成。
 
 上游依据：WinForms Subforms/Save Editors/SAV_EventFlags.cs／Designer.cs 的 AddFlagList、AddConstList、ChangeCustomBool、ChangeCustomConst 与 DiffSaves；Core Editing/Saves/Editors/EventOld 下的 EventWorkspace、EventLabelParsing、NamedEventWork，EventWork/Diff/EventWorkDiff.cs，Saves/Substructures/IEventFlagArray.cs，SAV7SM／SAV7USUM.UpdateQrConstants。

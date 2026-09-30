@@ -11,7 +11,24 @@ export interface EventCatalog {
   workLabels: EventLabel[];
   updatesQr: boolean;
   maximumValue: number;
+  minimumValue: number;
+  flagGroups: EventGroup[];
+  workGroups: EventGroup[];
   canEdit: boolean;
+}
+export interface EventGroup {
+  category: number;
+  start: number;
+  count: number;
+}
+export function eventGroup(
+  c: EventCatalog,
+  mode: "flags" | "values",
+  index: number,
+) {
+  return (mode === "flags" ? c.flagGroups : c.workGroups).find(
+    (g) => index >= g.start && index < g.start + g.count,
+  );
 }
 export interface EventEdit {
   flags: { index: number; value: boolean }[];
@@ -37,6 +54,7 @@ export const supportsEvents = (format: string) =>
     "SAV6AO",
     "SAV7SM",
     "SAV7USUM",
+    "SAV7b",
   ].includes(format);
 export const eventDraft = (c: EventCatalog) => ({
   flags: [...c.flags],
@@ -48,14 +66,22 @@ export function validateEvents(
 ): EventEdit {
   if (
     !c.canEdit ||
-    ![255, 65535].includes(c.maximumValue) ||
+    !(
+      (c.minimumValue === 0 && [255, 65535].includes(c.maximumValue)) ||
+      (c.minimumValue === -2147483648 && c.maximumValue === 2147483647)
+    ) ||
     d.flags.length !== c.flags.length ||
     d.values.length !== c.values.length ||
     d.flags.some((v) => typeof v !== "boolean")
   )
     throw new Error("Invalid event fields.");
-  const values = d.values.map((v) => (/^\d{1,5}$/.test(v) ? Number(v) : NaN));
-  if (values.some((v) => !Number.isInteger(v) || v < 0 || v > c.maximumValue))
+  const pattern = c.minimumValue < 0 ? /^-?\d{1,10}$/ : /^\d{1,5}$/;
+  const values = d.values.map((v) => (pattern.test(v) ? Number(v) : NaN));
+  if (
+    values.some(
+      (v) => !Number.isInteger(v) || v < c.minimumValue || v > c.maximumValue,
+    )
+  )
     throw new Error("Invalid event fields.");
   return {
     flags: d.flags.flatMap((value, index) =>
@@ -131,6 +157,9 @@ export const eventWords = {
       "可领取礼物",
     ],
     rebattle: "再次挑战",
+    groupIndex: "组内编号",
+    splitFlags: ["区域", "系统", "隐藏对象", "事件", "未分类"],
+    splitValues: ["区域", "系统", "场景", "事件", "未分类"],
   },
   en: {
     title: "Event flags and values",
@@ -182,6 +211,9 @@ export const eventWords = {
       "Gift Available",
     ],
     rebattle: "Rebattle",
+    groupIndex: "Group index",
+    splitFlags: ["Zone", "System", "Vanish", "Event", "Unclassified"],
+    splitValues: ["Zone", "System", "Scene", "Event", "Unclassified"],
   },
   ja: {
     title: "イベントフラグと数値",
@@ -233,6 +265,9 @@ export const eventWords = {
       "受取可能なギフト",
     ],
     rebattle: "再戦",
+    groupIndex: "グループ内番号",
+    splitFlags: ["エリア", "システム", "非表示", "イベント", "未分類"],
+    splitValues: ["エリア", "システム", "シーン", "イベント", "未分類"],
   },
 };
 export function eventDiffText(diff: EventDiff, lang: keyof typeof eventWords) {

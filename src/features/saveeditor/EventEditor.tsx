@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Select } from "../shared/Select";
 import {
   eventDraft,
+  eventGroup,
   eventIndex,
   eventWords,
   eventDiffText,
@@ -98,12 +99,21 @@ function EventForm({
   const count = draft[mode].length;
   const index = selected[mode];
   const label = labels.find((l) => l.index === index);
+  const groups = mode === "flags" ? catalog.flagGroups : catalog.workGroups;
+  const group = eventGroup(catalog, mode, index);
+  const categoryName = (c: number) =>
+    c >= 200
+      ? (mode === "flags" ? w.splitFlags : w.splitValues)[c - 200]
+      : c === 100
+        ? w.rebattle
+        : (w.categories[c] ?? `#${c}`);
   const names = new Map(labels.map((l) => [l.index, l]));
   const candidates = Array.from({ length: count }, (_, i) => i).filter((i) => {
     const l = names.get(i);
     return (
       (!known || l) &&
-      (category === -1 || l?.category === category) &&
+      (category === -1 ||
+        (eventGroup(catalog, mode, i)?.category ?? l?.category) === category) &&
       `${i} ${l?.name ?? w.unknown}`
         .toLocaleLowerCase()
         .includes(query.trim().toLocaleLowerCase())
@@ -180,11 +190,17 @@ function EventForm({
             onChange={(e) => setCategory(Number(e.target.value))}
           >
             <option value={-1}>{w.all}</option>
-            {[...new Set(labels.map((l) => l.category))]
+            {[
+              ...new Set(
+                groups.length
+                  ? groups.map((g) => g.category)
+                  : labels.map((l) => l.category),
+              ),
+            ]
               .sort((a, b) => a - b)
               .map((c) => (
                 <option key={c} value={c}>
-                  {c === 100 ? w.rebattle : (w.categories[c] ?? `#${c}`)}
+                  {categoryName(c)}
                 </option>
               ))}
           </Select>
@@ -242,6 +258,11 @@ function EventForm({
       <h4>
         #{index} · {label?.name ?? w.unknown}
       </h4>
+      {group && (
+        <p className="save-editor-note">
+          {categoryName(group.category)} · {w.groupIndex} {index - group.start}
+        </p>
+      )}
       {mode === "flags" ? (
         <label className="save-food-toggle">
           <input
@@ -288,11 +309,11 @@ function EventForm({
           )}
           <label className="field">
             <span>
-              {w.value} · 0–{catalog.maximumValue}
+              {w.value} · {catalog.minimumValue} ～ {catalog.maximumValue}
             </span>
             <input
-              inputMode="numeric"
-              maxLength={5}
+              inputMode={catalog.minimumValue < 0 ? "text" : "numeric"}
+              maxLength={catalog.minimumValue < 0 ? 11 : 5}
               value={draft.values[index]}
               readOnly={!catalog.canEdit}
               onChange={(e) => updateValue(e.target.value)}

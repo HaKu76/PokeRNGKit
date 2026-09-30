@@ -34,8 +34,8 @@ internal static class EventEditingTests
             foreach(var language in new[]{"zh","en","ja"})
             {
                 var c=JsonSerializer.Deserialize(SaveService.ReadEvents(data,JsonSerializer.Serialize(new EventQuery(language),SaveJsonContext.Default.EventQuery)),SaveJsonContext.Default.EventCatalog)!;
-                Check(c.MaximumValue==65535&&c.CanEdit&&c.UpdatesQr==(source is SAV7),"Gen3–7 retains ushort limits and its independent edit capability");
-                Check(c.Flags.SequenceEqual(block.GetEventFlags())&&c.Values.SequenceEqual(block.GetAllEventWork()),"Catalog values match every position");
+                Check(c.MinimumValue==0&&c.FlagGroups.Length==0&&c.WorkGroups.Length==0&&c.MaximumValue==65535&&c.CanEdit&&c.UpdatesQr==(source is SAV7),"Gen3–7 retains ushort limits and its independent edit capability");
+                Check(c.Flags.SequenceEqual(block.GetEventFlags())&&c.Values.SequenceEqual(block.GetAllEventWork().Select(v=>(int)v)),"Catalog values match every position");
                 Check(c.FlagLabels.All(l=>l.Index>=0&&l.Index<c.Flags.Length)&&c.WorkLabels.All(l=>l.Index>=0&&l.Index<c.Values.Length),"All localized resource indices bounded");
                 Check(c.FlagLabels.Select(l=>l.Index).Distinct().Count()==c.FlagLabels.Length&&c.WorkLabels.Select(l=>l.Index).Distinct().Count()==c.WorkLabels.Length,"Unique labels");
                 Check(c.WorkLabels.All(l=>l.Presets.All(p=>p.Value>=0&&p.Value<65535)),"Custom sentinel is not a preset");
@@ -84,6 +84,6 @@ internal static class EventEditingTests
         var x=File.ReadAllBytes(".tmp/pkhex-fixtures/X.sav");var y=Open(x);y.Version=GameVersion.Y;
         Reject(()=>SaveService.CompareEvents(x,JsonSerializer.Serialize(new EventCompareQuery(Convert.ToBase64String(y.Write().ToArray())),SaveJsonContext.Default.EventCompareQuery)));
         Reject(()=>SaveService.CompareEvents(new byte[1048577],"{}"));Reject(()=>SaveService.CompareEvents(x,"{\"newData\":\"bad!\"}"));
-        foreach(var file in new[]{"GP","GE","BD"}){var data=File.ReadAllBytes($".tmp/pkhex-fixtures/{file}.sav");Reject(()=>SaveService.ReadEvents(data,"{\"language\":\"en\"}"));Reject(()=>Apply(data,new([],[])));}
+        foreach(var file in new[]{"BD"}){var data=File.ReadAllBytes($".tmp/pkhex-fixtures/{file}.sav");Reject(()=>SaveService.ReadEvents(data,"{\"language\":\"en\"}"));Reject(()=>Apply(data,new([],[])));}
     }
 }

@@ -1402,8 +1402,8 @@ export function SaveEditorPanel(
               </dl>
               {report.checksumsValid && !report.canEdit && (
                 <p>
-                  {report.format === "SAV2"
-                    ? words.gen2EditorsOnly
+                  {["SAV2", "SAV7b"].includes(report.format)
+                    ? words.pokedexEventsOnly
                     : report.pokedex?.canEdit
                       ? words.pokedexOnly
                       : words.readonly}
