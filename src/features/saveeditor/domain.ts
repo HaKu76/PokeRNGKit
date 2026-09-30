@@ -59,7 +59,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 86;
+  apiVersion: 87;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -770,6 +770,7 @@ export interface SaveEditorResult {
   events?: import("./events").EventCatalog;
   eventDiff?: import("./events").EventDiff;
   gsBall2?: import("./gsBall2").GsBall2Catalog;
+  hall3?: import("./hall3").Hall3Catalog;
   hall1?: import("./hall1").Hall1Catalog;
   eventReset?: import("./eventReset").EventResetCatalog;
   roamer?: import("./roamer").RoamerCatalog;

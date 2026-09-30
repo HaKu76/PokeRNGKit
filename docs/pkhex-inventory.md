@@ -343,7 +343,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen1/SAV_HallOfFame1.cs`                               | API 85：核心、三语六格图像、全部操作与撤销已接入；浏览器待核验     |
 | `Subforms/Save Editors/Gen2/SAV_Misc2.cs`                                     | API 86：水晶 GS 球事件、三语状态和撤销已接入；浏览器待核验         |
 | `Subforms/Save Editors/Gen3/PokeBlock3CaseEditor.cs`                          | API 75：逐格／批量与三语目录已接入；工程检查通过，浏览器待核验     |
-| `Subforms/Save Editors/Gen3/SAV_HallOfFame3.cs`                               | 待核对                                                             |
+| `Subforms/Save Editors/Gen3/SAV_HallOfFame3.cs`                               | API 87：三语六格图像、全部操作与撤销已接入；工程通过，浏览器待核验 |
 | `Subforms/Save Editors/Gen3/SAV_Misc3.cs`                                     | 待核对                                                             |
 | `Subforms/Save Editors/Gen3/SAV_RTC3.cs`                                      | API 78：两组时钟／归零／树果修复工程检查通过；浏览器待核验         |
 | `Subforms/Save Editors/Gen3/SAV_Roamer3.cs`                                   | 待核对                                                             |

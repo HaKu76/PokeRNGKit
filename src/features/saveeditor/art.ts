@@ -45,7 +45,9 @@ export function speciesImage(species: number) {
   return url(assets[`b_${species}`] ? `b_${species}` : "b_unknown");
 }
 
-export function pokemonImage(pokemon: PokemonEntry) {
+export function pokemonImage(
+  pokemon: Pick<PokemonEntry, "species" | "sprite">,
+) {
   const key = assets[pokemon.sprite]
     ? pokemon.sprite
     : assets[`b_${pokemon.species}`]
