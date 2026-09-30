@@ -1,0 +1,31 @@
+.save-hall-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 8px;
+}
+.save-hall-team > button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 64px;
+  min-width: 0;
+  text-align: start;
+}
+.save-hall-team > button > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.save-hall-team > button[aria-pressed="true"] {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+}
+.save-hall-team small {
+  display: block;
+  font-size: 13px;
+  line-height: 20px;
+}
+.save-hall-team img {
+  flex: 0 0 40px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}

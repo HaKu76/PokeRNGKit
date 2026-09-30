@@ -340,7 +340,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/SAV_FolderList.cs`                                                  | 待核对                                                             |
 | `Subforms/SAV_MysteryGiftDB.cs`                                               | 待核对                                                             |
 | `Subforms/Save Editors/Gen1/SAV_EventReset1.cs`                               | 已接入四布局事件重置、三语、多选与撤销；浏览器与实档待核验         |
-| `Subforms/Save Editors/Gen1/SAV_HallOfFame1.cs`                               | 待核对                                                             |
+| `Subforms/Save Editors/Gen1/SAV_HallOfFame1.cs`                               | API 85：核心、三语六格图像、全部操作与撤销已接入；浏览器待核验     |
 | `Subforms/Save Editors/Gen2/SAV_Misc2.cs`                                     | 待核对                                                             |
 | `Subforms/Save Editors/Gen3/PokeBlock3CaseEditor.cs`                          | API 75：逐格／批量与三语目录已接入；工程检查通过，浏览器待核验     |
 | `Subforms/Save Editors/Gen3/SAV_HallOfFame3.cs`                               | 待核对                                                             |

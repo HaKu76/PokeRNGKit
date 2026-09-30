@@ -58,6 +58,8 @@ export class SaveEditorClient {
       | "events"
       | "eventsEdit"
       | "eventsCompare"
+      | "hall1"
+      | "hall1Edit"
       | "eventReset"
       | "eventResetEdit"
       | "roamer"

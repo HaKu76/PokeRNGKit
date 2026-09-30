@@ -51,6 +51,8 @@ import { SaveInventoryBrowser } from "./SaveInventoryBrowser";
 import { TrainerGeographyFields } from "./TrainerGeographyFields";
 import { EventEditor } from "./EventEditor";
 import { supportsEvents, eventWords, validateEventFiles } from "./events";
+import { Hall1Editor } from "./Hall1Editor";
+import { supportsHall1, hall1Words } from "./hall1";
 import { EventResetEditor } from "./EventResetEditor";
 import { supportsEventReset, eventResetWords } from "./eventReset";
 import { RoamerEditor } from "./RoamerEditor";
@@ -91,6 +93,7 @@ export function SaveEditorPanel(
     | "trainer"
     | "inventory"
     | "events"
+    | "hall1"
     | "eventReset"
     | "roamer"
     | "rtc"
@@ -206,6 +209,7 @@ export function SaveEditorPanel(
         (previous === "food" && !supportsFood(result.report.format)) ||
         (previous === "opowers" && !supportsOPowers(result.report.format)) ||
         (previous === "events" && !supportsEvents(result.report.format)) ||
+        (previous === "hall1" && !supportsHall1(result.report.format)) ||
         (previous === "eventReset" &&
           !supportsEventReset(result.report.format)) ||
         (previous === "roamer" && !supportsRoamer(result.report.format)) ||
@@ -617,6 +621,22 @@ export function SaveEditorPanel(
     });
     return diff;
   };
+  const readHall1 = async () => {
+    let catalog: import("./hall1").Hall1Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "hall1",
+      );
+      if (id !== operation.current) return;
+      if (!result.hall1)
+        throw new Error("No Hall of Fame catalog was returned.");
+      catalog = result.hall1;
+    });
+    return catalog;
+  };
   const readEventReset = async () => {
     let catalog: import("./eventReset").EventResetCatalog | undefined;
     await perform(async (id) => {
@@ -834,6 +854,7 @@ export function SaveEditorPanel(
       | import("./gen4Pokedex").Dex4Edit
       | import("./simplePokedex").SimpleDexEdit
       | import("./events").EventEdit
+      | import("./hall1").Hall1Edit
       | import("./eventReset").EventResetEdit
       | import("./roamer").RoamerEdit
       | import("./rtc").RtcEdit
@@ -865,6 +886,7 @@ export function SaveEditorPanel(
       | "pokedex4Edit"
       | "pokedexEdit"
       | "eventsEdit"
+      | "hall1Edit"
       | "eventResetEdit"
       | "roamerEdit"
       | "rtcEdit"
@@ -1125,6 +1147,16 @@ export function SaveEditorPanel(
                 {eventWords[batchLang].title}
               </button>
             )}
+            {supportsHall1(report.format) && (
+              <button
+                type="button"
+                disabled={busy}
+                aria-pressed={section === "hall1"}
+                onClick={() => setSection("hall1")}
+              >
+                {hall1Words[batchLang].title}
+              </button>
+            )}
             {supportsEventReset(report.format) && (
               <button
                 type="button"
@@ -1309,6 +1341,14 @@ export function SaveEditorPanel(
               onRead={readEvents}
               onApply={(edit) => applyWorkingEdit(edit, "eventsEdit")}
               onCompare={compareEvents}
+            />
+          ) : section === "hall1" && supportsHall1(report.format) ? (
+            <Hall1Editor
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readHall1}
+              onApply={(edit) => applyWorkingEdit(edit, "hall1Edit")}
             />
           ) : section === "eventReset" && supportsEventReset(report.format) ? (
             <EventResetEditor
