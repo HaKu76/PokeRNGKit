@@ -11,6 +11,7 @@ import {
   type EventCatalog,
   type EventEdit,
   type EventDiff,
+  type EventMode,
 } from "./events";
 
 type Lang = keyof typeof eventWords;
@@ -88,18 +89,28 @@ function EventForm({
 }) {
   const w = eventWords[lang];
   const [draft, setDraft] = useState(() => eventDraft(catalog));
-  const [mode, setMode] = useState<"flags" | "values">("flags");
-  const [selected, setSelected] = useState({ flags: 0, values: 0 });
+  const [mode, setMode] = useState<EventMode>("flags");
+  const [selected, setSelected] = useState({ flags: 0, system: 0, values: 0 });
   const [category, setCategory] = useState(-1);
   const [known, setKnown] = useState(true);
   const [query, setQuery] = useState("");
   const [jump, setJump] = useState("0");
   const [invalid, setInvalid] = useState(false);
-  const labels = mode === "flags" ? catalog.flagLabels : catalog.workLabels;
+  const labels =
+    mode === "flags"
+      ? catalog.flagLabels
+      : mode === "system"
+        ? catalog.systemLabels
+        : catalog.workLabels;
   const count = draft[mode].length;
   const index = selected[mode];
   const label = labels.find((l) => l.index === index);
-  const groups = mode === "flags" ? catalog.flagGroups : catalog.workGroups;
+  const groups =
+    mode === "flags"
+      ? catalog.flagGroups
+      : mode === "values"
+        ? catalog.workGroups
+        : [];
   const group = eventGroup(catalog, mode, index);
   const categoryName = (c: number) =>
     c >= 200
@@ -125,6 +136,13 @@ function EventForm({
         ? []
         : [`${w.flags} #${i}: ${catalog.flags[i] ? 1 : 0} → ${v ? 1 : 0}`],
     ),
+    ...draft.system.flatMap((v, i) =>
+      v === catalog.systemFlags[i]
+        ? []
+        : [
+            `${w.system} #${i}: ${catalog.systemFlags[i] ? 1 : 0} → ${v ? 1 : 0}`,
+          ],
+    ),
     ...draft.values.flatMap((v, i) =>
       v === String(catalog.values[i])
         ? []
@@ -141,6 +159,13 @@ function EventForm({
       ...draft,
       values: draft.values.map((v, i) => (i === index ? value : v)),
     });
+  const updateFlag = (value: boolean) => {
+    if (mode === "values") return;
+    setDraft({
+      ...draft,
+      [mode]: draft[mode].map((v, i) => (i === index ? value : v)),
+    });
+  };
   const apply = () => {
     let edit: EventEdit;
     try {
@@ -156,7 +181,13 @@ function EventForm({
     <fieldset className="save-food-fields" disabled={disabled}>
       <legend className="visually-hidden">{w.title}</legend>
       <div className="save-editor-toolbar" role="group" aria-label={w.title}>
-        {(["flags", "values"] as const).map((m) => (
+        {(
+          [
+            "flags",
+            ...(catalog.systemFlags.length ? ["system"] : []),
+            "values",
+          ] as EventMode[]
+        ).map((m) => (
           <button
             key={m}
             type="button"
@@ -263,20 +294,13 @@ function EventForm({
           {categoryName(group.category)} · {w.groupIndex} {index - group.start}
         </p>
       )}
-      {mode === "flags" ? (
+      {mode !== "values" ? (
         <label className="save-food-toggle">
           <input
             type="checkbox"
-            checked={draft.flags[index]}
+            checked={draft[mode][index]}
             disabled={!catalog.canEdit}
-            onChange={(e) =>
-              setDraft({
-                ...draft,
-                flags: draft.flags.map((v, i) =>
-                  i === index ? e.target.checked : v,
-                ),
-              })
-            }
+            onChange={(e) => updateFlag(e.target.checked)}
           />
           {w.enabled}
         </label>

@@ -9,6 +9,8 @@ export interface EventCatalog {
   values: number[];
   flagLabels: EventLabel[];
   workLabels: EventLabel[];
+  systemFlags: boolean[];
+  systemLabels: EventLabel[];
   updatesQr: boolean;
   maximumValue: number;
   minimumValue: number;
@@ -21,22 +23,22 @@ export interface EventGroup {
   start: number;
   count: number;
 }
-export function eventGroup(
-  c: EventCatalog,
-  mode: "flags" | "values",
-  index: number,
-) {
-  return (mode === "flags" ? c.flagGroups : c.workGroups).find(
-    (g) => index >= g.start && index < g.start + g.count,
-  );
+export type EventMode = "flags" | "system" | "values";
+export function eventGroup(c: EventCatalog, mode: EventMode, index: number) {
+  return (
+    mode === "flags" ? c.flagGroups : mode === "values" ? c.workGroups : []
+  ).find((g) => index >= g.start && index < g.start + g.count);
 }
 export interface EventEdit {
   flags: { index: number; value: boolean }[];
+  system: { index: number; value: boolean }[];
   values: { index: number; value: number }[];
 }
 export interface EventDiff {
   setFlags: number[];
   clearedFlags: number[];
+  setSystem: number[];
+  clearedSystem: number[];
   values: { index: number; before: number; after: number }[];
 }
 export const supportsEvents = (format: string) =>
@@ -55,9 +57,11 @@ export const supportsEvents = (format: string) =>
     "SAV7SM",
     "SAV7USUM",
     "SAV7b",
+    "SAV8BS",
   ].includes(format);
 export const eventDraft = (c: EventCatalog) => ({
   flags: [...c.flags],
+  system: [...c.systemFlags],
   values: c.values.map(String),
 });
 export function validateEvents(
@@ -71,8 +75,10 @@ export function validateEvents(
       (c.minimumValue === -2147483648 && c.maximumValue === 2147483647)
     ) ||
     d.flags.length !== c.flags.length ||
+    d.system.length !== c.systemFlags.length ||
     d.values.length !== c.values.length ||
-    d.flags.some((v) => typeof v !== "boolean")
+    d.flags.some((v) => typeof v !== "boolean") ||
+    d.system.some((v) => typeof v !== "boolean")
   )
     throw new Error("Invalid event fields.");
   const pattern = c.minimumValue < 0 ? /^-?\d{1,10}$/ : /^\d{1,5}$/;
@@ -86,6 +92,9 @@ export function validateEvents(
   return {
     flags: d.flags.flatMap((value, index) =>
       value === c.flags[index] ? [] : [{ index, value }],
+    ),
+    system: d.system.flatMap((value, index) =>
+      value === c.systemFlags[index] ? [] : [{ index, value }],
     ),
     values: values.flatMap((value, index) =>
       value === c.values[index] ? [] : [{ index, value }],
@@ -112,6 +121,9 @@ export const eventWords = {
     title: "事件标记与数值",
     read: "读取事件数据",
     flags: "事件标记",
+    system: "系统标记",
+    setSystem: "新增系统标记",
+    clearedSystem: "清除系统标记",
     values: "事件数值",
     category: "分类",
     all: "全部",
@@ -165,6 +177,9 @@ export const eventWords = {
     title: "Event flags and values",
     read: "Read event data",
     flags: "Event flags",
+    system: "System flags",
+    setSystem: "Set system flags",
+    clearedSystem: "Cleared system flags",
     values: "Event values",
     category: "Category",
     all: "All",
@@ -219,6 +234,9 @@ export const eventWords = {
     title: "イベントフラグと数値",
     read: "イベントデータを読み込む",
     flags: "イベントフラグ",
+    system: "システムフラグ",
+    setSystem: "追加されたシステムフラグ",
+    clearedSystem: "解除されたシステムフラグ",
     values: "イベント数値",
     category: "分類",
     all: "すべて",
@@ -272,5 +290,5 @@ export const eventWords = {
 };
 export function eventDiffText(diff: EventDiff, lang: keyof typeof eventWords) {
   const w = eventWords[lang];
-  return `${w.set}\n${diff.setFlags.join(", ") || w.none}\n\n${w.cleared}\n${diff.clearedFlags.join(", ") || w.none}\n\n${w.values}\n${diff.values.map((v) => `${v.index}: ${v.before} → ${v.after}`).join("\n") || w.none}`;
+  return `${w.set}\n${diff.setFlags.join(", ") || w.none}\n\n${w.cleared}\n${diff.clearedFlags.join(", ") || w.none}\n\n${w.setSystem}\n${diff.setSystem.join(", ") || w.none}\n\n${w.clearedSystem}\n${diff.clearedSystem.join(", ") || w.none}\n\n${w.values}\n${diff.values.map((v) => `${v.index}: ${v.before} → ${v.after}`).join("\n") || w.none}`;
 }

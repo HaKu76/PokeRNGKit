@@ -14,6 +14,8 @@ const catalog: EventCatalog = {
   values: [0, 65535, 32768],
   flagLabels: [],
   workLabels: [],
+  systemFlags: [],
+  systemLabels: [],
   updatesQr: false,
   maximumValue: 65535,
   minimumValue: 0,
@@ -22,6 +24,38 @@ const catalog: EventCatalog = {
   canEdit: true,
 };
 describe("event editing boundaries", () => {
+  it("keeps system flags independent with all drafts and strict bounds", () => {
+    const c: EventCatalog = {
+      ...catalog,
+      systemFlags: Array.from({ length: 1000 }, (_, i) => i % 2 === 0),
+    };
+    const d = eventDraft(c);
+    d.system[0] = false;
+    d.system[999] = true;
+    d.flags[0] = true;
+    d.values[0] = "1";
+    expect(validateEvents(c, d)).toEqual({
+      flags: [{ index: 0, value: true }],
+      values: [{ index: 0, value: 1 }],
+      system: [
+        { index: 0, value: false },
+        { index: 999, value: true },
+      ],
+    });
+    expect(c.systemFlags[0]).toBe(true);
+    expect(c.systemFlags[999]).toBe(false);
+    expect(() => validateEvents(c, { ...d, system: [] })).toThrow();
+    expect(() =>
+      validateEvents(c, { ...d, system: [...d.system, true] }),
+    ).toThrow();
+    const invalid = eventDraft(c);
+    invalid.system[500] = 1 as unknown as boolean;
+    expect(() => validateEvents(c, invalid)).toThrow();
+    expect(() =>
+      validateEvents(catalog, { ...eventDraft(catalog), system: [true] }),
+    ).toThrow();
+    expect(eventGroup(c, "system", 0)).toBeUndefined();
+  });
   it("preserves signed Int32 values including negative drafts and rejects truncation", () => {
     const c: EventCatalog = {
       ...catalog,
@@ -65,6 +99,8 @@ describe("event editing boundaries", () => {
           {
             setFlags: [],
             clearedFlags: [],
+            setSystem: [],
+            clearedSystem: [],
             values: [{ index: 999, before: -2147483648, after: 2147483647 }],
           },
           lang,
@@ -139,6 +175,7 @@ describe("event editing boundaries", () => {
     draft.values[0] = "65535";
     expect(validateEvents(catalog, draft)).toEqual({
       flags: [{ index: 2, value: true }],
+      system: [],
       values: [
         { index: 0, value: 65535 },
         { index: 1, value: 0 },
@@ -148,6 +185,7 @@ describe("event editing boundaries", () => {
     expect(catalog.values).toEqual([0, 65535, 32768]);
     expect(validateEvents(catalog, eventDraft(catalog))).toEqual({
       flags: [],
+      system: [],
       values: [],
     });
   });
@@ -169,13 +207,22 @@ describe("event editing boundaries", () => {
   });
   it("checks complete array shapes", () => {
     expect(() =>
-      validateEvents(catalog, { flags: [], values: ["0", "65535", "32768"] }),
-    ).toThrow();
-    expect(() =>
-      validateEvents(catalog, { flags: [false, true, false], values: [] }),
+      validateEvents(catalog, {
+        system: [],
+        flags: [],
+        values: ["0", "65535", "32768"],
+      }),
     ).toThrow();
     expect(() =>
       validateEvents(catalog, {
+        system: [],
+        flags: [false, true, false],
+        values: [],
+      }),
+    ).toThrow();
+    expect(() =>
+      validateEvents(catalog, {
+        system: [],
         flags: [0 as unknown as boolean, true, false],
         values: ["0", "65535", "32768"],
       }),
@@ -221,10 +268,10 @@ describe("event editing boundaries", () => {
       "SAV7SM",
       "SAV7USUM",
       "SAV7b",
+      "SAV8BS",
     ])
       expect(supportsEvents(f)).toBe(true);
-    for (const f of ["SAV8BS", "SAV3XD", "SAV9SV"])
-      expect(supportsEvents(f)).toBe(false);
+    for (const f of ["SAV3XD", "SAV9SV"]) expect(supportsEvents(f)).toBe(false);
   });
   it("reports additions, removals and both values in all UI languages", () => {
     for (const lang of ["zh", "en", "ja"] as const) {
@@ -232,12 +279,16 @@ describe("event editing boundaries", () => {
         {
           setFlags: [0, 7],
           clearedFlags: [8],
+          setSystem: [124],
+          clearedSystem: [999],
           values: [{ index: 5, before: 65535, after: 0 }],
         },
         lang,
       );
       expect(s).toContain("0, 7");
       expect(s).toContain("8");
+      expect(s).toContain("124");
+      expect(s).toContain("999");
       expect(s).toContain("5: 65535 → 0");
     }
   });
