@@ -14,6 +14,7 @@
     <Compile Include="../StandaloneGb.cs" Link="StandaloneGb.cs" />
     <Compile Include="../PokeBlocks6.cs" Link="PokeBlocks6.cs" />
     <Compile Include="../FoodCases.cs" Link="FoodCases.cs" />
+    <Compile Include="../OPowerEditing.cs" Link="OPowerEditing.cs" />
     <Compile Include="../SaveFood.cs" Link="SaveFood.cs" />
     <Compile Include="../StandaloneGbSpecial.cs" Link="StandaloneGbSpecial.cs" />
     <Compile Include="../BoxBinaryApi.cs" Link="BoxBinaryApi.cs" />

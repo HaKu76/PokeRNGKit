@@ -3,6 +3,20 @@
 2026-09-22 开始开发。入口位于悬浮工具菜单，使用本地 `PKHeX.Core` 26.08.26 源码；
 来源、归属与逐文件哈希见 [UPSTREAM](../../third_party/pkhex/UPSTREAM.md)。
 
+## 第六世代 O 力量
+
+API 77 在存档工具中增加 XY／ORAS 的 O 力量入口，读取与编辑复用本地 Worker、工作副本、撤销及导出。
+完整目录包括 OPower6Index 的 65 个状态、OPower6FieldType 的 10 项两组数值、OPower6BattleType 的 7 项两组数值，以及点数。
+82 个枚举名称摘自 PKHeX.WinForms Resources/text/lang_zh-Hans.txt、lang_en.txt、lang_ja.txt，保持上游原文与枚举索引；来源说明保留在 opowerNames.ts。
+Core OPower6 块固定 100 字节：状态 0–64、点数 65、场地数值 66–75／76–85、战斗数值 86–92／93–99。
+35 个可编辑数值均为 byte，WinForms NumericUpDown 范围为 0–255；网页接受 1–3 位十进制整数，拒绝空值、负数、小数和越界。
+状态按 GetState == Unlocked（1）显示；只在用户改变解锁状态时调用 SetState 写入 0／1，未修改的其他原始值保留并显示编号，不因修改点数而统一清零。
+全部解锁直接调用 UnlockAll：65 个状态设为 1、34 个数值设为 3，保留点数；清空直接调用 ClearAll：保留第 0 字节的总开关，清零第 1–99 字节。
+编辑请求必须完整包含 65 个布尔状态、10／10／7／7 项数值及点数；批量动作拒绝夹带草稿字段。拒绝不适用存档、超长请求与无效校验和编辑。
+写出后重新识别格式、检查校验和，并比较完整 100 字节块；原始输入缓冲区始终保留。
+状态、场地及战斗项目使用选择器，所有项目草稿同时保留；批量操作在草稿未应用时禁用。控件沿用浮动工具 44px 基线，三语文字与原始编号提示保持可读。
+上游依据：WinForms Subforms/Save Editors/Gen6/SAV_OPower.cs／Designer.cs 的 LoadCurrent、SaveCurrent 与批量按钮；Core Saves/Substructures/Gen6/OPower/OPower6.cs、OPower6Type.cs、OPower6FieldType.cs、OPower6BattleType.cs、OPowerFlagState.cs。
+
 ## 心金／魂银球果盒
 
 API 76 在背包分类中增加球果盒，不把独立存储的球果伪装成普通背包格位。

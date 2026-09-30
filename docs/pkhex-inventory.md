@@ -374,7 +374,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen6/SAV_BoxLayout.cs`                                 | API 59：箱名、壁纸、解锁数、标记、整箱交换；沿用当前编辑白名单     |
 | `Subforms/Save Editors/Gen6/SAV_HallOfFame.cs`                                | 待核对                                                             |
 | `Subforms/Save Editors/Gen6/SAV_Link6.cs`                                     | 待核对                                                             |
-| `Subforms/Save Editors/Gen6/SAV_OPower.cs`                                    | 待核对                                                             |
+| `Subforms/Save Editors/Gen6/SAV_OPower.cs`                                    | API 77：状态／数值／批量／三语工程检查通过；浏览器待核验           |
 | `Subforms/Save Editors/Gen6/SAV_PokeBlockORAS.cs`                             | API 74 数量／批量与树果田操作工程检查通过；浏览器待核验            |
 | `Subforms/Save Editors/Gen6/SAV_PokedexORAS.cs`                               | 已接入；字段及批量工程检查通过，浏览器待核验                       |
 | `Subforms/Save Editors/Gen6/SAV_PokedexXY.cs`                                 | 已接入；字段及批量工程检查通过，浏览器待核验                       |

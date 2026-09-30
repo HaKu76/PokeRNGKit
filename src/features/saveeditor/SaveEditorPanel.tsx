@@ -49,6 +49,8 @@ import type { PokemonEdit } from "./PokemonEditor";
 import { SavePokemonBrowser } from "./SavePokemonBrowser";
 import { SaveInventoryBrowser } from "./SaveInventoryBrowser";
 import { TrainerGeographyFields } from "./TrainerGeographyFields";
+import { OPowerEditor } from "./OPowerEditor";
+import { supportsOPowers, opowerWords } from "./opowers";
 import { SaveFoodEditor } from "./SaveFoodEditor";
 import { supportsFood, foodWords } from "./saveFood";
 import { SaveRecordEditor } from "./SaveRecordEditor";
@@ -80,6 +82,7 @@ export function SaveEditorPanel(
     | "pokemon"
     | "trainer"
     | "inventory"
+    | "opowers"
     | "food"
     | "records"
     | "pokedex"
@@ -188,7 +191,8 @@ export function SaveEditorPanel(
         (previous === "batch" && !result.report.canEdit) ||
         (previous === "pokedex" && !result.report.pokedex) ||
         (previous === "records" && !result.report.trainer.canRecords) ||
-        (previous === "food" && !supportsFood(result.report.format))
+        (previous === "food" && !supportsFood(result.report.format)) ||
+        (previous === "opowers" && !supportsOPowers(result.report.format))
           ? "trainer"
           : previous,
       );
@@ -558,6 +562,22 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readOPowers = async () => {
+    let catalog: import("./opowers").OPowerCatalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "opowers",
+      );
+      if (id !== operation.current) return;
+      if (!result.opowers) throw new Error("No O-Power catalog was returned.");
+      catalog = result.opowers;
+    });
+    return catalog;
+  };
+
   const readFood = async () => {
     let catalog: import("./saveFood").SaveFoodCatalog | undefined;
     await perform(async (id) => {
@@ -710,6 +730,7 @@ export function SaveEditorPanel(
       | import("./gen5Pokedex").Dex5Edit
       | import("./gen4Pokedex").Dex4Edit
       | import("./simplePokedex").SimpleDexEdit
+      | import("./opowers").OPowerEdit
       | import("./saveFood").SaveFoodEdit
       | import("./domain").SaveRecordEdit
       | ReturnType<typeof validateTrainer>
@@ -736,6 +757,7 @@ export function SaveEditorPanel(
       | "pokedex5Edit"
       | "pokedex4Edit"
       | "pokedexEdit"
+      | "opowersEdit"
       | "foodEdit"
       | "recordEdit"
       | "trainer",
@@ -982,6 +1004,15 @@ export function SaveEditorPanel(
                 {words.pokedexTitle}
               </button>
             )}
+            {supportsOPowers(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "opowers"}
+                onClick={() => setSection("opowers")}
+              >
+                {opowerWords[batchLang].title}
+              </button>
+            )}
             {supportsFood(report.format) && (
               <button
                 type="button"
@@ -1120,6 +1151,15 @@ export function SaveEditorPanel(
               busy={busy}
               onRead={readPokedex}
               onApply={(edit) => applyWorkingEdit(edit, "pokedexEdit")}
+            />
+          ) : section === "opowers" && supportsOPowers(report.format) ? (
+            <OPowerEditor
+              revision={workingRevision}
+              busy={busy}
+              canEdit={report.canEdit}
+              lang={batchLang}
+              onRead={readOPowers}
+              onApply={(edit) => applyWorkingEdit(edit, "opowersEdit")}
             />
           ) : section === "food" && supportsFood(report.format) ? (
             <SaveFoodEditor
