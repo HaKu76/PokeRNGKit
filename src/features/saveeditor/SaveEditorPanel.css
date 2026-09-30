@@ -556,7 +556,8 @@
 .save-dex4-order li {
   padding-block: 4px;
 }
-.save-property-batch textarea {
+.save-property-batch textarea,
+.save-event-editor textarea {
   width: 100%;
   box-sizing: border-box;
   resize: vertical;
@@ -578,7 +579,17 @@
   padding: 0;
   margin: 0;
 }
-.save-property-batch textarea:focus-visible {
+.save-property-batch textarea:focus-visible,
+.save-event-editor textarea:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-event-editor summary {
+  display: list-item;
+  list-style-position: inside;
+  align-content: center;
+}
+.save-event-editor summary:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }

@@ -3,6 +3,28 @@
 2026-09-22 开始开发。入口位于悬浮工具菜单，使用本地 `PKHeX.Core` 26.08.26 源码；
 来源、归属与逐文件哈希见 [UPSTREAM](../../third_party/pkhex/UPSTREAM.md)。
 
+## 第三至第七世代事件标记与数值
+
+API 80 接入 SAV_EventFlags 对应的 12 种布局：RS／E／FRLG、DP／Pt／HGSS、BW／B2W2、XY／ORAS、SM／USUM。
+读取通过 IEventFlag37 或 IEventFlagProvider37.EventWork，包含全部布尔标记和 UInt16 事件数值；不以具名项目数量代替实际数组长度。
+具名目录、分类编号及预设值使用 Core EventLabelParsing 与 flags／const 三语资源，缺少资源时沿用 GameLanguage 的英文回退；不改动全局语言状态。
+界面提供标记／数值模式、分类、名称或编号搜索、具名筛选、按编号定位、预设与手工数值；切换项目保留草稿，可查看待应用差异后统一应用或放弃。
+只读存档仍可切换模式、筛选与定位，仅禁用修改控件。比较文本沿用现有表单样式和 44px 操作基线。
+标记编号为十进制 0–EventFlagCount−1，数值编号为 0–EventWorkCount−1；编号框最多 5 位。
+事件数值为十进制 0–65535、最多 5 位，拒绝空值、负数、小数、指数及越界；不沿用桌面 MaskedTextBox 解析失败时归零的副作用。
+预设目录不把 NamedEventConst.CustomMagicValue（65535）当作预设值，手工输入仍允许 65535；切换到自定义不自动归零。
+编辑提交变化项，两个数组均必须存在，单项必须有编号和值；拒绝重复、越界、缺字段及超过实际数组长度的请求，先验证整个请求再写入。JSON 上限 1 MiB。
+SM／USUM 有实际变化时沿用 EventWorkspace.Save 的 UpdateQrConstants 联动；SM 标记 3100、USUM 标记 4060／4562 决定 QR 块常量。
+联动严格使用 Core 现有写入规则，包括 USUM 的 0x168／0x16C 写入位置；只读、空修改及值未改变的请求不触发同步，保留异常原字节。
+写出后核对类型、校验和、全部标记／数值及联动 QR 字节；原件、工作副本、撤销与导出仍使用同一会话流程。
+
+研究比较接受两个同游戏版本的非空存档，各最大 1 MiB；核对类型、版本与数组布局后调用 EventBlockDiff，输出新增标记、清除标记及每个数值的前后值，可查看和下载文本。
+比较在存档 Worker 内运行，不替换当前工作副本，也不应用编辑草稿；对第二个文件的 Base64 与请求长度同时设限。
+本项不包含 SAV_EventFlags2、Let’s Go 的 SAV_EventWork 或后续世代不同结构的事件窗口。
+12 布局专项已覆盖三语资源、每个编号、位边界／UInt16 边界、全文件 Core 对照、请求原子性、未改 QR 保持、QR 组合及差异方向；真实存档与浏览器检查仍待完成。
+
+上游依据：WinForms Subforms/Save Editors/SAV_EventFlags.cs／Designer.cs 的 AddFlagList、AddConstList、ChangeCustomBool、ChangeCustomConst 与 DiffSaves；Core Editing/Saves/Editors/EventOld 下的 EventWorkspace、EventLabelParsing、NamedEventWork，EventWork/Diff/EventWorkDiff.cs，Saves/Substructures/IEventFlagArray.cs，SAV7SM／SAV7USUM.UpdateQrConstants。
+
 ## 仓储工具布局与浏览器检查
 
 仓储工具收拢为可换行的紧凑网格，展开项占完整一行；标题保持 44px 操作高度，并提供展开箭头与键盘焦点。

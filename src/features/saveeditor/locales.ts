@@ -6,6 +6,9 @@ import { boxBinaryWords } from "./boxBinary";
 
 export const saveEditorResources = {
   zh: {
+    eventError: "事件数据无效或不适用于此存档，未应用修改。",
+    eventCompareError: "比较需要相同游戏版本及事件布局的两个存档。",
+    eventCompareSize: "比较存档必须非空，且每个不超过 1 MiB。",
     boxImportError: boxImportWords.zh.error,
     boxBinaryError: boxBinaryWords.zh.error,
     boxArchiveError: boxArchiveWords.zh.error,
@@ -538,6 +541,12 @@ export const saveEditorResources = {
     },
   },
   en: {
+    eventError:
+      "Event data is invalid or unavailable for this save. No changes were applied.",
+    eventCompareError:
+      "Comparison requires two saves with the same game version and event layout.",
+    eventCompareSize:
+      "Comparison saves must be nonempty and no larger than 1 MiB each.",
     boxImportError: boxImportWords.en.error,
     boxBinaryError: boxBinaryWords.en.error,
     boxArchiveError: boxArchiveWords.en.error,
@@ -1102,6 +1111,12 @@ export const saveEditorResources = {
     },
   },
   ja: {
+    eventError:
+      "イベントデータが無効か、このセーブでは使用できません。変更は適用されていません。",
+    eventCompareError:
+      "比較には同じゲームバージョンとイベント構造のセーブが2つ必要です。",
+    eventCompareSize:
+      "比較するセーブは空でない1 MiB以下のファイルにしてください。",
     boxImportError: boxImportWords.ja.error,
     boxBinaryError: boxBinaryWords.ja.error,
     boxArchiveError: boxArchiveWords.ja.error,
@@ -1684,6 +1699,15 @@ export function localizeSaveError(
   if (/File batch/.test(message)) return words.fileBatchError;
   if (/Property batch|Invalid property batch/.test(message))
     return words.propertyBatchError;
+  if (/Event comparison files/.test(message)) return words.eventCompareSize;
+  if (/Event comparison requires|Event layouts differ/.test(message))
+    return words.eventCompareError;
+  if (
+    /event flag|event value|event fields|Event changes|Event edit|Event export|event catalog|event comparison|event query|event language/i.test(
+      message,
+    )
+  )
+    return words.eventError;
   if (/^Storage /.test(message)) return words.storageError;
   if (/Box batch|Invalid box batch values/.test(message))
     return words.boxBatchError;

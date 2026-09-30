@@ -49,6 +49,8 @@ import type { PokemonEdit } from "./PokemonEditor";
 import { SavePokemonBrowser } from "./SavePokemonBrowser";
 import { SaveInventoryBrowser } from "./SaveInventoryBrowser";
 import { TrainerGeographyFields } from "./TrainerGeographyFields";
+import { EventEditor } from "./EventEditor";
+import { supportsEvents, eventWords, validateEventFiles } from "./events";
 import { RoamerEditor } from "./RoamerEditor";
 import { supportsRoamer, roamerWords } from "./roamer";
 import { RtcEditor } from "./RtcEditor";
@@ -86,6 +88,7 @@ export function SaveEditorPanel(
     | "pokemon"
     | "trainer"
     | "inventory"
+    | "events"
     | "roamer"
     | "rtc"
     | "opowers"
@@ -199,6 +202,7 @@ export function SaveEditorPanel(
         (previous === "records" && !result.report.trainer.canRecords) ||
         (previous === "food" && !supportsFood(result.report.format)) ||
         (previous === "opowers" && !supportsOPowers(result.report.format)) ||
+        (previous === "events" && !supportsEvents(result.report.format)) ||
         (previous === "roamer" && !supportsRoamer(result.report.format)) ||
         (previous === "rtc" && !supportsRtc(result.report.format))
           ? "trainer"
@@ -570,6 +574,44 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readEvents = async () => {
+    let catalog: import("./events").EventCatalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify({ language: batchLang }),
+        "events",
+      );
+      if (id !== operation.current) return;
+      if (!result.events) throw new Error("No event catalog was returned.");
+      catalog = result.events;
+    });
+    return catalog;
+  };
+  const compareEvents = async (old: File, newer: File) => {
+    let diff: import("./events").EventDiff | undefined;
+    await perform(async (id) => {
+      validateEventFiles([old, newer]);
+      const files = await readBatchFiles(
+        [newer],
+        () => id === operation.current,
+      );
+      if (!files || id !== operation.current) return;
+      const bytes = new Uint8Array(await old.arrayBuffer());
+      if (id !== operation.current) return;
+      const result = await client.current.run(
+        bytes,
+        JSON.stringify({ newData: files[0].data }),
+        "eventsCompare",
+      );
+      if (id !== operation.current) return;
+      if (!result.eventDiff)
+        throw new Error("No event comparison was returned.");
+      diff = result.eventDiff;
+    });
+    return diff;
+  };
   const readRoamer = async () => {
     let catalog: import("./roamer").RoamerCatalog | undefined;
     await perform(async (id) => {
@@ -770,6 +812,7 @@ export function SaveEditorPanel(
       | import("./gen5Pokedex").Dex5Edit
       | import("./gen4Pokedex").Dex4Edit
       | import("./simplePokedex").SimpleDexEdit
+      | import("./events").EventEdit
       | import("./roamer").RoamerEdit
       | import("./rtc").RtcEdit
       | import("./opowers").OPowerEdit
@@ -799,6 +842,7 @@ export function SaveEditorPanel(
       | "pokedex5Edit"
       | "pokedex4Edit"
       | "pokedexEdit"
+      | "eventsEdit"
       | "roamerEdit"
       | "rtcEdit"
       | "opowersEdit"
@@ -1048,6 +1092,16 @@ export function SaveEditorPanel(
                 {words.pokedexTitle}
               </button>
             )}
+            {supportsEvents(report.format) && (
+              <button
+                type="button"
+                disabled={busy}
+                aria-pressed={section === "events"}
+                onClick={() => setSection("events")}
+              >
+                {eventWords[batchLang].title}
+              </button>
+            )}
             {supportsRoamer(report.format) && (
               <button
                 type="button"
@@ -1213,6 +1267,16 @@ export function SaveEditorPanel(
               busy={busy}
               onRead={readPokedex}
               onApply={(edit) => applyWorkingEdit(edit, "pokedexEdit")}
+            />
+          ) : section === "events" && supportsEvents(report.format) ? (
+            <EventEditor
+              revision={workingRevision}
+              busy={busy}
+              canEdit={report.canEdit}
+              lang={batchLang}
+              onRead={readEvents}
+              onApply={(edit) => applyWorkingEdit(edit, "eventsEdit")}
+              onCompare={compareEvents}
             />
           ) : section === "roamer" && supportsRoamer(report.format) ? (
             <RoamerEditor

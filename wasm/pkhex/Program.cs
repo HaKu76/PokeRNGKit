@@ -77,6 +77,12 @@ public static partial class Program
     public static byte[] ExportWorkingCopy(byte[] data) => SaveService.ExportWorkingCopy(data);
 
     [JSExport]
+    public static string ReadEvents(byte[] data, string json) => SaveService.ReadEvents(data, json);
+    [JSExport]
+    public static byte[] EditEvents(byte[] data, string json) => SaveService.EditEvents(data, json);
+    [JSExport]
+    public static string CompareEvents(byte[] data, string json) => SaveService.CompareEvents(data, json);
+    [JSExport]
     public static string ReadRoamer(byte[] data) => SaveService.ReadRoamer(data);
     [JSExport]
     public static byte[] EditRoamer(byte[] data, string json) => SaveService.EditRoamer(data, json);
@@ -152,7 +158,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 79;
+    public const int ApiVersion = 80;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)
@@ -550,6 +556,11 @@ public sealed record SaveReport(
 [JsonSerializable(typeof(SimpleDexQuery))]
 [JsonSerializable(typeof(SimpleDexCatalog))]
 [JsonSerializable(typeof(SimpleDexEdit))]
+[JsonSerializable(typeof(EventQuery))]
+[JsonSerializable(typeof(EventCatalog))]
+[JsonSerializable(typeof(EventEdit))]
+[JsonSerializable(typeof(EventCompareQuery))]
+[JsonSerializable(typeof(EventDiff))]
 [JsonSerializable(typeof(RoamerCatalog))]
 [JsonSerializable(typeof(RoamerEdit))]
 [JsonSerializable(typeof(RtcCatalog))]
