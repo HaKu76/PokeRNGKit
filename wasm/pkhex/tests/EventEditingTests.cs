@@ -34,6 +34,7 @@ internal static class EventEditingTests
             foreach(var language in new[]{"zh","en","ja"})
             {
                 var c=JsonSerializer.Deserialize(SaveService.ReadEvents(data,JsonSerializer.Serialize(new EventQuery(language),SaveJsonContext.Default.EventQuery)),SaveJsonContext.Default.EventCatalog)!;
+                Check(c.MaximumValue==65535&&c.CanEdit&&c.UpdatesQr==(source is SAV7),"Gen3–7 retains ushort limits and its independent edit capability");
                 Check(c.Flags.SequenceEqual(block.GetEventFlags())&&c.Values.SequenceEqual(block.GetAllEventWork()),"Catalog values match every position");
                 Check(c.FlagLabels.All(l=>l.Index>=0&&l.Index<c.Flags.Length)&&c.WorkLabels.All(l=>l.Index>=0&&l.Index<c.Values.Length),"All localized resource indices bounded");
                 Check(c.FlagLabels.Select(l=>l.Index).Distinct().Count()==c.FlagLabels.Length&&c.WorkLabels.Select(l=>l.Index).Distinct().Count()==c.WorkLabels.Length,"Unique labels");

@@ -6,7 +6,7 @@ namespace PokeRNGKit.SaveEditor;
 public sealed record EventQuery(string Language);
 public sealed record EventPreset(string Name, int Value);
 public sealed record EventLabel(int Index, string Name, int Category, EventPreset[] Presets);
-public sealed record EventCatalog(bool[] Flags, ushort[] Values, EventLabel[] FlagLabels, EventLabel[] WorkLabels, bool UpdatesQr);
+public sealed record EventCatalog(bool[] Flags, ushort[] Values, EventLabel[] FlagLabels, EventLabel[] WorkLabels, bool UpdatesQr, int MaximumValue, bool CanEdit);
 public sealed record EventFlagChange(int? Index = null, bool? Value = null);
 public sealed record EventWorkChange(int? Index = null, int? Value = null);
 public sealed record EventEdit(EventFlagChange[]? Flags = null, EventWorkChange[]? Values = null);
@@ -16,8 +16,21 @@ public sealed record EventDiff(int[] SetFlags, int[] ClearedFlags, EventValueDif
 
 internal static class EventEditing
 {
+    // Normalize the read model, while writes keep Gen2's byte-width contract.
+    private sealed class ByteEventBlock(SAV2 save) : IEventFlag37
+    {
+        public int EventFlagCount => save.EventFlagCount;
+        public int EventWorkCount => save.EventWorkCount;
+        public bool GetEventFlag(int index) => save.GetEventFlag(index);
+        public void SetEventFlag(int index, bool value) => save.SetEventFlag(index, value);
+        public ushort GetWork(int index) => save.GetWork(index);
+        public void SetWork(int index, ushort value) => save.SetWork(index, checked((byte)value));
+    }
+    internal static int Maximum(SaveFile save) => save is SAV2 ? byte.MaxValue : ushort.MaxValue;
     internal static string Suffix(SaveFile save) => save switch
     {
+        SAV2 { Version: GameVersion.C } => "c",
+        SAV2 { Version: GameVersion.GD or GameVersion.SI or GameVersion.GS } => "gs",
         SAV3RS => "rs", SAV3E => "e", SAV3FRLG => "frlg",
         SAV4DP => "dp", SAV4Pt => "pt", SAV4HGSS => "hgss",
         SAV5BW => "bw", SAV5B2W2 => "b2w2",
@@ -27,7 +40,7 @@ internal static class EventEditing
     internal static IEventFlag37 Block(SaveFile save)
     {
         _ = Suffix(save);
-        return save is IEventFlagProvider37 p ? p.EventWork : (IEventFlag37)save;
+        return save is SAV2 two ? new ByteEventBlock(two) : save is IEventFlagProvider37 p ? p.EventWork : (IEventFlag37)save;
     }
     public static EventCatalog Read(SaveFile save, string language)
     {
@@ -38,7 +51,8 @@ internal static class EventEditing
         return new(block.GetEventFlags(), block.GetAllEventWork(),
             flags.Select(f => new EventLabel(f.Index, f.Name, (int)f.Type, [])).ToArray(),
             work.Select(w => new EventLabel(w.Index, w.Name, (int)w.Type,
-                w.PredefinedValues.Where(v => !v.IsCustom).Select(v => new EventPreset(v.Name, v.Value)).ToArray())).ToArray(), save is SAV7);
+                w.PredefinedValues.Where(v => !v.IsCustom).Select(v => new EventPreset(v.Name, v.Value)).ToArray())).ToArray(), save is SAV7,
+            Maximum(save), save.State.Exportable && SaveChecksums.Valid(save));
     }
     internal static byte[] Qr(SaveFile save) => save is SAV7 s
         ? s.Data.Slice(s.AllBlocks[35].Offset + 0x168, save is SAV7USUM ? 12 : 8).ToArray() : [];
@@ -53,7 +67,7 @@ internal static class EventEditing
             if (f is null || f.Index is not {} i || (uint)i >= block.EventFlagCount || f.Value is null || !flags.Add(i))
                 throw new ArgumentException("Invalid or duplicate event flag.");
         foreach (var w in edit.Values)
-            if (w is null || w.Index is not {} i || (uint)i >= block.EventWorkCount || w.Value is not {} v || (uint)v > ushort.MaxValue || !work.Add(i))
+            if (w is null || w.Index is not {} i || (uint)i >= block.EventWorkCount || w.Value is not {} v || (uint)v > Maximum(save) || !work.Add(i))
                 throw new ArgumentException("Invalid or duplicate event value.");
         bool changed = false;
         foreach (var f in edit.Flags)
@@ -85,13 +99,15 @@ public static partial class SaveService
     public static byte[] EditEvents(byte[] data, string json)
     {
         var save = Open(data);
-        if (!CanEdit(save) || !save.State.Exportable || !SaveChecksums.Valid(save)) throw new ArgumentException("Editing requires a supported save with valid checksums.");
+        if ((!CanEdit(save) && save is not SAV2) || !save.State.Exportable || !SaveChecksums.Valid(save)) throw new ArgumentException("Editing requires a supported save with valid checksums.");
         if (json.Length > 1024 * 1024) throw new ArgumentException("Event edit is too large.");
         var edit = JsonSerializer.Deserialize(json, SaveJsonContext.Default.EventEdit) ?? throw new ArgumentException("Missing event edit.");
         EventEditing.Apply(save, edit);
         var block = EventEditing.Block(save); var flags = block.GetEventFlags(); var values = block.GetAllEventWork(); var qr = EventEditing.Qr(save);
         var output = save.Write().ToArray(); var check = Open(output); var actual = EventEditing.Block(check);
-        if (check.GetType() != save.GetType() || !SaveChecksums.Valid(check) || !flags.SequenceEqual(actual.GetEventFlags()) || !values.SequenceEqual(actual.GetAllEventWork()) || !qr.SequenceEqual(EventEditing.Qr(check)))
+        if (check.GetType() != save.GetType() || check.Version != save.Version ||
+            (save is SAV2 two && (check is not SAV2 reloaded || two.SaveRevision != reloaded.SaveRevision)) ||
+            !SaveChecksums.Valid(check) || !flags.SequenceEqual(actual.GetEventFlags()) || !values.SequenceEqual(actual.GetAllEventWork()) || !qr.SequenceEqual(EventEditing.Qr(check)))
             throw new InvalidOperationException("Event export verification failed.");
         return output;
     }
@@ -104,6 +120,12 @@ public static partial class SaveService
         if (bytes.Length > 1024 * 1024) throw new ArgumentException("Event comparison files must not exceed 1 MiB.");
         var before = Open(data); var after = Open(bytes);
         if (before.GetType() != after.GetType() || before.Version != after.Version) throw new ArgumentException("Event comparison requires the same game version.");
+        if (before is SAV2 old2 && after is SAV2 new2)
+        {
+            var diff2 = new EventBlockDiff<SAV2, byte>(old2, new2);
+            if (diff2.Message != EventWorkDiffCompatibility.Valid) throw new ArgumentException("Event layouts differ.");
+            return JsonSerializer.Serialize(new EventDiff(diff2.SetFlags.ToArray(), diff2.ClearedFlags.ToArray(), diff2.WorkChanged.Select(i => new EventValueDiff(i, old2.GetWork(i), new2.GetWork(i))).ToArray()), SaveJsonContext.Default.EventDiff);
+        }
         var a = EventEditing.Block(before); var b = EventEditing.Block(after);
         if (a.EventFlagCount != b.EventFlagCount || a.EventWorkCount != b.EventWorkCount) throw new ArgumentException("Event layouts differ.");
         var diff = new EventBlockDiff<IEventFlag37, ushort>(a, b);

@@ -14,8 +14,42 @@ const catalog: EventCatalog = {
   flagLabels: [],
   workLabels: [],
   updatesQr: false,
+  maximumValue: 65535,
+  canEdit: true,
 };
 describe("event editing boundaries", () => {
+  it("keeps Gen2 values byte-sized while preserving the five-digit decimal input", () => {
+    const gen2: EventCatalog = {
+      ...catalog,
+      maximumValue: 255,
+      values: [0, 255, 128],
+    };
+    for (let value = 0; value <= 255; value++) {
+      const draft = eventDraft(gen2);
+      draft.values[0] = String(value).padStart(5, "0");
+      expect(validateEvents(gen2, draft).values).toEqual(
+        value === 0 ? [] : [{ index: 0, value }],
+      );
+    }
+    for (const value of ["256", "65535", "-1", "1.0", "1e2", ""]) {
+      const draft = eventDraft(gen2);
+      draft.values[2] = value;
+      expect(() => validateEvents(gen2, draft)).toThrow();
+    }
+    expect(eventIndex("1999", 2000)).toBe(1999);
+    expect(() => eventIndex("2000", 2000)).toThrow();
+    expect(eventIndex("255", 256)).toBe(255);
+    expect(() => eventIndex("256", 256)).toThrow();
+  });
+  it("refuses read-only catalogs and unknown value widths", () => {
+    expect(() =>
+      validateEvents({ ...catalog, canEdit: false }, eventDraft(catalog)),
+    ).toThrow();
+    for (const maximumValue of [0, 256, 65536, NaN])
+      expect(() =>
+        validateEvents({ ...catalog, maximumValue }, eventDraft(catalog)),
+      ).toThrow();
+  });
   it("keeps all drafts and sends only changed entries", () => {
     const draft = eventDraft(catalog);
     draft.flags[2] = true;
@@ -91,6 +125,7 @@ describe("event editing boundaries", () => {
   });
   it("limits the editor to the implemented layouts", () => {
     for (const f of [
+      "SAV2",
       "SAV3RS",
       "SAV3E",
       "SAV3FRLG",
@@ -105,7 +140,7 @@ describe("event editing boundaries", () => {
       "SAV7USUM",
     ])
       expect(supportsEvents(f)).toBe(true);
-    for (const f of ["SAV2", "SAV7b", "SAV8BS", "SAV3XD", "SAV9SV"])
+    for (const f of ["SAV7b", "SAV8BS", "SAV3XD", "SAV9SV"])
       expect(supportsEvents(f)).toBe(false);
   });
   it("reports additions, removals and both values in all UI languages", () => {

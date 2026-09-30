@@ -1272,7 +1272,6 @@ export function SaveEditorPanel(
             <EventEditor
               revision={workingRevision}
               busy={busy}
-              canEdit={report.canEdit}
               lang={batchLang}
               onRead={readEvents}
               onApply={(edit) => applyWorkingEdit(edit, "eventsEdit")}
@@ -1403,7 +1402,11 @@ export function SaveEditorPanel(
               </dl>
               {report.checksumsValid && !report.canEdit && (
                 <p>
-                  {report.pokedex?.canEdit ? words.pokedexOnly : words.readonly}
+                  {report.format === "SAV2"
+                    ? words.gen2EditorsOnly
+                    : report.pokedex?.canEdit
+                      ? words.pokedexOnly
+                      : words.readonly}
                 </p>
               )}
               <fieldset

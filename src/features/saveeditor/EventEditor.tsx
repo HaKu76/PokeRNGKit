@@ -16,7 +16,6 @@ type Lang = keyof typeof eventWords;
 export function EventEditor({
   revision,
   busy,
-  canEdit,
   lang,
   onRead,
   onApply,
@@ -24,7 +23,6 @@ export function EventEditor({
 }: {
   revision: number;
   busy: boolean;
-  canEdit: boolean;
   lang: Lang;
   onRead(): Promise<EventCatalog | undefined>;
   onApply(edit: EventEdit): Promise<void>;
@@ -56,7 +54,6 @@ export function EventEditor({
           key={revision}
           catalog={loaded.catalog}
           disabled={busy}
-          canEdit={canEdit}
           lang={lang}
           onApply={onApply}
         />
@@ -80,13 +77,11 @@ export function EventEditor({
 function EventForm({
   catalog,
   disabled,
-  canEdit,
   lang,
   onApply,
 }: {
   catalog: EventCatalog;
   disabled: boolean;
-  canEdit: boolean;
   lang: Lang;
   onApply(edit: EventEdit): Promise<void>;
 }) {
@@ -252,7 +247,7 @@ function EventForm({
           <input
             type="checkbox"
             checked={draft.flags[index]}
-            disabled={!canEdit}
+            disabled={!catalog.canEdit}
             onChange={(e) =>
               setDraft({
                 ...draft,
@@ -270,7 +265,7 @@ function EventForm({
             <label className="field">
               <span>{w.preset}</span>
               <Select
-                disabled={disabled || !canEdit}
+                disabled={disabled || !catalog.canEdit}
                 value={
                   label.presets.some(
                     (p) => String(p.value) === draft.values[index],
@@ -292,12 +287,14 @@ function EventForm({
             </label>
           )}
           <label className="field">
-            <span>{w.value} · 0–65535</span>
+            <span>
+              {w.value} · 0–{catalog.maximumValue}
+            </span>
             <input
               inputMode="numeric"
               maxLength={5}
               value={draft.values[index]}
-              readOnly={!canEdit}
+              readOnly={!catalog.canEdit}
               onChange={(e) => updateValue(e.target.value)}
             />
           </label>
@@ -312,7 +309,7 @@ function EventForm({
         <button
           type="button"
           className="primary"
-          disabled={disabled || !canEdit || !changes.length}
+          disabled={disabled || !catalog.canEdit || !changes.length}
           onClick={apply}
         >
           {w.apply}

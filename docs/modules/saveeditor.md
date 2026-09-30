@@ -3,6 +3,28 @@
 2026-09-22 开始开发。入口位于悬浮工具菜单，使用本地 `PKHeX.Core` 26.08.26 源码；
 来源、归属与逐文件哈希见 [UPSTREAM](../../third_party/pkhex/UPSTREAM.md)。
 
+## 第二世代事件标记与数值
+
+API 81 接入 SAV_EventFlags2，覆盖国际版／日文版金银与水晶、韩文版金银五种布局。
+SAV2 固定包含 2000 个布尔标记和 256 个 byte 事件数值，编号分别为 0–1999、0–255；新增值限 0–255。
+沿用上游 MaskedTextBox 的五位十进制输入宽度，允许前导零；空值、负数、小数、指数及超过 255 的值拒绝，不按桌面解析失败时归零。
+目录新增独立 canEdit 与 maximumValue，第三至第七世代保持 65535 上限；第二世代界面、预设与提交校验使用 byte 上限，写入时不截断或溢出转换。
+具名分类、预设、搜索、按编号定位、草稿预览、应用／撤销和三语资源沿用事件工作区；只读情况下仍可浏览，不开放其他未接入的 GB 编辑器。
+
+| 布局       | 事件标记偏移 | 事件数值偏移 |
+| ---------- | ------------ | ------------ |
+| 国际版金银 | 0x261F       | 0x251F       |
+| 国际版水晶 | 0x2600       | 0x2500       |
+| 日文版金银 | 0x2600       | 0x2500       |
+| 日文版水晶 | 0x25E2       | 0x24E2       |
+| 韩文版金银 | 0x25F7       | 0x24F7       |
+
+标记占 250 字节，数值占其前方 256 字节；生产读写调用 Core GetEventFlag／SetEventFlag 与 GetWork／SetWork，表中偏移用于独立原始字节测试。
+比较调用 EventBlockDiff<SAV2, byte>，保留新增／清除标记与数值前后值；金银文件由 Core 识别为 GS 组，不虚构单独金／银识别结果。
+导出复用 Core 的区域备份与保存流程，韩文版复用项目已核对的 SaveChecksums 双区域校验；重读核对游戏组、区域布局、完整事件数据及校验和，下载保持工作副本的精确字节。
+五布局八组样本长度（国际／韩文 32／64 KiB、日文 64 KiB）的三语目录、全部编号与 byte 值、独立位／字节及完整输出、主备份校验损坏、请求原子性、比较与导出专项通过；真实存档和浏览器仍待核验。
+上游依据：WinForms Subforms/Save Editors/SAV_EventFlags2.cs／Designer.cs 的 AddConstList、ChangeCustomConst、DiffSaves 与 MT_Stat.Mask；Core Saves/SAV2.cs 的 EventFlagCount、EventWorkCount、GetWork、SetWork、GetFinalData，Saves/Substructures/Gen12/SAV2Offsets.cs 的五组布局。
+
 ## 第三至第七世代事件标记与数值
 
 API 80 接入 SAV_EventFlags 对应的 12 种布局：RS／E／FRLG、DP／Pt／HGSS、BW／B2W2、XY／ORAS、SM／USUM。
@@ -20,7 +42,7 @@ SM／USUM 有实际变化时沿用 EventWorkspace.Save 的 UpdateQrConstants 联
 
 研究比较接受两个同游戏版本的非空存档，各最大 1 MiB；核对类型、版本与数组布局后调用 EventBlockDiff，输出新增标记、清除标记及每个数值的前后值，可查看和下载文本。
 比较在存档 Worker 内运行，不替换当前工作副本，也不应用编辑草稿；对第二个文件的 Base64 与请求长度同时设限。
-本项不包含 SAV_EventFlags2、Let’s Go 的 SAV_EventWork 或后续世代不同结构的事件窗口。
+第二世代对应窗口见上节；Let’s Go 的 SAV_EventWork 与后续世代不同结构的事件窗口仍待接入。
 12 布局专项已覆盖三语资源、每个编号、位边界／UInt16 边界、全文件 Core 对照、请求原子性、未改 QR 保持、QR 组合及差异方向；真实存档与浏览器检查仍待完成。
 
 上游依据：WinForms Subforms/Save Editors/SAV_EventFlags.cs／Designer.cs 的 AddFlagList、AddConstList、ChangeCustomBool、ChangeCustomConst 与 DiffSaves；Core Editing/Saves/Editors/EventOld 下的 EventWorkspace、EventLabelParsing、NamedEventWork，EventWork/Diff/EventWorkDiff.cs，Saves/Substructures/IEventFlagArray.cs，SAV7SM／SAV7USUM.UpdateQrConstants。

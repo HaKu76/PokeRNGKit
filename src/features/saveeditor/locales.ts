@@ -6,6 +6,7 @@ import { boxBinaryWords } from "./boxBinary";
 
 export const saveEditorResources = {
   zh: {
+    gen2EditorsOnly: "此格式已开放图鉴与事件编辑，训练家编辑仍在接入中。",
     eventError: "事件数据无效或不适用于此存档，未应用修改。",
     eventCompareError: "比较需要相同游戏版本及事件布局的两个存档。",
     eventCompareSize: "比较存档必须非空，且每个不超过 1 MiB。",
@@ -541,6 +542,8 @@ export const saveEditorResources = {
     },
   },
   en: {
+    gen2EditorsOnly:
+      "Pokédex and event editing are available for this format. Trainer editing is still in development.",
     eventError:
       "Event data is invalid or unavailable for this save. No changes were applied.",
     eventCompareError:
@@ -1111,6 +1114,8 @@ export const saveEditorResources = {
     },
   },
   ja: {
+    gen2EditorsOnly:
+      "この形式は図鑑とイベントの編集に対応しています。トレーナー編集は開発中です。",
     eventError:
       "イベントデータが無効か、このセーブでは使用できません。変更は適用されていません。",
     eventCompareError:

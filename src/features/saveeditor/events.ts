@@ -10,6 +10,8 @@ export interface EventCatalog {
   flagLabels: EventLabel[];
   workLabels: EventLabel[];
   updatesQr: boolean;
+  maximumValue: number;
+  canEdit: boolean;
 }
 export interface EventEdit {
   flags: { index: number; value: boolean }[];
@@ -22,6 +24,7 @@ export interface EventDiff {
 }
 export const supportsEvents = (format: string) =>
   [
+    "SAV2",
     "SAV3RS",
     "SAV3E",
     "SAV3FRLG",
@@ -44,13 +47,15 @@ export function validateEvents(
   d: ReturnType<typeof eventDraft>,
 ): EventEdit {
   if (
+    !c.canEdit ||
+    ![255, 65535].includes(c.maximumValue) ||
     d.flags.length !== c.flags.length ||
     d.values.length !== c.values.length ||
     d.flags.some((v) => typeof v !== "boolean")
   )
     throw new Error("Invalid event fields.");
   const values = d.values.map((v) => (/^\d{1,5}$/.test(v) ? Number(v) : NaN));
-  if (values.some((v) => !Number.isInteger(v) || v < 0 || v > 65535))
+  if (values.some((v) => !Number.isInteger(v) || v < 0 || v > c.maximumValue))
     throw new Error("Invalid event fields.");
   return {
     flags: d.flags.flatMap((value, index) =>
@@ -97,7 +102,7 @@ export const eventWords = {
     empty: "没有匹配项目。可清空搜索或按编号定位。",
     apply: "应用修改",
     discard: "放弃修改",
-    invalid: "请输入范围内的项目编号与 0–65535 的十进制整数，不能留空。",
+    invalid: "请输入所示范围内的项目编号与十进制整数，不能留空。",
     changes: "待应用修改",
     note: "草稿在项目之间保留，应用后可撤销。事件含义使用上游名称；缺少译文时保留上游回退文本。",
     qr: "第七世代应用事件修改时，会按 PKHeX 规则同步玛机雅娜等 QR 领取数据。未修改的草稿不会触发同步。",
@@ -148,7 +153,7 @@ export const eventWords = {
     apply: "Apply changes",
     discard: "Discard changes",
     invalid:
-      "Enter an index within its range and a decimal value from 0 to 65535. Empty values are not allowed.",
+      "Enter an index and a decimal value within the displayed ranges. Empty values are not allowed.",
     changes: "Pending changes",
     note: "Drafts are retained when switching entries and applied edits can be undone. Event descriptions use upstream text with its fallback for missing translations.",
     qr: "In Generation VII, applying event edits also synchronizes QR gift data such as Magearna according to PKHeX rules. Unchanged drafts do not trigger synchronization.",
@@ -199,7 +204,7 @@ export const eventWords = {
     apply: "変更を適用",
     discard: "変更を破棄",
     invalid:
-      "範囲内の項目番号と0～65535の10進整数を入力してください。空欄は使用できません。",
+      "表示範囲内の項目番号と10進整数を入力してください。空欄は使用できません。",
     changes: "未適用の変更",
     note: "項目を切り替えても下書きは保持され、適用後は元に戻せます。イベント名は上流の翻訳と未翻訳時の代替テキストを使用します。",
     qr: "第7世代でイベント変更を適用すると、PKHeXの規則に従ってマギアナなどのQR受取データも同期します。未変更の下書きでは同期しません。",
