@@ -83,6 +83,10 @@ public static partial class Program
     [JSExport]
     public static string CompareEvents(byte[] data, string json) => SaveService.CompareEvents(data, json);
     [JSExport]
+    public static string ReadEventReset(byte[] data, string json) => SaveService.ReadEventReset(data, json);
+    [JSExport]
+    public static byte[] EditEventReset(byte[] data, string json) => SaveService.EditEventReset(data, json);
+    [JSExport]
     public static string ReadRoamer(byte[] data) => SaveService.ReadRoamer(data);
     [JSExport]
     public static byte[] EditRoamer(byte[] data, string json) => SaveService.EditRoamer(data, json);
@@ -158,7 +162,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 83;
+    public const int ApiVersion = 84;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)
@@ -561,6 +565,8 @@ public sealed record SaveReport(
 [JsonSerializable(typeof(EventEdit))]
 [JsonSerializable(typeof(EventCompareQuery))]
 [JsonSerializable(typeof(EventDiff))]
+[JsonSerializable(typeof(EventResetCatalog))]
+[JsonSerializable(typeof(EventResetEdit))]
 [JsonSerializable(typeof(RoamerCatalog))]
 [JsonSerializable(typeof(RoamerEdit))]
 [JsonSerializable(typeof(RtcCatalog))]

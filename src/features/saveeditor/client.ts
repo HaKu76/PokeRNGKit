@@ -58,6 +58,8 @@ export class SaveEditorClient {
       | "events"
       | "eventsEdit"
       | "eventsCompare"
+      | "eventReset"
+      | "eventResetEdit"
       | "roamer"
       | "roamerEdit"
       | "rtc"

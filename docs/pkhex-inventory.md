@@ -32,6 +32,8 @@ API 82 接入 Let’s Go 的 4096 个标记与 1000 个有符号数值，保留�
 具名资源、预设、草稿、撤销和 Core 双文件比较已接通；正负边界、原始字节／完整文件与称号保留专项通过，浏览器与真实存档待核验。
 API 83 接入 BDSP 两版本四修订版的普通标记、独立系统标记及 Int32 数值，沿用具名预设、草稿与三语工作区。
 Core 比较、撤销、完整数组回读及精确修订版导出已接通；原始字节与八布局专项通过，浏览器及真实存档待核验。
+API 84 接入 Gen1 定点与赠送事件重置，提供三语搜索、多选、应用与撤销；RB 18 项、Yellow 21 项均沿用 Core 的关联标记。
+国际版／日文版四布局的全部项目、双标记组合、原始位与完整文件对照、无效请求及导出专项通过，浏览器与真实存档待核验。
 其余事件窗口仍按各自清单推进。
 
 独立宝可梦文件内核已分离 SaveFile 依赖；14 种第三至第九世代实体类型的基础编辑和四种存储／加密表示专项通过。
@@ -337,7 +339,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/SAV_Encounters.cs`                                                  | 待核对                                                             |
 | `Subforms/SAV_FolderList.cs`                                                  | 待核对                                                             |
 | `Subforms/SAV_MysteryGiftDB.cs`                                               | 待核对                                                             |
-| `Subforms/Save Editors/Gen1/SAV_EventReset1.cs`                               | 待核对                                                             |
+| `Subforms/Save Editors/Gen1/SAV_EventReset1.cs`                               | 已接入四布局事件重置、三语、多选与撤销；浏览器与实档待核验         |
 | `Subforms/Save Editors/Gen1/SAV_HallOfFame1.cs`                               | 待核对                                                             |
 | `Subforms/Save Editors/Gen2/SAV_Misc2.cs`                                     | 待核对                                                             |
 | `Subforms/Save Editors/Gen3/PokeBlock3CaseEditor.cs`                          | API 75：逐格／批量与三语目录已接入；工程检查通过，浏览器待核验     |

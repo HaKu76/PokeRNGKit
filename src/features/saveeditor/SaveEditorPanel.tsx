@@ -51,6 +51,8 @@ import { SaveInventoryBrowser } from "./SaveInventoryBrowser";
 import { TrainerGeographyFields } from "./TrainerGeographyFields";
 import { EventEditor } from "./EventEditor";
 import { supportsEvents, eventWords, validateEventFiles } from "./events";
+import { EventResetEditor } from "./EventResetEditor";
+import { supportsEventReset, eventResetWords } from "./eventReset";
 import { RoamerEditor } from "./RoamerEditor";
 import { supportsRoamer, roamerWords } from "./roamer";
 import { RtcEditor } from "./RtcEditor";
@@ -89,6 +91,7 @@ export function SaveEditorPanel(
     | "trainer"
     | "inventory"
     | "events"
+    | "eventReset"
     | "roamer"
     | "rtc"
     | "opowers"
@@ -203,6 +206,8 @@ export function SaveEditorPanel(
         (previous === "food" && !supportsFood(result.report.format)) ||
         (previous === "opowers" && !supportsOPowers(result.report.format)) ||
         (previous === "events" && !supportsEvents(result.report.format)) ||
+        (previous === "eventReset" &&
+          !supportsEventReset(result.report.format)) ||
         (previous === "roamer" && !supportsRoamer(result.report.format)) ||
         (previous === "rtc" && !supportsRtc(result.report.format))
           ? "trainer"
@@ -612,6 +617,22 @@ export function SaveEditorPanel(
     });
     return diff;
   };
+  const readEventReset = async () => {
+    let catalog: import("./eventReset").EventResetCatalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify({ language: batchLang }),
+        "eventReset",
+      );
+      if (id !== operation.current) return;
+      if (!result.eventReset)
+        throw new Error("No event reset catalog was returned.");
+      catalog = result.eventReset;
+    });
+    return catalog;
+  };
   const readRoamer = async () => {
     let catalog: import("./roamer").RoamerCatalog | undefined;
     await perform(async (id) => {
@@ -813,6 +834,7 @@ export function SaveEditorPanel(
       | import("./gen4Pokedex").Dex4Edit
       | import("./simplePokedex").SimpleDexEdit
       | import("./events").EventEdit
+      | import("./eventReset").EventResetEdit
       | import("./roamer").RoamerEdit
       | import("./rtc").RtcEdit
       | import("./opowers").OPowerEdit
@@ -843,6 +865,7 @@ export function SaveEditorPanel(
       | "pokedex4Edit"
       | "pokedexEdit"
       | "eventsEdit"
+      | "eventResetEdit"
       | "roamerEdit"
       | "rtcEdit"
       | "opowersEdit"
@@ -1102,6 +1125,16 @@ export function SaveEditorPanel(
                 {eventWords[batchLang].title}
               </button>
             )}
+            {supportsEventReset(report.format) && (
+              <button
+                type="button"
+                disabled={busy}
+                aria-pressed={section === "eventReset"}
+                onClick={() => setSection("eventReset")}
+              >
+                {eventResetWords[batchLang].title}
+              </button>
+            )}
             {supportsRoamer(report.format) && (
               <button
                 type="button"
@@ -1277,6 +1310,14 @@ export function SaveEditorPanel(
               onApply={(edit) => applyWorkingEdit(edit, "eventsEdit")}
               onCompare={compareEvents}
             />
+          ) : section === "eventReset" && supportsEventReset(report.format) ? (
+            <EventResetEditor
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readEventReset}
+              onApply={(edit) => applyWorkingEdit(edit, "eventResetEdit")}
+            />
           ) : section === "roamer" && supportsRoamer(report.format) ? (
             <RoamerEditor
               revision={workingRevision}
@@ -1402,11 +1443,13 @@ export function SaveEditorPanel(
               </dl>
               {report.checksumsValid && !report.canEdit && (
                 <p>
-                  {["SAV2", "SAV7b"].includes(report.format)
-                    ? words.pokedexEventsOnly
-                    : report.pokedex?.canEdit
-                      ? words.pokedexOnly
-                      : words.readonly}
+                  {report.format === "SAV1"
+                    ? words.pokedexResetOnly
+                    : ["SAV2", "SAV7b"].includes(report.format)
+                      ? words.pokedexEventsOnly
+                      : report.pokedex?.canEdit
+                        ? words.pokedexOnly
+                        : words.readonly}
                 </p>
               )}
               <fieldset

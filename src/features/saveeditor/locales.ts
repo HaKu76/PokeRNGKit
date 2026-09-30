@@ -6,6 +6,7 @@ import { boxBinaryWords } from "./boxBinary";
 
 export const saveEditorResources = {
   zh: {
+    pokedexResetOnly: "此格式已开放图鉴与事件重置，训练家编辑仍在接入中。",
     pokedexEventsOnly: "此格式已开放图鉴与事件编辑，训练家编辑仍在接入中。",
     eventError: "事件数据无效或不适用于此存档，未应用修改。",
     eventCompareError: "比较需要相同游戏版本及事件布局的两个存档。",
@@ -542,6 +543,8 @@ export const saveEditorResources = {
     },
   },
   en: {
+    pokedexResetOnly:
+      "Pokédex editing and event resets are available for this format. Trainer editing is still in development.",
     pokedexEventsOnly:
       "Pokédex and event editing are available for this format. Trainer editing is still in development.",
     eventError:
@@ -1114,6 +1117,8 @@ export const saveEditorResources = {
     },
   },
   ja: {
+    pokedexResetOnly:
+      "この形式は図鑑の編集とイベントのリセットに対応しています。トレーナー編集は開発中です。",
     pokedexEventsOnly:
       "この形式は図鑑とイベントの編集に対応しています。トレーナー編集は開発中です。",
     eventError:
@@ -1708,7 +1713,7 @@ export function localizeSaveError(
   if (/Event comparison requires|Event layouts differ/.test(message))
     return words.eventCompareError;
   if (
-    /event flag|event value|event fields|Event changes|Event edit|Event export|event catalog|event comparison|event query|event language/i.test(
+    /event reset|reset event|event flag|event value|event fields|Event changes|Event edit|Event export|event catalog|event comparison|event query|event language/i.test(
       message,
     )
   )

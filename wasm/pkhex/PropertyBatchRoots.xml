@@ -26,5 +26,7 @@
     <type fullname="PKHeX.Core.PK2" preserve="all" />
     <type fullname="PKHeX.Core.SK2" preserve="all" />
     <type fullname="PKHeX.Core.PK1" preserve="all" />
+    <!-- G1OverworldSpawner discovers its private Flag properties by reflection. -->
+    <type fullname="PKHeX.Core.G1OverworldSpawner" preserve="all" />
   </assembly>
 </linker>
