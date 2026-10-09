@@ -1,3 +1,4 @@
+import { ug4Words } from "./underground4";
 import { misc4Words } from "./misc4";
 import { honey4Words } from "./honeyTree4";
 import { geonet4Words } from "./geonet4";
@@ -15,6 +16,8 @@ export const saveEditorResources = {
   zh: {
     misc4Error: misc4Words.zh.invalid,
     misc4Stale: misc4Words.zh.stale,
+    underground4Error: ug4Words.zh.invalid,
+    underground4Stale: ug4Words.zh.stale,
     honey4Error: honey4Words.zh.invalid,
     honey4Stale: honey4Words.zh.stale,
     geonet4Error: geonet4Words.zh.invalid,
@@ -585,6 +588,8 @@ export const saveEditorResources = {
   en: {
     misc4Error: misc4Words.en.invalid,
     misc4Stale: misc4Words.en.stale,
+    underground4Error: ug4Words.en.invalid,
+    underground4Stale: ug4Words.en.stale,
     honey4Error: honey4Words.en.invalid,
     honey4Stale: honey4Words.en.stale,
     geonet4Error: geonet4Words.en.invalid,
@@ -1197,6 +1202,8 @@ export const saveEditorResources = {
   ja: {
     misc4Error: misc4Words.ja.invalid,
     misc4Stale: misc4Words.ja.stale,
+    underground4Error: ug4Words.ja.invalid,
+    underground4Stale: ug4Words.ja.stale,
     honey4Error: honey4Words.ja.invalid,
     honey4Stale: honey4Words.ja.stale,
     geonet4Error: geonet4Words.ja.invalid,
@@ -1842,6 +1849,8 @@ export function localizeSaveError(
   if (/battle video4.*stale/i.test(message)) return words.video4Stale;
   if (/Misc4.*stale/i.test(message)) return words.misc4Stale;
   if (/Misc4/i.test(message)) return words.misc4Error;
+  if (/Underground4.*stale/i.test(message)) return words.underground4Stale;
+  if (/Underground4/i.test(message)) return words.underground4Error;
   if (/HoneyTree4.*stale/i.test(message)) return words.honey4Stale;
   if (/HoneyTree4/i.test(message)) return words.honey4Error;
   if (/Geonet4.*stale/i.test(message)) return words.geonet4Stale;

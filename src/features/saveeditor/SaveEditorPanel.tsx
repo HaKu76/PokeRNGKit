@@ -79,6 +79,8 @@ import { Geonet4Editor } from "./Geonet4Editor";
 import { geonet4Words, supportsGeonet4 } from "./geonet4";
 import { Misc4Editor } from "./Misc4Editor";
 import { misc4Words, supportsMisc4 } from "./misc4";
+import { Underground4Editor } from "./Underground4Editor";
+import { ug4Words, supportsUnderground4 } from "./underground4";
 import { HoneyTree4Editor } from "./HoneyTree4Editor";
 import { honey4Words, supportsHoneyTree4 } from "./honeyTree4";
 import { Br4GearEditor } from "./Br4GearEditor";
@@ -147,6 +149,7 @@ export function SaveEditorPanel(
     | "battleVideo4"
     | "geonet4"
     | "misc4"
+    | "underground4"
     | "honeyTree4"
     | "br4Gear"
     | "joyful3"
@@ -290,6 +293,8 @@ export function SaveEditorPanel(
           !supportsBattleVideo4(result.report.format)) ||
         (previous === "geonet4" && !supportsGeonet4(result.report.format)) ||
         (previous === "misc4" && !supportsMisc4(result.report.format)) ||
+        (previous === "underground4" &&
+          !supportsUnderground4(result.report.format)) ||
         (previous === "honeyTree4" &&
           !supportsHoneyTree4(result.report.format)) ||
         (previous === "br4Gear" && !supportsBr4Gear(result.report.format)) ||
@@ -1011,6 +1016,42 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const previewUnderground4 = async (
+    edit: import("./underground4").Ug4Edit,
+  ) => {
+    let preview: import("./underground4").Ug4Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "underground4Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.underground4Preview)
+        throw Error("No Underground4 preview was returned.");
+      preview = result.underground4Preview;
+    });
+    return preview;
+  };
+
+  const readUnderground4 = async () => {
+    let catalog: import("./underground4").Ug4Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "underground4",
+      );
+      if (id !== operation.current) return;
+      if (!result.underground4)
+        throw new Error("No underground4 catalog was returned.");
+      catalog = result.underground4;
+    });
+    return catalog;
+  };
+
   const readHoneyTree4 = async () => {
     let catalog: import("./honeyTree4").Honey4Catalog | undefined;
     await perform(async (id) => {
@@ -1359,6 +1400,7 @@ export function SaveEditorPanel(
       | import("./battleVideo4").Video4Import
       | import("./geonet4").Geo4Edit
       | import("./misc4").Misc4Edit
+      | import("./underground4").Ug4Edit
       | import("./honeyTree4").Honey4Edit
       | import("./br4").Br4GearEdit
       | import("./joyful3").Joyful3Edit
@@ -1411,6 +1453,7 @@ export function SaveEditorPanel(
       | "video4Import"
       | "geonet4Edit"
       | "misc4Edit"
+      | "underground4Edit"
       | "honeyTree4Edit"
       | "br4GearEdit"
       | "joyful3Edit"
@@ -1904,6 +1947,15 @@ export function SaveEditorPanel(
                 {misc4Words[batchLang].title}
               </button>
             )}
+            {supportsUnderground4(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "underground4"}
+                onClick={() => setSection("underground4")}
+              >
+                {ug4Words[batchLang].title}
+              </button>
+            )}
             {supportsHoneyTree4(report.format) && (
               <button
                 type="button"
@@ -2286,6 +2338,17 @@ export function SaveEditorPanel(
               onPreview={previewMisc4}
               onApply={(edit) => applyWorkingEdit(edit, "misc4Edit")}
               onRelated={setSection}
+            />
+          ) : section === "underground4" &&
+            supportsUnderground4(report.format) ? (
+            <Underground4Editor
+              key={report.format + "." + batchLang}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readUnderground4}
+              onPreview={previewUnderground4}
+              onApply={(edit) => applyWorkingEdit(edit, "underground4Edit")}
             />
           ) : section === "honeyTree4" && supportsHoneyTree4(report.format) ? (
             <HoneyTree4Editor
