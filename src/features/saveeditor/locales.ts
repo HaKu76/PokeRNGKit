@@ -513,6 +513,9 @@ export const saveEditorResources = {
     nameError: "训练家姓名为空、过长或含此游戏不支持的字符。",
     rivalError:
       "劲敌姓名最多 7 字符，必须能在此游戏字符集中完整保存；原始姓名字节需为 16 位十六进制。",
+    pokegear4Error:
+      "无法应用通讯录操作。格位为 1–75，原始数值为 -128–127；请核对联系人和当前存档状态。",
+    pokegear4Stale: "存档已改变，请重新读取通讯录并生成批量预览。",
     secretBase3NameError:
       "基地姓名需按该记录的语言无损保存，最多 7 字符；原始姓名为 14 位十六进制。",
     secretBase3Error:
@@ -1095,6 +1098,10 @@ export const saveEditorResources = {
     zipError: "Extract the ZIP before opening its save.",
     rivalError:
       "The rival name accepts up to 7 characters and must be losslessly encoded by this game. Raw name bytes require 16 hex digits.",
+    pokegear4Error:
+      "Cannot apply the contact operation. Slots are 1–75 and raw values are -128–127. Check the contact and current save state.",
+    pokegear4Stale:
+      "The save has changed. Read the contacts again and regenerate the batch preview.",
     secretBase3NameError:
       "The base name must be losslessly encoded using the record's language, with up to 7 characters. Raw name bytes require 14 hex digits.",
     secretBase3Error:
@@ -1687,6 +1694,10 @@ export const saveEditorResources = {
     nameError: "名前が空、長すぎる、または使用できない文字を含んでいます。",
     rivalError:
       "ライバル名は7文字までで、このゲームの文字コードで完全に保存できる必要があります。バイト列は16桁の16進数です。",
+    pokegear4Error:
+      "連絡先の操作を適用できません。位置は 1–75、元の数値は -128–127 です。連絡先と現在のセーブ状態を確認してください。",
+    pokegear4Stale:
+      "セーブが変わりました。連絡先を再読み込みして一括プレビューを作り直してください。",
     secretBase3NameError:
       "基地名は記録の言語で完全に保存できる7文字までです。バイト列は14桁の16進数です。",
     secretBase3Error:
@@ -1758,6 +1769,9 @@ export function localizeSaveError(
   )
     return words.eventError;
   if (/GS Ball/i.test(message)) return words.gsBallError;
+  if (/PokeGear4.*valid checksums/i.test(message)) return words.invalid;
+  if (/PokeGear4 preview is stale/i.test(message)) return words.pokegear4Stale;
+  if (/PokeGear4/i.test(message)) return words.pokegear4Error;
   if (/Gen3 secret base.*valid checksums/i.test(message)) return words.invalid;
   if (/Gen3 secret base name/i.test(message)) return words.secretBase3NameError;
   if (/Gen3 secret base/i.test(message)) return words.secretBase3Error;

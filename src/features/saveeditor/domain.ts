@@ -59,7 +59,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 96;
+  apiVersion: 97;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -777,6 +777,7 @@ export interface SaveEditorResult {
   misc3?: import("./misc3").Misc3Catalog;
   secretBase3?: import("./secretBase3").SecretBase3Catalog;
   secretBase3Form?: import("./secretBase3").Base3FormSuggestion;
+  pokegear4?: import("./pokegear4").PokeGear4Catalog;
   joyful3?: import("./joyful3").Joyful3Catalog;
   frontier3?: import("./frontier3").Frontier3Catalog;
   gameRecords3?: import("./gameRecords3").GameRecord3Catalog;

@@ -50,6 +50,15 @@ describe("save editor localization", () => {
       expect(
         localizeSaveError("Invalid Gen3 secret base form preview.", words),
       ).toBe(words.secretBase3Error);
+      expect(localizeSaveError("Invalid PokeGear4 slot values.", words)).toBe(
+        words.pokegear4Error,
+      );
+      expect(
+        localizeSaveError("PokeGear4 preview is stale. Read it again.", words),
+      ).toBe(words.pokegear4Stale);
+      expect(
+        localizeSaveError("PokeGear4 requires valid checksums.", words),
+      ).toBe(words.invalid);
       expect(localizeSaveError("OT: 1–7 characters.", words)).toBe(
         words.nameError,
       );
