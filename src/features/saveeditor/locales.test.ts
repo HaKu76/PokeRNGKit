@@ -41,6 +41,15 @@ describe("save editor localization", () => {
       expect(localizeSaveError("Unrecognized save file.", words)).toBe(
         words.fileError,
       );
+      expect(
+        localizeSaveError(
+          "Gen3 secret base name cannot be encoded without loss.",
+          words,
+        ),
+      ).toBe(words.secretBase3NameError);
+      expect(
+        localizeSaveError("Invalid Gen3 secret base form preview.", words),
+      ).toBe(words.secretBase3Error);
       expect(localizeSaveError("OT: 1–7 characters.", words)).toBe(
         words.nameError,
       );

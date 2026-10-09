@@ -66,6 +66,9 @@ interface SaveExports {
         EditFerry3(data: Uint8Array, json: string): Uint8Array;
         ReadMisc3(data: Uint8Array): string;
         EditMisc3(data: Uint8Array, json: string): Uint8Array;
+        ReadSecretBase3(data: Uint8Array): string;
+        SuggestSecretBase3Form(data: Uint8Array, json: string): string;
+        EditSecretBase3(data: Uint8Array, json: string): Uint8Array;
         ReadJoyful3(data: Uint8Array): string;
         EditJoyful3(data: Uint8Array, json: string): Uint8Array;
         ReadFrontier3(data: Uint8Array): string;
@@ -194,6 +197,9 @@ self.addEventListener(
         | "ferry3Edit"
         | "misc3"
         | "misc3Edit"
+        | "secretBase3"
+        | "secretBase3Form"
+        | "secretBase3Edit"
         | "joyful3"
         | "joyful3Edit"
         | "frontier3"
@@ -251,7 +257,7 @@ self.addEventListener(
         const before: StandalonePokemonReport = JSON.parse(
           api.InspectStandalonePokemon(bytes, payload),
         );
-        if (before.apiVersion !== 95)
+        if (before.apiVersion !== 96)
           throw new Error("Save editor API version mismatch.");
         const output =
           kind === "entityGb"
@@ -295,7 +301,7 @@ self.addEventListener(
       }
       if (kind?.startsWith("boxBinary")) {
         const before: SaveReport = JSON.parse(api.Inspect(bytes));
-        if (before.apiVersion !== 95)
+        if (before.apiVersion !== 96)
           throw new Error("Save editor API version mismatch.");
         if (kind === "boxBinaryDiscard") api.DiscardBoxBinary(payload);
         const output =
@@ -323,7 +329,7 @@ self.addEventListener(
       }
       if (kind?.startsWith("boxImport")) {
         const before: SaveReport = JSON.parse(api.Inspect(bytes));
-        if (before.apiVersion !== 95)
+        if (before.apiVersion !== 96)
           throw new Error("Save editor API version mismatch.");
         if (kind === "boxImportDiscard") api.DiscardBoxImport(payload);
         const output =
@@ -346,7 +352,7 @@ self.addEventListener(
       }
       if (kind?.startsWith("file") || kind === "boxArchive") {
         const report: SaveReport = JSON.parse(api.Inspect(bytes));
-        if (report.apiVersion !== 95)
+        if (report.apiVersion !== 96)
           throw new Error("Save editor API version mismatch.");
         if (kind === "fileDiscard") api.DiscardFileBatch(payload);
         const archive =
@@ -398,6 +404,8 @@ self.addEventListener(
         kind === "eventReset" ||
         kind === "ferry3" ||
         kind === "misc3" ||
+        kind === "secretBase3" ||
+        kind === "secretBase3Form" ||
         kind === "joyful3" ||
         kind === "frontier3" ||
         kind === "gameRecords3" ||
@@ -422,168 +430,171 @@ self.addEventListener(
                 ? api.EditFerry3(bytes, payload)
                 : kind === "misc3Edit"
                   ? api.EditMisc3(bytes, payload)
-                  : kind === "joyful3Edit"
-                    ? api.EditJoyful3(bytes, payload)
-                    : kind === "frontier3Edit"
-                      ? api.EditFrontier3(bytes, payload)
-                      : kind === "gameRecords3Edit"
-                        ? api.EditGameRecords3(bytes, payload)
-                        : kind === "paintings3Edit"
-                          ? api.EditPaintings3(bytes, payload)
-                          : kind === "decorations3Edit"
-                            ? api.EditDecorations3(bytes, payload)
-                            : kind === "roamer3Edit"
-                              ? api.EditRoamer3(bytes, payload)
-                              : kind === "hall3Edit"
-                                ? api.EditHall3(bytes, payload)
-                                : kind === "gsBall2Edit"
-                                  ? api.EnableGsBall2(bytes)
-                                  : kind === "hall1Edit"
-                                    ? api.EditHall1(bytes, payload)
-                                    : kind === "eventResetEdit"
-                                      ? api.EditEventReset(bytes, payload)
-                                      : kind === "eventsEdit"
-                                        ? api.EditEvents(bytes, payload)
-                                        : kind === "propertyCommit"
-                                          ? api.CommitPropertyBatch(
-                                              bytes,
-                                              payload,
-                                            )
-                                          : kind === "exportWorkingCopy"
-                                            ? api.ExportWorkingCopy(bytes)
-                                            : kind === "pokedex9aEdit"
-                                              ? api.EditPokedex9a(
-                                                  bytes,
-                                                  payload,
-                                                )
-                                              : kind === "pokedex9Edit"
-                                                ? api.EditPokedex9(
+                  : kind === "secretBase3Edit"
+                    ? api.EditSecretBase3(bytes, payload)
+                    : kind === "joyful3Edit"
+                      ? api.EditJoyful3(bytes, payload)
+                      : kind === "frontier3Edit"
+                        ? api.EditFrontier3(bytes, payload)
+                        : kind === "gameRecords3Edit"
+                          ? api.EditGameRecords3(bytes, payload)
+                          : kind === "paintings3Edit"
+                            ? api.EditPaintings3(bytes, payload)
+                            : kind === "decorations3Edit"
+                              ? api.EditDecorations3(bytes, payload)
+                              : kind === "roamer3Edit"
+                                ? api.EditRoamer3(bytes, payload)
+                                : kind === "hall3Edit"
+                                  ? api.EditHall3(bytes, payload)
+                                  : kind === "gsBall2Edit"
+                                    ? api.EnableGsBall2(bytes)
+                                    : kind === "hall1Edit"
+                                      ? api.EditHall1(bytes, payload)
+                                      : kind === "eventResetEdit"
+                                        ? api.EditEventReset(bytes, payload)
+                                        : kind === "eventsEdit"
+                                          ? api.EditEvents(bytes, payload)
+                                          : kind === "propertyCommit"
+                                            ? api.CommitPropertyBatch(
+                                                bytes,
+                                                payload,
+                                              )
+                                            : kind === "exportWorkingCopy"
+                                              ? api.ExportWorkingCopy(bytes)
+                                              : kind === "pokedex9aEdit"
+                                                ? api.EditPokedex9a(
                                                     bytes,
                                                     payload,
                                                   )
-                                                : kind === "pokedex8aEdit"
-                                                  ? api.EditPokedex8a(
+                                                : kind === "pokedex9Edit"
+                                                  ? api.EditPokedex9(
                                                       bytes,
                                                       payload,
                                                     )
-                                                  : kind === "pokedex8Edit"
-                                                    ? api.EditPokedex8(
+                                                  : kind === "pokedex8aEdit"
+                                                    ? api.EditPokedex8a(
                                                         bytes,
                                                         payload,
                                                       )
-                                                    : kind === "pokedex8bEdit"
-                                                      ? api.EditPokedex8b(
+                                                    : kind === "pokedex8Edit"
+                                                      ? api.EditPokedex8(
                                                           bytes,
                                                           payload,
                                                         )
-                                                      : kind === "pokedex7Edit"
-                                                        ? api.EditPokedex7(
+                                                      : kind === "pokedex8bEdit"
+                                                        ? api.EditPokedex8b(
                                                             bytes,
                                                             payload,
                                                           )
                                                         : kind ===
-                                                            "pokedex6Edit"
-                                                          ? api.EditPokedex6(
+                                                            "pokedex7Edit"
+                                                          ? api.EditPokedex7(
                                                               bytes,
                                                               payload,
                                                             )
                                                           : kind ===
-                                                              "pokedex5Edit"
-                                                            ? api.EditPokedex5(
+                                                              "pokedex6Edit"
+                                                            ? api.EditPokedex6(
                                                                 bytes,
                                                                 payload,
                                                               )
                                                             : kind ===
-                                                                "pokedex4Edit"
-                                                              ? api.EditPokedex4(
+                                                                "pokedex5Edit"
+                                                              ? api.EditPokedex5(
                                                                   bytes,
                                                                   payload,
                                                                 )
                                                               : kind ===
-                                                                  "pokedexEdit"
-                                                                ? api.EditPokedex(
+                                                                  "pokedex4Edit"
+                                                                ? api.EditPokedex4(
                                                                     bytes,
                                                                     payload,
                                                                   )
                                                                 : kind ===
-                                                                    "roamerEdit"
-                                                                  ? api.EditRoamer(
+                                                                    "pokedexEdit"
+                                                                  ? api.EditPokedex(
                                                                       bytes,
                                                                       payload,
                                                                     )
                                                                   : kind ===
-                                                                      "rtcEdit"
-                                                                    ? api.EditRtc(
+                                                                      "roamerEdit"
+                                                                    ? api.EditRoamer(
                                                                         bytes,
                                                                         payload,
                                                                       )
                                                                     : kind ===
-                                                                        "opowersEdit"
-                                                                      ? api.EditOPowers(
+                                                                        "rtcEdit"
+                                                                      ? api.EditRtc(
                                                                           bytes,
                                                                           payload,
                                                                         )
                                                                       : kind ===
-                                                                          "foodEdit"
-                                                                        ? api.EditFood(
+                                                                          "opowersEdit"
+                                                                        ? api.EditOPowers(
                                                                             bytes,
                                                                             payload,
                                                                           )
                                                                         : kind ===
-                                                                            "recordEdit"
-                                                                          ? api.EditRecord(
+                                                                            "foodEdit"
+                                                                          ? api.EditFood(
                                                                               bytes,
                                                                               payload,
                                                                             )
                                                                           : kind ===
-                                                                              "inventoryBatch"
-                                                                            ? api.EditInventoryBatch(
+                                                                              "recordEdit"
+                                                                            ? api.EditRecord(
                                                                                 bytes,
                                                                                 payload,
                                                                               )
                                                                             : kind ===
-                                                                                "inventoryEdit"
-                                                                              ? api.EditInventory(
+                                                                                "inventoryBatch"
+                                                                              ? api.EditInventoryBatch(
                                                                                   bytes,
                                                                                   payload,
                                                                                 )
                                                                               : kind ===
-                                                                                  "pokemonRaw"
-                                                                                ? api.EditPokemonRaw(
+                                                                                  "inventoryEdit"
+                                                                                ? api.EditInventory(
                                                                                     bytes,
                                                                                     payload,
                                                                                   )
                                                                                 : kind ===
-                                                                                    "pokemon"
-                                                                                  ? api.EditPokemon(
+                                                                                    "pokemonRaw"
+                                                                                  ? api.EditPokemonRaw(
                                                                                       bytes,
                                                                                       payload,
                                                                                     )
                                                                                   : kind ===
-                                                                                      "box"
-                                                                                    ? api.EditBox(
+                                                                                      "pokemon"
+                                                                                    ? api.EditPokemon(
                                                                                         bytes,
                                                                                         payload,
                                                                                       )
                                                                                     : kind ===
-                                                                                        "storage"
-                                                                                      ? api.EditStorage(
+                                                                                        "box"
+                                                                                      ? api.EditBox(
                                                                                           bytes,
                                                                                           payload,
                                                                                         )
                                                                                       : kind ===
-                                                                                          "pokemonImport"
-                                                                                        ? api.ImportPokemon(
+                                                                                          "storage"
+                                                                                        ? api.EditStorage(
                                                                                             bytes,
                                                                                             payload,
                                                                                           )
-                                                                                        : api.Export(
-                                                                                            bytes,
-                                                                                            payload,
-                                                                                          ),
+                                                                                        : kind ===
+                                                                                            "pokemonImport"
+                                                                                          ? api.ImportPokemon(
+                                                                                              bytes,
+                                                                                              payload,
+                                                                                            )
+                                                                                          : api.Export(
+                                                                                              bytes,
+                                                                                              payload,
+                                                                                            ),
             );
       const report: SaveReport = JSON.parse(api.Inspect(output ?? bytes));
-      if (report.apiVersion !== 95)
+      if (report.apiVersion !== 96)
         throw new Error("Save editor API version mismatch.");
       const legality: PokemonLegalityReport | undefined =
         kind === "legality" && edit !== undefined
@@ -681,6 +692,14 @@ self.addEventListener(
             kind === "ferry3" ? JSON.parse(api.ReadFerry3(bytes)) : undefined,
           misc3:
             kind === "misc3" ? JSON.parse(api.ReadMisc3(bytes)) : undefined,
+          secretBase3:
+            kind === "secretBase3"
+              ? JSON.parse(api.ReadSecretBase3(bytes))
+              : undefined,
+          secretBase3Form:
+            kind === "secretBase3Form"
+              ? JSON.parse(api.SuggestSecretBase3Form(bytes, payload))
+              : undefined,
           joyful3:
             kind === "joyful3" ? JSON.parse(api.ReadJoyful3(bytes)) : undefined,
           frontier3:

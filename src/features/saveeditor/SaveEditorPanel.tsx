@@ -63,6 +63,8 @@ import { Ferry3Editor } from "./Ferry3Editor";
 import { supportsFerry3, ferry3Words } from "./ferry3";
 import { Misc3Editor } from "./Misc3Editor";
 import { supportsMisc3, misc3Words } from "./misc3";
+import { SecretBase3Editor } from "./SecretBase3Editor";
+import { supportsSecretBase3, secretBase3Words } from "./secretBase3";
 import { Joyful3Editor } from "./Joyful3Editor";
 import { supportsJoyful3, joyful3Words } from "./joyful3";
 import { Frontier3Editor } from "./Frontier3Editor";
@@ -119,6 +121,7 @@ export function SaveEditorPanel(
     | "eventReset"
     | "ferry3"
     | "misc3"
+    | "secretBase3"
     | "joyful3"
     | "frontier3"
     | "gameRecords3"
@@ -247,6 +250,8 @@ export function SaveEditorPanel(
           !supportsEventReset(result.report.format)) ||
         (previous === "ferry3" && !supportsFerry3(result.report.format)) ||
         (previous === "misc3" && !supportsMisc3(result.report.format)) ||
+        (previous === "secretBase3" &&
+          !supportsSecretBase3(result.report.format)) ||
         (previous === "joyful3" && !supportsJoyful3(result.report.format)) ||
         (previous === "frontier3" &&
           !supportsFrontier3(result.report.format)) ||
@@ -761,6 +766,41 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const suggestSecretBase3 = async (
+    query: import("./secretBase3").Base3FormQuery,
+  ) => {
+    let suggestion: import("./secretBase3").Base3FormSuggestion | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(query),
+        "secretBase3Form",
+      );
+      if (id !== operation.current) return;
+      if (!result.secretBase3Form)
+        throw new Error("No Gen3 secret base form preview returned.");
+      suggestion = result.secretBase3Form;
+    });
+    return suggestion;
+  };
+  const readSecretBase3 = async () => {
+    let catalog: import("./secretBase3").SecretBase3Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "secretBase3",
+      );
+      if (id !== operation.current) return;
+      if (!result.secretBase3)
+        throw new Error("No secretBase3 catalog was returned.");
+      catalog = result.secretBase3;
+    });
+    return catalog;
+  };
+
   const readJoyful3 = async () => {
     let catalog: import("./joyful3").Joyful3Catalog | undefined;
     await perform(async (id) => {
@@ -1068,6 +1108,7 @@ export function SaveEditorPanel(
       | import("./eventReset").EventResetEdit
       | import("./ferry3").Ferry3Edit
       | import("./misc3").Misc3Edit
+      | import("./secretBase3").SecretBase3Edit
       | import("./joyful3").Joyful3Edit
       | import("./frontier3").Frontier3Edit
       | import("./gameRecords3").GameRecord3Edit
@@ -1110,6 +1151,7 @@ export function SaveEditorPanel(
       | "eventResetEdit"
       | "ferry3Edit"
       | "misc3Edit"
+      | "secretBase3Edit"
       | "joyful3Edit"
       | "frontier3Edit"
       | "gameRecords3Edit"
@@ -1433,6 +1475,15 @@ export function SaveEditorPanel(
                 {misc3Words[batchLang].title}
               </button>
             )}
+            {supportsSecretBase3(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "secretBase3"}
+                onClick={() => setSection("secretBase3")}
+              >
+                {secretBase3Words[batchLang].title}
+              </button>
+            )}
             {supportsJoyful3(report.format) && (
               <button
                 type="button"
@@ -1715,6 +1766,17 @@ export function SaveEditorPanel(
               lang={batchLang}
               onRead={readMisc3}
               onApply={(edit) => applyWorkingEdit(edit, "misc3Edit")}
+            />
+          ) : section === "secretBase3" &&
+            supportsSecretBase3(report.format) ? (
+            <SecretBase3Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readSecretBase3}
+              onSuggest={suggestSecretBase3}
+              onApply={(edit) => applyWorkingEdit(edit, "secretBase3Edit")}
             />
           ) : section === "joyful3" && supportsJoyful3(report.format) ? (
             <Joyful3Editor

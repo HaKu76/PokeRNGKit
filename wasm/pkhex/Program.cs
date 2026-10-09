@@ -95,6 +95,12 @@ public static partial class Program
     [JSExport]
     public static byte[] EditMisc3(byte[] data, string json) => SaveService.EditMisc3(data, json);
     [JSExport]
+    public static string ReadSecretBase3(byte[] data) => SaveService.ReadSecretBase3(data);
+    [JSExport]
+    public static string SuggestSecretBase3Form(byte[] data, string json) => SaveService.SuggestSecretBase3Form(data, json);
+    [JSExport]
+    public static byte[] EditSecretBase3(byte[] data, string json) => SaveService.EditSecretBase3(data, json);
+    [JSExport]
     public static string ReadJoyful3(byte[] data) => SaveService.ReadJoyful3(data);
     [JSExport]
     public static byte[] EditJoyful3(byte[] data, string json) => SaveService.EditJoyful3(data, json);
@@ -206,7 +212,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 95;
+    public const int ApiVersion = 96;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)
@@ -615,6 +621,10 @@ public sealed record SaveReport(
 [JsonSerializable(typeof(Ferry3Edit))]
 [JsonSerializable(typeof(Misc3Catalog))]
 [JsonSerializable(typeof(Misc3Edit))]
+[JsonSerializable(typeof(SecretBase3Catalog))]
+[JsonSerializable(typeof(SecretBase3Edit))]
+[JsonSerializable(typeof(Base3FormQuery))]
+[JsonSerializable(typeof(Base3FormSuggestion))]
 [JsonSerializable(typeof(Joyful3Catalog))]
 [JsonSerializable(typeof(Joyful3Edit))]
 [JsonSerializable(typeof(Frontier3Catalog))]
