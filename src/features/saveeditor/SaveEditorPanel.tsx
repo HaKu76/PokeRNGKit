@@ -59,6 +59,8 @@ import { Hall1Editor } from "./Hall1Editor";
 import { supportsHall1, hall1Words } from "./hall1";
 import { EventResetEditor } from "./EventResetEditor";
 import { supportsEventReset, eventResetWords } from "./eventReset";
+import { Decorations3Editor } from "./Decorations3Editor";
+import { supportsDecorations3, decorations3Words } from "./decorations3";
 import { Roamer3Editor } from "./Roamer3Editor";
 import { supportsRoamer3, roamer3Words } from "./roamer3";
 import { RoamerEditor } from "./RoamerEditor";
@@ -103,6 +105,7 @@ export function SaveEditorPanel(
     | "hall3"
     | "hall1"
     | "eventReset"
+    | "decorations3"
     | "roamer3"
     | "roamer"
     | "rtc"
@@ -224,6 +227,8 @@ export function SaveEditorPanel(
         (previous === "hall1" && !supportsHall1(result.report.format)) ||
         (previous === "eventReset" &&
           !supportsEventReset(result.report.format)) ||
+        (previous === "decorations3" &&
+          !supportsDecorations3(result.report.format)) ||
         (previous === "roamer3" && !supportsRoamer3(result.report.format)) ||
         (previous === "roamer" && !supportsRoamer(result.report.format)) ||
         (previous === "rtc" && !supportsRtc(result.report.format))
@@ -697,6 +702,23 @@ export function SaveEditorPanel(
     });
     return catalog;
   };
+  const readDecorations3 = async () => {
+    let catalog: import("./decorations3").Decoration3Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "decorations3",
+      );
+      if (id !== operation.current) return;
+      if (!result.decorations3)
+        throw new Error("No decorations3 catalog was returned.");
+      catalog = result.decorations3;
+    });
+    return catalog;
+  };
+
   const readRoamer3 = async () => {
     let catalog: import("./roamer3").Roamer3Catalog | undefined;
     await perform(async (id) => {
@@ -918,6 +940,7 @@ export function SaveEditorPanel(
       | import("./hall3").Hall3Edit
       | import("./hall1").Hall1Edit
       | import("./eventReset").EventResetEdit
+      | import("./decorations3").Decoration3Edit
       | import("./roamer3").Roamer3Edit
       | import("./roamer").RoamerEdit
       | import("./rtc").RtcEdit
@@ -953,6 +976,7 @@ export function SaveEditorPanel(
       | "hall3Edit"
       | "hall1Edit"
       | "eventResetEdit"
+      | "decorations3Edit"
       | "roamer3Edit"
       | "roamerEdit"
       | "rtcEdit"
@@ -1253,6 +1277,15 @@ export function SaveEditorPanel(
                 {eventResetWords[batchLang].title}
               </button>
             )}
+            {supportsDecorations3(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "decorations3"}
+                onClick={() => setSection("decorations3")}
+              >
+                {decorations3Words[batchLang].title}
+              </button>
+            )}
             {supportsRoamer3(report.format) && (
               <button
                 type="button"
@@ -1472,6 +1505,15 @@ export function SaveEditorPanel(
               lang={batchLang}
               onRead={readEventReset}
               onApply={(edit) => applyWorkingEdit(edit, "eventResetEdit")}
+            />
+          ) : section === "decorations3" &&
+            supportsDecorations3(report.format) ? (
+            <Decorations3Editor
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readDecorations3}
+              onApply={(edit) => applyWorkingEdit(edit, "decorations3Edit")}
             />
           ) : section === "roamer3" && supportsRoamer3(report.format) ? (
             <Roamer3Editor

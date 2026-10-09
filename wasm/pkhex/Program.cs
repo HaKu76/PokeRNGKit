@@ -87,6 +87,10 @@ public static partial class Program
     [JSExport]
     public static byte[] EditEventReset(byte[] data, string json) => SaveService.EditEventReset(data, json);
     [JSExport]
+    public static string ReadDecorations3(byte[] data) => SaveService.ReadDecorations3(data);
+    [JSExport]
+    public static byte[] EditDecorations3(byte[] data, string json) => SaveService.EditDecorations3(data, json);
+    [JSExport]
     public static string ReadRoamer3(byte[] data) => SaveService.ReadRoamer3(data);
     [JSExport]
     public static byte[] EditRoamer3(byte[] data, string json) => SaveService.EditRoamer3(data, json);
@@ -178,7 +182,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 88;
+    public const int ApiVersion = 89;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)
@@ -583,6 +587,8 @@ public sealed record SaveReport(
 [JsonSerializable(typeof(EventDiff))]
 [JsonSerializable(typeof(EventResetCatalog))]
 [JsonSerializable(typeof(EventResetEdit))]
+[JsonSerializable(typeof(Decoration3Catalog))]
+[JsonSerializable(typeof(Decoration3Edit))]
 [JsonSerializable(typeof(Roamer3Catalog))]
 [JsonSerializable(typeof(Roamer3Edit))]
 [JsonSerializable(typeof(Hall3Catalog))]

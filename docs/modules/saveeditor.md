@@ -5,7 +5,7 @@
 
 ## 第三世代殿堂记录
 
-2026-09-30 已核对 WinForms/Subforms/Save Editors/Gen3/SAV_HallOfFame3.cs、其 Designer，以及 Core Saves/Substructures/Gen3/HallFame3.cs、SAV3.cs、Util.cs、StringConverter3.cs 和 Legal.cs。尚未开放产品入口。
+2026-09-30 已核对 WinForms/Subforms/Save Editors/Gen3/SAV_HallOfFame3.cs、其 Designer，以及 Core Saves/Substructures/Gen3/HallFame3.cs、SAV3.cs、Util.cs、StringConverter3.cs 和 Legal.cs。API 87 已开放产品入口。
 
 - RS／E／FRLG 的殿堂由 50 队、每队 6 格组成，每格 0x14 字节，实际记录共 6000 字节。GetHallOfFameData 合并 0x1C000 与 0x1D000 两扇区各 0xF80 字节，结果 7936 字节；剩余 1936 字节及扇区尾部元数据不能作为空白丢弃。
 - 只允许完整存档访问扩展扇区；SAV3.IsFullSaveFile 判断长度至少 0x20000。半长存档需要返回不可用，不补零。额外扇区校验位于各扇区偏移 0xFF4，按前 0xF80 字节计算；全部由 0／FF 构成的未初始化扇区按 Core 规则处理。
@@ -40,7 +40,19 @@ API 88 已增加独立第三世代游走入口；保留 XY 原有三鸟种类、
 Roamer3Editing.cs 已提供独立目录、逐字段补丁、保存与回读检查；API 88、Worker、三语入口及本地图像已接入，沿用工作副本、撤销与导出。图像展示已应用数据，异色只读；分别显示存储 IV 与受游戏缺陷影响的遭遇 IV。
 核心及公开接口专项已通过国际／日文 RS、E、FRLG 六种布局，覆盖全部字段边界、两种 IV 行为、异常激活／等级原值、未修改位、异色边界、完整文件对照和导出回读。前端 4 项专项与定向 Lint 已通过，完整检查状态见进度；浏览器及真实存档待核验。
 
-## 第三世代杂项范围核对（待实现）
+## 第三世代装饰品
+
+2026-10-09 核对上游 SAV_Misc3.cs 的 ReadDecorations／SaveDecorationCategory、Designer 八张 DataGridView 和 Core DecorationInventory3.cs／Decoration3.cs／SaveBlock3LargeRS.cs／SaveBlock3LargeE.cs。此功能仅适用 RS／E，不向 FRLG 开放。
+
+装饰品库存共 150 字节，LargeBlock 基址 RS 0x26A0、E 0x2734。桌子、椅子、植物、摆设、地毯、海报、玩偶、坐垫的相对起点依次为 0、10、20、30、60、90、100、140，容量依次为 10、10、10、30、30、10、40、10。
+每槽为一个 byte，0 表示空槽；1–120 的合法分类必须使用 DecorationInfo.GetCategory，尤其 111–120 仍为玩偶，不能按连续区间误分到坐垫。三语名称来自 Core decoration3 资源，分类名与操作使用当前界面语言。
+
+上游使用同类 ComboBox 选项，没有自由数值输入；每类均允许空槽、重复物品。保存时按原顺序压缩非空项，空槽置于该类末尾。网页按所选分类应用此规则，其他分类保持原始排列；提供独立整理空槽与清空分类操作，所有操作可撤销。
+旧存档中的异常 byte 或错类编号按原始格位显示，只能原样保留或替换，不能新增或移动异常编号。目录不自行修正异常数据；提交前验证分类、精确容量和全部槽位后再一次写入，避免部分修改。
+
+API 89、独立 Worker 路由与三语入口已接入工作副本、撤销和完整导出。导出回读复核游戏、区域、类型、长度、校验和全部 150 字节。专项已通过四种区域／游戏布局、150 格、120 物品分类、稳定压缩、重复与异常值、相邻数据、请求原子性和原件保持。前端专项、完整原生、浏览器核心构建、26 类型裁剪检查及完整 verify 通过；浏览器和真实存档待核验。
+
+## 第三世代杂项范围核对（部分接入）
 
 2026-09-30 已通读 SAV_Misc3.cs 并核对 Designer 与部分 Core 数据块。此窗口包含多个独立工作流，不可把现有宝可方块入口记为整个杂项已接入。
 
