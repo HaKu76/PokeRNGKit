@@ -1,0 +1,106 @@
+.save-cgear5-body,
+.save-cgear5-actions,
+.save-cgear5-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-cgear5-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-cgear5-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-cgear5-editor label > span,
+.save-cgear5-image figcaption {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-cgear5-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 256px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.save-cgear5-image {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+}
+.save-cgear5-image canvas,
+.save-cgear5-empty {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-sizing: border-box;
+}
+.save-cgear5-image canvas {
+  image-rendering: pixelated;
+}
+.save-cgear5-empty {
+  display: grid;
+  place-items: center;
+  padding: 12px;
+}
+.save-cgear5-metadata {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+}
+.save-cgear5-metadata > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.save-cgear5-metadata dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.save-cgear5-preview {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+.save-cgear5-preview h4 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.save-cgear5-preview summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-cgear5-preview summary:hover {
+  background: var(--surface-hover);
+}
+.save-cgear5-preview summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-cgear5-offsets {
+  max-height: 10rem;
+  overflow: auto;
+}
+.save-cgear5-warning {
+  color: var(--warning-text);
+}
+@media (max-width: 600px) {
+  .save-cgear5-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .save-cgear5-image {
+    max-width: 256px;
+  }
+}

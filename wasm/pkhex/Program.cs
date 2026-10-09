@@ -147,6 +147,14 @@ public static partial class Program
     [JSExport]
     public static byte[] EditMisc4(byte[] data,string json) => SaveService.EditMisc4(data,json);
     [JSExport]
+    public static string ReadCGear5(byte[] data) => SaveService.ReadCGear5(data);
+    [JSExport]
+    public static string PreviewCGear5(byte[] data,string json) => SaveService.PreviewCGear5(data,json);
+    [JSExport]
+    public static byte[] EditCGear5(byte[] data,string json) => SaveService.EditCGear5(data,json);
+    [JSExport]
+    public static byte[] ExportCGear5(byte[] data) => SaveService.ExportCGear5(data);
+    [JSExport]
     public static string ReadUnderground4(byte[] data) => SaveService.ReadUnderground4(data);
     [JSExport]
     public static string PreviewUnderground4(byte[] data,string json) => SaveService.PreviewUnderground4(data,json);
@@ -272,7 +280,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 106;
+    public const int ApiVersion = 107;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)
@@ -709,6 +717,9 @@ public sealed record SaveReport(
 [JsonSerializable(typeof(Misc4Catalog))]
 [JsonSerializable(typeof(Misc4Preview))]
 [JsonSerializable(typeof(Misc4Edit))]
+[JsonSerializable(typeof(CGear5Catalog))]
+[JsonSerializable(typeof(CGear5Preview))]
+[JsonSerializable(typeof(CGear5Edit))]
 [JsonSerializable(typeof(Ug4Catalog))]
 [JsonSerializable(typeof(Ug4Preview))]
 [JsonSerializable(typeof(Ug4Edit))]

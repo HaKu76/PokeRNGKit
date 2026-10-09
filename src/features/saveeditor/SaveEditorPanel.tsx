@@ -1,3 +1,5 @@
+import { CGear5Editor } from "./CGear5Editor";
+import { cgear5Words, supportsCGear5 } from "./cgear5";
 import { ZaPokedexEditor } from "./ZaPokedexEditor";
 import { SvPokedexEditor } from "./SvPokedexEditor";
 import { LegendsPokedexEditor } from "./LegendsPokedexEditor";
@@ -149,6 +151,7 @@ export function SaveEditorPanel(
     | "battleVideo4"
     | "geonet4"
     | "misc4"
+    | "cgear5"
     | "underground4"
     | "honeyTree4"
     | "br4Gear"
@@ -293,6 +296,7 @@ export function SaveEditorPanel(
           !supportsBattleVideo4(result.report.format)) ||
         (previous === "geonet4" && !supportsGeonet4(result.report.format)) ||
         (previous === "misc4" && !supportsMisc4(result.report.format)) ||
+        (previous === "cgear5" && !supportsCGear5(result.report.format)) ||
         (previous === "underground4" &&
           !supportsUnderground4(result.report.format)) ||
         (previous === "honeyTree4" &&
@@ -1016,6 +1020,57 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readCGear5 = async () => {
+    let catalog: import("./cgear5").CGear5Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "cgear5",
+      );
+      if (id !== operation.current) return;
+      if (!result.cgear5) throw Error("No CGear5 catalog was returned.");
+      catalog = result.cgear5;
+    });
+    return catalog;
+  };
+  const previewCGear5 = async (edit: import("./cgear5").CGear5Edit) => {
+    let preview: import("./cgear5").CGear5Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "cgear5Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.cgear5Preview) throw Error("No CGear5 preview was returned.");
+      preview = result.cgear5Preview;
+    });
+    return preview;
+  };
+  const exportCGear5 = (extension: string) =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "cgear5Export",
+      );
+      if (id !== operation.current) return;
+      if (!result.cgear5File) throw Error("No CGear5 file was returned.");
+      const url = URL.createObjectURL(new Blob([result.cgear5File]));
+      try {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "C-Gear." + extension;
+        a.click();
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
+    });
+
   const previewUnderground4 = async (
     edit: import("./underground4").Ug4Edit,
   ) => {
@@ -1400,6 +1455,7 @@ export function SaveEditorPanel(
       | import("./battleVideo4").Video4Import
       | import("./geonet4").Geo4Edit
       | import("./misc4").Misc4Edit
+      | import("./cgear5").CGear5Edit
       | import("./underground4").Ug4Edit
       | import("./honeyTree4").Honey4Edit
       | import("./br4").Br4GearEdit
@@ -1453,6 +1509,7 @@ export function SaveEditorPanel(
       | "video4Import"
       | "geonet4Edit"
       | "misc4Edit"
+      | "cgear5Edit"
       | "underground4Edit"
       | "honeyTree4Edit"
       | "br4GearEdit"
@@ -1947,6 +2004,15 @@ export function SaveEditorPanel(
                 {misc4Words[batchLang].title}
               </button>
             )}
+            {supportsCGear5(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "cgear5"}
+                onClick={() => setSection("cgear5")}
+              >
+                {cgear5Words[batchLang].title}
+              </button>
+            )}
             {supportsUnderground4(report.format) && (
               <button
                 type="button"
@@ -2338,6 +2404,17 @@ export function SaveEditorPanel(
               onPreview={previewMisc4}
               onApply={(edit) => applyWorkingEdit(edit, "misc4Edit")}
               onRelated={setSection}
+            />
+          ) : section === "cgear5" && supportsCGear5(report.format) ? (
+            <CGear5Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readCGear5}
+              onPreview={previewCGear5}
+              onApply={(edit) => applyWorkingEdit(edit, "cgear5Edit")}
+              onExport={exportCGear5}
             />
           ) : section === "underground4" &&
             supportsUnderground4(report.format) ? (

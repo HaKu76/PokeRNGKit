@@ -295,15 +295,56 @@ API 106 接通完整四类背包及十三成绩，候选按当前语言资源排
 
 球体新输入长度为 0–2；两位有符号数、正号或空格按来源整数解析。旧三位大小可保持原字符串，但不允许创建不同的三位新值。预览逐项显示实际成绩、格位、大小与原始数据变化，不在 JavaScript 另写转换或压缩算法。原生 DP／Pt 三语全部格位、十三上下界、压缩、符号／无效／空白／旧值、摘要、原件及完整文件专项通过；前端专项 7 项、定向 Lint、类型与完整 verify（238 文件／899 项测试）通过。全套原生、API 106 核心构建、裁剪后 26 类型属性检查及使用新核心的最终网页／PWA 打包通过，浏览器及实档待核验。
 
-### 第五世代 C-Gear（部分源码核对，尚未接入）
+### 第五世代 C-Gear（API 107，工程检查通过）
 
 已核对 `CGearImage.cs`、`SAV_DLC5.cs` C-Gear 导入／导出流程，以及 Core 的 `CGearBackground`、BW／B2W2 子类、`TiledImageConverter`、`PaletteColorSet` 与 `PaletteTileSelection`。图片固定 256×192、32-bit ARGB；Core 文件 0x2600 bytes，由 255 个 8×8 贴图（0x1FE0）、16 色调色板（0x20）和 768 项排列（0x600）组成。BW 后缀 psk、B2W2 后缀 cgb。
 
-来源先识别排列中的调色板／索引是否为 shift 格式，再按目标游戏调用 `ConvertToShiftFormat<CGearBackgroundBW>` 或 `ConvertFromShiftFormat`；不能仅改后缀。未初始化的全零／全 FF 图像关闭导出，读取不应初始化存档。`SetCGearSkin` 同时写额外区域、SkinInfo 校验／存在标记与 PlayerData 下载记录，不能只复制皮肤 bytes。
+来源先识别排列中的调色板／索引是否为 shift 格式，再按目标游戏调用 `ConvertToShiftFormat<CGearBackgroundBW>` 或 `ConvertFromShiftFormat`；不能仅改后缀。未初始化判定为每个 byte 都属于零／FF（含二者混合），关闭导出，读取不初始化存档。`SetCGearSkin` 同时写额外区域及 footer、SkinInfo 校验／存在标记与 PlayerData 下载记录，不能只复制皮肤 bytes。`PlayerData.GetExtData` 返回下载标识 UInt16 与计数 UInt32，来源导入默认写 0xC21E／1。
 
 PNG 导入先校验尺寸与 32bpp 格式，随后 Core 转换并写入存档，再调用 CheckResult 报告色数／贴图数量；容量提示不是导入前统一拒绝。PaletteColorSet 实际将颜色表限制为最先遇到的最多 16 色、忽略透明度，统计不能被解释为完整原图颜色总数。接入应使用 Core 返回结果及重新生成的图像预览，明确有损输出，不能自行另写量化算法或按假定色数截断规则拒绝来源可处理的图像。
 
-完整 DLC 窗口其余分组、文件格式及额外区域写入范围仍待核对；本记录仅证明 C-Gear 相关部分源码已读。
+API 107 在专用 Worker 接通读取、PNG 转换预览、psk／cgb 跨格式导入、原始皮肤导出及明确应用。当前背景与转换后的背景均来自 Core 渲染，以本地 canvas 显示；PNG 导出也只在浏览器中生成。接入层只交换 RGBA／BGRA 通道，图像贴图、颜色映射、翻转与两游戏排列转换均调用 Core，不复制算法。
+
+PNG 文件先读取 33-byte 头核对 IHDR 与 256×192，再交给本地浏览器解码；文件上限 4 MiB，传输像素必须精确 196608 bytes。浏览器统一得到 RGBA，不复刻 Windows GDI 的 PixelFormat 分类，可接受浏览器可解码的 PNG。透明像素的隐藏 RGB、色彩管理与预乘还原可能不同于 Windows；像素变化数量对照浏览器解码后的输入，不作为 PNG 文件级无损证明。psk／cgb 输入必须精确 9728 bytes，按数据识别格式，不依赖后缀。
+
+Core 返回色数受 16 色表截断，TileCount 也保留来源计数语义（未满容量时最后一个新贴图写入零起始索引）；UI 标注转换色数／贴图计数，不伪称原始图像完整唯一数量。转换后的图片、变化像素数、存档变化位置及皮肤校验／下载计数先冻结预览；超过来源容量检查仍允许明确应用来源结果。冻结摘要覆盖完整导出文件，确认时重新转换并比较完整文件摘要；原件、撤销、工作副本和完整导出沿用已有流程。
+
+异常旧布局若 Core 不能渲染仍保留原始文件导出和替换入口，不在读取时规范化。未初始化关闭原始／PNG 导出；读取保留旧 HasSkin、下载记录与校验，即使它们与皮肤内容不同。前端切换或卸载时取消待返回的本地文件处理结果，防止把迟到的导入作用到其他界面。
+
+前端专项 28 项通过；首轮原生请求因 System.Text.Json 转义 Base64 的加号超过 JSON 文本限制而失败，已将 JSON 上限改为 1600000 字符，解码后的输入与 Base64 长度上限不变。首轮 Lint 发现画布 effect 同步状态更新，已改为可取消的动画帧回调；修正后四版本原生专项、定向 Lint 与类型检查通过。Worker 为 Core 原生转换异常添加模块前缀并保留 cause，使错误按当前语言显示且保留诊断。全套原生、完整 verify（239 文件／904 项测试）、API 107 核心构建、裁剪后 26 类型属性检查及使用新核心的最终网页／PWA 打包通过，浏览器与真实存档待核验。
+
+已通读 DLC 窗口其余分组的事件流程：PWT、音乐剧、对战录像、宝可电影、两份回忆链接、图鉴皮肤及对战测试均提供本地导入／导出。图鉴皮肤渲染、对战测试窗口显示来源尚未实现。Core 文件结构、尺寸与额外区域写入范围的源码记录见下节，夹具与接入待完成，本批 C-Gear 不代表完整 DLC 窗口已完成。
+
+### 第五世代 DLC 其余文件（源码核对，尚未接入）
+
+已读取 `SAV5.cs` 额外区域写入／footer 规则、`SAV5BW.cs`／`SAV5B2W2.cs` 对应布局，以及 `WorldTournament5`、`MusicalShow5`、`PokestarMovie5`、`BattleTest5`、`PokeDexSkin5`。本段只记录来源限制，不作为功能完成证据。
+
+| 分组             | 来源输入与格位                                                 | 实际写入及注意点                                                                                                                                              |
+| ---------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PWT（B2W2）      | 3 格，pwt 0x1214 或 0x1314 bytes；后者调整到 0x1214            | 基址 0x7A000，间隔 0x1400；SetPWT 更新额外 footer 与 PlayerData，来源不刷新文件内 PWT 校验                                                                    |
+| 宝可电影（B2W2） | 8 格，psm5 精确 0x4B4                                          | 基址 0x77000，间隔 0x600；SetPokestarMovie 更新 footer 与 PlayerData；来源 Name 仅返回 Empty／Movie，不能伪造可播放或完整电影元数据                           |
+| 音乐剧           | pms：BW 0x1FC00，B2W2 0x17C00；另接受 0x17D78 并调整至目标长度 | BW／B2W2 基址 0x56000／0x55800，SetMusical 同步可用标记和下载记录；名字从文件名剥离编号、语言标签并截至 MusicalNameMaxLength，空文件清名字                    |
+| 回忆链接         | 两份 ml5，各精确 0x400                                         | BW 基址 0x7F800／0x7FC00，B2W2 0x7E000／0x7E400；只调用 SetLink1Data／SetLink2Data，不额外创建下载 footer                                                     |
+| 图鉴皮肤         | pds 0x6204 或 0x6200，短格式补零四字节                         | BW／B2W2 基址 0x76000／0x6D800；SetPokeDexSkin 写额外 footer、存在标记与下载记录，尾四字节改为存在值后再次刷新 footer；未初始化关闭导出，来源没有图像渲染实现 |
+| 对战测试         | bt5 精确 0x5C8                                                 | 两布局基址 0x55000；非空导入设置 Magic=0x0D68 并刷新 0x5C6 前数据 CRC16，再调用 SetBattleTest；来源标记 Needs research，不宣称实机可用                        |
+
+额外 footer 由 Core 写入：数据后 UInt16 count／CRC16，再在 `size + 0x100 - size % 0x100` 的对齐位置写 0x14-byte footer（包括校验的校验与 5.1 标识）。必须保护间隔余区。Core 的 PWT／电影 getter 与 setter 使用 `ThrowIfGreaterThan(index, Count)`，会错误接受等于数量的格位；接入层必须按窗口真实列表限制 0–2／0–7，防止写入相邻区域。
+
+已通读 `BattleVideo5.cs` 与 `Musical5.cs`。录像 bv5 长度 0x18A4，四格；来源导入按 LCRNG64 常量识别解密状态，转回加密后对非空录像刷新 checksum，再调用 SetBattleVideo；导出原始／解密两种。读取／解密必须用副本，保护工作存档。录像四支队伍的 Core GetTeam 错用 0x44-byte Trainer 数据而不是 0x2A4-byte Team 区域，可能读不到成员或越界；后续读取应使用真实 Team1–4 片段及 Core InflateToPK5，限制六格并说明缺少版本／相遇来源等字段，不把还原体当作原始完整 PK5。音乐剧名字最大 20 字符，来源 MusicalTrash 由块内 0x208 起 42 bytes 储存，可用标记 0x29E。对应夹具仍待编写。
+
+已继续核对 Designer 事件与 `Resources/text/lang_zh-Hans.txt`、`lang_en.txt`、`lang_ja.txt` 的八组标题。图鉴皮肤的前景／背景图片按钮没有 Click 接线，来源只实现整个 pds 文件导入／导出；不得把这些空按钮记作可用图片编辑功能。其余列表由窗口填充四录像、八电影及三 PWT，选中项回调为空，不增加来源没有的播放功能。后续分组标题采用以下资源，操作及提示仍按当前 UI 语言描述。
+
+| 来源分组    | 中文             | 英文             | 日文           |
+| ----------- | ---------------- | ---------------- | -------------- |
+| BattleTest  | 对战测试         | Battle Test      | バトルけんてい |
+| BattleVideo | 对战视频         | Battle Videos    | バトルビデオ   |
+| MemoryLink  | 记忆连接         | Memory Link      | おもいでリンク |
+| Musical     | 宝可梦音乐剧     | Musical          | ミュージカル   |
+| PokeDex     | 宝可梦图鉴皮肤   | PokéDex Skin     | ずかんスキン   |
+| Pokestar    | 宝可梦好莱坞     | Pokéstar Studios | ポケウッド     |
+| PWT         | 宝可梦世界锦标赛 | PWT              | PWT            |
+
+三语资源已核对，夹具仍待编写；本批只有 C-Gear 接入，以上分组尚未接入。
 
 ## HGSS 宝可全能竞技（API 98）
 
