@@ -25,6 +25,9 @@
     <Compile Include="../BrTrainer4Editing.cs" Link="BrTrainer4Editing.cs" />
     <Compile Include="../BattleVideo4Editing.cs" Link="BattleVideo4Editing.cs" />
     <Compile Include="../Geonet4Editing.cs" Link="Geonet4Editing.cs" />
+    <Compile Include="../Misc4Editing.cs" Link="Misc4Editing.cs" />
+    <Compile Include="../Misc4Frontier.cs" Link="Misc4Frontier.cs" />
+    <Compile Include="../Misc4DotImage.cs" Link="Misc4DotImage.cs" />
     <Compile Include="../HoneyTree4Editing.cs" Link="HoneyTree4Editing.cs" />
     <Compile Include="../Br4Editing.cs" Link="Br4Editing.cs" />
     <Compile Include="../Joyful3Editing.cs" Link="Joyful3Editing.cs" />

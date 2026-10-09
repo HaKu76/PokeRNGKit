@@ -77,6 +77,8 @@ import { BattleVideo4Editor } from "./BattleVideo4Editor";
 import { supportsBattleVideo4, video4Words } from "./battleVideo4";
 import { Geonet4Editor } from "./Geonet4Editor";
 import { geonet4Words, supportsGeonet4 } from "./geonet4";
+import { Misc4Editor } from "./Misc4Editor";
+import { misc4Words, supportsMisc4 } from "./misc4";
 import { HoneyTree4Editor } from "./HoneyTree4Editor";
 import { honey4Words, supportsHoneyTree4 } from "./honeyTree4";
 import { Br4GearEditor } from "./Br4GearEditor";
@@ -144,6 +146,7 @@ export function SaveEditorPanel(
     | "brTrainer4"
     | "battleVideo4"
     | "geonet4"
+    | "misc4"
     | "honeyTree4"
     | "br4Gear"
     | "joyful3"
@@ -286,6 +289,7 @@ export function SaveEditorPanel(
         (previous === "battleVideo4" &&
           !supportsBattleVideo4(result.report.format)) ||
         (previous === "geonet4" && !supportsGeonet4(result.report.format)) ||
+        (previous === "misc4" && !supportsMisc4(result.report.format)) ||
         (previous === "honeyTree4" &&
           !supportsHoneyTree4(result.report.format)) ||
         (previous === "br4Gear" && !supportsBr4Gear(result.report.format)) ||
@@ -975,6 +979,38 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const previewMisc4 = async (edit: import("./misc4").Misc4Edit) => {
+    let preview: import("./misc4").Misc4Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "misc4Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.misc4Preview) throw Error("No Misc4 preview was returned.");
+      preview = result.misc4Preview;
+    });
+    return preview;
+  };
+
+  const readMisc4 = async () => {
+    let catalog: import("./misc4").Misc4Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "misc4",
+      );
+      if (id !== operation.current) return;
+      if (!result.misc4) throw new Error("No misc4 catalog was returned.");
+      catalog = result.misc4;
+    });
+    return catalog;
+  };
+
   const readHoneyTree4 = async () => {
     let catalog: import("./honeyTree4").Honey4Catalog | undefined;
     await perform(async (id) => {
@@ -1322,6 +1358,7 @@ export function SaveEditorPanel(
       | import("./brTrainer4").BrTrainer4Edit
       | import("./battleVideo4").Video4Import
       | import("./geonet4").Geo4Edit
+      | import("./misc4").Misc4Edit
       | import("./honeyTree4").Honey4Edit
       | import("./br4").Br4GearEdit
       | import("./joyful3").Joyful3Edit
@@ -1373,6 +1410,7 @@ export function SaveEditorPanel(
       | "brTrainer4Edit"
       | "video4Import"
       | "geonet4Edit"
+      | "misc4Edit"
       | "honeyTree4Edit"
       | "br4GearEdit"
       | "joyful3Edit"
@@ -1857,6 +1895,15 @@ export function SaveEditorPanel(
                 {geonet4Words[batchLang].title}
               </button>
             )}
+            {supportsMisc4(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "misc4"}
+                onClick={() => setSection("misc4")}
+              >
+                {misc4Words[batchLang].title}
+              </button>
+            )}
             {supportsHoneyTree4(report.format) && (
               <button
                 type="button"
@@ -2228,6 +2275,17 @@ export function SaveEditorPanel(
               lang={batchLang}
               onRead={readGeonet4}
               onApply={(edit) => applyWorkingEdit(edit, "geonet4Edit")}
+            />
+          ) : section === "misc4" && supportsMisc4(report.format) ? (
+            <Misc4Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readMisc4}
+              onPreview={previewMisc4}
+              onApply={(edit) => applyWorkingEdit(edit, "misc4Edit")}
+              onRelated={setSection}
             />
           ) : section === "honeyTree4" && supportsHoneyTree4(report.format) ? (
             <HoneyTree4Editor

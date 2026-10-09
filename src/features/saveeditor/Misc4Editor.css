@@ -1,0 +1,112 @@
+.save-misc4-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-misc4-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-misc4-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-misc4-body {
+  display: grid;
+  gap: 12px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.save-misc4-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.save-misc4-fields > button {
+  align-self: end;
+}
+.save-misc4-field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-misc4-field output {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+.save-misc4-editor .save-misc4-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-misc4-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex: none;
+  margin: 0;
+}
+.save-misc4-preview,
+.save-misc4-dot {
+  display: grid;
+  gap: 12px;
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+  min-width: 0;
+}
+.save-misc4-preview h4,
+.save-misc4-dot h4 {
+  margin: 0;
+}
+.save-misc4-canvas {
+  width: 288px;
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.save-misc4-canvas[tabindex] {
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+.save-misc4-canvas:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-misc4-data {
+  max-height: 16rem;
+  overflow: auto;
+}
+.save-misc4-preview summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.save-misc4-preview summary:hover {
+  background: var(--surface-hover);
+}
+.save-misc4-preview summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-misc4-backdrop-preview {
+  margin: 0;
+  padding-inline-start: 1.5rem;
+  font-size: 14px;
+  line-height: 22px;
+}
+@media (max-width: 600px) {
+  .save-misc4-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
