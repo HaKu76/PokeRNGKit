@@ -1,0 +1,150 @@
+.save-bp4-selectors,
+.save-bp4-link-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.save-bp4-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-bp4-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-bp4-body {
+  border: 0;
+  padding: 0;
+  margin: 12px 0;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-bp4-body textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 88px;
+  resize: vertical;
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 8px 12px;
+}
+.save-bp4-body p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-bp4-editor .save-bp4-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-bp4-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex: none;
+  margin: 0;
+}
+.save-bp4-flags {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.save-bp4-details > summary {
+  min-height: 44px;
+  box-sizing: border-box;
+  padding-block: 11px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.save-bp4-details > summary:hover {
+  background: var(--surface-hover);
+}
+.save-bp4-details > summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-bp4-editor dl {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.save-bp4-editor dl > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(0, 2fr);
+  gap: 12px;
+}
+.save-bp4-editor dt,
+.save-bp4-editor dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.save-bp4-team {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.save-bp4-team button {
+  min-height: 88px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.save-bp4-team button[aria-pressed="true"] {
+  background: var(--surface-hover);
+  border-color: var(--brand);
+}
+.save-bp4-team img {
+  width: 48px;
+  height: 40px;
+  object-fit: contain;
+}
+.save-bp4-team span {
+  overflow-wrap: anywhere;
+}
+.save-bp4-team small {
+  font-size: 13px;
+  line-height: 20px;
+}
+.save-bp4-preview {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+  display: grid;
+  gap: 8px;
+}
+.save-bp4-editor h4 {
+  margin: 0;
+}
+.save-bp4-import-pokemon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.save-bp4-import-pokemon img {
+  width: 48px;
+  height: 40px;
+  object-fit: contain;
+}
+@media (max-width: 600px) {
+  .save-bp4-selectors,
+  .save-bp4-link-grid,
+  .save-bp4-flags {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .save-bp4-team {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .save-bp4-editor dl > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}

@@ -69,6 +69,8 @@ import { PokeGear4Editor } from "./PokeGear4Editor";
 import { supportsPokeGear4, pokegear4Words } from "./pokegear4";
 import { Pokeathlon4Editor } from "./Pokeathlon4Editor";
 import { supportsPokeathlon4, pokeathlon4Words } from "./pokeathlon4";
+import { BattlePass4Editor } from "./BattlePass4Editor";
+import { battlePass4Words } from "./battlePass4";
 import { Br4GearEditor } from "./Br4GearEditor";
 import { supportsBr4Gear, br4GearWords, br4Profile } from "./br4";
 import { Joyful3Editor } from "./Joyful3Editor";
@@ -130,6 +132,7 @@ export function SaveEditorPanel(
     | "secretBase3"
     | "pokegear4"
     | "pokeathlon4"
+    | "battlePass4"
     | "br4Gear"
     | "joyful3"
     | "frontier3"
@@ -265,6 +268,8 @@ export function SaveEditorPanel(
           !supportsPokeGear4(result.report.format)) ||
         (previous === "pokeathlon4" &&
           !supportsPokeathlon4(result.report.format)) ||
+        (previous === "battlePass4" &&
+          !supportsBr4Gear(result.report.format)) ||
         (previous === "br4Gear" && !supportsBr4Gear(result.report.format)) ||
         (previous === "joyful3" && !supportsJoyful3(result.report.format)) ||
         (previous === "frontier3" &&
@@ -849,6 +854,42 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const previewBattlePass4 = async (
+    edit: import("./battlePass4").BattlePass4Edit,
+  ) => {
+    let catalog: import("./battlePass4").BattlePass4PokemonPreview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "battlePass4Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.battlePassPreview)
+        throw new Error("No battlePass4 catalog was returned.");
+      catalog = result.battlePassPreview;
+    });
+    return catalog;
+  };
+
+  const readBattlePass4 = async (index: number) => {
+    let catalog: import("./battlePass4").BattlePass4Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify({ index }),
+        "battlePass4",
+      );
+      if (id !== operation.current) return;
+      if (!result.battlePass4)
+        throw new Error("No battlePass4 catalog was returned.");
+      catalog = result.battlePass4;
+    });
+    return catalog;
+  };
+
   const readBr4Gear = async () => {
     let catalog: import("./br4").Br4GearCatalog | undefined;
     await perform(async (id) => {
@@ -1175,6 +1216,7 @@ export function SaveEditorPanel(
       | import("./secretBase3").SecretBase3Edit
       | import("./pokegear4").PokeGear4Edit
       | import("./pokeathlon4").Pokeathlon4Edit
+      | import("./battlePass4").BattlePass4Edit
       | import("./br4").Br4GearEdit
       | import("./joyful3").Joyful3Edit
       | import("./frontier3").Frontier3Edit
@@ -1221,6 +1263,7 @@ export function SaveEditorPanel(
       | "secretBase3Edit"
       | "pokegear4Edit"
       | "pokeathlon4Edit"
+      | "battlePass4Edit"
       | "br4GearEdit"
       | "joyful3Edit"
       | "frontier3Edit"
@@ -1283,6 +1326,29 @@ export function SaveEditorPanel(
       for (const byte of bytes) binary += String.fromCharCode(byte);
       return { ...position, fileName: file.name, data: btoa(binary) };
     }, "pokemonImport");
+
+  const exportBattlePass4 = (index: number, slot?: number) =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify({ index, slot }),
+        "battlePass4Export",
+      );
+      if (id !== operation.current) return;
+      if (!result.battlePassFile) throw new Error("Entity file export failed.");
+      const bytes = Uint8Array.from(atob(result.battlePassFile.data), (char) =>
+        char.charCodeAt(0),
+      );
+      const url = URL.createObjectURL(
+        new Blob([bytes], { type: "application/octet-stream" }),
+      );
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = result.battlePassFile.fileName;
+      anchor.click();
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    });
 
   const exportPokemon = (position: PokemonPosition) =>
     perform(async (id) => {
@@ -1625,6 +1691,15 @@ export function SaveEditorPanel(
             {supportsBr4Gear(report.format) && (
               <button
                 type="button"
+                aria-pressed={section === "battlePass4"}
+                onClick={() => setSection("battlePass4")}
+              >
+                {battlePass4Words[batchLang].title}
+              </button>
+            )}
+            {supportsBr4Gear(report.format) && (
+              <button
+                type="button"
                 aria-pressed={section === "br4Gear"}
                 onClick={() => setSection("br4Gear")}
               >
@@ -1943,6 +2018,17 @@ export function SaveEditorPanel(
               lang={batchLang}
               onRead={readPokeathlon4}
               onApply={(edit) => applyWorkingEdit(edit, "pokeathlon4Edit")}
+            />
+          ) : section === "battlePass4" && supportsBr4Gear(report.format) ? (
+            <BattlePass4Editor
+              key={report.brProfiles?.active}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readBattlePass4}
+              onPreview={previewBattlePass4}
+              onApply={(edit) => applyWorkingEdit(edit, "battlePass4Edit")}
+              onExport={exportBattlePass4}
             />
           ) : section === "br4Gear" && supportsBr4Gear(report.format) ? (
             <Br4GearEditor

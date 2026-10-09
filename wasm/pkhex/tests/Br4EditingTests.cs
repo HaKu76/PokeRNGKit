@@ -8,7 +8,7 @@ internal static class Br4EditingTests
     private static void Check(bool ok,string message){if(!ok)throw new Exception(message);}
     private static void Reject(Action action){try{action();throw new Exception("Invalid BR request accepted");}catch(ArgumentException){}}
     private static SAV4BR Open(byte[] bytes,int profile){var save=SaveUtil.GetSaveFile(bytes.ToArray()) as SAV4BR??throw new Exception("BR fixture not recognized");save.CurrentSlot=profile;return save;}
-    private static byte[] Fixture(bool japanese,int partition)
+    internal static byte[] Fixture(bool japanese,int partition)
     {
         // All-zero plaintext has valid zero bit-count checksums for both full partitions.
         var plaintext=new byte[SaveUtil.SIZE_G4BR];var save=new SAV4BR(plaintext,false);

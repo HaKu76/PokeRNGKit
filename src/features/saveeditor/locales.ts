@@ -1,3 +1,4 @@
+import { battlePass4Words } from "./battlePass4";
 import { gsBall2Words } from "./gsBall2";
 import { saveEditorCopy } from "./copy";
 import { fileBatchWords } from "./fileBatch";
@@ -7,6 +8,7 @@ import { boxBinaryWords } from "./boxBinary";
 
 export const saveEditorResources = {
   zh: {
+    battlePassError: battlePass4Words.zh.invalid,
     gsBallError: gsBall2Words.zh.error,
     pokedexResetOnly:
       "此格式已开放图鉴、事件重置与殿堂记录，训练家编辑仍在接入中。",
@@ -567,6 +569,7 @@ export const saveEditorResources = {
     },
   },
   en: {
+    battlePassError: battlePass4Words.en.invalid,
     gsBallError: gsBall2Words.en.error,
     pokedexResetOnly:
       "Pokédex editing, event resets and Hall of Fame editing are available for this format. Trainer editing is still in development.",
@@ -1169,6 +1172,7 @@ export const saveEditorResources = {
     },
   },
   ja: {
+    battlePassError: battlePass4Words.ja.invalid,
     gsBallError: gsBall2Words.ja.error,
     pokedexResetOnly:
       "この形式は図鑑、イベントのリセット、殿堂入り記録の編集に対応しています。トレーナー編集は開発中です。",
@@ -1799,6 +1803,9 @@ export function localizeSaveError(
   )
     return words.eventError;
   if (/GS Ball/i.test(message)) return words.gsBallError;
+  if (/Battle Pass.*(?:preview is stale|player changed)/i.test(message))
+    return words.br4Stale;
+  if (/Battle Pass/i.test(message)) return words.battlePassError;
   if (/Battle Revolution.*valid checksums/i.test(message)) return words.invalid;
   if (/Battle Revolution.*(?:preview is stale|player changed)/i.test(message))
     return words.br4Stale;
