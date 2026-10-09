@@ -1,0 +1,98 @@
+.save-geonet4-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-geonet4-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-geonet4-selectors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.save-geonet4-body {
+  display: grid;
+  gap: 12px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.save-geonet4-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-geonet4-editor .save-geonet4-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-geonet4-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex: none;
+  margin: 0;
+}
+.save-geonet4-preview {
+  display: grid;
+  gap: 12px;
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+.save-geonet4-preview h4 {
+  margin: 0;
+}
+.save-geonet4-counts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.save-geonet4-counts > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.save-geonet4-counts strong {
+  font-weight: 500;
+  white-space: nowrap;
+}
+.save-geonet4-details > summary {
+  min-height: 44px;
+  box-sizing: border-box;
+  padding-block: 11px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-geonet4-details > summary:hover {
+  background: var(--surface-hover);
+}
+.save-geonet4-details > summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-geonet4-changes {
+  max-height: 16rem;
+  overflow: auto;
+}
+.save-geonet4-changes ul {
+  margin: 0;
+  padding-inline-start: 1.5rem;
+}
+.save-geonet4-changes li {
+  font-size: 14px;
+  line-height: 24px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .save-geonet4-selectors,
+  .save-geonet4-counts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

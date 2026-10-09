@@ -75,6 +75,8 @@ import { BrTrainer4Editor } from "./BrTrainer4Editor";
 import { brTrainer4Words } from "./brTrainer4";
 import { BattleVideo4Editor } from "./BattleVideo4Editor";
 import { supportsBattleVideo4, video4Words } from "./battleVideo4";
+import { Geonet4Editor } from "./Geonet4Editor";
+import { geonet4Words, supportsGeonet4 } from "./geonet4";
 import { Br4GearEditor } from "./Br4GearEditor";
 import { supportsBr4Gear, br4GearWords, br4Profile } from "./br4";
 import { Joyful3Editor } from "./Joyful3Editor";
@@ -139,6 +141,7 @@ export function SaveEditorPanel(
     | "battlePass4"
     | "brTrainer4"
     | "battleVideo4"
+    | "geonet4"
     | "br4Gear"
     | "joyful3"
     | "frontier3"
@@ -279,6 +282,7 @@ export function SaveEditorPanel(
         (previous === "brTrainer4" && !supportsBr4Gear(result.report.format)) ||
         (previous === "battleVideo4" &&
           !supportsBattleVideo4(result.report.format)) ||
+        (previous === "geonet4" && !supportsGeonet4(result.report.format)) ||
         (previous === "br4Gear" && !supportsBr4Gear(result.report.format)) ||
         (previous === "joyful3" && !supportsJoyful3(result.report.format)) ||
         (previous === "frontier3" &&
@@ -950,6 +954,22 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readGeonet4 = async () => {
+    let catalog: import("./geonet4").Geo4Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "geonet4",
+      );
+      if (id !== operation.current) return;
+      if (!result.geonet4) throw new Error("No geonet4 catalog was returned.");
+      catalog = result.geonet4;
+    });
+    return catalog;
+  };
+
   const readBr4Gear = async () => {
     let catalog: import("./br4").Br4GearCatalog | undefined;
     await perform(async (id) => {
@@ -1279,6 +1299,7 @@ export function SaveEditorPanel(
       | import("./battlePass4").BattlePass4Edit
       | import("./brTrainer4").BrTrainer4Edit
       | import("./battleVideo4").Video4Import
+      | import("./geonet4").Geo4Edit
       | import("./br4").Br4GearEdit
       | import("./joyful3").Joyful3Edit
       | import("./frontier3").Frontier3Edit
@@ -1328,6 +1349,7 @@ export function SaveEditorPanel(
       | "battlePass4Edit"
       | "brTrainer4Edit"
       | "video4Import"
+      | "geonet4Edit"
       | "br4GearEdit"
       | "joyful3Edit"
       | "frontier3Edit"
@@ -1802,6 +1824,15 @@ export function SaveEditorPanel(
                 {video4Words[batchLang].title}
               </button>
             )}
+            {supportsGeonet4(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "geonet4"}
+                onClick={() => setSection("geonet4")}
+              >
+                {geonet4Words[batchLang].title}
+              </button>
+            )}
             {supportsBr4Gear(report.format) && (
               <button
                 type="button"
@@ -2155,6 +2186,15 @@ export function SaveEditorPanel(
               onPreview={previewVideo4}
               onApply={(edit) => applyWorkingEdit(edit, "video4Import")}
               onExport={exportVideo4}
+            />
+          ) : section === "geonet4" && supportsGeonet4(report.format) ? (
+            <Geonet4Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readGeonet4}
+              onApply={(edit) => applyWorkingEdit(edit, "geonet4Edit")}
             />
           ) : section === "br4Gear" && supportsBr4Gear(report.format) ? (
             <Br4GearEditor

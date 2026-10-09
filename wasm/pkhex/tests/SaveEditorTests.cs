@@ -20,6 +20,7 @@ internal static class SaveEditorTests
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "battlepass4") { BattlePass4EditingTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "brtrainer4") { BrTrainer4EditingTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "video4") { BattleVideo4EditingTests.Run(); return; }
+        if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "geonet4") { Geonet4EditingTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "br4") { Br4EditingTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "joyful3") { Joyful3EditingTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "frontier3") { Frontier3EditingTests.Run(); return; }
@@ -94,7 +95,7 @@ internal static class SaveEditorTests
             var thunderbolt = document.RootElement.GetProperty("moveChoices")[85];
             Require(thunderbolt.GetProperty("name").GetProperty("zh").GetString() == "十万伏特", $"{version}: localized move choices");
             Require(thunderbolt.GetProperty("maxPp")[3].GetInt32() == pokemon.GetMovePP(85, 3), $"{version}: PP Up limit");
-            Require(document.RootElement.GetProperty("apiVersion").GetInt32() == 102, $"{version}: API version");
+            Require(document.RootElement.GetProperty("apiVersion").GetInt32() == 103, $"{version}: API version");
             Require(document.RootElement.GetProperty("boxSlotCount").GetInt32() == save.BoxSlotCount, $"{version}: box dimensions");
             var boxes = document.RootElement.GetProperty("boxes");
             Require(boxes.GetArrayLength() == save.BoxCount, $"{version}: box metadata count");
@@ -314,6 +315,7 @@ internal static class SaveEditorTests
         BattlePass4EditingTests.Run();
         BrTrainer4EditingTests.Run();
         BattleVideo4EditingTests.Run();
+        Geonet4EditingTests.Run();
         Br4EditingTests.Run();
         Joyful3EditingTests.Run();
         Frontier3EditingTests.Run();

@@ -24,6 +24,7 @@
     <Compile Include="../BattlePass4Editing.cs" Link="BattlePass4Editing.cs" />
     <Compile Include="../BrTrainer4Editing.cs" Link="BrTrainer4Editing.cs" />
     <Compile Include="../BattleVideo4Editing.cs" Link="BattleVideo4Editing.cs" />
+    <Compile Include="../Geonet4Editing.cs" Link="Geonet4Editing.cs" />
     <Compile Include="../Br4Editing.cs" Link="Br4Editing.cs" />
     <Compile Include="../Joyful3Editing.cs" Link="Joyful3Editing.cs" />
     <Compile Include="../Frontier3Editing.cs" Link="Frontier3Editing.cs" />

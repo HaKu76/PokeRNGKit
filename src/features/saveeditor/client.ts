@@ -90,6 +90,8 @@ export class SaveEditorClient {
       | "video4Preview"
       | "video4Import"
       | "video4Export"
+      | "geonet4"
+      | "geonet4Edit"
       | "br4Gear"
       | "br4GearEdit"
       | "joyful3"

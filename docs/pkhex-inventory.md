@@ -360,7 +360,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen4/SAV_BattlePass.cs`                                | API 100：人物、台词、成绩、队伍及完整操作工程通过；浏览器待核验    |
 | `Subforms/Save Editors/Gen4/SAV_DLC4.cs`                                      | API 102：录像四格／四队、导入预览与导出工程通过；浏览器待核验      |
 | `Subforms/Save Editors/Gen4/SAV_Gear.cs`                                      | API 99：装备、套装、批量与四玩家工程通过；浏览器与实档待核验       |
-| `Subforms/Save Editors/Gen4/SAV_Geonet4.cs`                                   | 源码及点位／批量／旗标语义核对，窗口待接入                         |
+| `Subforms/Save Editors/Gen4/SAV_Geonet4.cs`                                   | API 103：点位、旗标及批量预览工程通过；浏览器与实档待核验          |
 | `Subforms/Save Editors/Gen4/SAV_HoneyTree.cs`                                 | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_Misc4.cs`                                     | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_Pokeathlon4.cs`                               | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |

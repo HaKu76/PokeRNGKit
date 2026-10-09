@@ -1,3 +1,4 @@
+import { geonet4Words } from "./geonet4";
 import { video4Words } from "./battleVideo4";
 import { brTrainer4Words } from "./brTrainer4";
 import { battlePass4Words } from "./battlePass4";
@@ -10,6 +11,8 @@ import { boxBinaryWords } from "./boxBinary";
 
 export const saveEditorResources = {
   zh: {
+    geonet4Error: geonet4Words.zh.invalid,
+    geonet4Stale: geonet4Words.zh.stale,
     video4Error: video4Words.zh.invalid,
     video4Stale: video4Words.zh.stale,
     brTrainer4Error: brTrainer4Words.zh.invalid,
@@ -574,6 +577,8 @@ export const saveEditorResources = {
     },
   },
   en: {
+    geonet4Error: geonet4Words.en.invalid,
+    geonet4Stale: geonet4Words.en.stale,
     video4Error: video4Words.en.invalid,
     video4Stale: video4Words.en.stale,
     brTrainer4Error: brTrainer4Words.en.invalid,
@@ -1180,6 +1185,8 @@ export const saveEditorResources = {
     },
   },
   ja: {
+    geonet4Error: geonet4Words.ja.invalid,
+    geonet4Stale: geonet4Words.ja.stale,
     video4Error: video4Words.ja.invalid,
     video4Stale: video4Words.ja.stale,
     brTrainer4Error: brTrainer4Words.ja.invalid,
@@ -1819,6 +1826,8 @@ export function localizeSaveError(
   if (/BR trainer.*(?:stale|player changed)/i.test(message))
     return words.br4Stale;
   if (/battle video4.*stale/i.test(message)) return words.video4Stale;
+  if (/Geonet4.*stale/i.test(message)) return words.geonet4Stale;
+  if (/Geonet4/i.test(message)) return words.geonet4Error;
   if (/battle video4/i.test(message)) return words.video4Error;
   if (/BR trainer/i.test(message)) return words.brTrainer4Error;
   if (/Battle Pass/i.test(message)) return words.battlePassError;
