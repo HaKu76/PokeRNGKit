@@ -84,6 +84,8 @@ export class SaveEditorClient {
       | "battlePass4Edit"
       | "battlePass4Preview"
       | "battlePass4Export"
+      | "brTrainer4"
+      | "brTrainer4Edit"
       | "br4Gear"
       | "br4GearEdit"
       | "joyful3"

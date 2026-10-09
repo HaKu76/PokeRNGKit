@@ -365,7 +365,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen4/SAV_Misc4.cs`                                     | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_Pokeathlon4.cs`                               | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
 | `Subforms/Save Editors/Gen4/SAV_Pokedex4.cs`                                  | 已接入；三种布局工程检查通过，浏览器待核验                         |
-| `Subforms/Save Editors/Gen4/SAV_Trainer4BR.cs`                                | 源码及范围核对；地理写入地址与时间联动待独立验证，窗口待接入       |
+| `Subforms/Save Editors/Gen4/SAV_Trainer4BR.cs`                                | API 101：训练家、时间与四玩家工程通过；浏览器待核验                |
 | `Subforms/Save Editors/Gen4/SAV_Underground.cs`                               | 待核对                                                             |
 | `Subforms/Save Editors/Gen5/CGearImage.cs`                                    | 待核对                                                             |
 | `Subforms/Save Editors/Gen5/Join Avenue/IJoinAvenueSpecificEditor.cs`         | 待核对                                                             |

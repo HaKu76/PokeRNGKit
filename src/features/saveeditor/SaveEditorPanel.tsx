@@ -71,6 +71,8 @@ import { Pokeathlon4Editor } from "./Pokeathlon4Editor";
 import { supportsPokeathlon4, pokeathlon4Words } from "./pokeathlon4";
 import { BattlePass4Editor } from "./BattlePass4Editor";
 import { battlePass4Words } from "./battlePass4";
+import { BrTrainer4Editor } from "./BrTrainer4Editor";
+import { brTrainer4Words } from "./brTrainer4";
 import { Br4GearEditor } from "./Br4GearEditor";
 import { supportsBr4Gear, br4GearWords, br4Profile } from "./br4";
 import { Joyful3Editor } from "./Joyful3Editor";
@@ -133,6 +135,7 @@ export function SaveEditorPanel(
     | "pokegear4"
     | "pokeathlon4"
     | "battlePass4"
+    | "brTrainer4"
     | "br4Gear"
     | "joyful3"
     | "frontier3"
@@ -270,6 +273,7 @@ export function SaveEditorPanel(
           !supportsPokeathlon4(result.report.format)) ||
         (previous === "battlePass4" &&
           !supportsBr4Gear(result.report.format)) ||
+        (previous === "brTrainer4" && !supportsBr4Gear(result.report.format)) ||
         (previous === "br4Gear" && !supportsBr4Gear(result.report.format)) ||
         (previous === "joyful3" && !supportsJoyful3(result.report.format)) ||
         (previous === "frontier3" &&
@@ -890,6 +894,23 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readBrTrainer4 = async () => {
+    let catalog: import("./brTrainer4").BrTrainer4Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "brTrainer4",
+      );
+      if (id !== operation.current) return;
+      if (!result.brTrainer4)
+        throw new Error("No brTrainer4 catalog was returned.");
+      catalog = result.brTrainer4;
+    });
+    return catalog;
+  };
+
   const readBr4Gear = async () => {
     let catalog: import("./br4").Br4GearCatalog | undefined;
     await perform(async (id) => {
@@ -1217,6 +1238,7 @@ export function SaveEditorPanel(
       | import("./pokegear4").PokeGear4Edit
       | import("./pokeathlon4").Pokeathlon4Edit
       | import("./battlePass4").BattlePass4Edit
+      | import("./brTrainer4").BrTrainer4Edit
       | import("./br4").Br4GearEdit
       | import("./joyful3").Joyful3Edit
       | import("./frontier3").Frontier3Edit
@@ -1264,6 +1286,7 @@ export function SaveEditorPanel(
       | "pokegear4Edit"
       | "pokeathlon4Edit"
       | "battlePass4Edit"
+      | "brTrainer4Edit"
       | "br4GearEdit"
       | "joyful3Edit"
       | "frontier3Edit"
@@ -1700,6 +1723,15 @@ export function SaveEditorPanel(
             {supportsBr4Gear(report.format) && (
               <button
                 type="button"
+                aria-pressed={section === "brTrainer4"}
+                onClick={() => setSection("brTrainer4")}
+              >
+                {brTrainer4Words[batchLang].title}
+              </button>
+            )}
+            {supportsBr4Gear(report.format) && (
+              <button
+                type="button"
                 aria-pressed={section === "br4Gear"}
                 onClick={() => setSection("br4Gear")}
               >
@@ -2029,6 +2061,15 @@ export function SaveEditorPanel(
               onPreview={previewBattlePass4}
               onApply={(edit) => applyWorkingEdit(edit, "battlePass4Edit")}
               onExport={exportBattlePass4}
+            />
+          ) : section === "brTrainer4" && supportsBr4Gear(report.format) ? (
+            <BrTrainer4Editor
+              key={report.brProfiles?.active}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readBrTrainer4}
+              onApply={(edit) => applyWorkingEdit(edit, "brTrainer4Edit")}
             />
           ) : section === "br4Gear" && supportsBr4Gear(report.format) ? (
             <Br4GearEditor

@@ -1,3 +1,4 @@
+import { brTrainer4Words } from "./brTrainer4";
 import { battlePass4Words } from "./battlePass4";
 import { gsBall2Words } from "./gsBall2";
 import { saveEditorCopy } from "./copy";
@@ -8,6 +9,7 @@ import { boxBinaryWords } from "./boxBinary";
 
 export const saveEditorResources = {
   zh: {
+    brTrainer4Error: brTrainer4Words.zh.invalid,
     battlePassError: battlePass4Words.zh.invalid,
     gsBallError: gsBall2Words.zh.error,
     pokedexResetOnly:
@@ -569,6 +571,7 @@ export const saveEditorResources = {
     },
   },
   en: {
+    brTrainer4Error: brTrainer4Words.en.invalid,
     battlePassError: battlePass4Words.en.invalid,
     gsBallError: gsBall2Words.en.error,
     pokedexResetOnly:
@@ -1172,6 +1175,7 @@ export const saveEditorResources = {
     },
   },
   ja: {
+    brTrainer4Error: brTrainer4Words.ja.invalid,
     battlePassError: battlePass4Words.ja.invalid,
     gsBallError: gsBall2Words.ja.error,
     pokedexResetOnly:
@@ -1805,6 +1809,9 @@ export function localizeSaveError(
   if (/GS Ball/i.test(message)) return words.gsBallError;
   if (/Battle Pass.*(?:preview is stale|player changed)/i.test(message))
     return words.br4Stale;
+  if (/BR trainer.*(?:stale|player changed)/i.test(message))
+    return words.br4Stale;
+  if (/BR trainer/i.test(message)) return words.brTrainer4Error;
   if (/Battle Pass/i.test(message)) return words.battlePassError;
   if (/Battle Revolution.*valid checksums/i.test(message)) return words.invalid;
   if (/Battle Revolution.*(?:preview is stale|player changed)/i.test(message))

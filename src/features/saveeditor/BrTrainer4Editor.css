@@ -1,0 +1,97 @@
+.save-brtrainer4-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-brtrainer4-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-brtrainer4-body {
+  display: grid;
+  gap: 12px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.save-brtrainer4-body textarea {
+  font: inherit;
+  resize: vertical;
+  min-height: 88px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+.save-brtrainer4-body p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 22px;
+}
+.save-brtrainer4-time {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.save-brtrainer4-flags {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.save-brtrainer4-editor .save-brtrainer4-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-brtrainer4-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex: none;
+  margin: 0;
+}
+.save-brtrainer4-details > summary {
+  min-height: 44px;
+  box-sizing: border-box;
+  padding-block: 11px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-brtrainer4-details > summary:hover {
+  background: var(--surface-hover);
+}
+.save-brtrainer4-details > summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-brtrainer4-details dl {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.save-brtrainer4-details dl > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(0, 2fr);
+  gap: 12px;
+}
+.save-brtrainer4-details dt,
+.save-brtrainer4-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+@media (max-width: 600px) {
+  .save-brtrainer4-flags {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .save-brtrainer4-details dl > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
