@@ -60,7 +60,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 103;
+  apiVersion: 104;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -788,6 +788,7 @@ export interface SaveEditorResult {
   video4Preview?: import("./battleVideo4").Video4Preview;
   video4File?: { fileName: string; data: string };
   geonet4?: import("./geonet4").Geo4Catalog;
+  honeyTree4?: import("./honeyTree4").Honey4Catalog;
   br4Gear?: import("./br4").Br4GearCatalog;
   joyful3?: import("./joyful3").Joyful3Catalog;
   frontier3?: import("./frontier3").Frontier3Catalog;
