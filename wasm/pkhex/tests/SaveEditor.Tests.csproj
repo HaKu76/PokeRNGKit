@@ -17,6 +17,7 @@
     <Compile Include="../EventReset1.cs" Link="EventReset1.cs" />
     <Compile Include="../HallOfFame1.cs" Link="HallOfFame1.cs" />
     <Compile Include="../Ferry3Editing.cs" Link="Ferry3Editing.cs" />
+    <Compile Include="../Misc3Editing.cs" Link="Misc3Editing.cs" />
     <Compile Include="../Joyful3Editing.cs" Link="Joyful3Editing.cs" />
     <Compile Include="../Frontier3Editing.cs" Link="Frontier3Editing.cs" />
     <Compile Include="../GameRecords3.cs" Link="GameRecords3.cs" />

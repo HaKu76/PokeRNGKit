@@ -1,0 +1,33 @@
+.save-misc-coins {
+  grid-template-columns: minmax(0, 16rem) auto;
+  align-items: end;
+}
+.save-misc-field {
+  max-inline-size: 22rem;
+}
+.save-misc-main h4 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-misc-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 12px;
+}
+.save-misc-icon-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-misc-icon-heading img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+@media (max-width: 540px) {
+  .save-misc-coins {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -511,6 +511,11 @@ export const saveEditorResources = {
       "无法识别存档，请选择已解密的存档文件，而非游戏 ROM 或加密容器。",
     zipError: "请先解压 ZIP，再打开其中的存档。",
     nameError: "训练家姓名为空、过长或含此游戏不支持的字符。",
+    rivalError:
+      "劲敌姓名最多 7 字符，必须能在此游戏字符集中完整保存；原始姓名字节需为 16 位十六进制。",
+    misc3Error:
+      "杂项修改无法应用，请检查代币 0–9999、图标种类 0–386 及当前存档状态。",
+    mirageSourceError: "队伍首槽的原始个性值已改变，请重新读取幻影岛来源。",
     valueError: "输入值无效，请检查 ID 和金钱的允许范围。",
     runtimeError: "存档核心加载失败，请联网刷新后重试。",
     timeoutError: "处理超时，请重新打开存档；原文件未改动。",
@@ -1084,6 +1089,12 @@ export const saveEditorResources = {
     fileError:
       "Unrecognized save. Choose decrypted save data, not a ROM or encrypted container.",
     zipError: "Extract the ZIP before opening its save.",
+    rivalError:
+      "The rival name accepts up to 7 characters and must be losslessly encoded by this game. Raw name bytes require 16 hex digits.",
+    misc3Error:
+      "Main settings could not be applied. Check coins 0–9999, icon species 0–386 and the current save state.",
+    mirageSourceError:
+      "The first raw party PID changed. Read the Mirage Island source again.",
     nameError:
       "Trainer name is empty, too long or contains unsupported characters.",
     valueError: "Invalid value. Check the ID and money limits.",
@@ -1666,6 +1677,12 @@ export const saveEditorResources = {
       "認識できません。ROMや暗号化コンテナではなく復号済みセーブを選択してください。",
     zipError: "ZIPを解凍してからセーブを開いてください。",
     nameError: "名前が空、長すぎる、または使用できない文字を含んでいます。",
+    rivalError:
+      "ライバル名は7文字までで、このゲームの文字コードで完全に保存できる必要があります。バイト列は16桁の16進数です。",
+    misc3Error:
+      "基本設定を適用できません。コイン 0–9999、アイコンの種類 0–386 と現在のセーブ状態を確認してください。",
+    mirageSourceError:
+      "手持ち先頭スロットの元の性格値が変わりました。マボロシじまの元データを再読み込みしてください。",
     valueError: "IDと所持金の範囲を確認してください。",
     runtimeError:
       "セーブ機能を読み込めません。オンラインで再読み込みしてください。",
@@ -1729,6 +1746,11 @@ export function localizeSaveError(
   )
     return words.eventError;
   if (/GS Ball/i.test(message)) return words.gsBallError;
+  if (/Rival.*name/i.test(message)) return words.rivalError;
+  if (/first raw party PID changed/i.test(message))
+    return words.mirageSourceError;
+  if (/Gen3 main.*valid checksums/i.test(message)) return words.invalid;
+  if (/Gen3 main|trainer card icon/i.test(message)) return words.misc3Error;
   if (/Hall of Fame/i.test(message)) return words.hallError;
   if (/^Storage /.test(message)) return words.storageError;
   if (/Box batch|Invalid box batch values/.test(message))

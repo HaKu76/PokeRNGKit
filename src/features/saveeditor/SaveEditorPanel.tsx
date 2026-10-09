@@ -61,6 +61,8 @@ import { EventResetEditor } from "./EventResetEditor";
 import { supportsEventReset, eventResetWords } from "./eventReset";
 import { Ferry3Editor } from "./Ferry3Editor";
 import { supportsFerry3, ferry3Words } from "./ferry3";
+import { Misc3Editor } from "./Misc3Editor";
+import { supportsMisc3, misc3Words } from "./misc3";
 import { Joyful3Editor } from "./Joyful3Editor";
 import { supportsJoyful3, joyful3Words } from "./joyful3";
 import { Frontier3Editor } from "./Frontier3Editor";
@@ -116,6 +118,7 @@ export function SaveEditorPanel(
     | "hall1"
     | "eventReset"
     | "ferry3"
+    | "misc3"
     | "joyful3"
     | "frontier3"
     | "gameRecords3"
@@ -243,6 +246,7 @@ export function SaveEditorPanel(
         (previous === "eventReset" &&
           !supportsEventReset(result.report.format)) ||
         (previous === "ferry3" && !supportsFerry3(result.report.format)) ||
+        (previous === "misc3" && !supportsMisc3(result.report.format)) ||
         (previous === "joyful3" && !supportsJoyful3(result.report.format)) ||
         (previous === "frontier3" &&
           !supportsFrontier3(result.report.format)) ||
@@ -741,6 +745,22 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readMisc3 = async () => {
+    let catalog: import("./misc3").Misc3Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "misc3",
+      );
+      if (id !== operation.current) return;
+      if (!result.misc3) throw new Error("No misc3 catalog was returned.");
+      catalog = result.misc3;
+    });
+    return catalog;
+  };
+
   const readJoyful3 = async () => {
     let catalog: import("./joyful3").Joyful3Catalog | undefined;
     await perform(async (id) => {
@@ -1047,6 +1067,7 @@ export function SaveEditorPanel(
       | import("./hall1").Hall1Edit
       | import("./eventReset").EventResetEdit
       | import("./ferry3").Ferry3Edit
+      | import("./misc3").Misc3Edit
       | import("./joyful3").Joyful3Edit
       | import("./frontier3").Frontier3Edit
       | import("./gameRecords3").GameRecord3Edit
@@ -1088,6 +1109,7 @@ export function SaveEditorPanel(
       | "hall1Edit"
       | "eventResetEdit"
       | "ferry3Edit"
+      | "misc3Edit"
       | "joyful3Edit"
       | "frontier3Edit"
       | "gameRecords3Edit"
@@ -1402,6 +1424,15 @@ export function SaveEditorPanel(
                 {ferry3Words[batchLang].title}
               </button>
             )}
+            {supportsMisc3(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "misc3"}
+                onClick={() => setSection("misc3")}
+              >
+                {misc3Words[batchLang].title}
+              </button>
+            )}
             {supportsJoyful3(report.format) && (
               <button
                 type="button"
@@ -1675,6 +1706,15 @@ export function SaveEditorPanel(
               lang={batchLang}
               onRead={readFerry3}
               onApply={(edit) => applyWorkingEdit(edit, "ferry3Edit")}
+            />
+          ) : section === "misc3" && supportsMisc3(report.format) ? (
+            <Misc3Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readMisc3}
+              onApply={(edit) => applyWorkingEdit(edit, "misc3Edit")}
             />
           ) : section === "joyful3" && supportsJoyful3(report.format) ? (
             <Joyful3Editor
