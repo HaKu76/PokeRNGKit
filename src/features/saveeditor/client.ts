@@ -68,6 +68,8 @@ export class SaveEditorClient {
       | "eventResetEdit"
       | "ferry3"
       | "ferry3Edit"
+      | "joyful3"
+      | "joyful3Edit"
       | "frontier3"
       | "frontier3Edit"
       | "gameRecords3"
