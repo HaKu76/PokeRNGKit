@@ -129,6 +129,14 @@ public static partial class Program
     [JSExport]
     public static byte[] EditBrTrainer4(byte[] data,string json) => SaveService.EditBrTrainer4(data,json);
     [JSExport]
+    public static string ReadBattleVideo4(byte[] data,string json) => SaveService.ReadBattleVideo4(data,json);
+    [JSExport]
+    public static string PreviewBattleVideo4(byte[] data,string json) => SaveService.PreviewBattleVideo4(data,json);
+    [JSExport]
+    public static byte[] ImportBattleVideo4(byte[] data,string json) => SaveService.ImportBattleVideo4(data,json);
+    [JSExport]
+    public static string ExportBattleVideo4(byte[] data,string json) => SaveService.ExportBattleVideo4(data,json);
+    [JSExport]
     public static string ReadBr4Gear(byte[] data) => SaveService.ReadBr4Gear(data);
     [JSExport]
     public static byte[] EditBr4Gear(byte[] data,string json) => SaveService.EditBr4Gear(data,json);
@@ -244,7 +252,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 101;
+    public const int ApiVersion = 102;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)
@@ -670,6 +678,12 @@ public sealed record SaveReport(
 [JsonSerializable(typeof(Bp4Query))]
 [JsonSerializable(typeof(BrTrainer4Catalog))]
 [JsonSerializable(typeof(BrTrainer4Edit))]
+[JsonSerializable(typeof(Video4Catalog))]
+[JsonSerializable(typeof(Video4Query))]
+[JsonSerializable(typeof(Video4Import))]
+[JsonSerializable(typeof(Video4Export))]
+[JsonSerializable(typeof(Video4Preview))]
+[JsonSerializable(typeof(Video4File))]
 [JsonSerializable(typeof(Br4GearCatalog))]
 [JsonSerializable(typeof(Br4GearEdit))]
 [JsonSerializable(typeof(Joyful3Catalog))]

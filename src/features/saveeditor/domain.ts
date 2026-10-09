@@ -60,7 +60,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 101;
+  apiVersion: 102;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -784,6 +784,9 @@ export interface SaveEditorResult {
   battlePass4?: import("./battlePass4").BattlePass4Catalog;
   battlePassFile?: { fileName: string; data: string };
   brTrainer4?: import("./brTrainer4").BrTrainer4Catalog;
+  battleVideo4?: import("./battleVideo4").Video4Catalog;
+  video4Preview?: import("./battleVideo4").Video4Preview;
+  video4File?: { fileName: string; data: string };
   br4Gear?: import("./br4").Br4GearCatalog;
   joyful3?: import("./joyful3").Joyful3Catalog;
   frontier3?: import("./frontier3").Frontier3Catalog;

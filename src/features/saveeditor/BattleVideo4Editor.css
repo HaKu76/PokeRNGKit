@@ -1,0 +1,87 @@
+.save-video4-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-video4-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-video4-editor p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 22px;
+}
+.save-video4-teams {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
+}
+.save-video4-team {
+  min-width: 0;
+}
+.save-video4-editor h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  line-height: 24px;
+  overflow-wrap: anywhere;
+}
+.save-video4-team ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.save-video4-team li {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+}
+.save-video4-team img {
+  width: 48px;
+  height: 40px;
+  object-fit: contain;
+}
+.save-video4-team li > div {
+  display: grid;
+  min-width: 0;
+}
+.save-video4-team strong {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.save-video4-team span {
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-video4-editor .save-video4-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-video4-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex: none;
+  margin: 0;
+}
+.save-video4-preview {
+  display: grid;
+  gap: 12px;
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+@media (max-width: 600px) {
+  .save-video4-teams {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

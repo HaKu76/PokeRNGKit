@@ -73,6 +73,8 @@ import { BattlePass4Editor } from "./BattlePass4Editor";
 import { battlePass4Words } from "./battlePass4";
 import { BrTrainer4Editor } from "./BrTrainer4Editor";
 import { brTrainer4Words } from "./brTrainer4";
+import { BattleVideo4Editor } from "./BattleVideo4Editor";
+import { supportsBattleVideo4, video4Words } from "./battleVideo4";
 import { Br4GearEditor } from "./Br4GearEditor";
 import { supportsBr4Gear, br4GearWords, br4Profile } from "./br4";
 import { Joyful3Editor } from "./Joyful3Editor";
@@ -136,6 +138,7 @@ export function SaveEditorPanel(
     | "pokeathlon4"
     | "battlePass4"
     | "brTrainer4"
+    | "battleVideo4"
     | "br4Gear"
     | "joyful3"
     | "frontier3"
@@ -274,6 +277,8 @@ export function SaveEditorPanel(
         (previous === "battlePass4" &&
           !supportsBr4Gear(result.report.format)) ||
         (previous === "brTrainer4" && !supportsBr4Gear(result.report.format)) ||
+        (previous === "battleVideo4" &&
+          !supportsBattleVideo4(result.report.format)) ||
         (previous === "br4Gear" && !supportsBr4Gear(result.report.format)) ||
         (previous === "joyful3" && !supportsJoyful3(result.report.format)) ||
         (previous === "frontier3" &&
@@ -911,6 +916,40 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const previewVideo4 = async (edit: import("./battleVideo4").Video4Import) => {
+    let catalog: import("./battleVideo4").Video4Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "video4Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.video4Preview)
+        throw new Error("No battleVideo4 catalog was returned.");
+      catalog = result.video4Preview;
+    });
+    return catalog;
+  };
+
+  const readBattleVideo4 = async (index: number) => {
+    let catalog: import("./battleVideo4").Video4Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify({ index }),
+        "battleVideo4",
+      );
+      if (id !== operation.current) return;
+      if (!result.battleVideo4)
+        throw new Error("No battleVideo4 catalog was returned.");
+      catalog = result.battleVideo4;
+    });
+    return catalog;
+  };
+
   const readBr4Gear = async () => {
     let catalog: import("./br4").Br4GearCatalog | undefined;
     await perform(async (id) => {
@@ -1239,6 +1278,7 @@ export function SaveEditorPanel(
       | import("./pokeathlon4").Pokeathlon4Edit
       | import("./battlePass4").BattlePass4Edit
       | import("./brTrainer4").BrTrainer4Edit
+      | import("./battleVideo4").Video4Import
       | import("./br4").Br4GearEdit
       | import("./joyful3").Joyful3Edit
       | import("./frontier3").Frontier3Edit
@@ -1287,6 +1327,7 @@ export function SaveEditorPanel(
       | "pokeathlon4Edit"
       | "battlePass4Edit"
       | "brTrainer4Edit"
+      | "video4Import"
       | "br4GearEdit"
       | "joyful3Edit"
       | "frontier3Edit"
@@ -1349,6 +1390,29 @@ export function SaveEditorPanel(
       for (const byte of bytes) binary += String.fromCharCode(byte);
       return { ...position, fileName: file.name, data: btoa(binary) };
     }, "pokemonImport");
+
+  const exportVideo4 = (index: number, decrypted: boolean) =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify({ index, decrypted }),
+        "video4Export",
+      );
+      if (id !== operation.current) return;
+      if (!result.video4File) throw new Error("Entity file export failed.");
+      const bytes = Uint8Array.from(atob(result.video4File.data), (char) =>
+        char.charCodeAt(0),
+      );
+      const url = URL.createObjectURL(
+        new Blob([bytes], { type: "application/octet-stream" }),
+      );
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = result.video4File.fileName;
+      anchor.click();
+      setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    });
 
   const exportBattlePass4 = (index: number, slot?: number) =>
     perform(async (id) => {
@@ -1729,6 +1793,15 @@ export function SaveEditorPanel(
                 {brTrainer4Words[batchLang].title}
               </button>
             )}
+            {supportsBattleVideo4(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "battleVideo4"}
+                onClick={() => setSection("battleVideo4")}
+              >
+                {video4Words[batchLang].title}
+              </button>
+            )}
             {supportsBr4Gear(report.format) && (
               <button
                 type="button"
@@ -2070,6 +2143,18 @@ export function SaveEditorPanel(
               lang={batchLang}
               onRead={readBrTrainer4}
               onApply={(edit) => applyWorkingEdit(edit, "brTrainer4Edit")}
+            />
+          ) : section === "battleVideo4" &&
+            supportsBattleVideo4(report.format) ? (
+            <BattleVideo4Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readBattleVideo4}
+              onPreview={previewVideo4}
+              onApply={(edit) => applyWorkingEdit(edit, "video4Import")}
+              onExport={exportVideo4}
             />
           ) : section === "br4Gear" && supportsBr4Gear(report.format) ? (
             <Br4GearEditor
