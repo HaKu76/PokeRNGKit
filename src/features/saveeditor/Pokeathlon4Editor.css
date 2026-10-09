@@ -1,0 +1,66 @@
+.save-ath4-select {
+  max-inline-size: 26rem;
+}
+.save-ath4-roster.save-editor-toolbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  gap: 8px;
+}
+.save-ath4-roster button {
+  min-width: 0;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}
+.save-ath4-roster img,
+.save-ath4-sprite img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+.save-ath4-sprite {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.save-ath4-details > summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-ath4-details > summary:hover {
+  background: var(--surface-hover);
+}
+.save-ath4-details > summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-ath4-list {
+  max-height: 22rem;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.save-ath4-list table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 22px;
+}
+.save-ath4-list th,
+.save-ath4-list td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.save-ath4-list th {
+  font-weight: 500;
+}
+.save-ath4-list thead {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}

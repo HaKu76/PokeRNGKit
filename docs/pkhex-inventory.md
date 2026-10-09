@@ -350,12 +350,12 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen3/SAV_SecretBase3.cs`                               | API 96：基地训练家、六格队伍与形态预览接入；浏览器与真实存档待核验 |
 | `Subforms/Save Editors/Gen4/PoffinCase4Editor.cs`                             | API 75：逐格／批量与三语目录已接入；工程检查通过，浏览器待核验     |
 | `Subforms/Save Editors/Gen4/PokeGear4Editor.cs`                               | API 97：75 格通讯录、原始数值与批量预览工程通过；浏览器待核验      |
-| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonConnection4Editor.cs`        | 待核对                                                             |
-| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonEventData4Editor.cs`         | 待核对                                                             |
-| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonEventRecord4Editor.cs`       | 待核对                                                             |
-| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonEventTrainer4Editor.cs`      | 待核对                                                             |
-| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonParticipant4Editor.cs`       | 待核对                                                             |
-| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonSpeciesForm4Editor.cs`       | 待核对                                                             |
+| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonConnection4Editor.cs`        | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
+| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonEventData4Editor.cs`         | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
+| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonEventRecord4Editor.cs`       | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
+| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonEventTrainer4Editor.cs`      | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
+| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonParticipant4Editor.cs`       | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
+| `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonSpeciesForm4Editor.cs`       | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
 | `Subforms/Save Editors/Gen4/SAV_Apricorn.cs`                                  | API 76：数量／批量／三语图像工程检查通过；浏览器待核验             |
 | `Subforms/Save Editors/Gen4/SAV_BattlePass.cs`                                | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_DLC4.cs`                                      | 待核对                                                             |
@@ -363,7 +363,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen4/SAV_Geonet4.cs`                                   | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_HoneyTree.cs`                                 | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_Misc4.cs`                                     | 待核对                                                             |
-| `Subforms/Save Editors/Gen4/SAV_Pokeathlon4.cs`                               | 待核对                                                             |
+| `Subforms/Save Editors/Gen4/SAV_Pokeathlon4.cs`                               | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
 | `Subforms/Save Editors/Gen4/SAV_Pokedex4.cs`                                  | 已接入；三种布局工程检查通过，浏览器待核验                         |
 | `Subforms/Save Editors/Gen4/SAV_Trainer4BR.cs`                                | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_Underground.cs`                               | 待核对                                                             |

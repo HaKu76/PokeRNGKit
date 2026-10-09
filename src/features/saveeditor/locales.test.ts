@@ -63,6 +63,24 @@ describe("save editor localization", () => {
         words.nameError,
       );
       expect(
+        localizeSaveError("Invalid Pokeathlon4 participant fields.", words),
+      ).toBe(words.pokeathlon4Error);
+      expect(
+        localizeSaveError(
+          "Pokeathlon4 trainer name cannot be encoded without loss.",
+          words,
+        ),
+      ).toBe(words.pokeathlon4NameError);
+      expect(
+        localizeSaveError(
+          "Pokeathlon4 preview is stale. Read it again.",
+          words,
+        ),
+      ).toBe(words.pokeathlon4Stale);
+      expect(
+        localizeSaveError("Pokeathlon4 requires valid checksums.", words),
+      ).toBe(words.invalid);
+      expect(
         localizeSaveError("Rival name cannot be encoded without loss.", words),
       ).toBe(words.rivalError);
       expect(

@@ -513,6 +513,11 @@ export const saveEditorResources = {
     nameError: "训练家姓名为空、过长或含此游戏不支持的字符。",
     rivalError:
       "劲敌姓名最多 7 字符，必须能在此游戏字符集中完整保存；原始姓名字节需为 16 位十六进制。",
+    pokeathlon4Error:
+      "无法应用竞技操作，请核对所选位置、数值上限、种类与第四世代形态。",
+    pokeathlon4NameError:
+      "训练家姓名最多七个字符，必须可完整保存；原始姓名字节需为 32 位十六进制。",
+    pokeathlon4Stale: "存档已改变，请重新读取竞技数据并生成奖牌预览。",
     pokegear4Error:
       "无法应用通讯录操作。格位为 1–75，原始数值为 -128–127；请核对联系人和当前存档状态。",
     pokegear4Stale: "存档已改变，请重新读取通讯录并生成批量预览。",
@@ -1098,6 +1103,12 @@ export const saveEditorResources = {
     zipError: "Extract the ZIP before opening its save.",
     rivalError:
       "The rival name accepts up to 7 characters and must be losslessly encoded by this game. Raw name bytes require 16 hex digits.",
+    pokeathlon4Error:
+      "Cannot apply the Pokéathlon operation. Check positions, numeric limits, species and Generation IV forms.",
+    pokeathlon4NameError:
+      "Trainer names allow seven characters and must roundtrip exactly. Raw name bytes use 32 hex digits.",
+    pokeathlon4Stale:
+      "The save has changed. Read the Pokéathlon data again and regenerate the medal preview.",
     pokegear4Error:
       "Cannot apply the contact operation. Slots are 1–75 and raw values are -128–127. Check the contact and current save state.",
     pokegear4Stale:
@@ -1694,6 +1705,12 @@ export const saveEditorResources = {
     nameError: "名前が空、長すぎる、または使用できない文字を含んでいます。",
     rivalError:
       "ライバル名は7文字までで、このゲームの文字コードで完全に保存できる必要があります。バイト列は16桁の16進数です。",
+    pokeathlon4Error:
+      "ポケスロン操作を適用できません。位置、数値上限、種類と第四世代フォルムを確認してください。",
+    pokeathlon4NameError:
+      "トレーナー名は完全に保存できる七文字までです。元バイト列は32桁の16進数です。",
+    pokeathlon4Stale:
+      "セーブが変わりました。ポケスロンデータを再読み込みしてメダルのプレビューを作り直してください。",
     pokegear4Error:
       "連絡先の操作を適用できません。位置は 1–75、元の数値は -128–127 です。連絡先と現在のセーブ状態を確認してください。",
     pokegear4Stale:
@@ -1769,6 +1786,12 @@ export function localizeSaveError(
   )
     return words.eventError;
   if (/GS Ball/i.test(message)) return words.gsBallError;
+  if (/Pokeathlon4.*valid checksums/i.test(message)) return words.invalid;
+  if (/Pokeathlon4 preview is stale/i.test(message))
+    return words.pokeathlon4Stale;
+  if (/Pokeathlon4 trainer name/i.test(message))
+    return words.pokeathlon4NameError;
+  if (/Pokeathlon4/i.test(message)) return words.pokeathlon4Error;
   if (/PokeGear4.*valid checksums/i.test(message)) return words.invalid;
   if (/PokeGear4 preview is stale/i.test(message)) return words.pokegear4Stale;
   if (/PokeGear4/i.test(message)) return words.pokegear4Error;

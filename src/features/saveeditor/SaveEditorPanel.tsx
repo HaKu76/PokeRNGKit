@@ -67,6 +67,8 @@ import { SecretBase3Editor } from "./SecretBase3Editor";
 import { supportsSecretBase3, secretBase3Words } from "./secretBase3";
 import { PokeGear4Editor } from "./PokeGear4Editor";
 import { supportsPokeGear4, pokegear4Words } from "./pokegear4";
+import { Pokeathlon4Editor } from "./Pokeathlon4Editor";
+import { supportsPokeathlon4, pokeathlon4Words } from "./pokeathlon4";
 import { Joyful3Editor } from "./Joyful3Editor";
 import { supportsJoyful3, joyful3Words } from "./joyful3";
 import { Frontier3Editor } from "./Frontier3Editor";
@@ -125,6 +127,7 @@ export function SaveEditorPanel(
     | "misc3"
     | "secretBase3"
     | "pokegear4"
+    | "pokeathlon4"
     | "joyful3"
     | "frontier3"
     | "gameRecords3"
@@ -257,6 +260,8 @@ export function SaveEditorPanel(
           !supportsSecretBase3(result.report.format)) ||
         (previous === "pokegear4" &&
           !supportsPokeGear4(result.report.format)) ||
+        (previous === "pokeathlon4" &&
+          !supportsPokeathlon4(result.report.format)) ||
         (previous === "joyful3" && !supportsJoyful3(result.report.format)) ||
         (previous === "frontier3" &&
           !supportsFrontier3(result.report.format)) ||
@@ -823,6 +828,23 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readPokeathlon4 = async () => {
+    let catalog: import("./pokeathlon4").Pokeathlon4Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "pokeathlon4",
+      );
+      if (id !== operation.current) return;
+      if (!result.pokeathlon4)
+        throw new Error("No pokeathlon4 catalog was returned.");
+      catalog = result.pokeathlon4;
+    });
+    return catalog;
+  };
+
   const readJoyful3 = async () => {
     let catalog: import("./joyful3").Joyful3Catalog | undefined;
     await perform(async (id) => {
@@ -1132,6 +1154,7 @@ export function SaveEditorPanel(
       | import("./misc3").Misc3Edit
       | import("./secretBase3").SecretBase3Edit
       | import("./pokegear4").PokeGear4Edit
+      | import("./pokeathlon4").Pokeathlon4Edit
       | import("./joyful3").Joyful3Edit
       | import("./frontier3").Frontier3Edit
       | import("./gameRecords3").GameRecord3Edit
@@ -1176,6 +1199,7 @@ export function SaveEditorPanel(
       | "misc3Edit"
       | "secretBase3Edit"
       | "pokegear4Edit"
+      | "pokeathlon4Edit"
       | "joyful3Edit"
       | "frontier3Edit"
       | "gameRecords3Edit"
@@ -1517,6 +1541,15 @@ export function SaveEditorPanel(
                 {pokegear4Words[batchLang].title}
               </button>
             )}
+            {supportsPokeathlon4(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "pokeathlon4"}
+                onClick={() => setSection("pokeathlon4")}
+              >
+                {pokeathlon4Words[batchLang].title}
+              </button>
+            )}
             {supportsJoyful3(report.format) && (
               <button
                 type="button"
@@ -1819,6 +1852,16 @@ export function SaveEditorPanel(
               lang={batchLang}
               onRead={readPokeGear4}
               onApply={(edit) => applyWorkingEdit(edit, "pokegear4Edit")}
+            />
+          ) : section === "pokeathlon4" &&
+            supportsPokeathlon4(report.format) ? (
+            <Pokeathlon4Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readPokeathlon4}
+              onApply={(edit) => applyWorkingEdit(edit, "pokeathlon4Edit")}
             />
           ) : section === "joyful3" && supportsJoyful3(report.format) ? (
             <Joyful3Editor

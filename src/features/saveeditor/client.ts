@@ -75,6 +75,8 @@ export class SaveEditorClient {
       | "secretBase3Edit"
       | "pokegear4"
       | "pokegear4Edit"
+      | "pokeathlon4"
+      | "pokeathlon4Edit"
       | "joyful3"
       | "joyful3Edit"
       | "frontier3"
