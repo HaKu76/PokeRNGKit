@@ -63,6 +63,27 @@ describe("save editor localization", () => {
         words.nameError,
       );
       expect(
+        localizeSaveError("Invalid Battle Revolution gear flags.", words),
+      ).toBe(words.br4Error);
+      expect(
+        localizeSaveError(
+          "Battle Revolution player changed. Read the data again.",
+          words,
+        ),
+      ).toBe(words.br4Stale);
+      expect(
+        localizeSaveError(
+          "Battle Revolution preview is stale. Read it again.",
+          words,
+        ),
+      ).toBe(words.br4Stale);
+      expect(
+        localizeSaveError(
+          "Battle Revolution editing requires valid checksums.",
+          words,
+        ),
+      ).toBe(words.invalid);
+      expect(
         localizeSaveError("Invalid Pokeathlon4 participant fields.", words),
       ).toBe(words.pokeathlon4Error);
       expect(

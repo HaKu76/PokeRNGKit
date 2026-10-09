@@ -1,0 +1,54 @@
+.save-br4-select {
+  max-inline-size: 26rem;
+}
+.save-br4-outfit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.save-br4-outfit img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+.save-br4-details > summary {
+  min-height: 44px;
+  box-sizing: border-box;
+  padding-block: 11px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-br4-details > summary:hover {
+  background: var(--surface-hover);
+}
+.save-br4-details > summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-br4-list {
+  max-height: 22rem;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.save-br4-list table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 22px;
+}
+.save-br4-list th,
+.save-br4-list td {
+  text-align: start;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+.save-br4-list th {
+  font-weight: 500;
+}
+.save-br4-list thead {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}

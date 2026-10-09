@@ -69,6 +69,8 @@ import { PokeGear4Editor } from "./PokeGear4Editor";
 import { supportsPokeGear4, pokegear4Words } from "./pokegear4";
 import { Pokeathlon4Editor } from "./Pokeathlon4Editor";
 import { supportsPokeathlon4, pokeathlon4Words } from "./pokeathlon4";
+import { Br4GearEditor } from "./Br4GearEditor";
+import { supportsBr4Gear, br4GearWords, br4Profile } from "./br4";
 import { Joyful3Editor } from "./Joyful3Editor";
 import { supportsJoyful3, joyful3Words } from "./joyful3";
 import { Frontier3Editor } from "./Frontier3Editor";
@@ -128,6 +130,7 @@ export function SaveEditorPanel(
     | "secretBase3"
     | "pokegear4"
     | "pokeathlon4"
+    | "br4Gear"
     | "joyful3"
     | "frontier3"
     | "gameRecords3"
@@ -262,6 +265,7 @@ export function SaveEditorPanel(
           !supportsPokeGear4(result.report.format)) ||
         (previous === "pokeathlon4" &&
           !supportsPokeathlon4(result.report.format)) ||
+        (previous === "br4Gear" && !supportsBr4Gear(result.report.format)) ||
         (previous === "joyful3" && !supportsJoyful3(result.report.format)) ||
         (previous === "frontier3" &&
           !supportsFrontier3(result.report.format)) ||
@@ -845,6 +849,22 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readBr4Gear = async () => {
+    let catalog: import("./br4").Br4GearCatalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "br4Gear",
+      );
+      if (id !== operation.current) return;
+      if (!result.br4Gear) throw new Error("No br4Gear catalog was returned.");
+      catalog = result.br4Gear;
+    });
+    return catalog;
+  };
+
   const readJoyful3 = async () => {
     let catalog: import("./joyful3").Joyful3Catalog | undefined;
     await perform(async (id) => {
@@ -1155,6 +1175,7 @@ export function SaveEditorPanel(
       | import("./secretBase3").SecretBase3Edit
       | import("./pokegear4").PokeGear4Edit
       | import("./pokeathlon4").Pokeathlon4Edit
+      | import("./br4").Br4GearEdit
       | import("./joyful3").Joyful3Edit
       | import("./frontier3").Frontier3Edit
       | import("./gameRecords3").GameRecord3Edit
@@ -1200,6 +1221,7 @@ export function SaveEditorPanel(
       | "secretBase3Edit"
       | "pokegear4Edit"
       | "pokeathlon4Edit"
+      | "br4GearEdit"
       | "joyful3Edit"
       | "frontier3Edit"
       | "gameRecords3Edit"
@@ -1289,7 +1311,11 @@ export function SaveEditorPanel(
     perform(async (id) => {
       const bytes = originalSave ? original.current : history.at(-1);
       if (!bytes) return;
-      const result = await client.current.run(bytes);
+      const result = await client.current.run(
+        bytes,
+        undefined,
+        "inspectWorking",
+      );
       if (id !== operation.current) return;
       working.current = bytes;
       setReport(result.report);
@@ -1308,6 +1334,22 @@ export function SaveEditorPanel(
       );
     });
 
+  const selectBRPlayer = (profile: number) =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(br4Profile(profile)),
+        "brProfile",
+      );
+      if (id !== operation.current) return;
+      setReport(result.report);
+      setDraft(trainerDraft(result.report));
+      setLegality(undefined);
+      setWorkingRevision((previous) => previous + 1);
+      setFileRevision((previous) => previous + 1);
+    });
+
   return (
     <div className="save-editor-panel" aria-busy={busy}>
       <p>{words.intro}</p>
@@ -1316,7 +1358,14 @@ export function SaveEditorPanel(
           <button
             type="button"
             className="primary"
-            disabled={busy || !(report.canEdit || report.pokedex?.canEdit)}
+            disabled={
+              busy ||
+              !(
+                report.canEdit ||
+                report.pokedex?.canEdit ||
+                report.brProfiles?.canEdit
+              )
+            }
             onClick={() => void exportFile()}
           >
             <Download size={18} aria-hidden="true" /> {words.export}
@@ -1384,6 +1433,29 @@ export function SaveEditorPanel(
           </button>
         )}
       </div>
+      {report?.brProfiles && (
+        <>
+          <label className="field">
+            <span>{br4GearWords[batchLang].player}</span>
+            <Select
+              value={report.brProfiles.active}
+              disabled={busy}
+              onChange={(event) =>
+                void selectBRPlayer(Number(event.target.value))
+              }
+            >
+              {report.brProfiles.choices.map((profile) => (
+                <option key={profile.id} value={profile.id}>
+                  {profile.id + 1} ·{" "}
+                  {profile.name || br4GearWords[batchLang].empty}
+                </option>
+              ))}
+            </Select>
+          </label>
+          <p>{br4GearWords[batchLang].profileNote}</p>
+        </>
+      )}
+
       <p className="save-editor-note">{words.choose}</p>
       {busy && <p role="status">{words.loading}</p>}
       {error && (
@@ -1548,6 +1620,15 @@ export function SaveEditorPanel(
                 onClick={() => setSection("pokeathlon4")}
               >
                 {pokeathlon4Words[batchLang].title}
+              </button>
+            )}
+            {supportsBr4Gear(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "br4Gear"}
+                onClick={() => setSection("br4Gear")}
+              >
+                {br4GearWords[batchLang].title}
               </button>
             )}
             {supportsJoyful3(report.format) && (
@@ -1863,6 +1944,15 @@ export function SaveEditorPanel(
               onRead={readPokeathlon4}
               onApply={(edit) => applyWorkingEdit(edit, "pokeathlon4Edit")}
             />
+          ) : section === "br4Gear" && supportsBr4Gear(report.format) ? (
+            <Br4GearEditor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readBr4Gear}
+              onApply={(edit) => applyWorkingEdit(edit, "br4GearEdit")}
+            />
           ) : section === "joyful3" && supportsJoyful3(report.format) ? (
             <Joyful3Editor
               key={report.format}
@@ -2014,7 +2104,10 @@ export function SaveEditorPanel(
                         (game) =>
                           words.games[game as keyof typeof words.games] ?? game,
                       )
-                      .join(" / ") || report.version}{" "}
+                      .join(" / ") ||
+                      (report.format === "SAV4BR"
+                        ? words.br4Game
+                        : report.version)}{" "}
                     · {words.generation} {report.generation}
                   </dd>
                 </div>
@@ -2041,13 +2134,15 @@ export function SaveEditorPanel(
               </dl>
               {report.checksumsValid && !report.canEdit && (
                 <p>
-                  {report.format === "SAV1"
-                    ? words.pokedexResetOnly
-                    : ["SAV2", "SAV7b"].includes(report.format)
-                      ? words.pokedexEventsOnly
-                      : report.pokedex?.canEdit
-                        ? words.pokedexOnly
-                        : words.readonly}
+                  {report.format === "SAV4BR"
+                    ? br4GearWords[batchLang].scoped
+                    : report.format === "SAV1"
+                      ? words.pokedexResetOnly
+                      : ["SAV2", "SAV7b"].includes(report.format)
+                        ? words.pokedexEventsOnly
+                        : report.pokedex?.canEdit
+                          ? words.pokedexOnly
+                          : words.readonly}
                 </p>
               )}
               <fieldset

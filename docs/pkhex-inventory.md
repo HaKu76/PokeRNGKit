@@ -357,9 +357,9 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonParticipant4Editor.cs`       | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
 | `Subforms/Save Editors/Gen4/Pokeathlon/PokeathlonSpeciesForm4Editor.cs`       | API 98：随竞技窗口接入；工程通过，浏览器与实档待核验               |
 | `Subforms/Save Editors/Gen4/SAV_Apricorn.cs`                                  | API 76：数量／批量／三语图像工程检查通过；浏览器待核验             |
-| `Subforms/Save Editors/Gen4/SAV_BattlePass.cs`                                | 待核对                                                             |
+| `Subforms/Save Editors/Gen4/SAV_BattlePass.cs`                                | 源码及输入范围核对；四玩家上下文已接通，对战证窗口待接入           |
 | `Subforms/Save Editors/Gen4/SAV_DLC4.cs`                                      | 待核对                                                             |
-| `Subforms/Save Editors/Gen4/SAV_Gear.cs`                                      | 待核对                                                             |
+| `Subforms/Save Editors/Gen4/SAV_Gear.cs`                                      | API 99：装备、套装、批量与四玩家工程通过；浏览器与实档待核验       |
 | `Subforms/Save Editors/Gen4/SAV_Geonet4.cs`                                   | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_HoneyTree.cs`                                 | 待核对                                                             |
 | `Subforms/Save Editors/Gen4/SAV_Misc4.cs`                                     | 待核对                                                             |

@@ -45,6 +45,7 @@ export interface TrainerDateField {
 }
 
 export interface SaveReport {
+  brProfiles?: import("./br4").Br4Profiles | null;
   pokedex: {
     kind:
       | "simple"
@@ -59,7 +60,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 98;
+  apiVersion: 99;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -779,6 +780,7 @@ export interface SaveEditorResult {
   secretBase3Form?: import("./secretBase3").Base3FormSuggestion;
   pokegear4?: import("./pokegear4").PokeGear4Catalog;
   pokeathlon4?: import("./pokeathlon4").Pokeathlon4Catalog;
+  br4Gear?: import("./br4").Br4GearCatalog;
   joyful3?: import("./joyful3").Joyful3Catalog;
   frontier3?: import("./frontier3").Frontier3Catalog;
   gameRecords3?: import("./gameRecords3").GameRecord3Catalog;

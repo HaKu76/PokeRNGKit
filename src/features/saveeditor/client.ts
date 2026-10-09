@@ -3,6 +3,7 @@ import { MAX_SAVE_BYTES, type SaveEditorResult } from "./domain";
 export class SaveEditorClient {
   private worker?: Worker;
   private nextId = 0;
+  private brProfile = -1;
   private pending = new Map<
     number,
     {
@@ -16,6 +17,8 @@ export class SaveEditorClient {
     bytes: Uint8Array,
     edit?: string,
     kind:
+      | "brProfile"
+      | "inspectWorking"
       | "boxBinaryPreview"
       | "boxBinaryCommit"
       | "boxBinaryDiscard"
@@ -77,6 +80,8 @@ export class SaveEditorClient {
       | "pokegear4Edit"
       | "pokeathlon4"
       | "pokeathlon4Edit"
+      | "br4Gear"
+      | "br4GearEdit"
       | "joyful3"
       | "joyful3Edit"
       | "frontier3"
@@ -114,6 +119,7 @@ export class SaveEditorClient {
       | "originCatalog"
       | "pokemonExport" = "trainer",
   ): Promise<SaveEditorResult> {
+    if (kind === "trainer" && edit === undefined) this.brProfile = -1;
     if (!bytes.length || bytes.length > MAX_SAVE_BYTES)
       return Promise.reject(
         new Error("Save file must be between 1 byte and 32 MiB."),
@@ -129,7 +135,11 @@ export class SaveEditorClient {
         clearTimeout(request.timer);
         this.pending.delete(data.id);
         if (data.error) request.reject(new Error(data.error));
-        else request.resolve(data);
+        else {
+          if (data.report?.brProfiles)
+            this.brProfile = data.report.brProfiles.active;
+          request.resolve(data);
+        }
       };
       this.worker.onerror = (event) =>
         this.dispose(
@@ -149,9 +159,10 @@ export class SaveEditorClient {
         120_000,
       );
       this.pending.set(id, { resolve, reject, timer });
-      this.worker!.postMessage({ id, bytes: copy, base, edit, kind }, [
-        copy.buffer,
-      ]);
+      this.worker!.postMessage(
+        { id, bytes: copy, base, edit, kind, brProfile: this.brProfile },
+        [copy.buffer],
+      );
     });
   }
 

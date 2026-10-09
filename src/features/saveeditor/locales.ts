@@ -513,6 +513,9 @@ export const saveEditorResources = {
     nameError: "训练家姓名为空、过长或含此游戏不支持的字符。",
     rivalError:
       "劲敌姓名最多 7 字符，必须能在此游戏字符集中完整保存；原始姓名字节需为 16 位十六进制。",
+    br4Error: "无法应用对战革命操作，请核对玩家记录、装备位置和当前存档。",
+    br4Stale: "存档或所选玩家已改变，请重新读取装备并生成预览。",
+    br4Game: "宝可梦对战革命",
     pokeathlon4Error:
       "无法应用竞技操作，请核对所选位置、数值上限、种类与第四世代形态。",
     pokeathlon4NameError:
@@ -1103,6 +1106,11 @@ export const saveEditorResources = {
     zipError: "Extract the ZIP before opening its save.",
     rivalError:
       "The rival name accepts up to 7 characters and must be losslessly encoded by this game. Raw name bytes require 16 hex digits.",
+    br4Error:
+      "Cannot apply the Battle Revolution operation. Check the player record, gear position and current save.",
+    br4Stale:
+      "The save or selected player has changed. Read the gear again and regenerate the preview.",
+    br4Game: "Pokémon Battle Revolution",
     pokeathlon4Error:
       "Cannot apply the Pokéathlon operation. Check positions, numeric limits, species and Generation IV forms.",
     pokeathlon4NameError:
@@ -1705,6 +1713,11 @@ export const saveEditorResources = {
     nameError: "名前が空、長すぎる、または使用できない文字を含んでいます。",
     rivalError:
       "ライバル名は7文字までで、このゲームの文字コードで完全に保存できる必要があります。バイト列は16桁の16進数です。",
+    br4Error:
+      "バトルレボリューションの操作を適用できません。プレイヤー記録、装備位置と現在のセーブを確認してください。",
+    br4Stale:
+      "セーブや選択プレイヤーが変わりました。装備を再読み込みしてプレビューを作り直してください。",
+    br4Game: "ポケモンバトルレボリューション",
     pokeathlon4Error:
       "ポケスロン操作を適用できません。位置、数値上限、種類と第四世代フォルムを確認してください。",
     pokeathlon4NameError:
@@ -1786,6 +1799,10 @@ export function localizeSaveError(
   )
     return words.eventError;
   if (/GS Ball/i.test(message)) return words.gsBallError;
+  if (/Battle Revolution.*valid checksums/i.test(message)) return words.invalid;
+  if (/Battle Revolution.*(?:preview is stale|player changed)/i.test(message))
+    return words.br4Stale;
+  if (/Battle Revolution/i.test(message)) return words.br4Error;
   if (/Pokeathlon4.*valid checksums/i.test(message)) return words.invalid;
   if (/Pokeathlon4 preview is stale/i.test(message))
     return words.pokeathlon4Stale;

@@ -109,6 +109,16 @@ public static partial class Program
     [JSExport]
     public static byte[] EditPokeathlon4(byte[] data, string json) => SaveService.EditPokeathlon4(data, json);
     [JSExport]
+    public static void ResetBRProfile() => SaveService.ResetBRProfile();
+    [JSExport]
+    public static void ConfigureBRProfile(int profile) => SaveService.ConfigureBRProfile(profile);
+    [JSExport]
+    public static string SelectBRProfile(byte[] data,int profile) => SaveService.SelectBRProfile(data,profile);
+    [JSExport]
+    public static string ReadBr4Gear(byte[] data) => SaveService.ReadBr4Gear(data);
+    [JSExport]
+    public static byte[] EditBr4Gear(byte[] data,string json) => SaveService.EditBr4Gear(data,json);
+    [JSExport]
     public static string ReadJoyful3(byte[] data) => SaveService.ReadJoyful3(data);
     [JSExport]
     public static byte[] EditJoyful3(byte[] data, string json) => SaveService.EditJoyful3(data, json);
@@ -220,7 +230,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 98;
+    public const int ApiVersion = 99;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)
@@ -335,7 +345,7 @@ public static partial class SaveService
     public static byte[] ExportWorkingCopy(byte[] data)
     {
         var save = Open(data);
-        if ((!CanEdit(save) && !SimplePokedex.Supports(save) && !ZaPokedex.Supports(save) && save is not (SAV7b or SAV8LA or SAV9SV)) || !save.State.Exportable || !SaveChecksums.Valid(save))
+        if ((!CanEdit(save) && !SimplePokedex.Supports(save) && !ZaPokedex.Supports(save) && save is not (SAV7b or SAV8LA or SAV9SV or SAV4BR)) || !save.State.Exportable || !SaveChecksums.Valid(save))
             throw new ArgumentException("Export requires a supported save with valid checksums.");
         // Every edit already recomputes checksums and verifies a reload. Preserve those exact verified bytes.
         return data.ToArray();
@@ -392,8 +402,10 @@ public static partial class SaveService
         if (data.Length >= 4 && data[0] == 0x50 && data[1] == 0x4B && data[2] == 3 && data[3] == 4)
             throw new ArgumentException("Extract the save from its ZIP archive before opening it.");
         // PKHeX owns this copy. Never pass the caller's original buffer to a parser.
-        return SaveUtil.GetSaveFile(data.ToArray())
+        var save = SaveUtil.GetSaveFile(data.ToArray())
             ?? throw new ArgumentException("Unrecognized save file. Open decrypted save data, not a ROM or encrypted console container.");
+        if(save is SAV4BR br&&BRProfile>=0)br.CurrentSlot=BRProfile;
+        return save;
     }
 
     internal static bool CanEdit(SaveFile save) => save is
@@ -470,13 +482,14 @@ public static partial class SaveService
         var valid = SaveChecksums.Valid(save);
         var report = new SaveReport(
             ApiVersion, save.GetType().Name, save.Generation, save.Version.ToString(),
-            save.OT, save.TID16, save.SID16, save.DisplayTID, save.DisplaySID,
+            save is SAV4BR br ? br.CurrentOT : save.OT, save.TID16, save.SID16, save.DisplayTID, save.DisplaySID,
             save.Language, save.Gender, save.Money, save.MaxMoney,
             save is SAV3 { Japanese: true } ? 5 : save.MaxStringLengthTrainer,
             save.BoxCount, save.PartyCount, save.PlayTimeString, valid,
             valid && CanEdit(save) && save.State.Exportable,
             save.Extension, save is SAV4 gen4 ? gen4.NationalDex : null,
             PokemonReader.Read(save), save.BoxSlotCount, PokemonReader.Boxes(save), PokemonReader.MoveChoices(save), BoxEditing.Options(save), PokemonReader.Attributes(save), TrainerEditing.Options(save), ZaPokedex.Supports(save) ? new PokedexCapability("za", valid && save.State.Exportable) : save is SAV9SV ? new PokedexCapability("sv", valid && save.State.Exportable) : save is SAV8LA ? new PokedexCapability("legends", valid && save.State.Exportable) : save is SAV8SWSH ? new PokedexCapability("swsh", valid && save.State.Exportable) : save is SAV8BS ? new PokedexCapability("bdsp", valid && save.State.Exportable) : save is SAV7 or SAV7b ? new PokedexCapability("gen7", valid && save.State.Exportable) : save is SAV6XY or SAV6AO ? new PokedexCapability("gen6", valid && save.State.Exportable) : save is SAV5 ? new PokedexCapability("gen5", valid && save.State.Exportable) : save is SAV4 ? new PokedexCapability("gen4", valid && save.State.Exportable) : SimplePokedex.Capability(save));
+        report = report with { BrProfiles = Br4Editing.Profiles(save) };
         return JsonSerializer.Serialize(report, SaveJsonContext.Default.SaveReport);
     }
 
@@ -593,7 +606,7 @@ public sealed record SaveReport(
     ushort Tid, ushort Sid, uint DisplayTid, uint DisplaySid, int Language,
     byte Gender, uint Money, int MaxMoney, int MaxNameLength, int BoxCount,
     int PartyCount, string PlayTime, bool ChecksumsValid, bool CanEdit,
-    string Extension, bool? NationalDex, PokemonEntry[] Pokemon, int BoxSlotCount, BoxEntry[] Boxes, MoveChoice[] MoveChoices, BoxOptions BoxOptions, AttributeChoices AttributeChoices, TrainerOptions Trainer, PokedexCapability? Pokedex);
+    string Extension, bool? NationalDex, PokemonEntry[] Pokemon, int BoxSlotCount, BoxEntry[] Boxes, MoveChoice[] MoveChoices, BoxOptions BoxOptions, AttributeChoices AttributeChoices, TrainerOptions Trainer, PokedexCapability? Pokedex, Br4Profiles? BrProfiles=null);
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(SaveReport))]
@@ -637,6 +650,8 @@ public sealed record SaveReport(
 [JsonSerializable(typeof(PokeGear4Edit))]
 [JsonSerializable(typeof(Pokeathlon4Catalog))]
 [JsonSerializable(typeof(Pokeathlon4Edit))]
+[JsonSerializable(typeof(Br4GearCatalog))]
+[JsonSerializable(typeof(Br4GearEdit))]
 [JsonSerializable(typeof(Joyful3Catalog))]
 [JsonSerializable(typeof(Joyful3Edit))]
 [JsonSerializable(typeof(Frontier3Catalog))]
