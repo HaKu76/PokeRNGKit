@@ -66,6 +66,8 @@ export class SaveEditorClient {
       | "hall1Edit"
       | "eventReset"
       | "eventResetEdit"
+      | "roamer3"
+      | "roamer3Edit"
       | "roamer"
       | "roamerEdit"
       | "rtc"
