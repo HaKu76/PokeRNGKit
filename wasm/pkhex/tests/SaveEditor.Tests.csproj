@@ -16,6 +16,7 @@
     <Compile Include="../FoodCases.cs" Link="FoodCases.cs" />
     <Compile Include="../EventReset1.cs" Link="EventReset1.cs" />
     <Compile Include="../HallOfFame1.cs" Link="HallOfFame1.cs" />
+    <Compile Include="../Painting3Editing.cs" Link="Painting3Editing.cs" />
     <Compile Include="../Decoration3Editing.cs" Link="Decoration3Editing.cs" />
     <Compile Include="../Roamer3Editing.cs" Link="Roamer3Editing.cs" />
     <Compile Include="../HallOfFame3.cs" Link="HallOfFame3.cs" />
