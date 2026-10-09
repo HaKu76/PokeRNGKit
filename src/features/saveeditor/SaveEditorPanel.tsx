@@ -59,6 +59,8 @@ import { Hall1Editor } from "./Hall1Editor";
 import { supportsHall1, hall1Words } from "./hall1";
 import { EventResetEditor } from "./EventResetEditor";
 import { supportsEventReset, eventResetWords } from "./eventReset";
+import { Ferry3Editor } from "./Ferry3Editor";
+import { supportsFerry3, ferry3Words } from "./ferry3";
 import { Frontier3Editor } from "./Frontier3Editor";
 import { supportsFrontier3, frontier3Words } from "./frontier3";
 import { GameRecords3Editor } from "./GameRecords3Editor";
@@ -111,6 +113,7 @@ export function SaveEditorPanel(
     | "hall3"
     | "hall1"
     | "eventReset"
+    | "ferry3"
     | "frontier3"
     | "gameRecords3"
     | "paintings3"
@@ -236,6 +239,7 @@ export function SaveEditorPanel(
         (previous === "hall1" && !supportsHall1(result.report.format)) ||
         (previous === "eventReset" &&
           !supportsEventReset(result.report.format)) ||
+        (previous === "ferry3" && !supportsFerry3(result.report.format)) ||
         (previous === "frontier3" &&
           !supportsFrontier3(result.report.format)) ||
         (previous === "gameRecords3" &&
@@ -717,6 +721,22 @@ export function SaveEditorPanel(
     });
     return catalog;
   };
+  const readFerry3 = async () => {
+    let catalog: import("./ferry3").Ferry3Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "ferry3",
+      );
+      if (id !== operation.current) return;
+      if (!result.ferry3) throw new Error("No ferry3 catalog was returned.");
+      catalog = result.ferry3;
+    });
+    return catalog;
+  };
+
   const readFrontier3 = async () => {
     let catalog: import("./frontier3").Frontier3Catalog | undefined;
     await perform(async (id) => {
@@ -1006,6 +1026,7 @@ export function SaveEditorPanel(
       | import("./hall3").Hall3Edit
       | import("./hall1").Hall1Edit
       | import("./eventReset").EventResetEdit
+      | import("./ferry3").Ferry3Edit
       | import("./frontier3").Frontier3Edit
       | import("./gameRecords3").GameRecord3Edit
       | import("./paintings3").Painting3Edit
@@ -1045,6 +1066,7 @@ export function SaveEditorPanel(
       | "hall3Edit"
       | "hall1Edit"
       | "eventResetEdit"
+      | "ferry3Edit"
       | "frontier3Edit"
       | "gameRecords3Edit"
       | "paintings3Edit"
@@ -1349,6 +1371,15 @@ export function SaveEditorPanel(
                 {eventResetWords[batchLang].title}
               </button>
             )}
+            {supportsFerry3(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "ferry3"}
+                onClick={() => setSection("ferry3")}
+              >
+                {ferry3Words[batchLang].title}
+              </button>
+            )}
             {supportsFrontier3(report.format) && (
               <button
                 type="button"
@@ -1604,6 +1635,15 @@ export function SaveEditorPanel(
               lang={batchLang}
               onRead={readEventReset}
               onApply={(edit) => applyWorkingEdit(edit, "eventResetEdit")}
+            />
+          ) : section === "ferry3" && supportsFerry3(report.format) ? (
+            <Ferry3Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readFerry3}
+              onApply={(edit) => applyWorkingEdit(edit, "ferry3Edit")}
             />
           ) : section === "frontier3" && supportsFrontier3(report.format) ? (
             <Frontier3Editor
