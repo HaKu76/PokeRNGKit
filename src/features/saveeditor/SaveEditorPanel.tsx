@@ -59,6 +59,8 @@ import { Hall1Editor } from "./Hall1Editor";
 import { supportsHall1, hall1Words } from "./hall1";
 import { EventResetEditor } from "./EventResetEditor";
 import { supportsEventReset, eventResetWords } from "./eventReset";
+import { Frontier3Editor } from "./Frontier3Editor";
+import { supportsFrontier3, frontier3Words } from "./frontier3";
 import { GameRecords3Editor } from "./GameRecords3Editor";
 import { supportsGameRecords3, gameRecords3Words } from "./gameRecords3";
 import { Paintings3Editor } from "./Paintings3Editor";
@@ -109,6 +111,7 @@ export function SaveEditorPanel(
     | "hall3"
     | "hall1"
     | "eventReset"
+    | "frontier3"
     | "gameRecords3"
     | "paintings3"
     | "decorations3"
@@ -233,6 +236,8 @@ export function SaveEditorPanel(
         (previous === "hall1" && !supportsHall1(result.report.format)) ||
         (previous === "eventReset" &&
           !supportsEventReset(result.report.format)) ||
+        (previous === "frontier3" &&
+          !supportsFrontier3(result.report.format)) ||
         (previous === "gameRecords3" &&
           !supportsGameRecords3(result.report.format)) ||
         (previous === "paintings3" &&
@@ -712,6 +717,23 @@ export function SaveEditorPanel(
     });
     return catalog;
   };
+  const readFrontier3 = async () => {
+    let catalog: import("./frontier3").Frontier3Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "frontier3",
+      );
+      if (id !== operation.current) return;
+      if (!result.frontier3)
+        throw new Error("No frontier3 catalog was returned.");
+      catalog = result.frontier3;
+    });
+    return catalog;
+  };
+
   const readGameRecords3 = async () => {
     let catalog: import("./gameRecords3").GameRecord3Catalog | undefined;
     await perform(async (id) => {
@@ -984,6 +1006,7 @@ export function SaveEditorPanel(
       | import("./hall3").Hall3Edit
       | import("./hall1").Hall1Edit
       | import("./eventReset").EventResetEdit
+      | import("./frontier3").Frontier3Edit
       | import("./gameRecords3").GameRecord3Edit
       | import("./paintings3").Painting3Edit
       | import("./decorations3").Decoration3Edit
@@ -1022,6 +1045,7 @@ export function SaveEditorPanel(
       | "hall3Edit"
       | "hall1Edit"
       | "eventResetEdit"
+      | "frontier3Edit"
       | "gameRecords3Edit"
       | "paintings3Edit"
       | "decorations3Edit"
@@ -1325,6 +1349,15 @@ export function SaveEditorPanel(
                 {eventResetWords[batchLang].title}
               </button>
             )}
+            {supportsFrontier3(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "frontier3"}
+                onClick={() => setSection("frontier3")}
+              >
+                {frontier3Words[batchLang].title}
+              </button>
+            )}
             {supportsGameRecords3(report.format) && (
               <button
                 type="button"
@@ -1571,6 +1604,15 @@ export function SaveEditorPanel(
               lang={batchLang}
               onRead={readEventReset}
               onApply={(edit) => applyWorkingEdit(edit, "eventResetEdit")}
+            />
+          ) : section === "frontier3" && supportsFrontier3(report.format) ? (
+            <Frontier3Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readFrontier3}
+              onApply={(edit) => applyWorkingEdit(edit, "frontier3Edit")}
             />
           ) : section === "gameRecords3" &&
             supportsGameRecords3(report.format) ? (
