@@ -354,7 +354,7 @@ API 108 接通七分组、BW 九格／B2W2 二十格目录、全部来源尺寸�
 
 前端／客户端／领域专项 29 项、定向 Lint、类型与全仓格式通过。首轮原生在首版本文件／录像对照完成后因二十一字的夹具预期与来源二十字上限不符失败，已修正独立预期，四版本修正专项通过，并在全套原生中再次通过。初次全仓格式检查撞上下一编辑批次，报告一处 JSX；随后按最新文件格式化并通过全仓检查。完整 verify（240 文件／910 项测试、网页与 PWA 打包）、全套原生、API 108 核心构建、裁剪后 26 类型属性检查及使用新核心的最终网页／PWA 打包通过；浏览器／真实存档待核验。
 
-### 第五世代 Global Link（源码核对，尚未接入）
+### 第五世代 Global Link（API 109，工程检查通过）
 
 已通读 `SAV_GlobalLink5.cs`／Designer、Core `GlobalLink5.cs`／`DateQuad5.cs` 及 BW／B2W2 Accessor。两布局都绑定块 35，基址 0x1D300、长 0x1AC，独立块校验位于 0x1D4AE，校验目录分别位于 0x23F46／0x25F46。窗口编辑主设置、二十组道具和五组家具，不发出网络请求。Global Link 标记仅代表存档内值，不代表恢复在线服务。
 
@@ -362,11 +362,29 @@ API 108 接通七分组、BW 九格／B2W2 二十格目录、全部来源尺寸�
 
 日期 Designer 明确 2000-01-01 至 2099-12-31；DateQuad5 四 byte 为星期、日、月、相对 2000 的年，IsValid 同时校验星期与日历。FromDateOnly 由 Core 生成四字段，取消设置调用 SetEmpty 清四字节；读取异常旧值不可自动改成今天或清空。
 
-二十道具 ID 为各 UInt16（0xE4 起），数量为紧接四十字节后的二十 byte。来源候选为 GameInfo.FilteredSources.Items；数量文本 MaxInputLength=3、ValueType=byte，SaveData 采用 byte.TryParse，不能从三位长度推断 0–999。其 DataError 不抛出，文本提交与保存失败规则仍需在接入前区分核对。读取展示道具图片，不靠编号纯文字猜测身份。
+二十道具 ID 为各 UInt16（0xE4 起），数量为紧接四十字节后的二十 byte。来源候选为 GameInfo.FilteredSources.Items；数量文本 MaxInputLength=3、ValueType=byte，SaveData 采用 byte.TryParse，不能从三位长度推断 0–999。其 DataError 不抛出；[Microsoft CommitEdit 文档](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.datagridview.commitedit?view=windowsdesktop-10.0) 明确先转换为单元格类型，成功才提交。接入数量按成功的 byte 值 0–255 验证，失败草稿不写入或偷偷归零。读取展示道具图片，不靠编号纯文字猜测身份。
 
 五家具由 0x120 起、间隔 0x1A，前两字节 Value 0–65535、后二十四字节名称。Designer 未覆盖 TextBox MaxLength，按 [Microsoft TextBoxBase 文档](https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.textboxbase.maxlength?view=windowsdesktop-10.0) 默认允许 32767 字符输入；已进一步核对 StringConverter5 默认选项为 ClearZero，名称先截至十二 UTF16 字符，清缓冲区后写入并在空间允许时补 FFFF 终止符，性别符号沿用 Core 规范化。接入应区分 GUI 输入长度与实际保存结果，冻结预览显示截断／编码结果；未改名字与其尾随字节保持，改名时按来源清理。
 
-已核对 FilteredGameDataSource／GameDataSource：普通候选来自目标存档 HeldItems 与对应版本／上下文字符串，再按 MaxItemID 过滤；不能把所有 UInt16 编号都当作新增候选或借用其他存档的全局列表。原始越界 ID 仍保留浏览。三语来源标题为宝可梦全球连接编辑器／Pokémon Global Link Editor／ポケモングローバルリンク，分组三语常规／道具／家具资源已读取；日期、名字、候选及实际文本提交规则的夹具仍待编写，本段不代表模块完成。
+已核对 FilteredGameDataSource／GameDataSource：普通候选来自目标存档 HeldItems 与对应版本／上下文字符串，再按 MaxItemID 过滤；不能把所有 UInt16 编号都当作新增候选或借用其他存档的全局列表。原始越界 ID 仍保留浏览。三语来源标题为宝可梦全球连接编辑器／Pokémon Global Link Editor／ポケモングローバルリンク，分组三语常规／道具／家具资源已读取。
+
+API 109 接通三分组、六标量、四标记、明确日期设置／清除、二十道具与图片、五家具值／名称、整窗重新保存、冻结预览及确认应用。普通补丁只写指定字段，数量修改允许保留未知旧 ID，改 ID 必须使用目标存档真实候选；ID 零与数量非零可共存，沿用 GlobalLink5 语义，不套用背包的空道具清数量规则。标记改动才写 0／1，选中家具与同步标记分别保护其他位。上传宝可梦区域 8–0xE3、保留孔、其他模块及原件保持。
+
+整窗重新保存按来源清空无效日期、规范非零标记、重新生成所有家具名称缓冲区；与普通补丁分开且先预览。原始日期／标记／家具数据、实际截断名称、低七位保存值及完整存档变化位置均可见。冻结摘要覆盖完整导出，确认再次执行转换并核对目标，沿用工作副本、撤销与完整导出。JSON 限 1100000 字符，名字按来源最多 32767 字符；数字输入支持符号／空白后的整数验证，不强加 NumericUpDown 未设置的字符上限。
+
+前端／客户端／领域专项 30 项、定向 Lint、类型与全仓格式通过；四版本原生专项通过，原进程 23263 正常结束。核心夹具覆盖 Int32 两边界、全部格位、标记旧值、日期／闰日、名称截断／清理、源码候选、完整文件对照与原件保护。完整 verify 通过 241 文件／917 项测试及网页打包；全套原生、API 109 核心构建、裁剪后 26 类型属性检查和使用新核心的最终网页／PWA 打包均通过。外部 Chrome 仍未连接，浏览器与真实存档待核验；工程证据不作为项目所有者验收。
+
+### 第五世代奖牌（源码核对，尚未接入）
+
+已通读 `SAV_Medals5.cs` 与 Core `Medal5.cs`／`MedalList5.cs`，核对部分 Designer。仅 B2W2，Accessor 块 68：基址 0x25300、长 0x498，块校验 0x2579A／目录 0x25F88。前 255×4=1020 bytes 为奖章，源 ml5 导入／导出只覆盖该区域；与记忆连接同后缀但长度不同，不能混用。0x3FC 置顶奖章 0–254 或 255=None，0x3FD 等级 0–4，0x3FE 教程 bool，0x3FF 保留。
+
+奖章前两字节日期位为 yearSince2000 七位／月四位／日五位；GUI 日期 2000–2099、支持当前文化或 yyyy-MM-dd。状态三位只有 0–4 五候选，第三 byte 位 3 为未读，高四位及第四 byte 未使用。Core State setter 实际保留未读位但清高四位，接入需明确源副作用及保留策略，不能不经预览抹去未知数据。RawDate 非零但无效时 Date getter 会抛出，旧状态 5–7 也会超出来源名称数组，读取必须保存异常原始值而非修复或崩溃。
+
+状态 HintObtained／Obtained 可有日期，ObtainReady 仅旧 RawDate 非零时可有日期；改变状态后若可有日期但没有日期，来源自动用 EncounterDate.GetDateNDS。GiveAll 只填未获得的奖章并保持已有日期／未读，最后按 255 数量将等级设 Legend；单独等级计算按实际获得数以 50／100／150／200 分档。需冻结批量操作日期，不在确认时偷偷改成下一天。
+
+栖息地由块内 0x400 起、长 0x96，前 0x36 bytes 不用；九十格各一 byte，Grass／Surf／Fish 各两位 0–3，完成标记为 bit6，bit7 保留。普通 setter 保留其他位；SetComplete 写 0x7F、Clear 写零，明确批量才沿用整 byte 行为。完成按钮在没有 SelectedRows 时完成全部，清除通过选中行或选中格位所属行处理，需分别表达范围。0x90 UInt16／0x92 byte 未知字段，Designer 分别限定 0–65535／0–255；0x93 最后遇敌 0–2、0x94／0x95 两教程 bool，剩余两对齐字节不改。
+
+已核对 `medals_b2w2/text_medals_<language>.txt` 与 `text_medal_types_<language>.txt`：中文／英文／日文均为 255 名与五类型；窗口三语标题、五状态、五等级、四完成度、三遇敌类型资源已定位，中文正式标题为奖牌编辑器，使用来源奖牌名称。`EncounterDate.GetDateNDS` 从 TimeProvider.GetLocalNow 取本地日期，输入日期验证使用 2000–2099；不能假定其取日方法自身截顶年份。来源日期解析先 trim，接受当前文化或 yyyy-MM-dd，日期可编辑时拒绝空文本。GUI 读旧数据时没有防护非法日期／状态数组越界，接入应只读保留并显示原始值，修改仍按明确字段完成。源码边界与资源已核对，夹具及实际接入仍待完成。
 
 ## HGSS 宝可全能竞技（API 98）
 

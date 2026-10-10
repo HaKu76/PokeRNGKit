@@ -1,3 +1,4 @@
+import { gl5Words } from "./globalLink5";
 import { dlc5Words } from "./dlc5";
 import { cgear5Words } from "./cgear5";
 import { ug4Words } from "./underground4";
@@ -18,6 +19,8 @@ export const saveEditorResources = {
   zh: {
     misc4Error: misc4Words.zh.invalid,
     misc4Stale: misc4Words.zh.stale,
+    globalLink5Error: gl5Words.zh.invalid,
+    globalLink5Stale: gl5Words.zh.stale,
     dlc5Error: dlc5Words.zh.invalid,
     dlc5Stale: dlc5Words.zh.stale,
     cgear5Error: cgear5Words.zh.invalid,
@@ -594,6 +597,8 @@ export const saveEditorResources = {
   en: {
     misc4Error: misc4Words.en.invalid,
     misc4Stale: misc4Words.en.stale,
+    globalLink5Error: gl5Words.en.invalid,
+    globalLink5Stale: gl5Words.en.stale,
     dlc5Error: dlc5Words.en.invalid,
     dlc5Stale: dlc5Words.en.stale,
     cgear5Error: cgear5Words.en.invalid,
@@ -1212,6 +1217,8 @@ export const saveEditorResources = {
   ja: {
     misc4Error: misc4Words.ja.invalid,
     misc4Stale: misc4Words.ja.stale,
+    globalLink5Error: gl5Words.ja.invalid,
+    globalLink5Stale: gl5Words.ja.stale,
     dlc5Error: dlc5Words.ja.invalid,
     dlc5Stale: dlc5Words.ja.stale,
     cgear5Error: cgear5Words.ja.invalid,
@@ -1863,6 +1870,8 @@ export function localizeSaveError(
   if (/battle video4.*stale/i.test(message)) return words.video4Stale;
   if (/Misc4.*stale/i.test(message)) return words.misc4Stale;
   if (/Misc4/i.test(message)) return words.misc4Error;
+  if (/GlobalLink5.*stale/i.test(message)) return words.globalLink5Stale;
+  if (/GlobalLink5/i.test(message)) return words.globalLink5Error;
   if (/Dlc5.*stale/i.test(message)) return words.dlc5Stale;
   if (/Dlc5/i.test(message)) return words.dlc5Error;
   if (/CGear5.*stale/i.test(message)) return words.cgear5Stale;

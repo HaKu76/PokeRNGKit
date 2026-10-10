@@ -1,0 +1,101 @@
+.save-global-link5-body,
+.save-global-link5-fields,
+.save-global-link5-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-global-link5-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.save-global-link5-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-global-link5-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-global-link5-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-global-link5-editor small {
+  font-size: 13px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+.save-global-link5-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.save-global-link5-editor .save-global-link5-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-global-link5-check input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  flex: none;
+}
+.save-global-link5-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-global-link5-item img {
+  flex: none;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.save-global-link5-preview {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+.save-global-link5-preview h4 {
+  margin: 0;
+}
+.save-global-link5-changes {
+  display: grid;
+  gap: 8px;
+  max-height: 20rem;
+  overflow: auto;
+}
+.save-global-link5-raw {
+  max-height: 10rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.save-global-link5-preview summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-global-link5-preview summary:hover {
+  background: var(--surface-hover);
+}
+.save-global-link5-preview summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+@media (max-width: 600px) {
+  .save-global-link5-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

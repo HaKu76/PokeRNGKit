@@ -1,3 +1,5 @@
+import { GlobalLink5Editor } from "./GlobalLink5Editor";
+import { gl5Words, supportsGlobalLink5 } from "./globalLink5";
 import { Dlc5Editor } from "./Dlc5Editor";
 import { dlc5Words, supportsDlc5 } from "./dlc5";
 import { CGear5Editor } from "./CGear5Editor";
@@ -153,6 +155,7 @@ export function SaveEditorPanel(
     | "battleVideo4"
     | "geonet4"
     | "misc4"
+    | "globalLink5"
     | "dlc5"
     | "cgear5"
     | "underground4"
@@ -299,6 +302,8 @@ export function SaveEditorPanel(
           !supportsBattleVideo4(result.report.format)) ||
         (previous === "geonet4" && !supportsGeonet4(result.report.format)) ||
         (previous === "misc4" && !supportsMisc4(result.report.format)) ||
+        (previous === "globalLink5" &&
+          !supportsGlobalLink5(result.report.format)) ||
         (previous === "dlc5" && !supportsDlc5(result.report.format)) ||
         (previous === "cgear5" && !supportsCGear5(result.report.format)) ||
         (previous === "underground4" &&
@@ -1024,6 +1029,38 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readGlobalLink5 = async () => {
+    let c: import("./globalLink5").Gl5Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "globalLink5",
+      );
+      if (id !== operation.current) return;
+      if (!result.globalLink5)
+        throw Error("No GlobalLink5 catalog was returned.");
+      c = result.globalLink5;
+    });
+    return c;
+  };
+  const previewGlobalLink5 = async (edit: import("./globalLink5").Gl5Edit) => {
+    let p: import("./globalLink5").Gl5Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "globalLink5Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.globalLink5Preview)
+        throw Error("No GlobalLink5 preview was returned.");
+      p = result.globalLink5Preview;
+    });
+    return p;
+  };
   const readDlc5 = async () => {
     let c: import("./dlc5").Dlc5Catalog | undefined;
     await perform(async (id) => {
@@ -1511,6 +1548,7 @@ export function SaveEditorPanel(
       | import("./battleVideo4").Video4Import
       | import("./geonet4").Geo4Edit
       | import("./misc4").Misc4Edit
+      | import("./globalLink5").Gl5Edit
       | import("./dlc5").Dlc5Edit
       | import("./cgear5").CGear5Edit
       | import("./underground4").Ug4Edit
@@ -1566,6 +1604,7 @@ export function SaveEditorPanel(
       | "video4Import"
       | "geonet4Edit"
       | "misc4Edit"
+      | "globalLink5Edit"
       | "dlc5Edit"
       | "cgear5Edit"
       | "underground4Edit"
@@ -2062,6 +2101,15 @@ export function SaveEditorPanel(
                 {misc4Words[batchLang].title}
               </button>
             )}
+            {supportsGlobalLink5(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "globalLink5"}
+                onClick={() => setSection("globalLink5")}
+              >
+                {gl5Words[batchLang].title}
+              </button>
+            )}
             {supportsDlc5(report.format) && (
               <button
                 type="button"
@@ -2471,6 +2519,17 @@ export function SaveEditorPanel(
               onPreview={previewMisc4}
               onApply={(edit) => applyWorkingEdit(edit, "misc4Edit")}
               onRelated={setSection}
+            />
+          ) : section === "globalLink5" &&
+            supportsGlobalLink5(report.format) ? (
+            <GlobalLink5Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readGlobalLink5}
+              onPreview={previewGlobalLink5}
+              onApply={(edit) => applyWorkingEdit(edit, "globalLink5Edit")}
             />
           ) : section === "dlc5" && supportsDlc5(report.format) ? (
             <Dlc5Editor

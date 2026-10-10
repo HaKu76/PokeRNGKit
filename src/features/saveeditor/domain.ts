@@ -60,7 +60,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 108;
+  apiVersion: 109;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -790,6 +790,8 @@ export interface SaveEditorResult {
   geonet4?: import("./geonet4").Geo4Catalog;
   misc4?: import("./misc4").Misc4Catalog;
   misc4Preview?: import("./misc4").Misc4Preview;
+  globalLink5?: import("./globalLink5").Gl5Catalog;
+  globalLink5Preview?: import("./globalLink5").Gl5Preview;
   dlc5?: import("./dlc5").Dlc5Catalog;
   dlc5Preview?: import("./dlc5").Dlc5Preview;
   dlc5File?: { fileName: string; data: string };
