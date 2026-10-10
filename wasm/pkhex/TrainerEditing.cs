@@ -16,7 +16,7 @@ internal sealed record TrainerSnapshot(string Ot, ushort Tid, ushort Sid, uint M
 internal static class TrainerEditing
 {
     public static TrainerOptions Options(SaveFile save) => new(save.Generation > 1,
-        save is SAV3 or SAV4 or SAV5 or SAV6XY or SAV6AO or SAV7SM or SAV7USUM or SAV8SWSH or SAV8BS,
+        save is SAV3 or SAV4 or SAV5 or SAV6XY or SAV6AO or SAV6AODemo or SAV7SM or SAV7USUM or SAV8SWSH or SAV8BS,
         save.PlayedHours,save.PlayedMinutes,save.PlayedSeconds, Languages(save), Geography(save), TrainerBadges.Read(save), TrainerCurrencies.Read(save), SaveRecords.Supports(save), TrainerGameOptions.Read(save), TrainerPosition.Read(save), TrainerDates.Read(save), TrainerSpatialPosition.Read(save), TrainerGameVersion.Read(save), TrainerAppearance6.Read(save));
     private static readonly Lazy<OriginChoice[]> Consoles = new(() => Locale3DS.DefinedLocales.ToArray().Select(id =>
         new OriginChoice(id,new(GameInfo.GetStrings("zh-Hans").console3ds[id],GameInfo.GetStrings("en").console3ds[id],GameInfo.GetStrings("ja").console3ds[id]))).ToArray());
@@ -31,13 +31,13 @@ internal static class TrainerEditing
     {
         SAV4 => new(Location(save)!, GeographicCatalog.Gen4Countries.Value, GeographicCatalog.Gen4Regions.Value, [], false),
         SAV5 => new(Location(save)!, GeographicCatalog.Gen5Countries.Value, GeographicCatalog.Gen5Regions.Value, [], false),
-        SAV6XY or SAV6AO => new(Location(save)!, GeographicCatalog.Countries.Value, GeographicCatalog.Regions.Value, Consoles.Value, true,GeographicCatalog.Gen6Orders.Value),
+        SAV6XY or SAV6AO or SAV6AODemo => new(Location(save)!, GeographicCatalog.Countries.Value, GeographicCatalog.Regions.Value, Consoles.Value, true,GeographicCatalog.Gen6Orders.Value),
         SAV7SM or SAV7USUM => new(Location(save)!, GeographicCatalog.Countries.Value, GeographicCatalog.Regions.Value, Consoles.Value, true),
         _ => null,
     };
     internal static OriginChoice[] Languages(SaveFile save)
     {
-        if (save is not (SAV6XY or SAV6AO or SAV7SM or SAV7USUM or SAV8SWSH or SAV8BS)) return [];
+        if (save is not (SAV6XY or SAV6AO or SAV6AODemo or SAV7SM or SAV7USUM or SAV8SWSH or SAV8BS)) return [];
         var zh = GameInfo.GetStrings("zh-Hans").languageNames;
         var en = GameInfo.GetStrings("en").languageNames;
         var ja = GameInfo.GetStrings("ja").languageNames;
@@ -52,7 +52,7 @@ internal static class TrainerEditing
     {
         var options = Options(save);
         var maxName = save is SAV3 { Japanese: true } ? 5 : save.MaxStringLengthTrainer;
-        int minName = save is SAV6XY or SAV6AO ? 0 : 1;
+        int minName = save is SAV6XY or SAV6AO or SAV6AODemo ? 0 : 1;
         if (edit.Ot is null || edit.Ot.Length < minName || edit.Ot.Length > maxName || edit.Ot.Any(char.IsControl))
             throw new ArgumentException($"Trainer name must contain {minName}–{maxName} supported characters.");
         if (edit.Money > save.MaxMoney) throw new ArgumentException($"Money must be between 0 and {save.MaxMoney}.");

@@ -394,7 +394,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen6/SAV_Roamer6.cs`                                   | API 79：读取／编辑／推导已接入；X 合成样本修改／撤销已检查                  |
 | `Subforms/Save Editors/Gen6/SAV_SecretBase.cs`                                | API 117：全部属性／图像队伍／摆设／文件／批量三语工程通过；浏览器待核验     |
 | `Subforms/Save Editors/Gen6/SAV_SuperTrain.cs`                                | API 118：三十二阶段／两组图像纪录／三语解析／十二袋工程通过；浏览器待核验   |
-| `Subforms/Save Editors/Gen6/SAV_Trainer.cs`                                   | API 119：X／Y／ORAS 字段／图像／保存工程通过；试玩版及浏览器待完成          |
+| `Subforms/Save Editors/Gen6/SAV_Trainer.cs`                                   | API 120：X／Y／ORAS 与试玩版训练家全量工程通过；浏览器及实档待验收          |
 | `Subforms/Save Editors/Gen7/SAV_Capture7GG.cs`                                | 已接入 API 53；工程检查通过，浏览器待核验                                   |
 | `Subforms/Save Editors/Gen7/SAV_FestivalPlaza.cs`                             | 待核对                                                                      |
 | `Subforms/Save Editors/Gen7/SAV_HallOfFame7.cs`                               | 待核对                                                                      |

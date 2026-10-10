@@ -15,7 +15,7 @@ import {
 
 export const emeraldReport: SaveReport = {
   pokedex: { kind: "simple", canEdit: true },
-  apiVersion: 119,
+  apiVersion: 120,
   trainer: {
     appearance6: null,
     gameVersion: { value: 3, choices: [] },
@@ -72,6 +72,26 @@ export const emeraldReport: SaveReport = {
 };
 
 describe("save editor boundaries", () => {
+  it("allows the demo trainer capability without enabling generic editing", () => {
+    const report: SaveReport = {
+      ...emeraldReport,
+      format: "SAV6AODemo",
+      generation: 6,
+      canEdit: false,
+      trainerOnly: true,
+      boxCount: 0,
+      maxNameLength: 12,
+    };
+    const draft = { ...trainerDraft(report), ot: "" };
+    expect(validateTrainer(draft, report).ot).toBe("");
+    expect(report.canEdit).toBe(false);
+    expect(() =>
+      validateTrainer(draft, { ...report, trainerOnly: false }),
+    ).toThrow();
+    expect(() =>
+      validateTrainer(draft, { ...report, checksumsValid: false }),
+    ).toThrow();
+  });
   it("validates trainer game markers and preserves pending changes during undo", () => {
     const report: SaveReport = {
       ...emeraldReport,

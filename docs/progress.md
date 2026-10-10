@@ -2,6 +2,11 @@
 
 ## 当前目标
 
+- 2026-10-11 接入 ORAS 试玩版训练家窗口，main 基线 4d59abd，API 120，工程检查通过，提交收尾中。
+  已核对 SAV6AODemo、SaveBlockAccessor6AODemo 和 Gen6/SAV_Trainer.cs／Designer。试玩版没有真实箱子，报告与操作目录按 HasBox 判断，保留真实队伍及本地图像。训练家、游戏记录与导出采用独立权限，其他试玩版编辑仍待逐项接入。
+  源窗口移除留言、Maison、多人形象、Mega 与 XY 专属页，Overview 的 Vivillon 仍显示；已接基本信息、地理、日期、时间、徽章、点数、坐标与姓名废字节。整窗保存保留来源隐藏留言重编码、里程同步及模型重置，普通补丁保护隐藏字段。
+  前端领域／训练家专项 38 项通过。两轮测试夹具因受保护队伍方法／属性编译失败，已改为公开 SetPartySlotAtIndex 自动更新数量，第三轮四种布局专项通过，原进程 58087 正常结束。完整 verify 原进程 99454 正常结束，251 文件／1015 项测试、格式、Lint、类型与网页打包通过；额外类型原进程 14151 正常结束。完整原生、API 120 核心构建与裁剪后 26 类型属性检查均通过，串行原进程 14337 正常结束。使用最新 API 120 核心的最终网页／PWA 打包通过，原进程 48377 正常结束。保留既有 Hook、JSExport、反射裁剪及网页体积／插件提示；最后格式与差异检查后按既有授权提交推送本批。Chrome 重试返回 nodeRepl.fetch request failed，浏览器／真实存档未验收。GitHub CLI 查询因网络失败；连接器确认上一批 4d59abd 的 Actions 38065690329 build、windows-desktop、deploy-cloudflare 与 deploy 均成功，不将其作为本批部署或算法验收。Git 直连失败后，核实既有本地 127.0.0.1:7897 代理正在监听；用单命令 http.proxy 成功读取远端 main=4d59abd，与本地基线一致。收尾推送可沿用单命令代理，不写全局设置。
+
 - 2026-10-10 补齐第六世代训练家窗口，main 基线 1996412，API 119，X／Y／ORAS 工程检查通过，提交收尾中。
   新增 Trainer6Editing／Trainer6Names、三语领域与图像面板，五留言、二十 Maison、多人头像／Vivillon、Mega／ORAS 烈空坐标记、XY 城堡／Style、解锁所有时装、姓名废字节、来源整窗重新保存与完整文件冻结预览已接 JSExport／Worker。面板嵌入既有训练家入口，基础与补充草稿互相锁定；密集外观按单属性选择显示，沿用共享 Select 与 44px 控件。保留原件、未指定旧字段、撤销和完整导出。
   从原版 ResX 导入 76 张未修改本地训练家 PNG，共 34762 bytes，原进程 72661 正常结束；来源 SHA-256 与前端键映射同步。新增来源属性路径使用 UInt32Converter／EnumConverter 和显式绑定，允许 unsigned 数字／十六进制、signed 枚举及名称后由 Core 截位，既有 API 47 常规外观规则保持；男／女所有公开属性独立反射对照在原生测试中，生产没有运行时属性发现。

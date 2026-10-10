@@ -60,7 +60,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 119;
+  apiVersion: 120;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -115,6 +115,7 @@ export interface SaveReport {
   };
   checksumsValid: boolean;
   canEdit: boolean;
+  trainerOnly?: boolean;
   extension: string;
   nationalDex: boolean | null;
   pokemon: PokemonEntry[];
@@ -367,9 +368,11 @@ export function rebaseTrainerDraft(
 }
 
 export function validateTrainer(draft: TrainerDraft, report: SaveReport) {
-  if (!report.canEdit || !report.checksumsValid)
+  if (!(report.canEdit || report.trainerOnly) || !report.checksumsValid)
     throw new Error("This save is read-only.");
-  const minName = ["SAV6XY", "SAV6AO"].includes(report.format) ? 0 : 1;
+  const minName = ["SAV6XY", "SAV6AO", "SAV6AODemo"].includes(report.format)
+    ? 0
+    : 1;
   if (
     draft.ot.length < minName ||
     draft.ot.length > report.maxNameLength ||

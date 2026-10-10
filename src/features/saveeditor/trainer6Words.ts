@@ -1,6 +1,8 @@
 import type { Br4Lang } from "./br4";
 const en = {
   title: "Generation VI trainer settings",
+  demoScope:
+    "ORAS demo: trainer and game-record editing is available. This save has a party and no boxes. Other editing capabilities remain read-only until individually verified.",
   read: "Read trainer settings",
   group: "Settings group",
   sayings: "Saved sayings",
@@ -61,6 +63,8 @@ export const trainer6Words: Record<Br4Lang, typeof en> = {
   en,
   zh: {
     title: "第六世代训练家设置",
+    demoScope:
+      "ORAS 试玩版可编辑训练家与游戏记录。存档有队伍、没有箱子，其他编辑能力保留只读，待逐项核对后开放。",
     read: "读取训练家设置",
     group: "设置分组",
     sayings: "保存的招呼短语",
@@ -118,6 +122,8 @@ export const trainer6Words: Record<Br4Lang, typeof en> = {
   },
   ja: {
     title: "第六世代のトレーナー設定",
+    demoScope:
+      "ORAS体験版ではトレーナーとゲーム記録を編集できます。手持ちはありますがボックスはありません。その他の編集は個別に確認するまで読み取り専用です。",
     read: "トレーナー設定を読み込む",
     group: "設定グループ",
     sayings: "保存されたあいさつ",

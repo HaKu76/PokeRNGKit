@@ -57,7 +57,7 @@ export interface Tr6Preview {
   ignoredFields: string[];
 }
 export const supportsTrainer6 = (format: string) =>
-  ["SAV6XY", "SAV6AO"].includes(format);
+  ["SAV6XY", "SAV6AO", "SAV6AODemo"].includes(format);
 // SAV_Trainer MT_TID/MT_SID TextChanged -> ChangeFFFF; keep leading zeroes.
 export function tr6IdInput(text: string): string {
   if (!/^\d{0,5}$/.test(text)) return text;

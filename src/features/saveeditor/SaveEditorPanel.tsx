@@ -38,6 +38,7 @@ import { FlagPokedexEditor } from "./FlagPokedexEditor";
 import { Gen4PokedexEditor } from "./Gen4PokedexEditor";
 import { SimplePokedexEditor } from "./SimplePokedexEditor";
 import { Trainer6Editor } from "./Trainer6Editor";
+import { trainer6Words } from "./trainer6Words";
 import { supportsTrainer6, tr6IdInput, tr6Tsv } from "./trainer6";
 import { TrainerAppearance6Fields } from "./TrainerAppearance6Fields";
 import { TrainerDateFields } from "./TrainerDateFields";
@@ -391,16 +392,17 @@ export function SaveEditorPanel(
   const exportFile = () =>
     perform(async (id) => {
       if (!report || !original.current) return;
-      const result = report.canEdit
-        ? await client.current.run(
-            working.current ?? original.current,
-            JSON.stringify(validateTrainer(draft, report)),
-          )
-        : await client.current.run(
-            working.current ?? original.current,
-            undefined,
-            "exportWorkingCopy",
-          );
+      const result =
+        report.canEdit || report.trainerOnly
+          ? await client.current.run(
+              working.current ?? original.current,
+              JSON.stringify(validateTrainer(draft, report)),
+            )
+          : await client.current.run(
+              working.current ?? original.current,
+              undefined,
+              "exportWorkingCopy",
+            );
       if (id !== operation.current) return;
       if (!result.output) throw new Error("No output was returned.");
       const blob = new Blob([new Uint8Array(result.output)], {
@@ -2276,6 +2278,7 @@ export function SaveEditorPanel(
               busy ||
               !(
                 report.canEdit ||
+                report.trainerOnly ||
                 report.pokedex?.canEdit ||
                 report.brProfiles?.canEdit
               )
@@ -3335,7 +3338,7 @@ export function SaveEditorPanel(
               key={`${name}:${fileRevision}`}
               revision={workingRevision}
               busy={busy}
-              canEdit={report.canEdit}
+              canEdit={report.canEdit || !!report.trainerOnly}
               onRead={readRecords}
               onApply={(edit) => applyWorkingEdit(edit, "recordEdit")}
             />
@@ -3421,19 +3424,25 @@ export function SaveEditorPanel(
               </dl>
               {report.checksumsValid && !report.canEdit && (
                 <p>
-                  {report.format === "SAV4BR"
-                    ? br4GearWords[batchLang].scoped
-                    : report.format === "SAV1"
-                      ? words.pokedexResetOnly
-                      : ["SAV2", "SAV7b"].includes(report.format)
-                        ? words.pokedexEventsOnly
-                        : report.pokedex?.canEdit
-                          ? words.pokedexOnly
-                          : words.readonly}
+                  {report.trainerOnly
+                    ? trainer6Words[batchLang].demoScope
+                    : report.format === "SAV4BR"
+                      ? br4GearWords[batchLang].scoped
+                      : report.format === "SAV1"
+                        ? words.pokedexResetOnly
+                        : ["SAV2", "SAV7b"].includes(report.format)
+                          ? words.pokedexEventsOnly
+                          : report.pokedex?.canEdit
+                            ? words.pokedexOnly
+                            : words.readonly}
                 </p>
               )}
               <fieldset
-                disabled={busy || !report.canEdit || trainer6Draft}
+                disabled={
+                  busy ||
+                  !(report.canEdit || report.trainerOnly) ||
+                  trainer6Draft
+                }
                 className="save-editor-fields"
               >
                 <legend>{words.trainer}</legend>
@@ -3585,7 +3594,11 @@ export function SaveEditorPanel(
                   key={`${name}:${fileRevision}:${workingRevision}:${geographyReset}`}
                   report={report}
                   draft={draft}
-                  disabled={busy || !report.canEdit || trainer6Draft}
+                  disabled={
+                    busy ||
+                    !(report.canEdit || report.trainerOnly) ||
+                    trainer6Draft
+                  }
                   onChange={setDraft}
                 />
                 {report.trainer.canGender && (
@@ -3631,7 +3644,11 @@ export function SaveEditorPanel(
               {report.trainer.badges && (
                 <fieldset
                   className="save-editor-fields save-trainer-badges"
-                  disabled={busy || !report.canEdit || trainer6Draft}
+                  disabled={
+                    busy ||
+                    !(report.canEdit || report.trainerOnly) ||
+                    trainer6Draft
+                  }
                 >
                   <legend>{words.trainerBadges}</legend>
                   {Array.from(
@@ -3664,25 +3681,41 @@ export function SaveEditorPanel(
               <TrainerGameOptionFields
                 report={report}
                 draft={draft}
-                disabled={busy || !report.canEdit || trainer6Draft}
+                disabled={
+                  busy ||
+                  !(report.canEdit || report.trainerOnly) ||
+                  trainer6Draft
+                }
                 onChange={setDraft}
               />
               <TrainerAppearance6Fields
                 report={report}
                 draft={draft}
-                disabled={busy || !report.canEdit || trainer6Draft}
+                disabled={
+                  busy ||
+                  !(report.canEdit || report.trainerOnly) ||
+                  trainer6Draft
+                }
                 onChange={setDraft}
               />
               <TrainerDateFields
                 report={report}
                 draft={draft}
-                disabled={busy || !report.canEdit || trainer6Draft}
+                disabled={
+                  busy ||
+                  !(report.canEdit || report.trainerOnly) ||
+                  trainer6Draft
+                }
                 onChange={setDraft}
               />
               <TrainerPositionFields
                 report={report}
                 draft={draft}
-                disabled={busy || !report.canEdit || trainer6Draft}
+                disabled={
+                  busy ||
+                  !(report.canEdit || report.trainerOnly) ||
+                  trainer6Draft
+                }
                 onChange={setDraft}
               />
               <p className="save-editor-note">{words.ids}</p>
@@ -3703,7 +3736,7 @@ export function SaveEditorPanel(
                   className="primary"
                   disabled={
                     busy ||
-                    !report.canEdit ||
+                    !(report.canEdit || report.trainerOnly) ||
                     trainer6Draft ||
                     trainerDraftMatches(draft, report)
                   }
@@ -3718,7 +3751,11 @@ export function SaveEditorPanel(
                 </button>
                 <button
                   type="button"
-                  disabled={busy || !report.canEdit || trainer6Draft}
+                  disabled={
+                    busy ||
+                    !(report.canEdit || report.trainerOnly) ||
+                    trainer6Draft
+                  }
                   onClick={() => {
                     setDraft(trainerDraft(report));
                     setGeographyReset((value) => value + 1);

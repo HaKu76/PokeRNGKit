@@ -12,7 +12,7 @@ internal static class TrainerDates
 {
     private const string Format = "yyyy-MM-dd'T'HH:mm:ss";
     private static readonly DateTime Epoch = new(2000, 1, 1);
-    private static bool HasEpoch(SaveFile save) => save is SAV4 or SAV5 or SAV6XY or SAV6AO or SAV7SM or SAV7USUM;
+    private static bool HasEpoch(SaveFile save) => save is SAV4 or SAV5 or SAV6XY or SAV6AO or SAV6AODemo or SAV7SM or SAV7USUM;
     private static string Text(DateTime date) => date.ToString(Format, CultureInfo.InvariantCulture);
     private static string SafeText(Func<DateTime?> read)
     {

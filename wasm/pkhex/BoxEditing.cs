@@ -11,6 +11,7 @@ internal static class BoxEditing
     // PKHeX.WinForms/Subforms/Save Editors/Gen6/SAV_BoxLayout.cs.
     public static BoxOptions Options(SaveFile save)
     {
+        if(!save.HasBox)return new(false,0,[],null,[],0,false,[]);
         var length = save.Generation switch
         {
             2 when save is SAV2 { Japanese: false, Korean: false } => 16,

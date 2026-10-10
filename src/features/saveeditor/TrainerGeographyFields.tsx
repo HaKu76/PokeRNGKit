@@ -35,7 +35,7 @@ export function TrainerGeographyFields({
     : i18n.language.startsWith("ja")
       ? "ja"
       : "en";
-  const sourceGen6 = ["SAV6XY", "SAV6AO"].includes(report.format);
+  const sourceGen6 = ["SAV6XY", "SAV6AO", "SAV6AODemo"].includes(report.format);
   const shownCountry =
     sourceGen6 && draft.country === "0" ? regionSource : draft.country;
   const regions = trainerGeographyChoices(report, lang, shownCountry);

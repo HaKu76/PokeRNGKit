@@ -29,6 +29,7 @@ internal static class SaveEditorTests
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "secretBase6") { SecretBase6EditingTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "superTrain6") { SuperTrain6EditingTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "trainer6") { Trainer6EditingTests.Run(); return; }
+        if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "trainer6-demo") { Trainer6DemoTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "hall6") { HallOfFame6EditingTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "berry6xy") { BerryField6XYReadingTests.Run(); return; }
         if (Environment.GetEnvironmentVariable("PKHEX_TEST_FOCUS") == "avenue5") { Avenue5EditingTests.Run(); return; }
@@ -111,7 +112,7 @@ internal static class SaveEditorTests
             var thunderbolt = document.RootElement.GetProperty("moveChoices")[85];
             Require(thunderbolt.GetProperty("name").GetProperty("zh").GetString() == "十万伏特", $"{version}: localized move choices");
             Require(thunderbolt.GetProperty("maxPp")[3].GetInt32() == pokemon.GetMovePP(85, 3), $"{version}: PP Up limit");
-            Require(document.RootElement.GetProperty("apiVersion").GetInt32() == 119, $"{version}: API version");
+            Require(document.RootElement.GetProperty("apiVersion").GetInt32() == 120, $"{version}: API version");
             Require(document.RootElement.GetProperty("boxSlotCount").GetInt32() == save.BoxSlotCount, $"{version}: box dimensions");
             var boxes = document.RootElement.GetProperty("boxes");
             Require(boxes.GetArrayLength() == save.BoxCount, $"{version}: box metadata count");
@@ -344,6 +345,7 @@ internal static class SaveEditorTests
         SecretBase6EditingTests.Run();
         SuperTrain6EditingTests.Run();
         Trainer6EditingTests.Run();
+        Trainer6DemoTests.Run();
         Dlc5EditingTests.Run();
         CGear5EditingTests.Run();
         Underground4EditingTests.Run();

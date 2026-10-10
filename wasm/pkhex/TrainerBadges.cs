@@ -13,6 +13,7 @@ internal static class TrainerBadges
         SAV5 s => new(8,s.Misc.Badges),
         SAV6XY s => new(8,s.Badges),
         SAV6AO s => new(8,s.Badges),
+        SAV6AODemo s => new(8,s.Badges),
         SAV8BS s => new(8,Enumerable.Range(0,8).Aggregate(0,(mask,i) => mask | (s.FlagWork.GetSystemFlag(124+i) ? 1 << i : 0))),
         _ => null,
     };

@@ -15,7 +15,7 @@ internal static class SaveRecords
         string? date=bias<0?null:new DateTime(2000,1,1).AddSeconds(unchecked(remaining+bias)).ToString("yyyy-MM-dd HH:mm:ss",CultureInfo.InvariantCulture);
         return new((days>0?days+"天 ":"")+clock+(date is null?"":"\n日期："+date),(days>0?days+"d ":"")+clock+(date is null?"":"\nDate: "+date),(days>0?days+"日 ":"")+clock+(date is null?"":"\n日時："+date));
     }
-    public static bool Supports(SaveFile save) => save is SAV6XY or SAV6AO or SAV7SM or SAV7USUM or SAV8SWSH or SAV8BS;
+    public static bool Supports(SaveFile save) => save is SAV6XY or SAV6AO or SAV6AODemo or SAV7SM or SAV7USUM or SAV8SWSH or SAV8BS;
     public static SaveRecordCatalog Read(SaveFile save)
     {
         if(!Supports(save)) throw new ArgumentException("Game records are unavailable for this format.");

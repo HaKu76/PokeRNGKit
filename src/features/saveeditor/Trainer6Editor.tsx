@@ -73,7 +73,9 @@ function Form({
   onDirtyChange,
 }: Props & { c: Tr6Catalog }) {
   const w = trainer6Words[lang];
-  const [group, setGroup] = useState("sayings"),
+  const [group, setGroup] = useState(
+      c.fields.some((f) => f.group === "sayings") ? "sayings" : "multiplayer",
+    ),
     [mode, setMode] = useState(0),
     [property, setProperty] = useState("Appearance.Version"),
     [draft, setDraft] = useState<Record<string, string>>({}),
@@ -96,8 +98,10 @@ function Form({
   }, [dirty, pending, preview, onDirtyChange]);
   useEffect(() => () => onDirtyChange?.(false), [onDirtyChange]);
   const groups = [
-    "sayings",
-    "maison",
+    ...(c.fields.some((f) => f.group === "sayings")
+      ? ["sayings" as const]
+      : []),
+    ...(c.fields.some((f) => f.group === "maison") ? ["maison" as const] : []),
     "multiplayer",
     "position",
     ...(c.fields.some((f) => f.group === "chateau")
@@ -106,7 +110,7 @@ function Form({
     ...(c.fields.some((f) => f.group === "appearance")
       ? ["appearance" as const]
       : []),
-    "flags",
+    ...(c.fields.some((f) => f.group === "flags") ? ["flags" as const] : []),
     "trash",
   ] as const;
   const rows = c.fields.filter(
@@ -157,12 +161,15 @@ function Form({
         >
           {groups.map((g) => (
             <option key={g} value={g}>
-              {w[g]}
+              {g === "multiplayer" && !c.fields.some((f) => f.key === "Sprite")
+                ? (c.fields.find((f) => f.key === "Vivillon")?.name[lang] ??
+                  w[g])
+                : w[g]}
             </option>
           ))}
         </Select>
       </label>
-      {group === "multiplayer" && (
+      {group === "multiplayer" && c.fields.some((f) => f.key === "Sprite") && (
         <div className="save-trainer6-image">
           <img src={trainerImage(c.sprite)} alt="" width={68} height={68} />
           <span>

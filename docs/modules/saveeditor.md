@@ -2896,3 +2896,23 @@ PokedexSaveStatisticsEntry.cs、PokedexResearchTaskType8a.cs、FormConverter.cs 
 
 两种合成修订专项与最终原生全套、200 文件／736 项前端测试、最终类型、静态检查及核心／网页构建通过。
 保留既有 Hook、核心裁剪、网页体积与构建插件耗时警告，本批未进行浏览器验收。
+
+### ORAS 试玩版训练家（API 120，工程检查通过）
+
+试玩版实际长 0x5A00，十六块目录和 BEEF 识别标记由 SAV6AODemo／SaveBlockAccessor6AODemo 定义。Situation 在 0x1000，Status 在 0x3C00，Party 在 0x3E00，Records 在 0x5400；Box 未初始化，HasBox 为假。读取返回零箱子及真实队伍，箱子目录不提供名称、壁纸、交换或批量操作。
+
+源 SAV_Trainer.cs 对试玩版移除 Multiplayer／Maison，且没有 ISaveBlock6Main／IMultiplayerSprite。API 120 因此只增加独立训练家／记录／导出能力，不开放普通宝可梦与背包编辑。基本姓名、ID、性别、金钱、时间、地理、日期、徽章、BP／里程沿用已核对第六世代输入；Overview 的 Vivillon 可编辑，保留编号；坐标与姓名废字节沿用来源整窗规则。普通操作不重写隐藏留言与标记；明确整窗重新保存才重编码五留言、同步里程记录并重置 ORAS 模型。
+
+新增 OR／AS × 两性别的合成完整存档专项，对照源 Core 全文件输出，覆盖真实队伍／无箱子、可见及禁止字段、坐标、废字节、整窗、基础训练家、记录、校验拒绝、冻结哈希、原件与精确工作副本导出。前端专项 38 项与四布局原生专项通过；完整 verify 的 251 文件／1015 项测试、格式／Lint／类型／网页打包，完整原生、API 120 核心构建与裁剪后 26 类型检查均通过。最新核心的最终网页／PWA 打包通过；浏览器和真实存档未验收。
+
+### 第七世代基格尔德细胞来源核对（尚未实现）
+
+2026-10-11 已读 SAV_ZygardeCell.cs／Designer 与 EventWork7.cs。SM 是 95 格基格尔德细胞，USUM 是 100 格霸主贴纸；来源语言资源标题明确同时包含细胞／贴纸，不能把共享 Core 名称 ZygardeCell 当作两游戏的同一物品。每格状态 UInt16 位于事件数值编号 198+i，来源候选为 None／Available／Received 对应 0／1／2。累计与已收集分别位于编号 161／169，两个 NumericUpDown 默认最小零、显式最大 65535，不能误限为格数。上游旧状态大于 2 会在载入时抛错，网页需要明确显示异常并保护未修改值。
+
+GiveAll 按非 Received 格数量增加已收集，SM 同时增加累计，USUM 不增加累计；不能简单把计数设成 95／100。保存逐格写入并保存两计数，USUM 还同步记录 72。增加后的计数若超过 65535，网页需在工作副本写入前拒绝，保护原件与请求原子性。两游戏分别使用来源完整位置数组，格位不可互换；该窗口尚未进入产品代码及验收。
+
+### 第七世代殿堂来源核对（尚未实现）
+
+2026-10-11 已读 SAV_HallOfFame7.cs／Designer 与 EventWork7.cs 的 HallOfFame7。窗口不是完整宝可梦记录，而是首次／当前两组六种类，共十二个 UInt16，连续 24 字节；SM 位于事件块 0x9C4，USUM 位于 0xA3C。源窗口按 GetEntry(i)／SetEntry(i) 的 i*2 地址访问，不能使用 First1 等独立属性代替，其中 First3／First4 属性错误地重复 0x04 地址，而索引接口没有该错误。
+
+十二个候选沿用 GameInfo.FilteredSources.Species，并保留原始异常编号直到明确修改；界面可使用本地种类图像，但数据不包含形态、异色、昵称或训练家，不应伪造这些信息。只有 USUM 显示初始宝可梦加密常数，TB_EC 最大八位十六进制，保存用 Util.GetHexValue，空值为零。源窗口取消不保存，保存顺序写十二格后更新 USUM 的 Misc.StarterEncryptionConstant；网页需一次验证后写入工作副本并提供撤销。产品实现、三语与工程／浏览器验证尚未开始。

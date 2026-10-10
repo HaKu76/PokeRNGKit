@@ -360,7 +360,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 119;
+    public const int ApiVersion = 120;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)
@@ -475,7 +475,7 @@ public static partial class SaveService
     public static byte[] ExportWorkingCopy(byte[] data)
     {
         var save = Open(data);
-        if ((!CanEdit(save) && !SimplePokedex.Supports(save) && !ZaPokedex.Supports(save) && save is not (SAV7b or SAV8LA or SAV9SV or SAV4BR)) || !save.State.Exportable || !SaveChecksums.Valid(save))
+        if ((!CanEditTrainer(save) && !SimplePokedex.Supports(save) && !ZaPokedex.Supports(save) && save is not (SAV7b or SAV8LA or SAV9SV or SAV4BR)) || !save.State.Exportable || !SaveChecksums.Valid(save))
             throw new ArgumentException("Export requires a supported save with valid checksums.");
         // Every edit already recomputes checksums and verifies a reload. Preserve those exact verified bytes.
         return data.ToArray();
@@ -485,7 +485,7 @@ public static partial class SaveService
     public static byte[] EditRecord(byte[] data,string json)
     {
         var save=Open(data);
-        if(!CanEdit(save) || !save.State.Exportable || !SaveChecksums.Valid(save))
+        if(!CanEditTrainer(save) || !save.State.Exportable || !SaveChecksums.Valid(save))
             throw new ArgumentException("Editing requires a supported save with valid checksums.");
         var edit=JsonSerializer.Deserialize(json,SaveJsonContext.Default.SaveRecordEdit) ?? throw new ArgumentException("Missing game record edit.");
         var expected=SaveRecords.Apply(save,edit);
@@ -542,6 +542,7 @@ public static partial class SaveService
         SAV3RS or SAV3E or SAV3FRLG or SAV3Colosseum or SAV3XD or
         SAV4DP or SAV4Pt or SAV4HGSS or SAV5BW or SAV5B2W2 or
         SAV6XY or SAV6AO or SAV7SM or SAV7USUM or SAV8SWSH or SAV8BS;
+    internal static bool CanEditTrainer(SaveFile save) => CanEdit(save) || save is SAV6AODemo;
 
     public static string ReadHistory(byte[] data, string json)
     {
@@ -615,11 +616,11 @@ public static partial class SaveService
             save is SAV4BR br ? br.CurrentOT : save.OT, save.TID16, save.SID16, save.DisplayTID, save.DisplaySID,
             save.Language, save.Gender, save.Money, save.MaxMoney,
             save is SAV3 { Japanese: true } ? 5 : save.MaxStringLengthTrainer,
-            save.BoxCount, save.PartyCount, save.PlayTimeString, valid,
+            save.HasBox ? save.BoxCount : 0, save.PartyCount, save.PlayTimeString, valid,
             valid && CanEdit(save) && save.State.Exportable,
             save.Extension, save is SAV4 gen4 ? gen4.NationalDex : null,
             PokemonReader.Read(save), save.BoxSlotCount, PokemonReader.Boxes(save), PokemonReader.MoveChoices(save), BoxEditing.Options(save), PokemonReader.Attributes(save), TrainerEditing.Options(save), ZaPokedex.Supports(save) ? new PokedexCapability("za", valid && save.State.Exportable) : save is SAV9SV ? new PokedexCapability("sv", valid && save.State.Exportable) : save is SAV8LA ? new PokedexCapability("legends", valid && save.State.Exportable) : save is SAV8SWSH ? new PokedexCapability("swsh", valid && save.State.Exportable) : save is SAV8BS ? new PokedexCapability("bdsp", valid && save.State.Exportable) : save is SAV7 or SAV7b ? new PokedexCapability("gen7", valid && save.State.Exportable) : save is SAV6XY or SAV6AO ? new PokedexCapability("gen6", valid && save.State.Exportable) : save is SAV5 ? new PokedexCapability("gen5", valid && save.State.Exportable) : save is SAV4 ? new PokedexCapability("gen4", valid && save.State.Exportable) : SimplePokedex.Capability(save));
-        report = report with { BrProfiles = Br4Editing.Profiles(save) };
+        report = report with { BrProfiles = Br4Editing.Profiles(save), TrainerOnly = valid && save.State.Exportable && save is SAV6AODemo };
         return JsonSerializer.Serialize(report, SaveJsonContext.Default.SaveReport);
     }
 
@@ -716,7 +717,7 @@ public static partial class SaveService
     public static byte[] Export(byte[] data, string json)
     {
         var save = Open(data);
-        if (!CanEdit(save) || !save.State.Exportable || !SaveChecksums.Valid(save))
+        if (!CanEditTrainer(save) || !save.State.Exportable || !SaveChecksums.Valid(save))
             throw new ArgumentException("Editing requires a supported save with valid checksums.");
         var edit = JsonSerializer.Deserialize(json, SaveJsonContext.Default.TrainerEdit)
             ?? throw new ArgumentException("Missing trainer values.");
@@ -736,7 +737,7 @@ public sealed record SaveReport(
     ushort Tid, ushort Sid, uint DisplayTid, uint DisplaySid, int Language,
     byte Gender, uint Money, int MaxMoney, int MaxNameLength, int BoxCount,
     int PartyCount, string PlayTime, bool ChecksumsValid, bool CanEdit,
-    string Extension, bool? NationalDex, PokemonEntry[] Pokemon, int BoxSlotCount, BoxEntry[] Boxes, MoveChoice[] MoveChoices, BoxOptions BoxOptions, AttributeChoices AttributeChoices, TrainerOptions Trainer, PokedexCapability? Pokedex, Br4Profiles? BrProfiles=null);
+    string Extension, bool? NationalDex, PokemonEntry[] Pokemon, int BoxSlotCount, BoxEntry[] Boxes, MoveChoice[] MoveChoices, BoxOptions BoxOptions, AttributeChoices AttributeChoices, TrainerOptions Trainer, PokedexCapability? Pokedex, Br4Profiles? BrProfiles=null,bool TrainerOnly=false);
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(SaveReport))]

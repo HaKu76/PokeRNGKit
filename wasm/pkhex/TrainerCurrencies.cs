@@ -11,6 +11,7 @@ internal static class TrainerCurrencies
         SAV5 s => [new("bp",s.BattleSubway.BP,s.MaxCoins)],
         SAV6XY s => [new("bp",s.BP,9999),new("pokeMiles",s.GetRecord(63),9999999)],
         SAV6AO s => [new("bp",s.BP,9999),new("pokeMiles",s.GetRecord(63),9999999)],
+        SAV6AODemo s => [new("bp",s.BP,9999),new("pokeMiles",s.GetRecord(63),9999999)],
         SAV7 s => [new("bp",s.Misc.BP,9999),new("festivalCoins",s.Festa.FestaCoins,9999999)],
         SAV8SWSH s => [new("bp",s.Misc.BP,9999),new("watts",s.MyStatus.Watt,(int)MyStatus8.MaxWatt)],
         SAV8BS s => [new("bp",s.BattleTower.BP,9999)],

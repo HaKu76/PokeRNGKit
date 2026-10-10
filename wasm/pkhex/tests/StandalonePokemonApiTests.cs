@@ -35,7 +35,7 @@ internal static class StandalonePokemonApiTests
             var request = new StandalonePokemonRequest("entity." + p.Extension, encrypted, party, encrypted);
             using var report = JsonDocument.Parse(Api.InspectStandalonePokemon(input, Json(request)));
             var root = report.RootElement;
-            Check(root.GetProperty("apiVersion").GetInt32() == 119 && root.GetProperty("canEdit").GetBoolean(), "Public API version and editable format");
+            Check(root.GetProperty("apiVersion").GetInt32() == 120 && root.GetProperty("canEdit").GetBoolean(), "Public API version and editable format");
             Check(root.GetProperty("pokemon").GetProperty("speciesName").GetProperty("zh").GetString() == "皮卡丘", "Nested localized report survives source generation");
             Check(root.GetProperty("attributeChoices").GetProperty("species").GetArrayLength() == p.MaxSpeciesID, "Full entity catalog serialized");
             var expectedNoOp = original.ToArray();

@@ -12,7 +12,7 @@ public sealed record Tr6Edit(string Action,string? SourceHash,Tr6Value[]? Fields
 public sealed record Tr6Preview(Tr6Edit Request,Tr6Catalog Result,int[] ChangedOffsets,string[] IgnoredFields);
 internal static class Trainer6Editing
 {
-    internal static SAV6 Save(SaveFile s)=>s is SAV6XY or SAV6AO?(SAV6)s:throw new ArgumentException("Trainer6 requires X/Y or ORAS.");
+    internal static SAV6 Save(SaveFile s)=>s is SAV6XY or SAV6AO or SAV6AODemo?(SAV6)s:throw new ArgumentException("Trainer6 requires X/Y, ORAS or the ORAS demo.");
     internal static MaisonBlock Maison(SAV6 s)=>((ISaveBlock6Main)s).Maison;
     private static string Text(int n)=>n.ToString(CultureInfo.InvariantCulture);
     private static LocalizedText Label(string key,string fallback)=>Trainer6Names.Get("SAV_Trainer."+key,fallback);
@@ -24,13 +24,13 @@ internal static class Trainer6Editing
     {
         var result=new List<Tr6Field>();
         void Add(string key,string group,string label,int value,int max,int width,OriginChoice[]? choices=null)=>result.Add(new(key,group,Label(label,key),Text(value),choices is null?"number":"choice",width,0,max,choices??[]));
-        var sayings=Sayings(s);for(int i=0;i<5;i++)result.Add(new("Saying"+i,"sayings",Label("L_Saying"+(i+1),Text(i+1)),sayings[i],"text",16,0,0,[]));
+        var sayings=Sayings(s);if(s is not SAV6AODemo)for(int i=0;i<5;i++)result.Add(new("Saying"+i,"sayings",Label("L_Saying"+(i+1),Text(i+1)),sayings[i],"text",16,0,0,[]));
         string[] modes=["Singles","Doubles","Triples","Rotation","Multi"];
-        for(int i=0;i<20;i++)Add("Maison"+i,"maison",$"L_{modes[i/4]}{(i%4<2?"C":"B")}",Maison(s).GetMaisonStat(i),9999,4);
-        Add("Sprite","multiplayer","L_MultiplayerSprite",((IMultiplayerSprite)s).MultiplayerSpriteID,255,3,Sprites(s));
+        if(s is not SAV6AODemo)for(int i=0;i<20;i++)Add("Maison"+i,"maison",$"L_{modes[i/4]}{(i%4<2?"C":"B")}",Maison(s).GetMaisonStat(i),9999,4);
+        if(s is IMultiplayerSprite)Add("Sprite","multiplayer","L_MultiplayerSprite",((IMultiplayerSprite)s).MultiplayerSpriteID,255,3,Sprites(s));
         var viv=Vivillon(s);result.Add(new("Vivillon","multiplayer",new(GameInfo.GetStrings("zh-Hans").specieslist[666],GameInfo.GetStrings("en").specieslist[666],GameInfo.GetStrings("ja").specieslist[666]),Text(s.Vivillon),"choice",2,0,viv.Length-1,viv));
         OriginChoice[] flags=[new(0,new("关","Off","オフ")),new(1,new("开","On","オン"))];
-        Add("Mega","flags","CHK_MegaUnlocked",s.Status.IsMegaEvolutionUnlocked?1:0,1,1,flags);
+        if(s is not SAV6AODemo)Add("Mega","flags","CHK_MegaUnlocked",s.Status.IsMegaEvolutionUnlocked?1:0,1,1,flags);
         if(s is SAV6AO){Add("Rayquaza","flags","CHK_MegaRayquazaUnlocked",s.Status.IsMegaRayquazaUnlocked?1:0,1,1,flags);var label=result[^1].Name;result[^1]=result[^1] with{Name=new(GameInfo.GetStrings("zh-Hans").specieslist[384]+" · "+label.Zh,GameInfo.GetStrings("en").specieslist[384]+" · "+label.En,GameInfo.GetStrings("ja").specieslist[384]+" · "+label.Ja)};}
         if(s is SAV6XY xy){Add("Style","chateau","L_Style",s.Situation.Style,255,3);var ranks=Enum.GetValues<BattleChateauRank6>().Select(v=>new OriginChoice((int)v,Trainer6Names.Get("BattleChateauRank6."+v,v.ToString()))).ToArray();Add("Rank","chateau","L_BattleChateauRank",xy.SUBE.ChateauRank,5,1,ranks);Add("Points","chateau","L_BattleChateauPoints",xy.SUBE.ChateauPoints,4095,4);}
         if(s is SAV6XY appearance)result.AddRange(TrainerAppearance6.WindowFields(appearance));
@@ -38,7 +38,7 @@ internal static class Trainer6Editing
     }
     internal static Tr6Catalog Read(SaveFile save,string hash)
     {
-        var s=Save(save);int sprite=((IMultiplayerSprite)s).MultiplayerSpriteID;return new(s.State.Exportable&&SaveChecksums.Valid(s),hash,Fields(s),$"tr_{sprite:00}",s.Overworld.PlayerModel,Convert.ToHexString(s.Status.OriginalTrainerTrash),Hall6TrashEditing.Chars,Hall6TrashEditing.Species.Value,Hall6TrashEditing.Languages.Value,TrainerEditing.Options(s),new(s.OT,s.TID16,s.SID16,s.Money,s.Gender),Trainer6Position.Read(s));
+        var s=Save(save);int sprite=s is IMultiplayerSprite ms?ms.MultiplayerSpriteID:0;return new(s.State.Exportable&&SaveChecksums.Valid(s),hash,Fields(s),$"tr_{sprite:00}",s.Overworld.PlayerModel,Convert.ToHexString(s.Status.OriginalTrainerTrash),Hall6TrashEditing.Chars,Hall6TrashEditing.Species.Value,Hall6TrashEditing.Languages.Value,TrainerEditing.Options(s),new(s.OT,s.TID16,s.SID16,s.Money,s.Gender),Trainer6Position.Read(s));
     }
     private static int Number(Tr6Field field,string text)
     {
@@ -68,8 +68,8 @@ internal static class Trainer6Editing
         var options=TrainerEditing.Options(s);var sayings=Sayings(s);s.Overworld.ResetPlayerModel();s.Money=(uint)Prefix(s.Money,7);
         int country=Pick(s.Country,options.Geography!.Countries.Select(v=>v.Id));var regions=country>0?Util.GetCountryRegionList($"sr_{country:000}","en").Select(v=>v.Value):[];
         s.Region=unchecked((byte)Pick(s.Region,regions));s.Country=unchecked((byte)country);s.ConsoleRegion=unchecked((byte)Pick(s.ConsoleRegion,options.Geography.Consoles.Select(v=>v.Id)));s.Language=Pick(s.Language,options.Languages.Select(v=>v.Id));
-        for(int i=0;i<5;i++)Saying(s,i,sayings[i]);for(int i=0;i<20;i++)Maison(s).SetMaisonStat(i,(ushort)Prefix(Maison(s).GetMaisonStat(i),4));s.BP=Prefix(s.BP,4);int miles=Prefix(s.GetRecord(63),7);s.SetRecord(63,miles);s.SetRecord(64,miles);s.Situation.Style=Math.Min(s.Situation.Style,255);
-        s.Badges=s.Badges;s.Vivillon=s.Vivillon;s.PlayedMinutes=Prefix(s.PlayedMinutes,2)%60;s.PlayedSeconds=Prefix(s.PlayedSeconds,2)%60;((IMultiplayerSprite)s).MultiplayerSpriteID=unchecked((byte)Pick(((IMultiplayerSprite)s).MultiplayerSpriteID,Sprites(s).Select(v=>v.Id)));
+        for(int i=0;i<5;i++)Saying(s,i,sayings[i]);if(s is not SAV6AODemo)for(int i=0;i<20;i++)Maison(s).SetMaisonStat(i,(ushort)Prefix(Maison(s).GetMaisonStat(i),4));s.BP=Prefix(s.BP,4);int miles=Prefix(s.GetRecord(63),7);s.SetRecord(63,miles);s.SetRecord(64,miles);s.Situation.Style=Math.Min(s.Situation.Style,255);
+        s.Badges=s.Badges;s.Vivillon=s.Vivillon;s.PlayedMinutes=Prefix(s.PlayedMinutes,2)%60;s.PlayedSeconds=Prefix(s.PlayedSeconds,2)%60;if(s is IMultiplayerSprite ms)ms.MultiplayerSpriteID=unchecked((byte)Pick(ms.MultiplayerSpriteID,Sprites(s).Select(v=>v.Id)));
         if(s is SAV6XY xy){xy.SUBE.ChateauRank=(ushort)Math.Min((int)xy.SUBE.ChateauRank,5);var appearance=xy.Status.Fashion;xy.Status.Fashion=appearance;xy.Status.Nickname=xy.Status.Nickname;}
         if(saved is {} d)s.Played.LastSavedDate=new(d.Year,d.Month,d.Day,d.Hour,d.Minute,0);
     }

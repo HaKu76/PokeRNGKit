@@ -89,10 +89,11 @@ describe("Generation VI source trainer window", () => {
     expect(tr6Tsv("65535", "00000")).toBe("4095");
     expect(tr6Tsv("00123", "00123")).toBe("0000");
   });
-  it("opens only full X/Y and ORAS formats", () => {
+  it("opens X/Y, ORAS and the source ORAS demo trainer window", () => {
     expect(supportsTrainer6("SAV6XY")).toBe(true);
     expect(supportsTrainer6("SAV6AO")).toBe(true);
-    for (const format of ["SAV6AODemo", "SAV5B2W2", "SAV7SM", "SAV6"])
+    expect(supportsTrainer6("SAV6AODemo")).toBe(true);
+    for (const format of ["SAV5B2W2", "SAV7SM", "SAV6"])
       expect(supportsTrainer6(format)).toBe(false);
   });
   it("accepts four digit Maison controls and preserves unknown old values until explicit patch", () => {

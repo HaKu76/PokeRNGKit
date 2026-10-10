@@ -38,7 +38,7 @@ internal static class PokemonReader
         Enumerable.Range(0, 25).Select(i => Text(s => Name(s.natures, i))).ToArray(),
         Enumerable.Range(0, p.MaxItemID + 1).Select(i => Text(s => Name(s.GetItemStrings(p.Context, p.Version), i))).ToArray(), PokemonIdentity.Choices(p));
 
-    public static BoxEntry[] Boxes(SaveFile save) => Enumerable.Range(0, save.BoxCount).Select(i =>
+    public static BoxEntry[] Boxes(SaveFile save) => Enumerable.Range(0, save.HasBox ? save.BoxCount : 0).Select(i =>
         new BoxEntry(i, save is IBoxDetailNameRead names ? names.GetBoxName(i) : string.Empty,
             save is IBoxDetailWallpaper wallpaper ? wallpaper.GetBoxWallpaper(i) : -1)).ToArray();
 
