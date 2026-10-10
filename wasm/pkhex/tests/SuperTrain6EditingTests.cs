@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+using System.Globalization;
+using System.Text.Json;
+using System.Buffers.Binary;
+using PKHeX.Core;
+using PokeRNGKit.SaveEditor;
+internal static class SuperTrain6EditingTests
+{
+    private static void Check(bool ok,string message){if(!ok)throw new Exception(message);}
+    private static void Reject(Action action){try{action();throw new Exception("Invalid SuperTrain6 request accepted");}catch(ArgumentException){}}
+    private static SAV6 Open(byte[] bytes)=>(SAV6)SaveUtil.GetSaveFile(bytes.ToArray())!;
+    private static SuperTrainBlock Block(SAV6 s)=>((ISaveBlock6Main)s).SuperTrain;
+    private static string Json(St6Edit e)=>JsonSerializer.Serialize(e,SaveJsonContext.Default.St6Edit);
+    private static St6Catalog Read(byte[] data)=>JsonSerializer.Deserialize(SaveService.ReadSuperTrain6(data),SaveJsonContext.Default.St6Catalog)!;
+    private static St6Preview Preview(byte[] data,St6Edit e)=>JsonSerializer.Deserialize(SaveService.PreviewSuperTrain6(data,Json(e)),SaveJsonContext.Default.St6Preview)!;
+    private static byte[] Apply(byte[] data,St6Edit e){var original=data.ToArray();var p=Preview(data,e);var output=SaveService.EditSuperTrain6(data,Json(p.Request));Check(data.SequenceEqual(original),"SuperTrain6 original immutable");Check(p.Request.TargetHash==Br4Editing.Hash(output)&&p.Result.SourceHash==p.Request.TargetHash,"SuperTrain6 frozen whole file");Check(p.ChangedOffsets.SequenceEqual(Enumerable.Range(0,data.Length).Where(i=>data[i]!=output[i])),"SuperTrain6 all changed offsets");Check(SaveService.ExportWorkingCopy(output).SequenceEqual(output),"SuperTrain6 exact complete export");return output;}
+    private static byte[] Compare(byte[] data,St6Edit e,Action<SAV6> oracle){var expected=Open(data);oracle(expected);var output=Apply(data,e);Check(output.SequenceEqual(expected.Write().ToArray()),"SuperTrain6 independent complete-file oracle: "+e.Action);return output;}
+    private static void PackOracle(SAV6 s,int[] selected,string language){var names=GameInfo.GetStrings(language).trainingbags.ToArray();names[0]="---";int empty=0;for(int i=0;i<12;i++){int id=Array.IndexOf(names,names[selected[i]]);if(id<=0){empty++;continue;}Block(s).Data[0x308+i-empty]=(byte)id;}}
+    public static void Run()
+    {
+        var languages=new[]{("zh","zh-Hans"),("en","en"),("ja","ja")};var sharedZeros=languages.Select(x=>GameInfo.GetStrings(x.Item2).trainingbags[0]).ToArray();
+        foreach(var version in new[]{GameVersion.X,GameVersion.Y,GameVersion.OR,GameVersion.AS}){
+            var s=Open(File.ReadAllBytes($".tmp/pkhex-fixtures/{(version is GameVersion.X or GameVersion.Y?"X":"OR")}.sav"));s.Version=version;var b=Block(s);b.Data.Fill(0xA6);for(int i=0;i<12;i++)b.SetBag(i,(byte)(i+1));
+            uint[] patterns=[0,0x80000000,0x7F800001,0x7FC0A6A6,0x7F800000,0xFF800000,0x7F7FFFFF,0xFF7FFFFF,1,0x80000001,0x3F000000];for(int i=0;i<48;i++)for(int lane=0;lane<2;lane++)BinaryPrimitives.WriteUInt32LittleEndian(b.Data[((lane==0?0x08:0xC8)+i*4)..],patterns[(i*2+lane)%patterns.Length]);var data=s.Write().ToArray();var original=data.ToArray();var c=Read(data);
+            Check(c.CanEdit&&c.Stages.Length==32&&c.Stages.All(x=>x.Holders.Length==2)&&c.Bags.Length==12&&c.RawHex.Length==0x318*2,"SuperTrain6 full source catalog");for(int i=0;i<32;i++)for(int lane=0;lane<2;lane++)Check(c.Stages[i].Holders[lane].TimeBits==patterns[(i*2+lane)%patterns.Length].ToString("X8"),"SuperTrain6 exact IEEE754 reads including NaN payloads");
+            using(var schema=JsonDocument.Parse(SaveService.ReadSuperTrain6(data)))Check(schema.RootElement.GetProperty("numberSymbols").GetProperty("naN").GetProperty("zh").GetString()==c.NumberSymbols.NaN.Zh,"SuperTrain6 exact browser JSON acronym property");
+            foreach(var (ui,code) in languages){var culture=CultureInfo.GetCultureInfo(code);foreach(int species in new[]{c.Species.First().Id,c.Species.Last().Id})for(int i=0;i<32;i++)for(int lane=0;lane<2;lane++){int index=i,row=lane;Compare(data,new("record",c.SourceHash,ui,i,lane,species,"255","255","-0"),x=>{var block=Block(x);int offset=(row==0?0x188:0x248)+index*4;BinaryPrimitives.WriteUInt16LittleEndian(block.Data[offset..],(ushort)species);block.Data[offset+2]=block.Data[offset+3]=255;BinaryPrimitives.WriteSingleLittleEndian(block.Data[((row==0?0x08:0xC8)+index*4)..],float.Parse("-0",culture));});}
+                foreach(string text in new[]{"","bad"," 1,234.5 ","3.4028235e38","1e39","-1e39","1e-50","-1e-50","NaN","Infinity",culture.NumberFormat.NaNSymbol,culture.NumberFormat.PositiveInfinitySymbol,culture.NumberFormat.NegativeInfinitySymbol}){
+                    bool valid=float.TryParse(text,NumberStyles.Float|NumberStyles.AllowThousands,culture,out float number);var request=new St6Edit("record",c.SourceHash,ui,31,1,Time:text);var preview=Preview(data,request);Check(preview.IgnoredFields.Contains("Time")==!valid,"SuperTrain6 exact active-culture TryParse behavior");Compare(data,request,x=>{if(valid)BinaryPrimitives.WriteSingleLittleEndian(Block(x).Data[(0xC8+31*4)..],number);});
+                }
+                foreach(string text in new[]{"","bad","0","255","256","+255","-1"," 255 "}){bool valid=byte.TryParse(text,NumberStyles.Integer,culture,out byte value);var request=new St6Edit("record",c.SourceHash,ui,0,0,Form:text,Gender:text);var preview=Preview(data,request);Check(preview.IgnoredFields.Contains("Form")==!valid&&preview.IgnoredFields.Contains("Gender")==!valid,"SuperTrain6 ignored byte edits preserve old data");Compare(data,request,x=>{if(valid){Block(x).Data[0x18A]=value;Block(x).Data[0x18B]=value;}});}
+                var names=GameInfo.GetStrings(code).trainingbags.ToArray();names[0]="---";Check(names.Length==c.BagChoices.Length&&c.BagChoices.Select(x=>x.Id).SequenceEqual(Enumerable.Range(0,names.Length)),"SuperTrain6 all named bag candidates");int[] initial=Enumerable.Range(1,12).ToArray();Compare(data,new("resave",c.SourceHash,ui),x=>PackOracle(x,initial,code));
+                foreach(int emptyMask in new[]{0,1,0x555,0xAAA,0x800,0xFFF}){var selected=initial.Select((v,i)=>(emptyMask&(1<<i))!=0?0:v).ToArray();var edits=Enumerable.Range(0,12).Select(i=>new St6BagEdit(i,selected[i])).ToArray();Compare(data,new("bags",c.SourceHash,ui,Bags:edits),x=>PackOracle(x,selected,code));}
+                for(int slot=0;slot<12;slot++){int index=slot,id=names.Length-1;var selected=initial.ToArray();selected[index]=id;Compare(data,new("bags",c.SourceHash,ui,Bags:[new(index,id)]),x=>PackOracle(x,selected,code));}
+            }
+            var strange=Open(data);Block(strange).SetBag(11,255);var odd=strange.Write().ToArray();var oc=Read(odd);Check(!oc.Bags[11].SourceReadable&&oc.Bags[11].Id==255,"SuperTrain6 unknown bag still readable");Reject(()=>Preview(odd,new("resave",oc.SourceHash,"en")));Compare(odd,new("bags",oc.SourceHash,"en",Bags:[new(11,0)]),x=>PackOracle(x,[1,2,3,4,5,6,7,8,9,10,11,0],"en"));
+            var good=new St6Edit("record",c.SourceHash,"en",0,0,Time:"1");foreach(var request in new[]{good with{Stage=32},good with{Lane=2},good with{UiLanguage="fr"},good with{Species=65535},good with{Bags=[new(0,1)]},good with{Time=null},good with{Time=new string('1',32768)},new St6Edit("bags",c.SourceHash,"en",Bags:[]),new St6Edit("bags",c.SourceHash,"en",Bags:[new(12,1)]),new St6Edit("bags",c.SourceHash,"en",Bags:[new(0,255)]),new St6Edit("bags",c.SourceHash,"en",Bags:[new(0,1),new(0,2)]),new St6Edit("resave",c.SourceHash,"en",Bags:[new(0,1)]),good with{SourceHash=new string('0',64)}})Reject(()=>Preview(data,request));Reject(()=>SaveService.EditSuperTrain6(data,Json(good)));var frozen=Preview(data,good).Request;Reject(()=>SaveService.EditSuperTrain6(data,Json(frozen with{TargetHash=new string('0',64)})));
+            Check(data.SequenceEqual(original),"SuperTrain6 all reads/rejections preserve original");Console.WriteLine($"PASS {version}: all 32x2 source record addresses/byte bounds, 3 cultures/IEEE754 endpoints/ignored fields, twelve bag slots/full candidates/source packing without tail clearing, hidden records/flags/header preservation, full-file frozen oracles and atomic rejection");
+        }
+        for(int i=0;i<3;i++)Check(GameInfo.GetStrings(languages[i].Item2).trainingbags[0]==sharedZeros[i],"SuperTrain6 shared localized strings not mutated");Reject(()=>SaveService.ReadSuperTrain6(File.ReadAllBytes(".tmp/pkhex-fixtures/B2.sav")));
+    }
+}

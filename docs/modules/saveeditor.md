@@ -531,13 +531,27 @@ OR／AS 新专项覆盖全部 31 基地、828 摆设、90 队伍，全部属性�
 
 API 117 已接 JSExport／独立 Worker／领域和三语浮动面板：全部属性、只读派生状态、二十八摆设与只读参数、三格本地图像队伍、常规／招式／个体努力值、记录、文件与批量均可访问。草稿锁定所属基地／模式／格位，同一目标内允许保留草稿切换属性／字段分组；只读读取／预览／文件导出分支不返回工作副本，只有确认应用返回新存档。预览包括实际属性、摆设、成员、异色／蛋联动、记录的 signed／unsigned 值、移动后的全部基地、库存原始标记和完整字节变化。数字属性支持源类型转换器的十六进制输入；掩码输入按实际字符位宽验证，保存转换交给 Core。前端／客户端／领域／多语言专项 36 项及定向 Lint 通过，完整 verify 的 249 文件／985 项测试与网页／PWA、全套原生、API 117 核心构建、裁剪后 26 类型属性检查和新核心最终网页／PWA 打包均通过；外部 Chrome 和真实存档仍待核验。
 
-### 第六世代超级训练（来源核对，尚未接入）
+### 第六世代超级训练（API 118，工程检查通过）
 
 已通读只读 `PKHeX.WinForms/Subforms/Save Editors/Gen6/SAV_SuperTrain.cs`，核对 Designer、`PKHeX.Core/Saves/Substructures/Gen6/SuperTrainBlock.cs` 与两份 SaveBlockAccessor6。X／Y 和 ORAS 均为块 46，基址 0x1F200／0x20200，长度 0x318。窗口只列前 32 个阶段，每项两组种类／形态／性别／Single 时间，另有十二个训练袋；Core 实际有 48 组，未显示的后十六组、解锁标记、分发标记、Counter 与教程 tracker 不得被普通修改顺带重写或当作窗口现有控制。
 
-两组时间从 0x08／0xC8 起、步长 4；两组 holder 从 0x188／0x248 起、步长 4，依次 UInt16 种类、独立 byte 形态、独立 byte 性别，不是常见宝可梦的 packed 位。种类使用目标存档 FilteredSources.Species。形态／性别虽然用 MaskedTextBox，但 Designer 未设置 Mask 或显式 MaxLength，回调只是 byte.TryParse，实际写入可成功的 0–255，不能按性别 0–2 或当前种类形态数代替源输入。时间读取用 InvariantCulture，回调 float.TryParse 未显式传 Culture，失败／空值保持原有数据；没有正数范围或时间截顶，三语解析、NaN／Infinity／旧 float 原始位仍需继续核对。
+两组时间从 0x08／0xC8 起、步长 4；两组 holder 从 0x188／0x248 起、步长 4，依次 UInt16 种类、独立 byte 形态、独立 byte 性别，不是常见宝可梦的 packed 位。种类使用目标存档 FilteredSources.Species。形态／性别虽然用 MaskedTextBox，但 Designer 未设置 Mask 或显式 MaxLength，回调只是 byte.TryParse，实际写入可成功的 0–255，不能按性别 0–2 或当前种类形态数代替源输入。时间读取用 InvariantCulture，回调 float.TryParse 未显式传 Culture，失败／空值保持原有数据；没有正数范围或时间截顶。Main.ApplyMainLanguage 调用 WinFormsUtil.SetCultureLanguage，设置 CurrentCulture 和 CurrentUICulture，因此按当前中文 zh-Hans／英文 en／日文 ja 解析。
 
-训练袋从 0x308 起共十二 byte。窗口把当前语言 trainingbags[0] 改成 `---`，候选只加入非空名称，保存以完整名称数组 IndexOf 查回编号，可能受重复名称影响。B_Save 只把非空袋向前压紧，不清除尾部旧格位；全部选择空袋也没有清空循环，不能实现为清零十二格或稳定过滤后补零。静态接入应克隆名称数组而非修改共享缓存，并在预览明确显示来源打包后的真实十二格。Core 的 GetOpenBagIndex／AddBag、ClearBlock／ClearRecord／UnlockAllStages 不由此窗口调用，不能据方法存在声称它们是该窗口的现成功能。三语 SAV_SuperTrain 控件键与 Core trainingstage／trainingbags 资源已定位；完整候选、输入转换及独立夹具为下一步，当前未改超级训练产品代码。
+训练袋从 0x308 起共十二 byte。窗口把当前语言 trainingbags[0] 改成 `---`，候选只加入非空名称，保存以完整名称数组 IndexOf 查回编号，可能受重复名称影响。B_Save 只把非空袋向前压紧，不清除尾部旧格位；全部选择空袋也没有清空循环，不能实现为清零十二格或稳定过滤后补零。接入克隆名称数组而非修改共享缓存，并在预览显示来源打包后的真实十二格。Core 的 GetOpenBagIndex／AddBag、ClearBlock／ClearRecord／UnlockAllStages 不由此窗口调用，不能据方法存在声称它们是该窗口的现成功能。三语 SAV_SuperTrain 控件键与 Core trainingstage／trainingbags 资源分别来自固定只读源码及 `Resources/text/other/<language>/text_SuperTraining_<language>.txt`／`text_TrainingBag_<language>.txt`。
+
+新增 SuperTrain6Editing、领域／三语图像编辑器，API 118 接 JSExport／独立 Worker／浮动存档面板。纪录补丁只写指定项，Form／Gender／Time 的失败解析在预览 IgnoredFields 显示，旧原始位保持；时间采用当前语言 CultureInfo 与 Single.TryParse，字符串传输及八位原始位避免 JSON 对 NaN／Infinity 的损失。确认沿用冻结的解析语言、完整源／目标 SHA-256，保护其他纪录、所有未显示格位／标记、原件、撤销及完整导出。袋位提交与来源重新保存都使用实际姓名数组 IndexOf／不清尾规则，未知超界编号仍可读取，但必须明确修复后才能执行该来源打包。没有擅自加入解除训练／清块按钮。
+
+时间 TextBox 的默认 MaxLength 32767 可在 [.NET TextBoxBase](https://raw.githubusercontent.com/dotnet/winforms/main/src/System.Windows.Forms/System/Windows/Forms/Controls/TextBox/TextBoxBase.cs) 的字段与 DefaultValue 核对。形态／性别的 [.NET MaskedTextBox](https://raw.githubusercontent.com/dotnet/winforms/main/src/System.Windows.Forms/System/Windows/Forms/Controls/TextBox/MaskedTextBox.cs) 不支持设置 MaxLength，WndProc 在空 Mask 分支前忽略 EM_LIMITTEXT；不能据属性 getter 冒充实测的硬上限。本产品将三个文本输入统一限为 32767 字符作为请求保护，成功 byte 输入与来源完全相同，失败输入不转换为零。以上框架资料为当前公开实现参考，未将其当作固定 PKHeX 源码中的显式设置。
+
+X／Y／OR／AS 核心专项已通过全部 32×2 地址、0／255 byte、三语解析、正负零／NaN payload／Infinity／极限／溢出／下溢、忽略输入、十二袋／全部候选／六种空洞计划、超界修复、共享名称缓存保护、隐藏区域、完整冻结文件对照和拒绝原子性。前端／客户端／领域／多语言专项 34 项与定向 Lint 通过；完整 verify 的 250 文件／995 项测试、格式、静态检查、类型及网页／PWA 打包通过。全套原生、API 118 核心构建、裁剪后 26 类型属性检查与新核心最终网页／PWA 打包均通过，预缓存 252 项；保留既有 Hook、JSExport、反射裁剪和网页体积／插件提示。浏览器连接仍返回 nodeRepl.fetch request failed，没有完成外部 Chrome 或真实存档验收。
+
+### 第六世代训练家完整窗口（来源复核，既有通用能力继续保留）
+
+已通读只读 `Gen6/SAV_Trainer.cs`，核对 Designer 的显式值，以及 MyStatus6、MaisonBlock、SubEventLog6XY、TrainerSprite6；先对照既有训练家姓名／ID／性别／时间／地区／徽章／对应点数／日期／坐标／XY 昵称与外观，避免重复新增。当前完整窗口仍需补五留言、二十 Maison 记录、XY 对战城堡、多人形象、Vivillon、Mega 标记、全窗口重新保存及 Ctrl+姓名的废字节操作。源窗口对 ORAS 移除 Appearance／Battle Chateau 页，AODemo 还移除 Multiplayer／Maison；当前产品该完整接入阶段不据 Demo 继承关系直接开放未核对模块。
+
+五留言控件 MaxLength 16，MyStatus6 从 0x7C 起、步长 0x22 bytes，Core ClearZero setter；二十 Maison 记录从块内 0x1C0 起、步长 2，按五对战模式各四 UInt16 排列。GUI 全部四位数字掩码并绑定 ChangeFFFF，不能拿 Core UInt16 上限代替可输入四位；旧五位值、空输入事件与 ushort.Parse 的保存行为仍需独立对照。XY 城堡等级读取 clamp 到枚举列表、改等级自动设置来源点数 0／5／30／100／300／1000，点数 NUD 0–4095；Core Rank 低四位、Points 高十二位共享 UInt16，各 setter 保护另一项。
+
+多人形象控件在 Designer 禁用后于构造函数对非 Demo 重新启用；候选必须按枚举数组的实际前缀构造，XY 的 max 是 `(int)TrainerSprite6.Trevor` 而非按编号过滤，枚举存在 17／25 空洞，不能假设此值等于最后候选的编号。Mega 两标记为 Status 0x14A bit0／bit1；Rayquaza 勾选只在 ORAS 显示，但源 Save 两种状态都调用 setter。窗口保存无条件 ResetPlayerModel，重写五留言／Maison／Sprite／XY 外观与昵称；坐标仅 GB_Map.Enabled && MapUpdated 时写；姓名仅实际变化才写，分钟／秒取模 60，当前里程同时写记录 63／64，最后保存时间秒归零。既有 TrainerCurrencies 已在修改里程时同时写记录 63／64；TrainerSpatialPosition 已按十八倍缩放与六位小数提供 X／Y 0–65535、Z ±65535、地图 0–1000 与朝向 0–7，不能重复新增。当前 TrainerAppearance6 仅昵称与外观字段，尚无 GiveAllAccessories；Situation.Style 的三位掩码／Change255／byte.Parse 保存也未接入。PlayerSpriteUtil 对 IMultiplayerSprite 使用 tr_{编号:00}，图片缺失回退 tr_00；来源图片位于 PKHeX.Drawing.Misc/Resources/img/Trainer Sprites。FieldMoveModelSave6 每 0x108 bytes 查首个 0x43 标记，模型字段在该记录 +0x8 的 UInt16，无标记时重设无操作；默认模型 XY 男／女 2／1、ORAS 172／171。Fashion6XY.UnlockAllAccessories 复制固定来源字节序列，不能替换成全块填 FF。完整重保存的副作用、字段适用性、三语候选、图片与独立夹具尚待继续核对，当前未改训练家产品代码。
 
 ## HGSS 宝可全能竞技（API 98）
 

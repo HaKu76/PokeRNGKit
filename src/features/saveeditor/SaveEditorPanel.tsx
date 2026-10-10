@@ -1,3 +1,6 @@
+import { SuperTrain6Editor } from "./SuperTrain6Editor";
+import { supportsSuperTrain6 } from "./superTrain6";
+import { st6Words } from "./superTrain6Words";
 import { SecretBase6Editor } from "./SecretBase6Editor";
 import { supportsSecretBase6 } from "./secretBase6";
 import { sb6Words } from "./secretBase6Words";
@@ -180,6 +183,7 @@ export function SaveEditorPanel(
     | "medals5"
     | "berryField6xy"
     | "avenue5"
+    | "superTrain6"
     | "secretBase6"
     | "link6"
     | "hall6"
@@ -336,6 +340,8 @@ export function SaveEditorPanel(
         (previous === "berryField6xy" &&
           !supportsBerryField6XY(result.report.format)) ||
         (previous === "avenue5" && !supportsAvenue5(result.report.format)) ||
+        (previous === "superTrain6" &&
+          !supportsSuperTrain6(result.report.format)) ||
         (previous === "secretBase6" &&
           !supportsSecretBase6(result.report.format)) ||
         (previous === "link6" && !supportsLink6(result.report.format)) ||
@@ -1278,6 +1284,38 @@ export function SaveEditorPanel(
     });
     return p;
   };
+  const readSuperTrain6 = async () => {
+    let c: import("./superTrain6").St6Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "superTrain6",
+      );
+      if (id !== operation.current) return;
+      if (!result.superTrain6)
+        throw Error("No SuperTrain6 catalog was returned.");
+      c = result.superTrain6;
+    });
+    return c;
+  };
+  const previewSuperTrain6 = async (edit: import("./superTrain6").St6Edit) => {
+    let p: import("./superTrain6").St6Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "superTrain6Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.superTrain6Preview)
+        throw Error("No SuperTrain6 preview was returned.");
+      p = result.superTrain6Preview;
+    });
+    return p;
+  };
   const readLink6 = async () => {
     let c: import("./link6").Link6Catalog | undefined;
     await perform(async (id) => {
@@ -1940,6 +1978,7 @@ export function SaveEditorPanel(
       | import("./misc5").Misc5Edit
       | import("./medals5").Medals5Edit
       | import("./avenue5").Avenue5Edit
+      | import("./superTrain6").St6Edit
       | import("./secretBase6").Sb6Edit
       | import("./link6").Link6Edit
       | import("./hall6").Hall6Edit
@@ -2003,6 +2042,7 @@ export function SaveEditorPanel(
       | "misc5Edit"
       | "medals5Edit"
       | "avenue5Edit"
+      | "superTrain6Edit"
       | "secretBase6Edit"
       | "link6Edit"
       | "hall6Edit"
@@ -2540,6 +2580,15 @@ export function SaveEditorPanel(
                 {avenue5Words[batchLang].title}
               </button>
             )}
+            {supportsSuperTrain6(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "superTrain6"}
+                onClick={() => setSection("superTrain6")}
+              >
+                {st6Words[batchLang].title}
+              </button>
+            )}
             {supportsSecretBase6(report.format) && (
               <button
                 type="button"
@@ -3035,6 +3084,17 @@ export function SaveEditorPanel(
               onPreview={previewAvenue5}
               onApply={(edit) => applyWorkingEdit(edit, "avenue5Edit")}
               onExport={exportAvenue5}
+            />
+          ) : section === "superTrain6" &&
+            supportsSuperTrain6(report.format) ? (
+            <SuperTrain6Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readSuperTrain6}
+              onPreview={previewSuperTrain6}
+              onApply={(edit) => applyWorkingEdit(edit, "superTrain6Edit")}
             />
           ) : section === "secretBase6" &&
             supportsSecretBase6(report.format) ? (

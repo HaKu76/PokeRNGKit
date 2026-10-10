@@ -33,6 +33,7 @@
     <Compile Include="../Misc5Editing.cs" Link="Misc5Editing.cs" />
     <Compile Include="../Link6Editing.cs" Link="Link6Editing.cs" />
     <Compile Include="../SecretBase6Editing.cs" Link="SecretBase6Editing.cs" />
+    <Compile Include="../SuperTrain6Editing.cs" Link="SuperTrain6Editing.cs" />
     <Compile Include="../SecretBase6Fields.cs" Link="SecretBase6Fields.cs" />
     <Compile Include="../SecretBase6Pokemon.cs" Link="SecretBase6Pokemon.cs" />
     <Compile Include="../HallOfFame6Editing.cs" Link="HallOfFame6Editing.cs" />
