@@ -1,0 +1,99 @@
+.save-misc5-body,
+.save-misc5-fields,
+.save-misc5-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-misc5-fields {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.save-misc5-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-misc5-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-misc5-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-misc5-editor small {
+  font-size: 13px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+.save-misc5-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.save-misc5-editor .save-misc5-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-misc5-check input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  flex: none;
+}
+.save-misc5-pokemon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.save-misc5-pokemon img {
+  flex: none;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.save-misc5-preview {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+.save-misc5-preview h4 {
+  margin: 0;
+}
+.save-misc5-changes {
+  display: grid;
+  gap: 8px;
+  max-height: 22rem;
+  overflow: auto;
+}
+.save-misc5-raw {
+  max-height: 10rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.save-misc5-preview summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-misc5-preview summary:hover {
+  background: var(--surface-hover);
+}
+.save-misc5-preview summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+@media (max-width: 600px) {
+  .save-misc5-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,3 +1,6 @@
+import { Misc5Editor } from "./Misc5Editor";
+import { supportsMisc5 } from "./misc5";
+import { misc5Labels } from "./misc5Labels";
 import { Medals5Editor } from "./Medals5Editor";
 import { supportsMedals5 } from "./medals5";
 import { medals5Labels } from "./medals5Labels";
@@ -158,6 +161,7 @@ export function SaveEditorPanel(
     | "battleVideo4"
     | "geonet4"
     | "misc4"
+    | "misc5"
     | "medals5"
     | "globalLink5"
     | "dlc5"
@@ -306,6 +310,7 @@ export function SaveEditorPanel(
           !supportsBattleVideo4(result.report.format)) ||
         (previous === "geonet4" && !supportsGeonet4(result.report.format)) ||
         (previous === "misc4" && !supportsMisc4(result.report.format)) ||
+        (previous === "misc5" && !supportsMisc5(result.report.format)) ||
         (previous === "medals5" && !supportsMedals5(result.report.format)) ||
         (previous === "globalLink5" &&
           !supportsGlobalLink5(result.report.format)) ||
@@ -1034,6 +1039,57 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readMisc5 = async () => {
+    let c: import("./misc5").Misc5Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "misc5",
+      );
+      if (id !== operation.current) return;
+      if (!result.misc5) throw Error("No Misc5 catalog was returned.");
+      c = result.misc5;
+    });
+    return c;
+  };
+  const previewMisc5 = async (edit: import("./misc5").Misc5Edit) => {
+    let p: import("./misc5").Misc5Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "misc5Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.misc5Preview) throw Error("No Misc5 preview was returned.");
+      p = result.misc5Preview;
+    });
+    return p;
+  };
+  const exportMisc5 = () =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "misc5Export",
+      );
+      if (id !== operation.current) return;
+      if (!result.misc5File) throw Error("No Misc5 file was returned.");
+      const url = URL.createObjectURL(new Blob([result.misc5File]));
+      try {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "forest-city.fc5";
+        a.click();
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
+    });
+
   const readMedals5 = async () => {
     let c: import("./medals5").Medals5Catalog | undefined;
     await perform(async (id) => {
@@ -1605,6 +1661,7 @@ export function SaveEditorPanel(
       | import("./battleVideo4").Video4Import
       | import("./geonet4").Geo4Edit
       | import("./misc4").Misc4Edit
+      | import("./misc5").Misc5Edit
       | import("./medals5").Medals5Edit
       | import("./globalLink5").Gl5Edit
       | import("./dlc5").Dlc5Edit
@@ -1662,6 +1719,7 @@ export function SaveEditorPanel(
       | "video4Import"
       | "geonet4Edit"
       | "misc4Edit"
+      | "misc5Edit"
       | "medals5Edit"
       | "globalLink5Edit"
       | "dlc5Edit"
@@ -2160,6 +2218,15 @@ export function SaveEditorPanel(
                 {misc4Words[batchLang].title}
               </button>
             )}
+            {supportsMisc5(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "misc5"}
+                onClick={() => setSection("misc5")}
+              >
+                {misc5Labels[batchLang].title}
+              </button>
+            )}
             {supportsMedals5(report.format) && (
               <button
                 type="button"
@@ -2587,6 +2654,17 @@ export function SaveEditorPanel(
               onPreview={previewMisc4}
               onApply={(edit) => applyWorkingEdit(edit, "misc4Edit")}
               onRelated={setSection}
+            />
+          ) : section === "misc5" && supportsMisc5(report.format) ? (
+            <Misc5Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readMisc5}
+              onPreview={previewMisc5}
+              onExport={exportMisc5}
+              onApply={(edit) => applyWorkingEdit(edit, "misc5Edit")}
             />
           ) : section === "medals5" && supportsMedals5(report.format) ? (
             <Medals5Editor
