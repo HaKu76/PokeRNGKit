@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import { Select } from "../shared/Select";
 import {
   changeTrainerCountry,
+  trainerGeographyChoices,
   type OriginChoice,
   type SaveReport,
   type TrainerDraft,
@@ -12,24 +14,31 @@ export function TrainerGeographyFields({
   report,
   draft,
   onChange,
+  disabled = false,
 }: {
   report: SaveReport;
   draft: TrainerDraft;
   onChange(value: TrainerDraft): void;
+  disabled?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const words = t("saveEditor", {
     returnObjects: true,
   }) as typeof saveEditorResources.en;
   const geo = report.trainer.geography;
+  const [regionSource, setRegionSource] = useState(
+    String(geo?.value.country ?? 0),
+  );
   if (!geo) return null;
   const lang = i18n.language.startsWith("zh")
     ? "zh"
     : i18n.language.startsWith("ja")
       ? "ja"
       : "en";
-  const regions =
-    geo.regions.find((r) => String(r.country) === draft.country)?.choices ?? [];
+  const sourceGen6 = ["SAV6XY", "SAV6AO"].includes(report.format);
+  const shownCountry =
+    sourceGen6 && draft.country === "0" ? regionSource : draft.country;
+  const regions = trainerGeographyChoices(report, lang, shownCountry);
   const options = (choices: OriginChoice[], value: string) => (
     <>
       {!choices.some((c) => String(c.id) === value) && (
@@ -48,11 +57,23 @@ export function TrainerGeographyFields({
         <span>{words.historyCountry}</span>
         <Select
           value={draft.country}
-          onChange={(e) =>
-            onChange(changeTrainerCountry(draft, report, e.target.value))
-          }
+          disabled={disabled}
+          onChange={(e) => {
+            const country = e.target.value;
+            onChange(
+              changeTrainerCountry(
+                draft,
+                report,
+                country,
+                lang,
+                sourceGen6 ? shownCountry : draft.country,
+              ),
+            );
+            if (country !== "0" || !geo.keepRegionWhenCountryZero)
+              setRegionSource(country);
+          }}
         >
-          {options(geo.countries, draft.country)}
+          {options(trainerGeographyChoices(report, lang), draft.country)}
         </Select>
       </label>
       <label className="field">
@@ -60,7 +81,10 @@ export function TrainerGeographyFields({
         <Select
           value={draft.region}
           disabled={
-            (draft.country === "0" && geo.keepRegionWhenCountryZero) ||
+            disabled ||
+            (!sourceGen6 &&
+              draft.country === "0" &&
+              geo.keepRegionWhenCountryZero) ||
             regions.length === 0
           }
           onChange={(e) => onChange({ ...draft, region: e.target.value })}
@@ -73,6 +97,7 @@ export function TrainerGeographyFields({
           <span>{words.trainerConsoleRegion}</span>
           <Select
             value={draft.consoleRegion}
+            disabled={disabled}
             onChange={(e) =>
               onChange({ ...draft, consoleRegion: e.target.value })
             }

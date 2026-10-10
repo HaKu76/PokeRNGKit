@@ -1,12 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 using PKHeX.Core;
+using System.Globalization;
 namespace PokeRNGKit.SaveEditor;
 
-public sealed record SaveRecordEntry(int Index,string Name,int Value,int Max,int NormalMax,int Offset,string? TimeHint);
+public sealed record SaveRecordEntry(int Index,string Name,int Value,int Max,int NormalMax,int Offset,string? TimeHint,LocalizedText? TimeHintLocalized=null);
 public sealed record SaveRecordCatalog(SaveRecordEntry[] Entries);
 public sealed record SaveRecordEdit(int Index,int Value);
 internal static class SaveRecords
 {
+    private static LocalizedText LocalizedTime(int value,int bias)
+    {
+        int days=value/86400,remaining=value%86400;string clock=new TimeOnly(remaining*TimeSpan.TicksPerSecond).ToString("HH:mm:ss",CultureInfo.InvariantCulture);
+        // DateUtil uses the within-day remainder and an unchecked int addition. Preserve both.
+        string? date=bias<0?null:new DateTime(2000,1,1).AddSeconds(unchecked(remaining+bias)).ToString("yyyy-MM-dd HH:mm:ss",CultureInfo.InvariantCulture);
+        return new((days>0?days+"天 ":"")+clock+(date is null?"":"\n日期："+date),(days>0?days+"d ":"")+clock+(date is null?"":"\nDate: "+date),(days>0?days+"日 ":"")+clock+(date is null?"":"\n日時："+date));
+    }
     public static bool Supports(SaveFile save) => save is SAV6XY or SAV6AO or SAV7SM or SAV7USUM or SAV8SWSH or SAV8BS;
     public static SaveRecordCatalog Read(SaveFile save)
     {
@@ -17,7 +25,7 @@ internal static class SaveRecords
             int value=records.GetRecord(i),max=records.GetRecordMax(i);
             string? time= i==2 && save is SAV6 or SAV7 && value>=0
                 ? DateUtil.ConvertDateValueToString(value,save.SecondsToStart <= int.MaxValue ? (int)save.SecondsToStart : -1) : null;
-            return new SaveRecordEntry(i,names.GetValueOrDefault(i,i.ToString("D3")),value,Math.Max(value,max),max,records.GetRecordOffset(i),time);
+            return new SaveRecordEntry(i,names.GetValueOrDefault(i,i.ToString("D3")),value,Math.Max(value,max),max,records.GetRecordOffset(i),time,time is null?null:LocalizedTime(value,save.SecondsToStart<=int.MaxValue?(int)save.SecondsToStart:-1));
         }).ToArray());
     }
     public static string Snapshot(SaveFile save) => Convert.ToHexString(save switch {

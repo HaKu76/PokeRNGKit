@@ -14,6 +14,11 @@ export function itemImage(sprite: string) {
   );
 }
 
+// PKHeX.Drawing.Misc PlayerSpriteUtil uses tr_00 when the stored resource is absent.
+export function trainerImage(sprite: string) {
+  return url(sprite.startsWith("tr_") && assets[sprite] ? sprite : "tr_00");
+}
+
 // PKHeX.Drawing.Misc RibbonSpriteUtil and RibbonEditor numeric sprite rules.
 export function ribbonImage(
   key: string,

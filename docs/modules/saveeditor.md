@@ -545,13 +545,32 @@ API 117 已接 JSExport／独立 Worker／领域和三语浮动面板：全部�
 
 X／Y／OR／AS 核心专项已通过全部 32×2 地址、0／255 byte、三语解析、正负零／NaN payload／Infinity／极限／溢出／下溢、忽略输入、十二袋／全部候选／六种空洞计划、超界修复、共享名称缓存保护、隐藏区域、完整冻结文件对照和拒绝原子性。前端／客户端／领域／多语言专项 34 项与定向 Lint 通过；完整 verify 的 250 文件／995 项测试、格式、静态检查、类型及网页／PWA 打包通过。全套原生、API 118 核心构建、裁剪后 26 类型属性检查与新核心最终网页／PWA 打包均通过，预缓存 252 项；保留既有 Hook、JSExport、反射裁剪和网页体积／插件提示。浏览器连接仍返回 nodeRepl.fetch request failed，没有完成外部 Chrome 或真实存档验收。
 
-### 第六世代训练家完整窗口（来源复核，既有通用能力继续保留）
+### 第六世代训练家窗口（API 119，X／Y／ORAS 工程检查通过）
 
 已通读只读 `Gen6/SAV_Trainer.cs`，核对 Designer 的显式值，以及 MyStatus6、MaisonBlock、SubEventLog6XY、TrainerSprite6；先对照既有训练家姓名／ID／性别／时间／地区／徽章／对应点数／日期／坐标／XY 昵称与外观，避免重复新增。当前完整窗口仍需补五留言、二十 Maison 记录、XY 对战城堡、多人形象、Vivillon、Mega 标记、全窗口重新保存及 Ctrl+姓名的废字节操作。源窗口对 ORAS 移除 Appearance／Battle Chateau 页，AODemo 还移除 Multiplayer／Maison；当前产品该完整接入阶段不据 Demo 继承关系直接开放未核对模块。
 
 五留言控件 MaxLength 16，MyStatus6 从 0x7C 起、步长 0x22 bytes，Core ClearZero setter；二十 Maison 记录从块内 0x1C0 起、步长 2，按五对战模式各四 UInt16 排列。GUI 全部四位数字掩码并绑定 ChangeFFFF，不能拿 Core UInt16 上限代替可输入四位；旧五位值、空输入事件与 ushort.Parse 的保存行为仍需独立对照。XY 城堡等级读取 clamp 到枚举列表、改等级自动设置来源点数 0／5／30／100／300／1000，点数 NUD 0–4095；Core Rank 低四位、Points 高十二位共享 UInt16，各 setter 保护另一项。
 
-多人形象控件在 Designer 禁用后于构造函数对非 Demo 重新启用；候选必须按枚举数组的实际前缀构造，XY 的 max 是 `(int)TrainerSprite6.Trevor` 而非按编号过滤，枚举存在 17／25 空洞，不能假设此值等于最后候选的编号。Mega 两标记为 Status 0x14A bit0／bit1；Rayquaza 勾选只在 ORAS 显示，但源 Save 两种状态都调用 setter。窗口保存无条件 ResetPlayerModel，重写五留言／Maison／Sprite／XY 外观与昵称；坐标仅 GB_Map.Enabled && MapUpdated 时写；姓名仅实际变化才写，分钟／秒取模 60，当前里程同时写记录 63／64，最后保存时间秒归零。既有 TrainerCurrencies 已在修改里程时同时写记录 63／64；TrainerSpatialPosition 已按十八倍缩放与六位小数提供 X／Y 0–65535、Z ±65535、地图 0–1000 与朝向 0–7，不能重复新增。当前 TrainerAppearance6 仅昵称与外观字段，尚无 GiveAllAccessories；Situation.Style 的三位掩码／Change255／byte.Parse 保存也未接入。PlayerSpriteUtil 对 IMultiplayerSprite 使用 tr_{编号:00}，图片缺失回退 tr_00；来源图片位于 PKHeX.Drawing.Misc/Resources/img/Trainer Sprites。FieldMoveModelSave6 每 0x108 bytes 查首个 0x43 标记，模型字段在该记录 +0x8 的 UInt16，无标记时重设无操作；默认模型 XY 男／女 2／1、ORAS 172／171。Fashion6XY.UnlockAllAccessories 复制固定来源字节序列，不能替换成全块填 FF。完整重保存的副作用、字段适用性、三语候选、图片与独立夹具尚待继续核对，当前未改训练家产品代码。
+多人形象控件在 Designer 禁用后于构造函数对非 Demo 重新启用；候选必须按枚举数组的实际前缀构造，XY 的 max 是 `(int)TrainerSprite6.Trevor` 而非按编号过滤，枚举存在 17／25 空洞，不能假设此值等于最后候选的编号。Mega 两标记为 Status 0x14A bit0／bit1；Rayquaza 勾选只在 ORAS 显示，但源 Save 两种状态都调用 setter。窗口保存无条件 ResetPlayerModel，重写五留言／Maison／Sprite／XY 外观与昵称；坐标仅 GB_Map.Enabled && MapUpdated 时写；姓名仅实际变化才写，分钟／秒取模 60，当前里程同时写记录 63／64，最后保存时间秒归零。既有 TrainerCurrencies 已在修改里程时同时写记录 63／64；TrainerSpatialPosition 已按十八倍缩放与六位小数提供 X／Y 0–65535、Z ±65535、地图 0–1000 与朝向 0–7，不能重复新增。当前 TrainerAppearance6 仅昵称与外观字段，尚无 GiveAllAccessories；Situation.Style 的三位掩码／Change255／byte.Parse 保存也未接入。PlayerSpriteUtil 对 IMultiplayerSprite 使用 tr_{编号:00}，图片缺失回退 tr_00；来源图片位于 PKHeX.Drawing.Misc/Resources/img/Trainer Sprites。FieldMoveModelSave6 每 0x108 bytes 查首个 0x43 标记，模型字段在该记录 +0x8 的 UInt16，无标记时重设无操作；默认模型 XY 男／女 2／1、ORAS 172／171。Fashion6XY.UnlockAllAccessories 复制固定来源字节序列，不能替换成全块填 FF。已新增独立接入路径和合成四版本／两性别夹具，已列出的字段与来源重保存通过完整文件对照；通用基础输入、专属提示和生产验收继续核对，不把这个阶段当作完整窗口完成。
+
+API 119 新增 Trainer6Editing、三语界面与 Worker 路由，嵌入既有训练家入口并互锁两组草稿。五条留言输入最多十六 UTF16 字符，允许空字符串；普通补丁只调用指定 setter，整窗重新保存才重新编码全部留言。二十 Maison 控件四位十进制 0–9999，空输入按 ChangeFFFF 恢复零；用当前公开 .NET MaskedTextBox.Replace 的逐字处理及 MaskedTextProvider 核对，旧 65535 加载为 6553。Style 三位输入经 Change255 截顶 255。数值候选保留真实编号，XY 前 36 个枚举项实际包含 Brendan 37；未知旧值读取显示，普通修改不顺带修正。
+
+XY 完整外观属性另增明确窗口路径，复用既有逐项绑定。普通 UInt32 用 UInt32Converter，枚举用对应 EnumConverter，允许上游类型转换后的值交给 Core 截位；请求预览显示真实写入结果。全字段均显式列出，生产不通过反射发现属性；既有 API 47 的受存储位宽限制的常规入口继续保留。属性文本请求保护上限 32767，不声称这是源 PropertyGrid 的硬输入上限。完整男／女公开属性、极值／十六进制／负枚举／来源名称已与原生来源类型转换及独立 setter 对照，裁剪后运行时元数据与浏览器仍待验证。
+
+姓名废字节提供 prepare／text／hex／clear／layer：26 bytes、52 位十六进制；文本最多十二字符，三十四个源私用字符可追加，名称层使用全部源种类、Gen6 语言和世代 0–100。来源先将当前姓名编码到原字节，文本修改只覆盖写入长度，清除只处理终止符之后，层仅在可见姓名之后覆盖；未知字节与未指定字段保持。整窗保存预览显示实际字段、模型、里程／时间／地区／日期及原始姓名字节。
+
+训练家图片使用未修改 PlayerSpriteUtil 资源 tr_00 等 76 张 PNG，来自同一固定来源 ResX；导入脚本、哈希与本地键映射随源码分发。三语窗口／城堡标签逐字读取固定 WinForms 资源，原版没有 TrainerSprite6 翻译时保留它实际使用的枚举名称。普通字段修改、来源整窗保存、时装及废字节分别冻结源／目标完整哈希；读取和预览不返回工作副本，只有确认应用写入。
+
+位置新增独立来源保存路径：X／Z／Y 从 `(decimal)(float / 18.0)` 加载，完整保留底层 Value 的精度，显示六位小数；地图／朝向显示零位但并非 Value 强制为整数。当前公开 [.NET NumericUpDown](https://raw.githubusercontent.com/dotnet/winforms/main/src/System.Windows.Forms/System/Windows/Forms/Controls/UpDown/NumericUpDown.cs) 的 ParseEditText 使用当前文化 decimal.Parse 后 Constrain，失败保持旧 Value；DecimalPlaces 只控制显示。接入请求使用明确 UI 语言，允许 Source NumberStyles.Number 文本，超界截到 M 0–1000、R 0–7、X／Y 0–65535、Z ±65535；空值／失败显示忽略项。只有实际 decimal Value 改变，才按来源顺序保存 M／X／Z／Y／R 及全部镜像，M／R cast 截去小数。五字段文本统一 32767 字符请求保护，不声称这是 Designer 显式上限。旧浮点 NaN／Infinity／超界导致来源 GB_Map 禁用；读取保持原始位，位置分组禁用，普通其他字段修改继续保护它们。
+
+国家和地区现在携带三语的源列表 ID 顺序，直接使用 Util.GetCountryRegionList 的 CompareOrdinal，不用浏览器区域排序推测。第一空项位置保持，Source SetCountrySubRegion 仅保留旧地区索引大于零且仍有效的情况；国家零保留前一正国家的地区列表，初次零国家则列表为空。保存后的重新读取按新源窗口初始化列表，未知旧编号仍显示并保持，改变国家时按来源实际索引选择新值。
+
+日期再次核对发现：SAV_Trainer 直接将完整日期时间设为 DateTimePicker.Value，而 Designer MaxDate 是 2050-12-31 00:00:00。[.NET DateTimePicker](https://raw.githubusercontent.com/dotnet/winforms/main/src/System.Windows.Forms/System/Windows/Forms/Controls/DateTimePicker/DateTimePicker.cs) 的 Value setter 比较完整时间；因此来源整窗重新载入旧日期后保存，不接受末日午夜之后的值，不能仅用 Year <= 2050 判断。既有底层日期编辑可表示范围继续保留，来源整窗操作独立验证实际载入约束；真实控件行为和产品浏览器验收仍待所有者核验。
+
+剧情记录的旧 TimeHint 已存在，新增三语 TimeHintLocalized 展示，保留旧字符串供兼容与源码对照。沿用 DateUtil 的“天数 + 日内时间”，日期偏移使用日内余数而非完整耗时，整数相加按源 unchecked 行为；未提供可用 bias 时只显示耗时。四版本独立完整文件对照含所有位置字段／三语解析／精度／镜像、三语国家与全部地区顺序、日期载入边界及剧情日期，工程专项已通过；这不是实际游戏存档或浏览器验收。
+补充基础输入来源证据：Designer 的 MT_TID／MT_SID 都是五位掩码，TextChanged 明确绑定 ChangeFFFF，空值恢复 0、超过 65535 截为 65535，因此不能只看到 Save 的 ushort cast 就推断发生回绕；MouseHover 绑定 ShowTSV，提示使用 (TID ^ SID) >> 4 并显示四位。姓名 TextBox 最大十二字符，Save 仅在姓名变化时写，没有非空检查。最大金钱按钮把掩码输入设为 9,999,999。已在 Gen6 通用入口增加空姓名、ID 即时规范化、最大金钱和四位 TSV 悬停提示，金钱空值按源 Util.ToUInt32 取零。其他格式的名称与 ID 规则保持；扩展四版本原生完整输出专项、最后类型和定向 Lint 已通过。
+
+当前四版本及两种外观布局工程专项通过，基础 Worker 接线、三语、领域与客户端及外观文本转发专项 36 项、当时类型与定向 Lint 通过。后续基础输入扩展前端专项 38 项通过，更新后的四版本原生／类型及定向 Lint 已通过。当前 API 119 核心构建／裁剪检查仍在原进程运行；尚未完成整轮 verify、原生及最终网页。枚举绑定明确保留 PublicFields 元数据，后续裁剪构建仍待验证。四个完整版本的跨字段地区、日期／脏坐标与专属记录提示已补齐并专项核对；最终全套 verify 的 251 文件／1013 项测试、格式／Lint／类型和网页／PWA、全套原生、API 119 核心构建、裁剪后 26 类型属性检查及最新核心的最终网页／PWA 打包均通过。保留既有 Hook、JSExport、反射裁剪与网页体积／插件提示；外部 Chrome 仍连接失败，真实存档和所有者验收待完成。SAV6AODemo 没有 ISaveBlock6Main／IMultiplayerSprite，源窗口的 Multiplayer（包含留言／Mega）与 Maison 页移除，但 Overview 的 Vivillon 仍显示，试玩版范围尚未开放。它的十六块 Accessor 给出 Situation 0x1000／0x150、Status 0x3C00／0x170、Party 0x3E00、Records 0x5400／0x25C；未初始化 Box 地址，HasBox 为假，不能把 SAV6 基类名义 BoxCount 31 当真实盒数。当前通用箱子报告尚需在试玩版接入时修正，当前未扩展试玩版产品代码。四个完整版本按工程通过记录，最后格式收尾后依已有授权提交推送；试玩版继续保留待接入状态。
 
 ## HGSS 宝可全能竞技（API 98）
 

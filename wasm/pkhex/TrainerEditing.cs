@@ -7,7 +7,9 @@ public sealed record TrainerEdit(string Ot, ushort Tid, ushort Sid, uint Money,
     int? Gender = null, int? Hours = null, int? Minutes = null, int? Seconds = null, int? Language = null,
     int? Country = null, int? Region = null, int? ConsoleRegion = null, int? Badges = null, TrainerCurrencyEdit? Currencies = null, TrainerGameOptionEdit? GameOptions = null, TrainerPositionEdit? Position = null, TrainerDateEdit? Dates = null, TrainerSpatialEdit? SpatialPosition = null, int? GameVersion = null, TrainerAppearance6Edit? Appearance6 = null);
 public sealed record TrainerLocation(int Country, int Region, int? ConsoleRegion);
-public sealed record TrainerGeography(TrainerLocation Value, OriginChoice[] Countries, GeoRegions[] Regions, OriginChoice[] Consoles, bool KeepRegionWhenCountryZero);
+public sealed record TrainerGeoRegionOrder(int Country,int[] Ids);
+public sealed record TrainerGeoOrder(string Language,int[] Countries,TrainerGeoRegionOrder[] Regions);
+public sealed record TrainerGeography(TrainerLocation Value, OriginChoice[] Countries, GeoRegions[] Regions, OriginChoice[] Consoles, bool KeepRegionWhenCountryZero,TrainerGeoOrder[]? Orders=null);
 public sealed record TrainerOptions(bool CanGender, bool CanPlayTime, int Hours, int Minutes, int Seconds, OriginChoice[] Languages, TrainerGeography? Geography, TrainerBadgeState? Badges, TrainerCurrencyField[] Currencies, bool CanRecords, TrainerGameOptionState? GameOptions, TrainerPositionState? Position, TrainerDateField[] Dates, TrainerSpatialField[] SpatialPosition, TrainerGameVersionState GameVersion, TrainerAppearance6State? Appearance6);
 internal sealed record TrainerSnapshot(string Ot, ushort Tid, ushort Sid, uint Money, byte Gender, int Hours, int Minutes, int Seconds, string? Appearance, int Language, uint? RuntimeLanguage, TrainerLocation? Location, TrainerBadgeState? Badges, string Currencies, TrainerGameOptionState? GameOptions, TrainerPositionSnapshot? Position, TrainerDateSnapshot? Dates, string? SpatialPosition, GameVersion Version, string? Appearance6);
 
@@ -29,7 +31,8 @@ internal static class TrainerEditing
     {
         SAV4 => new(Location(save)!, GeographicCatalog.Gen4Countries.Value, GeographicCatalog.Gen4Regions.Value, [], false),
         SAV5 => new(Location(save)!, GeographicCatalog.Gen5Countries.Value, GeographicCatalog.Gen5Regions.Value, [], false),
-        SAV6XY or SAV6AO or SAV7SM or SAV7USUM => new(Location(save)!, GeographicCatalog.Countries.Value, GeographicCatalog.Regions.Value, Consoles.Value, true),
+        SAV6XY or SAV6AO => new(Location(save)!, GeographicCatalog.Countries.Value, GeographicCatalog.Regions.Value, Consoles.Value, true,GeographicCatalog.Gen6Orders.Value),
+        SAV7SM or SAV7USUM => new(Location(save)!, GeographicCatalog.Countries.Value, GeographicCatalog.Regions.Value, Consoles.Value, true),
         _ => null,
     };
     internal static OriginChoice[] Languages(SaveFile save)
@@ -49,8 +52,9 @@ internal static class TrainerEditing
     {
         var options = Options(save);
         var maxName = save is SAV3 { Japanese: true } ? 5 : save.MaxStringLengthTrainer;
-        if (string.IsNullOrEmpty(edit.Ot) || edit.Ot.Length > maxName || edit.Ot.Any(char.IsControl))
-            throw new ArgumentException($"Trainer name must contain 1–{maxName} supported characters.");
+        int minName = save is SAV6XY or SAV6AO ? 0 : 1;
+        if (edit.Ot is null || edit.Ot.Length < minName || edit.Ot.Length > maxName || edit.Ot.Any(char.IsControl))
+            throw new ArgumentException($"Trainer name must contain {minName}–{maxName} supported characters.");
         if (edit.Money > save.MaxMoney) throw new ArgumentException($"Money must be between 0 and {save.MaxMoney}.");
         if (edit.Gender.HasValue && (!options.CanGender || edit.Gender is < 0 or > 1))
             throw new ArgumentException("Trainer gender must be 0 or 1 for this format.");

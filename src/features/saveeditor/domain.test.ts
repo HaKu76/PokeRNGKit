@@ -6,6 +6,7 @@ import {
   trainerDraft,
   rebaseTrainerDraft,
   changeTrainerCountry,
+  trainerGeographyChoices,
   validateTrainer,
   validateSaveRecord,
   parsePokemonHex,
@@ -14,7 +15,7 @@ import {
 
 export const emeraldReport: SaveReport = {
   pokedex: { kind: "simple", canEdit: true },
-  apiVersion: 118,
+  apiVersion: 119,
   trainer: {
     appearance6: null,
     gameVersion: { value: 3, choices: [] },
@@ -990,5 +991,78 @@ describe("save editor boundaries", () => {
   it("always exports a distinct filename", () => {
     expect(exportSaveName("main")).toBe("edited-main");
     expect(exportSaveName("../trainer.sav")).toBe("edited-.._trainer.sav");
+  });
+  it("uses the active language's source geography order and keeps the prior list across country zero", () => {
+    const choice = (id: number) => ({
+      id,
+      name: { zh: String(id), en: String(id), ja: String(id) },
+    });
+    const report: SaveReport = {
+      ...emeraldReport,
+      format: "SAV6XY",
+      generation: 6,
+      trainer: {
+        ...emeraldReport.trainer,
+        geography: {
+          value: { country: 1, region: 20, consoleRegion: 1 },
+          keepRegionWhenCountryZero: true,
+          consoles: [],
+          countries: [0, 1, 2].map(choice),
+          regions: [
+            { country: 0, choices: [choice(0)] },
+            { country: 1, choices: [0, 10, 20].map(choice) },
+            { country: 2, choices: [0, 30, 40].map(choice) },
+          ],
+          orders: [
+            {
+              language: "zh",
+              countries: [0, 1, 2],
+              regions: [
+                { country: 0, ids: [] },
+                { country: 1, ids: [0, 10, 20] },
+                { country: 2, ids: [0, 30, 40] },
+              ],
+            },
+            {
+              language: "ja",
+              countries: [0, 2, 1],
+              regions: [
+                { country: 0, ids: [] },
+                { country: 1, ids: [0, 20, 10] },
+                { country: 2, ids: [0, 30, 40] },
+              ],
+            },
+          ],
+        },
+      },
+    };
+    const draft = trainerDraft(report);
+    expect(trainerGeographyChoices(report, "ja").map((v) => v.id)).toEqual([
+      0, 2, 1,
+    ]);
+    expect(trainerGeographyChoices(report, "zh", "0")).toEqual([]);
+    expect(changeTrainerCountry(draft, report, "2", "zh").region).toBe("40");
+    expect(changeTrainerCountry(draft, report, "2", "ja").region).toBe("30");
+    const zero = changeTrainerCountry(draft, report, "0", "ja");
+    expect(zero.region).toBe("20");
+    expect(changeTrainerCountry(zero, report, "2", "ja", "1").region).toBe(
+      "30",
+    );
+    expect(changeTrainerCountry(zero, report, "2", "ja").region).toBe("0");
+  });
+  it("allows the source trainer window's empty name only for full Generation VI saves", () => {
+    const report = emeraldReport;
+    for (const format of ["SAV6XY", "SAV6AO"]) {
+      const gen6 = { ...report, format, generation: 6, maxNameLength: 12 };
+      expect(
+        validateTrainer({ ...trainerDraft(gen6), money: "" }, gen6).money,
+      ).toBe(0);
+      expect(validateTrainer({ ...trainerDraft(gen6), ot: "" }, gen6).ot).toBe(
+        "",
+      );
+    }
+    expect(() =>
+      validateTrainer({ ...trainerDraft(report), ot: "" }, report),
+    ).toThrow();
   });
 });

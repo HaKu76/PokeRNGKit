@@ -18,6 +18,7 @@ internal static class GeographicCatalog
         return lists[0].Keys.Select(id => new OriginChoice(id, new(lists[0][id], lists[1][id], lists[2][id]))).ToArray();
     }
     internal static readonly Lazy<OriginChoice[]> Countries = new(() => Choices("countries"));
+    internal static readonly Lazy<TrainerGeoOrder[]> Gen6Orders=new(()=>new[]{("zh","zh-Hans"),("en","en"),("ja","ja")}.Select(l=>new TrainerGeoOrder(l.Item1,Util.GetCountryRegionList("countries",l.Item2).Select(v=>v.Value).ToArray(),Countries.Value.Select(c=>new TrainerGeoRegionOrder(c.Id,c.Id==0?[]:Util.GetCountryRegionList($"sr_{c.Id:000}",l.Item2).Select(v=>v.Value).ToArray())).ToArray())).ToArray());
     internal static readonly Lazy<GeoRegions[]> Regions = new(() => Countries.Value.Select(c => new GeoRegions(c.Id, c.Id == 0 ? [new(0, new("—", "—", "—"))] : Choices($"sr_{c.Id:000}"))).ToArray());
     internal static readonly Lazy<OriginChoice[]> Gen4Countries = new(() => Choices("gen4_countries"));
     internal static readonly Lazy<OriginChoice[]> Gen5Countries = new(() => Choices("gen5_countries"));

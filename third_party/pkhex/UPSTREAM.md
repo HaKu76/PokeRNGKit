@@ -34,3 +34,5 @@ into the distribution legal folder. This adaptation does not modify the upstream
 ## Item resources (2026-09-27)
 
 606 unmodified classic item PNGs (303,893 bytes) from `PKHeX.Drawing.PokeSprite/Resources/img/Big Items/` are included locally. `scripts/import-pkhex-item-art.mjs` imports the `bitem_` file references from the same archive's `Properties/Resources.resx`, extending both artwork manifests with resource keys and SHA-256 values. The inventory adapter follows `SAV_Inventory.UpdateSprite` and `SpriteBuilder.GetItemSprite`, calling Core's `ItemConverter.GetItemDisplay` and `HeldItemLumpUtil` for generation conversion and TM/TR selection. All formats use the classic sprite collection; the optional artwork-style collection is not included. Empty slots have no image, and missing keys use the upstream unknown-item sprite. The same GPL terms and artwork attribution above apply.
+
+2026-10-10：使用同一只读来源的 PKHeX.Drawing.Misc Resources.resx，导入 76 张未修改训练家 PNG（34762 bytes）。脚本为 scripts/import-pkhex-trainer-art.mjs；资源键、源路径与 SHA-256 使用既有两个 artwork manifest。Trainer6Names.cs 的窗口与城堡三语标签来自同版本 WinForms lang_zh-Hans／en／ja；缺少的头像枚举翻译沿用源窗口的实际名称。没有修改 Core、引入远程图片或运行时 CDN。

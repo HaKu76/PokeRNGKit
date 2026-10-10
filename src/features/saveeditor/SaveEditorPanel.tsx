@@ -37,6 +37,8 @@ import { Gen7PokedexEditor } from "./Gen7PokedexEditor";
 import { FlagPokedexEditor } from "./FlagPokedexEditor";
 import { Gen4PokedexEditor } from "./Gen4PokedexEditor";
 import { SimplePokedexEditor } from "./SimplePokedexEditor";
+import { Trainer6Editor } from "./Trainer6Editor";
+import { supportsTrainer6, tr6IdInput, tr6Tsv } from "./trainer6";
 import { TrainerAppearance6Fields } from "./TrainerAppearance6Fields";
 import { TrainerDateFields } from "./TrainerDateFields";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -246,6 +248,8 @@ export function SaveEditorPanel(
     minutes: "",
     seconds: "",
   });
+  const [trainer6Draft, setTrainer6Draft] = useState(false);
+  const [geographyReset, setGeographyReset] = useState(0);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [version, setVersion] = useState("");
@@ -1284,6 +1288,37 @@ export function SaveEditorPanel(
     });
     return p;
   };
+  const readTrainer6 = async () => {
+    let c: import("./trainer6").Tr6Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "trainer6",
+      );
+      if (id !== operation.current) return;
+      if (!result.trainer6) throw Error("No Trainer6 catalog was returned.");
+      c = result.trainer6;
+    });
+    return c;
+  };
+  const previewTrainer6 = async (edit: import("./trainer6").Tr6Edit) => {
+    let p: import("./trainer6").Tr6Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "trainer6Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.trainer6Preview)
+        throw Error("No Trainer6 preview was returned.");
+      p = result.trainer6Preview;
+    });
+    return p;
+  };
   const readSuperTrain6 = async () => {
     let c: import("./superTrain6").St6Catalog | undefined;
     await perform(async (id) => {
@@ -1978,6 +2013,7 @@ export function SaveEditorPanel(
       | import("./misc5").Misc5Edit
       | import("./medals5").Medals5Edit
       | import("./avenue5").Avenue5Edit
+      | import("./trainer6").Tr6Edit
       | import("./superTrain6").St6Edit
       | import("./secretBase6").Sb6Edit
       | import("./link6").Link6Edit
@@ -2042,6 +2078,7 @@ export function SaveEditorPanel(
       | "misc5Edit"
       | "medals5Edit"
       | "avenue5Edit"
+      | "trainer6Edit"
       | "superTrain6Edit"
       | "secretBase6Edit"
       | "link6Edit"
@@ -3396,7 +3433,7 @@ export function SaveEditorPanel(
                 </p>
               )}
               <fieldset
-                disabled={busy || !report.canEdit}
+                disabled={busy || !report.canEdit || trainer6Draft}
                 className="save-editor-fields"
               >
                 <legend>{words.trainer}</legend>
@@ -3415,16 +3452,45 @@ export function SaveEditorPanel(
                     ["money", words.money, report.maxMoney],
                   ] as const
                 ).map(([key, label, max]) => (
-                  <label className="field" key={key}>
+                  <label
+                    className={
+                      key === "money" && supportsTrainer6(report.format)
+                        ? "field save-trainer6-money"
+                        : "field"
+                    }
+                    key={key}
+                  >
                     <span>{label}</span>
                     <input
                       inputMode="numeric"
                       value={draft[key]}
                       maxLength={String(max).length}
+                      title={
+                        supportsTrainer6(report.format) && key !== "money"
+                          ? `TSV: ${tr6Tsv(draft.tid, draft.sid)}`
+                          : undefined
+                      }
                       onChange={(e) =>
-                        setDraft({ ...draft, [key]: e.target.value })
+                        setDraft({
+                          ...draft,
+                          [key]:
+                            supportsTrainer6(report.format) && key !== "money"
+                              ? tr6IdInput(e.target.value)
+                              : e.target.value,
+                        })
                       }
                     />
+                    {key === "money" && supportsTrainer6(report.format) && (
+                      <button
+                        type="button"
+                        aria-label={`${label}: ${max}`}
+                        onClick={() =>
+                          setDraft({ ...draft, money: String(max) })
+                        }
+                      >
+                        +
+                      </button>
+                    )}
                   </label>
                 ))}
                 {report.trainer.gameVersion.choices.length > 0 && (
@@ -3516,8 +3582,10 @@ export function SaveEditorPanel(
                   </label>
                 ))}
                 <TrainerGeographyFields
+                  key={`${name}:${fileRevision}:${workingRevision}:${geographyReset}`}
                   report={report}
                   draft={draft}
+                  disabled={busy || !report.canEdit || trainer6Draft}
                   onChange={setDraft}
                 />
                 {report.trainer.canGender && (
@@ -3563,7 +3631,7 @@ export function SaveEditorPanel(
               {report.trainer.badges && (
                 <fieldset
                   className="save-editor-fields save-trainer-badges"
-                  disabled={busy || !report.canEdit}
+                  disabled={busy || !report.canEdit || trainer6Draft}
                 >
                   <legend>{words.trainerBadges}</legend>
                   {Array.from(
@@ -3596,25 +3664,25 @@ export function SaveEditorPanel(
               <TrainerGameOptionFields
                 report={report}
                 draft={draft}
-                disabled={busy || !report.canEdit}
+                disabled={busy || !report.canEdit || trainer6Draft}
                 onChange={setDraft}
               />
               <TrainerAppearance6Fields
                 report={report}
                 draft={draft}
-                disabled={busy || !report.canEdit}
+                disabled={busy || !report.canEdit || trainer6Draft}
                 onChange={setDraft}
               />
               <TrainerDateFields
                 report={report}
                 draft={draft}
-                disabled={busy || !report.canEdit}
+                disabled={busy || !report.canEdit || trainer6Draft}
                 onChange={setDraft}
               />
               <TrainerPositionFields
                 report={report}
                 draft={draft}
-                disabled={busy || !report.canEdit}
+                disabled={busy || !report.canEdit || trainer6Draft}
                 onChange={setDraft}
               />
               <p className="save-editor-note">{words.ids}</p>
@@ -3636,6 +3704,7 @@ export function SaveEditorPanel(
                   disabled={
                     busy ||
                     !report.canEdit ||
+                    trainer6Draft ||
                     trainerDraftMatches(draft, report)
                   }
                   onClick={() =>
@@ -3649,15 +3718,28 @@ export function SaveEditorPanel(
                 </button>
                 <button
                   type="button"
-                  disabled={busy || !report.canEdit}
+                  disabled={busy || !report.canEdit || trainer6Draft}
                   onClick={() => {
                     setDraft(trainerDraft(report));
+                    setGeographyReset((value) => value + 1);
                     setError("");
                   }}
                 >
                   <RotateCcw size={18} aria-hidden="true" /> {words.reset}
                 </button>
               </div>
+              {supportsTrainer6(report.format) && (
+                <Trainer6Editor
+                  key={`${name}:${fileRevision}:${report.format}`}
+                  revision={workingRevision}
+                  busy={busy || !trainerDraftMatches(draft, report)}
+                  lang={batchLang}
+                  onRead={readTrainer6}
+                  onPreview={previewTrainer6}
+                  onApply={(edit) => applyWorkingEdit(edit, "trainer6Edit")}
+                  onDirtyChange={setTrainer6Draft}
+                />
+              )}
               <section
                 className="save-editor-profile"
                 aria-label={t("profile")}

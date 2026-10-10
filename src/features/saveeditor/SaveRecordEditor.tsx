@@ -99,7 +99,12 @@ function RecordForm({
   disabled: boolean;
   onApply(edit: SaveRecordEdit): Promise<void>;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const hintLanguage = i18n.language.startsWith("zh")
+    ? "zh"
+    : i18n.language.startsWith("ja")
+      ? "ja"
+      : "en";
   const words = t("saveEditor", {
     returnObjects: true,
   }) as typeof saveEditorResources.en;
@@ -139,8 +144,9 @@ function RecordForm({
         <p className="save-editor-note">{words.recordsNegative}</p>
       )}
       {entry.timeHint && (
-        <p className="save-editor-note">
-          {words.recordsTime}: {entry.timeHint}
+        <p className="save-editor-note" style={{ whiteSpace: "pre-line" }}>
+          {words.recordsTime}:{" "}
+          {entry.timeHintLocalized?.[hintLanguage] ?? entry.timeHint}
         </p>
       )}
       <details>

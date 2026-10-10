@@ -1,0 +1,76 @@
+.save-trainer6-body {
+  display: grid;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 22px;
+}
+.save-trainer6-body > p {
+  margin: 0;
+}
+.save-editor-fields .save-trainer6-money {
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: end;
+}
+.save-editor-fields .save-trainer6-money > span {
+  grid-column: 1 / -1;
+}
+.save-trainer6-body label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-trainer6-body label > span {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-trainer6-grid {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+  min-width: 0;
+}
+.save-trainer6-image {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.save-trainer6-image img {
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.save-trainer6-characters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.save-trainer6-characters button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.save-trainer6-note {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--muted);
+}
+.save-trainer6-preview {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.save-trainer6-preview p,
+.save-trainer6-preview h4 {
+  margin: 0;
+}
+.save-trainer6-preview code {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+@media (max-width: 540px) {
+  .save-trainer6-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

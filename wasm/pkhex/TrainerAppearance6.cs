@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 using PKHeX.Core;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PokeRNGKit.SaveEditor;
 
@@ -10,12 +12,19 @@ public sealed record TrainerAppearance6Edit(int Gender, string? Nickname = null,
 
 internal static class TrainerAppearance6
 {
-    private sealed record Binding(TrainerAppearanceField Field, Action<uint> Set);
-    private static Binding Number(string key, uint max, Func<uint> get, Action<uint> set) => new(new(key, get(), max, []), set);
-    private static Binding Boolean(string key, Func<bool> get, Action<bool> set) => new(new(key, get() ? 1u : 0, 1, [new(0, "Off"), new(1, "On")]), v => set(v == 1));
-    private static Binding EnumField<T>(string key, uint max, Func<T> get, Action<T> set) where T : struct, Enum => new(
+    private sealed record Binding(TrainerAppearanceField Field, Action<uint> Set, Func<string,uint> Parse);
+    private static Binding Number(string key, uint max, Func<uint> get, Action<uint> set) => new(new(key, get(), max, []), set, text => (uint)new UInt32Converter().ConvertFromInvariantString(text)!);
+    private static Binding Boolean(string key, Func<bool> get, Action<bool> set) => new(new(key, get() ? 1u : 0, 1, [new(0, "Off"), new(1, "On")]), v => set(v == 1), text => text switch{"0"=>0,"1"=>1,_=>throw new ArgumentException("Invalid Trainer6 appearance boolean.")});
+    private static Binding EnumField<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] T>(string key, uint max, Func<T> get, Action<T> set) where T : struct, Enum => new(
         new(key, Convert.ToUInt32(get()), max, Enum.GetValues<T>().Select(v => new TrainerAppearanceChoice(Convert.ToUInt32(v), v.ToString())).ToArray()),
-        v => set((T)Enum.ToObject(typeof(T), v)));
+        v => set((T)Enum.ToObject(typeof(T), v)), text => unchecked((uint)Convert.ToInt64(new EnumConverter(typeof(T)).ConvertFromInvariantString(text)!)));
+    internal static Tr6Field[] WindowFields(SAV6XY save)=>Fields(save.Status.Fashion).Select(b=>new Tr6Field("Appearance."+b.Field.Key,"appearance",new(b.Field.Key,b.Field.Key,b.Field.Key),b.Field.Value.ToString(System.Globalization.CultureInfo.InvariantCulture),b.Field.Key=="Contacts"?"choice":"property",32767,b.Field.Choices.Length==0?0:int.MinValue,b.Field.Choices.Length==0?uint.MaxValue:int.MaxValue,b.Field.Choices.Select(v=>new OriginChoice((int)v.Id,new(v.Name,v.Name,v.Name))).ToArray())).ToArray();
+    internal static void WindowApply(SAV6XY save,Tr6Value[] rows)
+    {
+        var fashion=save.Status.Fashion;var bindings=Fields(fashion).ToDictionary(v=>"Appearance."+v.Field.Key);var setters=new List<(Binding Binding,uint Value)>();
+        foreach(var row in rows){if(!bindings.TryGetValue(row.Key,out var b)||row.Value.Length>32767)throw new ArgumentException("Invalid Trainer6 appearance property.");uint value;try{value=b.Parse(row.Value);}catch(Exception e)when(e is FormatException or ArgumentException or OverflowException){throw new ArgumentException("Invalid Trainer6 appearance property value.",e);}setters.Add((b,value));}
+        foreach(var (b,value) in setters)b.Set(value);save.Status.Fashion=fashion;
+    }
     private static Binding[] Fields(TrainerFashion6 fashion) => fashion switch { Fashion6Male m => Fields(m), Fashion6Female f => Fields(f), _ => [] };
     public static TrainerAppearance6State? Read(SaveFile save) => save is SAV6XY xy ? new(xy.Status.Nickname, xy.Gender, Fields(xy.Status.Fashion).Select(b => b.Field).ToArray()) : null;
     public static string? Snapshot(SaveFile save) => save is SAV6XY xy ? Convert.ToHexString(xy.Status.Data.Slice(0x30, 16)) + Convert.ToHexString(xy.Status.Data.Slice(0x62, 26)) : null;

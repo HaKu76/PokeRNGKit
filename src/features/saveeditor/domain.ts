@@ -60,7 +60,7 @@ export interface SaveReport {
       | "za";
     canEdit: boolean;
   } | null;
-  apiVersion: 118;
+  apiVersion: 119;
   attributeChoices: {
     natures: LocalizedText[];
     items: LocalizedText[];
@@ -95,6 +95,13 @@ export interface SaveReport {
     geography: {
       value: { country: number; region: number; consoleRegion: number | null };
       keepRegionWhenCountryZero: boolean;
+      orders?:
+        | {
+            language: string;
+            countries: number[];
+            regions: { country: number; ids: number[] }[];
+          }[]
+        | null;
       countries: OriginChoice[];
       regions: { country: number; choices: OriginChoice[] }[];
       consoles: OriginChoice[];
@@ -362,16 +369,18 @@ export function rebaseTrainerDraft(
 export function validateTrainer(draft: TrainerDraft, report: SaveReport) {
   if (!report.canEdit || !report.checksumsValid)
     throw new Error("This save is read-only.");
+  const minName = ["SAV6XY", "SAV6AO"].includes(report.format) ? 0 : 1;
   if (
-    !draft.ot ||
+    draft.ot.length < minName ||
     draft.ot.length > report.maxNameLength ||
     [...draft.ot].some(
       (char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127,
     )
   ) {
-    throw new Error(`OT: 1–${report.maxNameLength} characters.`);
+    throw new Error(`OT: ${minName}–${report.maxNameLength} characters.`);
   }
   const integer = (text: string, max: number, label: string) => {
+    if (minName === 0 && label === "Money" && text === "") return 0;
     if (!/^\d+$/.test(text) || Number(text) > max)
       throw new Error(`${label}: 0–${max}.`);
     return Number(text);
@@ -531,6 +540,8 @@ export function changeTrainerCountry(
   draft: TrainerDraft,
   report: SaveReport,
   country: string,
+  language = "zh",
+  regionSource = draft.country,
 ): TrainerDraft {
   const geo = report.trainer.geography;
   if (!geo || country === draft.country) return draft;
@@ -538,16 +549,37 @@ export function changeTrainerCountry(
   // 3DS country zero preserves the region; NDS rebuilds its default list instead.
   if (country === "0" && geo.keepRegionWhenCountryZero)
     return { ...draft, country };
-  const old =
-    geo.regions.find((r) => String(r.country) === draft.country)?.choices ?? [];
-  const next =
-    geo.regions.find((r) => String(r.country) === country)?.choices ?? [];
+  const old = trainerGeographyChoices(report, language, regionSource);
+  const next = trainerGeographyChoices(report, language, country);
   const index = old.findIndex((c) => String(c.id) === draft.region);
   return {
     ...draft,
     country,
     region: String(next[index > 0 && index < next.length ? index : 0]?.id ?? 0),
   };
+}
+export function trainerGeographyChoices(
+  report: SaveReport,
+  language: string,
+  country?: string,
+): OriginChoice[] {
+  const geo = report.trainer.geography;
+  if (!geo) return [];
+  const choices =
+    country === undefined
+      ? geo.countries
+      : (geo.regions.find((r) => String(r.country) === country)?.choices ?? []);
+  const order = geo.orders?.find((v) => v.language === language);
+  if (!order) return choices;
+  const ids =
+    country === undefined
+      ? order.countries
+      : (order.regions.find((v) => String(v.country) === country)?.ids ?? []);
+  const byId = new Map(choices.map((v) => [v.id, v]));
+  return ids.flatMap((id) => {
+    const v = byId.get(id);
+    return v ? [v] : [];
+  });
 }
 
 // Grouped game IDs are deliberately not resolved to one arbitrary game.
@@ -800,6 +832,8 @@ export interface SaveEditorResult {
   avenue5?: import("./avenue5").Avenue5Catalog;
   avenue5Preview?: import("./avenue5").Avenue5Preview;
   avenue5File?: Uint8Array<ArrayBuffer>;
+  trainer6?: import("./trainer6").Tr6Catalog;
+  trainer6Preview?: import("./trainer6").Tr6Preview;
   superTrain6?: import("./superTrain6").St6Catalog;
   superTrain6Preview?: import("./superTrain6").St6Preview;
   secretBase6?: import("./secretBase6").Sb6Catalog;
@@ -855,6 +889,7 @@ export interface SaveRecordEntry {
   normalMax: number;
   offset: number;
   timeHint: string | null;
+  timeHintLocalized?: LocalizedText | null;
 }
 export interface SaveRecordCatalog {
   entries: SaveRecordEntry[];
