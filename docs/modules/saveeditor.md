@@ -513,7 +513,7 @@ Designer 永久禁用来源、启用勾选、六道具候选和六数量输入�
 
 LinkEntity6 从 PL6 0x09D 起，共六段 0xA0 bytes、步长 0xA8；六道具／数量从 0x489 起、步长 4；BP／里程为 0x4A1／0x4A3。完整实体原始数据只读，不从种类文字框推断独立宝可梦编辑器。源码为只读 PKHeX 26.08.26 的 `PKHeX.WinForms/Subforms/Save Editors/Gen6/SAV_Link6.cs`／`.Designer.cs`、`PKHeX.Core/Saves/Substructures/Gen6/LinkBlock6.cs`、`PKHeX.Core/MysteryGifts/PL6.cs`（内含 LinkEntity6）和两份 SaveBlockAccessor6；三语控件文字来自 `PKHeX.WinForms/Resources/text/lang_zh-Hans.txt`、`lang_en.txt`、`lang_ja.txt`。X／Y／OR／AS 原生完整文件对照通过，前端／客户端／领域／多语言专项 33 项及定向 Lint 通过；完整 verify 的 248 文件／973 项测试与网页／PWA、全套原生、API 116 核心构建、裁剪后 26 类型属性检查和新核心最终网页／PWA 打包均通过。Vitest 退出清理提示已记入进度，不据正常终止前的观察超时重复运行；外部 Chrome 与真实存档核验仍待完成。
 
-### 第六世代秘密基地（来源核对，尚未接入）
+### 第六世代秘密基地（API 117，工程检查通过）
 
 已通读只读来源 `PKHeX.WinForms/Subforms/Save Editors/Gen6/SAV_SecretBase.cs`，核对 Designer 显式范围、`PKHeX.Core/Saves/Substructures/Gen6/SecretBase6Block.cs`、`SecretBase/SecretBase6.cs`／`SecretBase6PKM.cs`／`SecretBase6GoodPlacement.cs`／`SecretBase6GoodStock.cs`、RecordBlock6 与 SaveBlockAccessor6AO。仅 SAV6AO，实际块 54、基址 0x23A00、长 0x7AD0；自身一份 0x310-byte 在块内 0x324，其他三十份 0x3E0-byte 从 0x638 起。每基地二十八摆设，其他基地各三格 0x34-byte 对战队伍。导入只接受自身／其他两种精确大小；目标为自身时截取共同 0x310 bytes，其他目标读入自身文件时只替换共同部分，尾部队伍等旧值保持。导出先 SaveCurrent；删除拒绝自身，移动后续其他基地并清末项。
 
@@ -521,7 +521,23 @@ LinkEntity6 从 PL6 0x09D 起，共六段 0xA0 bytes、步长 0xA8；六道具�
 
 队伍来源候选使用目标存档 FilteredSources 的 Ball／Items／Species／Nature／Moves，形态由 FormConverter 与 AO 个人数据产生，特性候选按当前种类／形态的个人数据生成，AbilityNumber 保存 SelectedIndex 左移一位。EC 最大八字符并经 Util.GetHexValue，忽略非 ASCII 十六进制字符、空值为零；IV 为两位数字掩码，保存 Convert.ToByte 后与 31；EV 为三位数字掩码，Convert.ToInt32 后 clamp 0–252；等级与亲密度三位掩码并 Convert.ToByte。四个 PP Ups 下拉在 Designer 均仅有 0／1／2／3，保存 SelectedIndex。空掩码转换、未知旧值与来源完整重保存仍需专门核对。性别／形态／特性联动与固定性别必须匹配来源；IsShiny 和 IsEgg 在 Core 都操作 0x2D bit5，窗口只有异色控制，不得误当成互相独立的存储位。
 
-旗标记录绑定 Records 编号 80，GUI 0–UInt32.MaxValue，来源保存先 cast UInt32 再 cast Int32；RecordBlock6AO 编号 80 最大类型 0，对正值上限 999999999 截顶，负 Int32 不截下限。不能用看似合理的十亿上限替代 GUI 允许值或忽略高位转换，预览必须呈现实际保存值。给予全部摆设调用 GiveAllGoods：前 173 库存写完整 UInt32 值 25 | (1 << 16)，其余 27 库存不变；当前窗口未提供逐库存编辑。三语资源已定位到 lang_zh-Hans／en／ja 的 SAV_SecretBase 键。属性表、能力／候选／输入转换与完整文件夹具仍待继续核对，当前没有新增秘密基地产品代码。
+旗标记录绑定 Records 编号 80，GUI 0–UInt32.MaxValue，来源保存先 cast UInt32 再 cast Int32；RecordBlock6AO 编号 80 最大类型 0，对正值上限 999999999 截顶，负 Int32 不截下限。不能用看似合理的十亿上限替代 GUI 允许值或忽略高位转换，预览必须呈现实际保存值。给予全部摆设调用 GiveAllGoods：前 173 库存写完整 UInt32 值 25 | (1 << 16)，其余 27 库存不变；当前窗口未提供逐库存编辑。三语资源已定位到 lang_zh-Hans／en／ja 的 SAV_SecretBase 键。
+
+新增 SecretBase6Editing／SecretBase6Fields／SecretBase6Pokemon 核心目录、明确补丁、来源重新保存、sb6 文件和完整 SHA-256 冻结预览。自身公开可写属性十五项，其他基地再加 Language／Gender；使用显式类型 setter 与数字转换器接入全部属性，不依赖运行时反射发现字段。属性数字按 Byte／UInt32／Int32 的标准属性转换器处理，地点的 1／2→0 与 -1／85 截顶、IsNew 的两字节重写、文字的十二／十六字符存储和 Rank 的枚举／Int32 输入在预览呈现。属性文字的产品输入上限 32767 是应用保护，不冒充上游 Core 的存储长度。原生夹具通过公共可写属性反射名单核对接入完整度。
+
+队伍目录保留全部三十一控件字段、旧属性值与 0x34 bytes，派生种类／形态／特性候选缓存按存档版本生成；普通明确修改只写指定内容及必要种类／形态／特性／性别联动，不能借此改写旧 PID、Sanity／Checksum 或蛋状态。来源重新保存只规范化当前选中摆设与其他基地的当前队伍格位，同时提交记录 80，不遍历修改所有基地和所有队伍。重新保存还包括两位 IV 掩码截取、EV clamp、未知选择值转 -1 后的位宽转换、能力槽重写及性别显示恢复；无法被来源载入的 PP Ups／种类／形态拒绝该操作，仍可读取和明确修复。文件导出按来源 SaveCurrent 在临时副本中规范化当前格位，输出对应 0x310／0x3E0 bytes，不改当前工作副本、不提交记录 80；文件导入按来源 Load 的共同／完整复制处理。
+
+OR／AS 新专项覆盖全部 31 基地、828 摆设、90 队伍，全部属性类型／转换、旗标边界、173 库存、三十删除位置与两种文件大小，使用独立字节地址或来源属性转换器构造完整文件对照，并检查原件、目标摘要、完整导出及无效请求原子性。首轮在双性别目录调用 FixedGender 时失败，已改为只对固定性别种类调用，修正专项通过。后续复核修正种类／形态变更时未知特性编号的第一槽恢复，扩展专项通过；全部三十一队伍控件的两端／字节地址、雌雄形态联动与负旧记录也已通过扩展专项。源码固定，没有删减覆盖或修改预期避开失败。
+
+API 117 已接 JSExport／独立 Worker／领域和三语浮动面板：全部属性、只读派生状态、二十八摆设与只读参数、三格本地图像队伍、常规／招式／个体努力值、记录、文件与批量均可访问。草稿锁定所属基地／模式／格位，同一目标内允许保留草稿切换属性／字段分组；只读读取／预览／文件导出分支不返回工作副本，只有确认应用返回新存档。预览包括实际属性、摆设、成员、异色／蛋联动、记录的 signed／unsigned 值、移动后的全部基地、库存原始标记和完整字节变化。数字属性支持源类型转换器的十六进制输入；掩码输入按实际字符位宽验证，保存转换交给 Core。前端／客户端／领域／多语言专项 36 项及定向 Lint 通过，完整 verify 的 249 文件／985 项测试与网页／PWA、全套原生、API 117 核心构建、裁剪后 26 类型属性检查和新核心最终网页／PWA 打包均通过；外部 Chrome 和真实存档仍待核验。
+
+### 第六世代超级训练（来源核对，尚未接入）
+
+已通读只读 `PKHeX.WinForms/Subforms/Save Editors/Gen6/SAV_SuperTrain.cs`，核对 Designer、`PKHeX.Core/Saves/Substructures/Gen6/SuperTrainBlock.cs` 与两份 SaveBlockAccessor6。X／Y 和 ORAS 均为块 46，基址 0x1F200／0x20200，长度 0x318。窗口只列前 32 个阶段，每项两组种类／形态／性别／Single 时间，另有十二个训练袋；Core 实际有 48 组，未显示的后十六组、解锁标记、分发标记、Counter 与教程 tracker 不得被普通修改顺带重写或当作窗口现有控制。
+
+两组时间从 0x08／0xC8 起、步长 4；两组 holder 从 0x188／0x248 起、步长 4，依次 UInt16 种类、独立 byte 形态、独立 byte 性别，不是常见宝可梦的 packed 位。种类使用目标存档 FilteredSources.Species。形态／性别虽然用 MaskedTextBox，但 Designer 未设置 Mask 或显式 MaxLength，回调只是 byte.TryParse，实际写入可成功的 0–255，不能按性别 0–2 或当前种类形态数代替源输入。时间读取用 InvariantCulture，回调 float.TryParse 未显式传 Culture，失败／空值保持原有数据；没有正数范围或时间截顶，三语解析、NaN／Infinity／旧 float 原始位仍需继续核对。
+
+训练袋从 0x308 起共十二 byte。窗口把当前语言 trainingbags[0] 改成 `---`，候选只加入非空名称，保存以完整名称数组 IndexOf 查回编号，可能受重复名称影响。B_Save 只把非空袋向前压紧，不清除尾部旧格位；全部选择空袋也没有清空循环，不能实现为清零十二格或稳定过滤后补零。静态接入应克隆名称数组而非修改共享缓存，并在预览明确显示来源打包后的真实十二格。Core 的 GetOpenBagIndex／AddBag、ClearBlock／ClearRecord／UnlockAllStages 不由此窗口调用，不能据方法存在声称它们是该窗口的现成功能。三语 SAV_SuperTrain 控件键与 Core trainingstage／trainingbags 资源已定位；完整候选、输入转换及独立夹具为下一步，当前未改超级训练产品代码。
 
 ## HGSS 宝可全能竞技（API 98）
 

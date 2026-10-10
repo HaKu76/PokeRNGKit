@@ -1,3 +1,6 @@
+import { SecretBase6Editor } from "./SecretBase6Editor";
+import { supportsSecretBase6 } from "./secretBase6";
+import { sb6Words } from "./secretBase6Words";
 import { Link6Editor } from "./Link6Editor";
 import { supportsLink6 } from "./link6";
 import { link6Words } from "./link6Words";
@@ -177,6 +180,7 @@ export function SaveEditorPanel(
     | "medals5"
     | "berryField6xy"
     | "avenue5"
+    | "secretBase6"
     | "link6"
     | "hall6"
     | "unityTower5"
@@ -332,6 +336,8 @@ export function SaveEditorPanel(
         (previous === "berryField6xy" &&
           !supportsBerryField6XY(result.report.format)) ||
         (previous === "avenue5" && !supportsAvenue5(result.report.format)) ||
+        (previous === "secretBase6" &&
+          !supportsSecretBase6(result.report.format)) ||
         (previous === "link6" && !supportsLink6(result.report.format)) ||
         (previous === "hall6" && !supportsHall6(result.report.format)) ||
         (previous === "unityTower5" &&
@@ -1322,6 +1328,62 @@ export function SaveEditorPanel(
         setTimeout(() => URL.revokeObjectURL(url), 0);
       }
     });
+  const readSecretBase6 = async () => {
+    let c: import("./secretBase6").Sb6Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "secretBase6",
+      );
+      if (id !== operation.current) return;
+      if (!result.secretBase6)
+        throw Error("No SecretBase6 catalog was returned.");
+      c = result.secretBase6;
+    });
+    return c;
+  };
+  const previewSecretBase6 = async (edit: import("./secretBase6").Sb6Edit) => {
+    let p: import("./secretBase6").Sb6Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "secretBase6Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.secretBase6Preview)
+        throw Error("No SecretBase6 preview was returned.");
+      p = result.secretBase6Preview;
+    });
+    return p;
+  };
+  const exportSecretBase6 = (
+    edit: import("./secretBase6").Sb6Edit,
+    fileName: string,
+  ) =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "secretBase6Export",
+      );
+      if (id !== operation.current) return;
+      if (!result.secretBase6File)
+        throw Error("No SecretBase6 file was returned.");
+      const url = URL.createObjectURL(new Blob([result.secretBase6File]));
+      try {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
+    });
   const readUnityTower5 = async () => {
     let c: import("./unityTower5").Tower5Catalog | undefined;
     await perform(async (id) => {
@@ -1878,6 +1940,7 @@ export function SaveEditorPanel(
       | import("./misc5").Misc5Edit
       | import("./medals5").Medals5Edit
       | import("./avenue5").Avenue5Edit
+      | import("./secretBase6").Sb6Edit
       | import("./link6").Link6Edit
       | import("./hall6").Hall6Edit
       | import("./unityTower5").Tower5Edit
@@ -1940,6 +2003,7 @@ export function SaveEditorPanel(
       | "misc5Edit"
       | "medals5Edit"
       | "avenue5Edit"
+      | "secretBase6Edit"
       | "link6Edit"
       | "hall6Edit"
       | "unityTower5Edit"
@@ -2476,6 +2540,15 @@ export function SaveEditorPanel(
                 {avenue5Words[batchLang].title}
               </button>
             )}
+            {supportsSecretBase6(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "secretBase6"}
+                onClick={() => setSection("secretBase6")}
+              >
+                {sb6Words[batchLang].title}
+              </button>
+            )}
             {supportsLink6(report.format) && (
               <button
                 type="button"
@@ -2962,6 +3035,18 @@ export function SaveEditorPanel(
               onPreview={previewAvenue5}
               onApply={(edit) => applyWorkingEdit(edit, "avenue5Edit")}
               onExport={exportAvenue5}
+            />
+          ) : section === "secretBase6" &&
+            supportsSecretBase6(report.format) ? (
+            <SecretBase6Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readSecretBase6}
+              onPreview={previewSecretBase6}
+              onApply={(edit) => applyWorkingEdit(edit, "secretBase6Edit")}
+              onExport={exportSecretBase6}
             />
           ) : section === "link6" && supportsLink6(report.format) ? (
             <Link6Editor

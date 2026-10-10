@@ -32,6 +32,9 @@
     <Compile Include="../Medals5Editing.cs" Link="Medals5Editing.cs" />
     <Compile Include="../Misc5Editing.cs" Link="Misc5Editing.cs" />
     <Compile Include="../Link6Editing.cs" Link="Link6Editing.cs" />
+    <Compile Include="../SecretBase6Editing.cs" Link="SecretBase6Editing.cs" />
+    <Compile Include="../SecretBase6Fields.cs" Link="SecretBase6Fields.cs" />
+    <Compile Include="../SecretBase6Pokemon.cs" Link="SecretBase6Pokemon.cs" />
     <Compile Include="../HallOfFame6Editing.cs" Link="HallOfFame6Editing.cs" />
     <Compile Include="../Hall6TrashEditing.cs" Link="Hall6TrashEditing.cs" />
     <Compile Include="../BerryField6XYReading.cs" Link="BerryField6XYReading.cs" />
