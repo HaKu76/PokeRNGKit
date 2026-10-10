@@ -1,3 +1,6 @@
+import { Medals5Editor } from "./Medals5Editor";
+import { supportsMedals5 } from "./medals5";
+import { medals5Labels } from "./medals5Labels";
 import { GlobalLink5Editor } from "./GlobalLink5Editor";
 import { gl5Words, supportsGlobalLink5 } from "./globalLink5";
 import { Dlc5Editor } from "./Dlc5Editor";
@@ -155,6 +158,7 @@ export function SaveEditorPanel(
     | "battleVideo4"
     | "geonet4"
     | "misc4"
+    | "medals5"
     | "globalLink5"
     | "dlc5"
     | "cgear5"
@@ -302,6 +306,7 @@ export function SaveEditorPanel(
           !supportsBattleVideo4(result.report.format)) ||
         (previous === "geonet4" && !supportsGeonet4(result.report.format)) ||
         (previous === "misc4" && !supportsMisc4(result.report.format)) ||
+        (previous === "medals5" && !supportsMedals5(result.report.format)) ||
         (previous === "globalLink5" &&
           !supportsGlobalLink5(result.report.format)) ||
         (previous === "dlc5" && !supportsDlc5(result.report.format)) ||
@@ -1029,6 +1034,58 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readMedals5 = async () => {
+    let c: import("./medals5").Medals5Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "medals5",
+      );
+      if (id !== operation.current) return;
+      if (!result.medals5) throw Error("No Medals5 catalog was returned.");
+      c = result.medals5;
+    });
+    return c;
+  };
+  const previewMedals5 = async (edit: import("./medals5").Medals5Edit) => {
+    let p: import("./medals5").Medals5Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "medals5Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.medals5Preview)
+        throw Error("No Medals5 preview was returned.");
+      p = result.medals5Preview;
+    });
+    return p;
+  };
+  const exportMedals5 = () =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "medals5Export",
+      );
+      if (id !== operation.current) return;
+      if (!result.medals5File) throw Error("No Medals5 file was returned.");
+      const url = URL.createObjectURL(new Blob([result.medals5File]));
+      try {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "medals.ml5";
+        a.click();
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
+    });
+
   const readGlobalLink5 = async () => {
     let c: import("./globalLink5").Gl5Catalog | undefined;
     await perform(async (id) => {
@@ -1548,6 +1605,7 @@ export function SaveEditorPanel(
       | import("./battleVideo4").Video4Import
       | import("./geonet4").Geo4Edit
       | import("./misc4").Misc4Edit
+      | import("./medals5").Medals5Edit
       | import("./globalLink5").Gl5Edit
       | import("./dlc5").Dlc5Edit
       | import("./cgear5").CGear5Edit
@@ -1604,6 +1662,7 @@ export function SaveEditorPanel(
       | "video4Import"
       | "geonet4Edit"
       | "misc4Edit"
+      | "medals5Edit"
       | "globalLink5Edit"
       | "dlc5Edit"
       | "cgear5Edit"
@@ -2101,6 +2160,15 @@ export function SaveEditorPanel(
                 {misc4Words[batchLang].title}
               </button>
             )}
+            {supportsMedals5(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "medals5"}
+                onClick={() => setSection("medals5")}
+              >
+                {medals5Labels[batchLang].title}
+              </button>
+            )}
             {supportsGlobalLink5(report.format) && (
               <button
                 type="button"
@@ -2519,6 +2587,17 @@ export function SaveEditorPanel(
               onPreview={previewMisc4}
               onApply={(edit) => applyWorkingEdit(edit, "misc4Edit")}
               onRelated={setSection}
+            />
+          ) : section === "medals5" && supportsMedals5(report.format) ? (
+            <Medals5Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readMedals5}
+              onPreview={previewMedals5}
+              onExport={exportMedals5}
+              onApply={(edit) => applyWorkingEdit(edit, "medals5Edit")}
             />
           ) : section === "globalLink5" &&
             supportsGlobalLink5(report.format) ? (

@@ -19,7 +19,7 @@ internal static class GsBall2Tests
             foreach(int length in jp?new[]{0x10000}:new[]{0x8000,0x10000})
             {
                 using(var report=JsonDocument.Parse(SaveService.Inspect(full[..length])))
-                    Check(report.RootElement.GetProperty("version").GetString()=="C" && report.RootElement.GetProperty("apiVersion").GetInt32() == 109,"Public report matches frontend Crystal gate and protocol");
+                    Check(report.RootElement.GetProperty("version").GetString()=="C" && report.RootElement.GetProperty("apiVersion").GetInt32() == 110,"Public report matches frontend Crystal gate and protocol");
                 foreach(byte a in new byte[]{0,1,0x0B,255})foreach(byte b in new byte[]{0,1,0x0B,255})
                 {
                     var s=Open(full[..length]);s.Data[primary]=a;s.Data[backup]=b;

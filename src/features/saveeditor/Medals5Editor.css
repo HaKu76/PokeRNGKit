@@ -1,0 +1,96 @@
+.save-medals5-body,
+.save-medals5-fields,
+.save-medals5-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-medals5-fields {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.save-medals5-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-medals5-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-medals5-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-medals5-editor small {
+  font-size: 13px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+.save-medals5-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.save-medals5-editor .save-medals5-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-medals5-check input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  flex: none;
+}
+.save-medals5-selection {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 4px;
+  max-height: 16rem;
+  overflow: auto;
+}
+.save-medals5-batch,
+.save-medals5-preview {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+.save-medals5-editor summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-medals5-editor summary:hover {
+  background: var(--surface-hover);
+}
+.save-medals5-editor summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-medals5-preview h4 {
+  margin: 0;
+}
+.save-medals5-changes {
+  display: grid;
+  gap: 8px;
+  max-height: 20rem;
+  overflow: auto;
+}
+.save-medals5-raw {
+  max-height: 10rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .save-medals5-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
