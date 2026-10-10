@@ -96,6 +96,10 @@ interface SaveExports {
         ReadMisc4(data: Uint8Array): string;
         PreviewMisc4(data: Uint8Array, json: string): string;
         EditMisc4(data: Uint8Array, json: string): Uint8Array;
+        ReadDlc5(data: Uint8Array): string;
+        PreviewDlc5(data: Uint8Array, json: string): string;
+        EditDlc5(data: Uint8Array, json: string): Uint8Array;
+        ExportDlc5(data: Uint8Array, json: string): string;
         ReadCGear5(data: Uint8Array): string;
         PreviewCGear5(data: Uint8Array, json: string): string;
         EditCGear5(data: Uint8Array, json: string): Uint8Array;
@@ -258,6 +262,10 @@ self.addEventListener(
         | "misc4"
         | "misc4Preview"
         | "misc4Edit"
+        | "dlc5"
+        | "dlc5Preview"
+        | "dlc5Edit"
+        | "dlc5Export"
         | "cgear5"
         | "cgear5Preview"
         | "cgear5Edit"
@@ -332,7 +340,7 @@ self.addEventListener(
         const report: SaveReport = JSON.parse(
           api.SelectBRProfile(bytes, profile),
         );
-        if (report.apiVersion !== 107)
+        if (report.apiVersion !== 108)
           throw new Error("Save editor API version mismatch.");
         self.postMessage({ id, report });
         return;
@@ -343,7 +351,7 @@ self.addEventListener(
         const before: StandalonePokemonReport = JSON.parse(
           api.InspectStandalonePokemon(bytes, payload),
         );
-        if (before.apiVersion !== 107)
+        if (before.apiVersion !== 108)
           throw new Error("Save editor API version mismatch.");
         const output =
           kind === "entityGb"
@@ -387,7 +395,7 @@ self.addEventListener(
       }
       if (kind?.startsWith("boxBinary")) {
         const before: SaveReport = JSON.parse(api.Inspect(bytes));
-        if (before.apiVersion !== 107)
+        if (before.apiVersion !== 108)
           throw new Error("Save editor API version mismatch.");
         if (kind === "boxBinaryDiscard") api.DiscardBoxBinary(payload);
         const output =
@@ -415,7 +423,7 @@ self.addEventListener(
       }
       if (kind?.startsWith("boxImport")) {
         const before: SaveReport = JSON.parse(api.Inspect(bytes));
-        if (before.apiVersion !== 107)
+        if (before.apiVersion !== 108)
           throw new Error("Save editor API version mismatch.");
         if (kind === "boxImportDiscard") api.DiscardBoxImport(payload);
         const output =
@@ -438,7 +446,7 @@ self.addEventListener(
       }
       if (kind?.startsWith("file") || kind === "boxArchive") {
         const report: SaveReport = JSON.parse(api.Inspect(bytes));
-        if (report.apiVersion !== 107)
+        if (report.apiVersion !== 108)
           throw new Error("Save editor API version mismatch.");
         if (kind === "fileDiscard") api.DiscardFileBatch(payload);
         const archive =
@@ -466,13 +474,64 @@ self.addEventListener(
         return;
       }
       if (
+        kind === "dlc5" ||
+        kind === "dlc5Preview" ||
+        kind === "dlc5Edit" ||
+        kind === "dlc5Export"
+      ) {
+        const before: SaveReport = JSON.parse(api.Inspect(bytes));
+        if (before.apiVersion !== 108)
+          throw Error("Save editor API version mismatch.");
+        function dlcCall<T>(action: () => T): T {
+          try {
+            return action();
+          } catch (error) {
+            throw Error(
+              "Dlc5: " +
+                (error instanceof Error ? error.message : String(error)),
+              { cause: error },
+            );
+          }
+        }
+        const output =
+          kind === "dlc5Edit"
+            ? Uint8Array.from(dlcCall(() => api.EditDlc5(bytes, payload)))
+            : undefined;
+        const report: SaveReport = output
+          ? JSON.parse(api.Inspect(output))
+          : before;
+        if (report.apiVersion !== 108)
+          throw Error("Save editor API version mismatch.");
+        self.postMessage(
+          {
+            id,
+            report,
+            output,
+            dlc5:
+              kind === "dlc5"
+                ? JSON.parse(dlcCall(() => api.ReadDlc5(bytes)))
+                : undefined,
+            dlc5Preview:
+              kind === "dlc5Preview"
+                ? JSON.parse(dlcCall(() => api.PreviewDlc5(bytes, payload)))
+                : undefined,
+            dlc5File:
+              kind === "dlc5Export"
+                ? JSON.parse(dlcCall(() => api.ExportDlc5(bytes, payload)))
+                : undefined,
+          },
+          output ? [output.buffer] : [],
+        );
+        return;
+      }
+      if (
         kind === "cgear5" ||
         kind === "cgear5Preview" ||
         kind === "cgear5Edit" ||
         kind === "cgear5Export"
       ) {
         const before: SaveReport = JSON.parse(api.Inspect(bytes));
-        if (before.apiVersion !== 107)
+        if (before.apiVersion !== 108)
           throw Error("Save editor API version mismatch.");
         function cgearCall<T>(action: () => T): T {
           try {
@@ -496,7 +555,7 @@ self.addEventListener(
         const report: SaveReport = output
           ? JSON.parse(api.Inspect(output))
           : before;
-        if (report.apiVersion !== 107)
+        if (report.apiVersion !== 108)
           throw Error("Save editor API version mismatch.");
         self.postMessage(
           {
@@ -806,7 +865,7 @@ self.addEventListener(
                                                                                                                 ),
             );
       const report: SaveReport = JSON.parse(api.Inspect(output ?? bytes));
-      if (report.apiVersion !== 107)
+      if (report.apiVersion !== 108)
         throw new Error("Save editor API version mismatch.");
       const legality: PokemonLegalityReport | undefined =
         kind === "legality" && edit !== undefined

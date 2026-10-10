@@ -1,3 +1,5 @@
+import { Dlc5Editor } from "./Dlc5Editor";
+import { dlc5Words, supportsDlc5 } from "./dlc5";
 import { CGear5Editor } from "./CGear5Editor";
 import { cgear5Words, supportsCGear5 } from "./cgear5";
 import { ZaPokedexEditor } from "./ZaPokedexEditor";
@@ -151,6 +153,7 @@ export function SaveEditorPanel(
     | "battleVideo4"
     | "geonet4"
     | "misc4"
+    | "dlc5"
     | "cgear5"
     | "underground4"
     | "honeyTree4"
@@ -296,6 +299,7 @@ export function SaveEditorPanel(
           !supportsBattleVideo4(result.report.format)) ||
         (previous === "geonet4" && !supportsGeonet4(result.report.format)) ||
         (previous === "misc4" && !supportsMisc4(result.report.format)) ||
+        (previous === "dlc5" && !supportsDlc5(result.report.format)) ||
         (previous === "cgear5" && !supportsCGear5(result.report.format)) ||
         (previous === "underground4" &&
           !supportsUnderground4(result.report.format)) ||
@@ -1020,6 +1024,58 @@ export function SaveEditorPanel(
     return catalog;
   };
 
+  const readDlc5 = async () => {
+    let c: import("./dlc5").Dlc5Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "dlc5",
+      );
+      if (id !== operation.current) return;
+      if (!result.dlc5) throw Error("No Dlc5 catalog was returned.");
+      c = result.dlc5;
+    });
+    return c;
+  };
+  const previewDlc5 = async (edit: import("./dlc5").Dlc5Edit) => {
+    let p: import("./dlc5").Dlc5Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "dlc5Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.dlc5Preview) throw Error("No Dlc5 preview was returned.");
+      p = result.dlc5Preview;
+    });
+    return p;
+  };
+  const exportDlc5 = (query: import("./dlc5").Dlc5Export) =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(query),
+        "dlc5Export",
+      );
+      if (id !== operation.current) return;
+      if (!result.dlc5File) throw Error("No Dlc5 file was returned.");
+      const binary = atob(result.dlc5File.data),
+        bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+      const url = URL.createObjectURL(new Blob([bytes]));
+      try {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = result.dlc5File.fileName;
+        a.click();
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
+    });
   const readCGear5 = async () => {
     let catalog: import("./cgear5").CGear5Catalog | undefined;
     await perform(async (id) => {
@@ -1455,6 +1511,7 @@ export function SaveEditorPanel(
       | import("./battleVideo4").Video4Import
       | import("./geonet4").Geo4Edit
       | import("./misc4").Misc4Edit
+      | import("./dlc5").Dlc5Edit
       | import("./cgear5").CGear5Edit
       | import("./underground4").Ug4Edit
       | import("./honeyTree4").Honey4Edit
@@ -1509,6 +1566,7 @@ export function SaveEditorPanel(
       | "video4Import"
       | "geonet4Edit"
       | "misc4Edit"
+      | "dlc5Edit"
       | "cgear5Edit"
       | "underground4Edit"
       | "honeyTree4Edit"
@@ -2004,6 +2062,15 @@ export function SaveEditorPanel(
                 {misc4Words[batchLang].title}
               </button>
             )}
+            {supportsDlc5(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "dlc5"}
+                onClick={() => setSection("dlc5")}
+              >
+                {dlc5Words[batchLang].title}
+              </button>
+            )}
             {supportsCGear5(report.format) && (
               <button
                 type="button"
@@ -2404,6 +2471,18 @@ export function SaveEditorPanel(
               onPreview={previewMisc4}
               onApply={(edit) => applyWorkingEdit(edit, "misc4Edit")}
               onRelated={setSection}
+            />
+          ) : section === "dlc5" && supportsDlc5(report.format) ? (
+            <Dlc5Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readDlc5}
+              onPreview={previewDlc5}
+              onApply={(edit) => applyWorkingEdit(edit, "dlc5Edit")}
+              onExport={exportDlc5}
+              onCGear={() => setSection("cgear5")}
             />
           ) : section === "cgear5" && supportsCGear5(report.format) ? (
             <CGear5Editor

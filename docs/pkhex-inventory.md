@@ -376,7 +376,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueSettingsEditor.cs`          | 待核对                                                             |
 | `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueVisitorSpecificEditor.cs`   | 待核对                                                             |
 | `Subforms/Save Editors/Gen5/Join Avenue/SAV_JoinAvenue.cs`                    | 待核对                                                             |
-| `Subforms/Save Editors/Gen5/SAV_DLC5.cs`                                      | API 107 接入 C-Gear；其余分组 Core／三语已核对，夹具及接入待完成   |
+| `Subforms/Save Editors/Gen5/SAV_DLC5.cs`                                      | API 108：七类文件、图像队伍、导入导出与预览工程通过；浏览器待核验  |
 | `Subforms/Save Editors/Gen5/SAV_GlobalLink5.cs`                               | 待核对                                                             |
 | `Subforms/Save Editors/Gen5/SAV_Medals5.cs`                                   | 待核对                                                             |
 | `Subforms/Save Editors/Gen5/SAV_Misc5.cs`                                     | 待核对                                                             |

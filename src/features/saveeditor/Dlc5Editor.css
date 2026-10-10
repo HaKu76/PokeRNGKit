@@ -1,0 +1,117 @@
+.save-dlc5-body,
+.save-dlc5-details,
+.save-dlc5-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-dlc5-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-dlc5-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-dlc5-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-dlc5-grid,
+.save-dlc5-teams {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.save-dlc5-metadata {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+}
+.save-dlc5-metadata > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.save-dlc5-metadata dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.save-dlc5-preview {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+.save-dlc5-preview h4,
+.save-dlc5-team h4 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.save-dlc5-editor summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.save-dlc5-editor summary:hover {
+  background: var(--surface-hover);
+}
+.save-dlc5-editor summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-dlc5-offsets {
+  max-height: 10rem;
+  overflow: auto;
+}
+.save-dlc5-team {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+.save-dlc5-members {
+  display: grid;
+  gap: 8px;
+}
+.save-dlc5-member {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.save-dlc5-member img {
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex: none;
+}
+.save-dlc5-member > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+.save-dlc5-member strong {
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-dlc5-editor small {
+  font-size: 13px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .save-dlc5-grid,
+  .save-dlc5-teams {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -28,6 +28,7 @@
     <Compile Include="../Misc4Editing.cs" Link="Misc4Editing.cs" />
     <Compile Include="../Misc4Frontier.cs" Link="Misc4Frontier.cs" />
     <Compile Include="../Misc4DotImage.cs" Link="Misc4DotImage.cs" />
+    <Compile Include="../Dlc5Editing.cs" Link="Dlc5Editing.cs" />
     <Compile Include="../CGear5Editing.cs" Link="CGear5Editing.cs" />
     <Compile Include="../Underground4Editing.cs" Link="Underground4Editing.cs" />
     <Compile Include="../HoneyTree4Editing.cs" Link="HoneyTree4Editing.cs" />
