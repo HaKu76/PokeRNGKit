@@ -1,3 +1,6 @@
+import { Link6Editor } from "./Link6Editor";
+import { supportsLink6 } from "./link6";
+import { link6Words } from "./link6Words";
 import { Hall6Editor } from "./Hall6Editor";
 import { supportsHall6 } from "./hall6";
 import { hall6Words } from "./hall6Words";
@@ -174,6 +177,7 @@ export function SaveEditorPanel(
     | "medals5"
     | "berryField6xy"
     | "avenue5"
+    | "link6"
     | "hall6"
     | "unityTower5"
     | "globalLink5"
@@ -328,6 +332,7 @@ export function SaveEditorPanel(
         (previous === "berryField6xy" &&
           !supportsBerryField6XY(result.report.format)) ||
         (previous === "avenue5" && !supportsAvenue5(result.report.format)) ||
+        (previous === "link6" && !supportsLink6(result.report.format)) ||
         (previous === "hall6" && !supportsHall6(result.report.format)) ||
         (previous === "unityTower5" &&
           !supportsUnityTower5(result.report.format)) ||
@@ -1267,6 +1272,56 @@ export function SaveEditorPanel(
     });
     return p;
   };
+  const readLink6 = async () => {
+    let c: import("./link6").Link6Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "link6",
+      );
+      if (id !== operation.current) return;
+      if (!result.link6) throw Error("No Link6 catalog was returned.");
+      c = result.link6;
+    });
+    return c;
+  };
+  const previewLink6 = async (edit: import("./link6").Link6Edit) => {
+    let p: import("./link6").Link6Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "link6Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.link6Preview) throw Error("No Link6 preview was returned.");
+      p = result.link6Preview;
+    });
+    return p;
+  };
+  const exportLink6 = (edit: import("./link6").Link6Edit) =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "link6Export",
+      );
+      if (id !== operation.current) return;
+      if (!result.link6File) throw Error("No Link6 file was returned.");
+      const url = URL.createObjectURL(new Blob([result.link6File]));
+      try {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "pokemon-link.pl6";
+        a.click();
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
+    });
   const readUnityTower5 = async () => {
     let c: import("./unityTower5").Tower5Catalog | undefined;
     await perform(async (id) => {
@@ -1823,6 +1878,7 @@ export function SaveEditorPanel(
       | import("./misc5").Misc5Edit
       | import("./medals5").Medals5Edit
       | import("./avenue5").Avenue5Edit
+      | import("./link6").Link6Edit
       | import("./hall6").Hall6Edit
       | import("./unityTower5").Tower5Edit
       | import("./globalLink5").Gl5Edit
@@ -1884,6 +1940,7 @@ export function SaveEditorPanel(
       | "misc5Edit"
       | "medals5Edit"
       | "avenue5Edit"
+      | "link6Edit"
       | "hall6Edit"
       | "unityTower5Edit"
       | "globalLink5Edit"
@@ -2419,6 +2476,15 @@ export function SaveEditorPanel(
                 {avenue5Words[batchLang].title}
               </button>
             )}
+            {supportsLink6(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "link6"}
+                onClick={() => setSection("link6")}
+              >
+                {link6Words[batchLang].title}
+              </button>
+            )}
             {supportsHall6(report.format) && (
               <button
                 type="button"
@@ -2896,6 +2962,17 @@ export function SaveEditorPanel(
               onPreview={previewAvenue5}
               onApply={(edit) => applyWorkingEdit(edit, "avenue5Edit")}
               onExport={exportAvenue5}
+            />
+          ) : section === "link6" && supportsLink6(report.format) ? (
+            <Link6Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readLink6}
+              onPreview={previewLink6}
+              onApply={(edit) => applyWorkingEdit(edit, "link6Edit")}
+              onExport={exportLink6}
             />
           ) : section === "hall6" && supportsHall6(report.format) ? (
             <Hall6Editor

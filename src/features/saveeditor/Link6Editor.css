@@ -1,0 +1,96 @@
+.save-link6-body,
+.save-link6-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-link6-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-link6-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-link6-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-link6-editor small {
+  display: block;
+  font-size: 13px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+.save-link6-fields,
+.save-link6-slots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.save-link6-slots {
+  list-style: none;
+}
+.save-link6-slots li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-link6-slots img {
+  flex: none;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.save-link6-summary {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+}
+.save-link6-summary div {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) minmax(0, 2fr);
+  gap: 12px;
+}
+.save-link6-summary dd {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.save-link6-import input {
+  max-width: 100%;
+  min-width: 0;
+}
+.save-link6-preview ul {
+  margin: 0;
+  padding-inline-start: 20px;
+  font-size: 14px;
+  line-height: 22px;
+}
+.save-link6-preview pre {
+  max-height: 180px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 20px;
+}
+@media (max-width: 540px) {
+  .save-link6-fields,
+  .save-link6-slots {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

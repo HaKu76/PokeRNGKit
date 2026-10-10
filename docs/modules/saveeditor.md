@@ -497,7 +497,7 @@ Source 成员输入范围按非零种类数量动态设为 1–count，count=0 �
 
 新增 HallOfFame6Editing／Hall6TrashEditing、字段领域层与三语图像编辑器，API 115 接 JSExport／独立 Worker／浮动存档面板。提供全部字段、来源重新保存、删除移动、特殊字符、废字节及当前语言队伍文本复制。全部写入先完整文件摘要预览，确认核对冻结目标；重解析验证格式、版本、长度、校验和完整块。X／Y／OR／AS 原生专项及扩展专项通过全部 16×6 地址、来源掩码／联动、十五种删除位置、26-byte 边界、文本／种类名称层／世代端点、旧值规范化／孔位、完整原件／导出对照及拒绝原子性。前端／客户端／领域专项 32 项通过，完整 verify 的 247 文件／964 项测试与网页／PWA、全套原生、API 115 核心构建、裁剪后 26 类型属性检查和新核心最终网页／PWA 打包均通过；浏览器／真实存档待核验。
 
-### 第六世代 Pokémon Link（部分来源核对，尚未接入）
+### 第六世代 Pokémon Link（API 116，工程检查通过）
 
 已通读 SAV_Link6.cs，核对 Designer 显式输入、LinkBlock6、PL6 主存储字段及两份 Accessor。X／Y 与 ORAS 实际均绑定块 48，基址 0x1FE00／0x20E00，长 0xC48；PL6 从块内 0x1FF 起，精确 0xA47 bytes。导入按精确尺寸复制 Gifts.Data 后重新读取控件，导出直接写当前 Gifts.Data，不调用 SaveLinkData；正式保存才写界面字段并 RefreshChecksum，再复制工作副本。
 
@@ -505,7 +505,23 @@ Source 成员输入范围按非零种类数量动态设为 1–count，count=0 �
 
 LinkBlock6 的内部校验为 CRC16_CCITT(Data[0x200..^4])，结果写 Data[^4..]；它与外层存档块校验分别处理。该校验排除块内 0x1FF 的 Enabled 字节，PL6 切片包含内部校验字节。正式保存、原始 PL6 导入与只读导出的校验时机必须区分，不应为了导出自动规范化未保存内容。
 
-初始禁用状态与 Loaded Enabled 的控制联动、三语候选／操作、完整 LinkEntity6 与安全导出、异常旧字段及独立整文件夹具仍待继续核对。此处仅记录来源证据，当前没有新增 Pokémon Link 产品代码。
+Designer 永久禁用来源、启用勾选、六道具候选和六数量输入，六宝可梦文字框为 ReadOnly；LoadLinkData 只在 Enabled 为真时打开 BP、里程和导出。产品按这些真实可用控件接入，不能将存储字段误当作窗口支持的直接编辑。显示全部六道具／六宝可梦本地图像、三语种类／道具名、完整 UInt16 数量、原始标记与内部校验；BP／里程分别为四／五字符十进制，空输入表示保留旧值，有效范围由领域和 Core 两侧验证。异常旧 BP 大于 9999 仍可读取，重新保存前须明确修正。
+
+普通补丁只写已指定的 BP／里程并刷新内部校验，保护未指定的来源、标记、道具与实体；整窗重新保存单独执行来源规范化，包括名称清零、Enabled 重写、道具候选缺失转 UInt16 65535、数量 cast byte 及内部校验刷新。所有写入必须先预览，再核对完整源／目标 SHA-256 后确认应用；显示来源、标记、数值、道具、实体、内部校验和完整存档变化字节。原件、撤销、完整工作副本导出保持。
+
+原始 pl6 导入精确 2631 bytes，不自行修复文件内部校验；外层存档校验随工作副本写入更新。可在确认前查看导入图像／原始字节，并另行预览整窗重新保存。独立导出路由直接取当前原始 PL6，不包含草稿、预览或窗口重保存副作用；禁用记录保持来源导出限制。WinForms 在同一个窗口先载入 Enabled 再导入 Disabled 时没有 else 复位控件，这是暂态窗口状态；本产品每次工作副本应用后重新读取目录，相当于关闭并重新打开来源窗口，不将这次启用残留保存为存档能力。
+
+LinkEntity6 从 PL6 0x09D 起，共六段 0xA0 bytes、步长 0xA8；六道具／数量从 0x489 起、步长 4；BP／里程为 0x4A1／0x4A3。完整实体原始数据只读，不从种类文字框推断独立宝可梦编辑器。源码为只读 PKHeX 26.08.26 的 `PKHeX.WinForms/Subforms/Save Editors/Gen6/SAV_Link6.cs`／`.Designer.cs`、`PKHeX.Core/Saves/Substructures/Gen6/LinkBlock6.cs`、`PKHeX.Core/MysteryGifts/PL6.cs`（内含 LinkEntity6）和两份 SaveBlockAccessor6；三语控件文字来自 `PKHeX.WinForms/Resources/text/lang_zh-Hans.txt`、`lang_en.txt`、`lang_ja.txt`。X／Y／OR／AS 原生完整文件对照通过，前端／客户端／领域／多语言专项 33 项及定向 Lint 通过；完整 verify 的 248 文件／973 项测试与网页／PWA、全套原生、API 116 核心构建、裁剪后 26 类型属性检查和新核心最终网页／PWA 打包均通过。Vitest 退出清理提示已记入进度，不据正常终止前的观察超时重复运行；外部 Chrome 与真实存档核验仍待完成。
+
+### 第六世代秘密基地（来源核对，尚未接入）
+
+已通读只读来源 `PKHeX.WinForms/Subforms/Save Editors/Gen6/SAV_SecretBase.cs`，核对 Designer 显式范围、`PKHeX.Core/Saves/Substructures/Gen6/SecretBase6Block.cs`、`SecretBase/SecretBase6.cs`／`SecretBase6PKM.cs`／`SecretBase6GoodPlacement.cs`／`SecretBase6GoodStock.cs`、RecordBlock6 与 SaveBlockAccessor6AO。仅 SAV6AO，实际块 54、基址 0x23A00、长 0x7AD0；自身一份 0x310-byte 在块内 0x324，其他三十份 0x3E0-byte 从 0x638 起。每基地二十八摆设，其他基地各三格 0x34-byte 对战队伍。导入只接受自身／其他两种精确大小；目标为自身时截取共同 0x310 bytes，其他目标读入自身文件时只替换共同部分，尾部队伍等旧值保持。导出先 SaveCurrent；删除拒绝自身，移动后续其他基地并清末项。
+
+摆设选择 0–27、队伍选择 0–2；Good GUI -1–65535、默认 -1，保存 cast ushort，负一成为 65535；X／Y 为 0–65535、Rotation 0–255。读取通过 Clamp 限制到 GUI 范围，Param1／2 虽存在于结构中，但摆设窗口没有对应控制，不据 Core 字段额外声称窗口可编辑。PG_Base 直接绑定当前 SecretBase6／SecretBase6Other，需要独立核对全部公开可写属性、枚举、派生只读值、文本 setter 与裁剪元数据，不能只接训练家姓名和地点。
+
+队伍来源候选使用目标存档 FilteredSources 的 Ball／Items／Species／Nature／Moves，形态由 FormConverter 与 AO 个人数据产生，特性候选按当前种类／形态的个人数据生成，AbilityNumber 保存 SelectedIndex 左移一位。EC 最大八字符并经 Util.GetHexValue，忽略非 ASCII 十六进制字符、空值为零；IV 为两位数字掩码，保存 Convert.ToByte 后与 31；EV 为三位数字掩码，Convert.ToInt32 后 clamp 0–252；等级与亲密度三位掩码并 Convert.ToByte。四个 PP Ups 下拉在 Designer 均仅有 0／1／2／3，保存 SelectedIndex。空掩码转换、未知旧值与来源完整重保存仍需专门核对。性别／形态／特性联动与固定性别必须匹配来源；IsShiny 和 IsEgg 在 Core 都操作 0x2D bit5，窗口只有异色控制，不得误当成互相独立的存储位。
+
+旗标记录绑定 Records 编号 80，GUI 0–UInt32.MaxValue，来源保存先 cast UInt32 再 cast Int32；RecordBlock6AO 编号 80 最大类型 0，对正值上限 999999999 截顶，负 Int32 不截下限。不能用看似合理的十亿上限替代 GUI 允许值或忽略高位转换，预览必须呈现实际保存值。给予全部摆设调用 GiveAllGoods：前 173 库存写完整 UInt32 值 25 | (1 << 16)，其余 27 库存不变；当前窗口未提供逐库存编辑。三语资源已定位到 lang_zh-Hans／en／ja 的 SAV_SecretBase 键。属性表、能力／候选／输入转换与完整文件夹具仍待继续核对，当前没有新增秘密基地产品代码。
 
 ## HGSS 宝可全能竞技（API 98）
 

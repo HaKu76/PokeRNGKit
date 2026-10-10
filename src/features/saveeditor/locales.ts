@@ -1,3 +1,4 @@
+import { link6Words } from "./link6Words";
 import { hall6Words } from "./hall6Words";
 import { berry6xyWords } from "./berryField6xy";
 import { avenue5Words } from "./avenue5";
@@ -32,6 +33,8 @@ export const saveEditorResources = {
     berry6xyError: berry6xyWords.zh.invalid,
     avenue5Error: avenue5Words.zh.invalid,
     avenue5Stale: avenue5Words.zh.stale,
+    link6Error: link6Words.zh.invalid,
+    link6Stale: link6Words.zh.stale,
     hall6Error: hall6Words.zh.invalid,
     hall6Stale: hall6Words.zh.stale,
     unityTower5Error: tower5Words.zh.invalid,
@@ -621,6 +624,8 @@ export const saveEditorResources = {
     berry6xyError: berry6xyWords.en.invalid,
     avenue5Error: avenue5Words.en.invalid,
     avenue5Stale: avenue5Words.en.stale,
+    link6Error: link6Words.en.invalid,
+    link6Stale: link6Words.en.stale,
     hall6Error: hall6Words.en.invalid,
     hall6Stale: hall6Words.en.stale,
     unityTower5Error: tower5Words.en.invalid,
@@ -1252,6 +1257,8 @@ export const saveEditorResources = {
     berry6xyError: berry6xyWords.ja.invalid,
     avenue5Error: avenue5Words.ja.invalid,
     avenue5Stale: avenue5Words.ja.stale,
+    link6Error: link6Words.ja.invalid,
+    link6Stale: link6Words.ja.stale,
     hall6Error: hall6Words.ja.invalid,
     hall6Stale: hall6Words.ja.stale,
     unityTower5Error: tower5Words.ja.invalid,
@@ -1916,6 +1923,8 @@ export function localizeSaveError(
   if (/BerryField6XY/i.test(message)) return words.berry6xyError;
   if (/Avenue5.*stale/i.test(message)) return words.avenue5Stale;
   if (/Avenue5/i.test(message)) return words.avenue5Error;
+  if (/Link6.*stale/i.test(message)) return words.link6Stale;
+  if (/Link6/i.test(message)) return words.link6Error;
   if (/Hall6.*stale/i.test(message)) return words.hall6Stale;
   if (/Hall6/i.test(message)) return words.hall6Error;
   if (/UnityTower5.*stale/i.test(message)) return words.unityTower5Stale;
