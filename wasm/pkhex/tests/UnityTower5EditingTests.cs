@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+using System.Text.Json;
+using PKHeX.Core;
+using PokeRNGKit.SaveEditor;
+internal static class UnityTower5EditingTests
+{
+    private static void Check(bool ok,string message){if(!ok)throw new Exception(message);}
+    private static void Reject(Action action){try{action();throw new Exception("Invalid UnityTower5 request accepted");}catch(ArgumentException){}}
+    private static SAV5 Open(byte[] data)=>SaveUtil.GetSaveFile(data.ToArray())as SAV5??throw new Exception("Unrecognized Gen5 fixture");
+    private static Tower5Catalog Read(byte[] data)=>JsonSerializer.Deserialize(SaveService.ReadUnityTower5(data),SaveJsonContext.Default.Tower5Catalog)!;
+    private static Tower5Preview Preview(byte[] data,Tower5Edit e)=>JsonSerializer.Deserialize(SaveService.PreviewUnityTower5(data,JsonSerializer.Serialize(e,SaveJsonContext.Default.Tower5Edit)),SaveJsonContext.Default.Tower5Preview)!;
+    private static byte[] Apply(byte[] data,Tower5Edit e){var original=data.ToArray();var p=Preview(data,e);var output=SaveService.EditUnityTower5(data,JsonSerializer.Serialize(p.Request,SaveJsonContext.Default.Tower5Edit));Check(data.SequenceEqual(original),"Tower original immutable");Check(Br4Editing.Hash(output)==p.Request.TargetHash&&p.Result.SourceHash==p.Request.TargetHash,"Tower frozen full output");Check(p.ChangedOffsets.SequenceEqual(Enumerable.Range(0,data.Length).Where(i=>data[i]!=output[i])),"Tower complete changed offsets");Check(SaveService.ExportWorkingCopy(output).SequenceEqual(output),"Tower full export");return output;}
+    private static void Compare(byte[] data,Tower5Edit e,Action<SAV5> oracle){var s=Open(data);oracle(s);Check(Apply(data,e).SequenceEqual(s.Write().ToArray()),"Tower independent full-file oracle and protected survey/unknown data");}
+    private static (int Country,int Region)[] SourcePairs(){var countries=Util.GetCountryRegionList("gen5_countries","en");var result=new List<(int,int)>();for(int i=1;i<=232;i++){int country=countries[i].Value,count=UnityTower5.GetSubregionCount((byte)country);var regions=Util.GetCountryRegionList(count==0?"gen5_sr_default":$"gen5_sr_{country:000}","en");if(count==0)result.Add((country,regions[0].Value));else for(int j=1;j<=count;j++)result.Add((country,regions[j].Value));}return result.ToArray();}
+    public static void Run()
+    {
+        var pairs=SourcePairs();Check(pairs.Distinct().Count()==pairs.Length,"Tower source coordinate uniqueness");
+        foreach(var version in new[]{GameVersion.B,GameVersion.W,GameVersion.B2,GameVersion.W2}){
+            var save=Open(File.ReadAllBytes($".tmp/pkhex-fixtures/{(version is GameVersion.B or GameVersion.W?"B":"B2")}.sav"));save.Version=version;save.Country=105;save.Region=50;save.UnityTower.Data.Fill(0xA5);save.UnityTower.Data[0x344]=9;save.UnityTower.Data[0x345]=255;var data=save.Write().ToArray();var original=data.ToArray();var c=Read(data);var hash=c.SourceHash;
+            Check(c.CanEdit&&c.OwnSafe&&c.OwnListed&&c.RawGlobal==9&&c.RawUnlocked==255&&c.Floors.Length==232,"Tower raw flags/catalog");
+            Check(c.Points.Select(p=>(p.Country,p.Region)).ToHashSet().SetEquals(pairs)&&c.Points.All(p=>p.Id==(p.Country-1)*64+p.Region),"Tower actual GUI directory and physical IDs");
+            foreach(var lang in new[]{"zh-Hans","en","ja"}){var countries=Util.GetCountryRegionList("gen5_countries",lang).ToDictionary(v=>v.Value,v=>v.Text);foreach(var f in c.Floors)Check((lang=="zh-Hans"?f.Name.Zh:lang=="en"?f.Name.En:f.Name.Ja)==countries[f.Country],"Tower source names by ID after language sorting");}
+            foreach(int point in new[]{0,1,2,3})Compare(data,new("patch",hash,Points:c.Points.Select(p=>new Tower5PointEdit(p.Id,point)).ToArray()),s=>{foreach(var p in pairs){int offset=0x348+(p.Country-1)*16+p.Region/4,shift=2*(p.Region%4);s.UnityTower.Data[offset]=(byte)((s.UnityTower.Data[offset]&~(3<<shift))|(point<<shift));}s.UnityTower.SetSAVCountry();});
+            foreach(bool value in new[]{false,true})Compare(data,new("patch",hash,Floors:Enumerable.Range(1,232).Select(country=>new Tower5FloorEdit(country,value)).ToArray()),s=>{for(int country=1;country<=232;country++){int offset=0x320+country/8,mask=1<<(country%8);s.UnityTower.Data[offset]=(byte)((s.UnityTower.Data[offset]&~mask)|(value?mask:0));}s.UnityTower.SetSAVCountry();});
+            foreach(bool value in new[]{false,true}){Compare(data,new("patch",hash,Global:value),s=>{s.UnityTower.GlobalFlag=value;s.UnityTower.SetSAVCountry();});Compare(data,new("patch",hash,Unlocked:value),s=>{s.UnityTower.UnityTowerFlag=value;s.UnityTower.SetSAVCountry();});}
+            foreach(string action in new[]{"all","legal","clear","resave"})Compare(data,new(action,hash),s=>{var b=s.UnityTower;switch(action){case "all":b.SetAll();break;case "legal":b.SetAllLegal();break;case "clear":b.ClearAll();break;default:var values=pairs.Select(p=>(p.Country,p.Region,Point:b.GetCountrySubregion((byte)p.Country,(byte)p.Region))).ToArray();var floors=Enumerable.Range(1,232).Select(country=>(Country:country,Unlocked:b.GetUnityTowerFloor((byte)country))).ToArray();bool global=b.GlobalFlag,unlocked=b.UnityTowerFlag;b.ClearAll();foreach(var p in values)b.SetCountrySubregion((byte)p.Country,(byte)p.Region,p.Point);foreach(var f in floors)b.SetUnityTowerFloor((byte)f.Country,f.Unlocked);b.SetSAVCountry();b.GlobalFlag=global;b.UnityTowerFlag=unlocked;break;}});
+            var owned=c.Points.Single(p=>p.Owned);var own=Preview(data,new("patch",hash,Points:[new(owned.Id,0)]));Check(own.Result.Points.Single(p=>p.Owned).Point==3,"Tower own point restored red");
+            foreach(var location in new[]{(0,255),(1,0),(232,63),(255,63)}){var s=Open(data);s.Country=location.Item1;s.Region=location.Item2;var d=s.Write().ToArray();var catalog=Read(d);Check(catalog.OwnSafe&&catalog.CanEdit,"Tower physical own location guard permits source-safe unknown positions");Compare(d,new("clear",catalog.SourceHash),x=>x.UnityTower.ClearAll());}
+            foreach(var location in new[]{(1,64),(232,255),(255,255)}){var s=Open(data);s.Country=location.Item1;s.Region=location.Item2;var d=s.Write().ToArray();var catalog=Read(d);Check(!catalog.OwnSafe&&!catalog.CanEdit,"Tower cross-country or out-of-block own location blocked");Reject(()=>Preview(d,new("all",catalog.SourceHash)));}
+            var valid=new Tower5Edit("patch",hash,Global:true);
+            foreach(var invalid in new[]{valid with{SourceHash=new string('0',64)},valid with{TargetHash=new string('0',64)},new("patch",hash),new("patch",hash,Points:[]),new("patch",hash,Points:[new(-1,0)]),new("patch",hash,Points:[new(c.Points[0].Id,4)]),new("patch",hash,Points:[new(c.Points[0].Id,0),new(c.Points[0].Id,1)]),new("patch",hash,Floors:[new(0,true)]),new("patch",hash,Floors:[new(233,true)]),new("patch",hash,Floors:[new(1,true),new(1,false)]),new("all",hash,Global:true)})Reject(()=>Preview(data,invalid));
+            Reject(()=>SaveService.EditUnityTower5(data,JsonSerializer.Serialize(valid,SaveJsonContext.Default.Tower5Edit)));
+            var corrupt=data.ToArray();corrupt[0x100]^=1;var bad=Read(corrupt);Check(!bad.CanEdit,"Tower invalid save checksum gate");Reject(()=>Preview(corrupt,valid with{SourceHash=bad.SourceHash}));Check(data.SequenceEqual(original),"Tower reject paths retain original");
+            Console.WriteLine($"PASS {version}: {pairs.Length} source points/all 232 floors, three-language IDs, packed bits/raw flags, source batches/resave/own linkage, safe unknown/unsafe own pairs, frozen/full-file oracles and rejection");
+        }
+        Reject(()=>SaveService.ReadUnityTower5(File.ReadAllBytes(".tmp/pkhex-fixtures/D.sav")));
+    }
+}

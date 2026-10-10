@@ -1,3 +1,4 @@
+import { tower5Words } from "./unityTower5";
 import { misc5Words } from "./misc5Words";
 import { medals5Words } from "./medals5Words";
 import { gl5Words } from "./globalLink5";
@@ -25,6 +26,8 @@ export const saveEditorResources = {
     misc5Stale: misc5Words.zh.stale,
     medals5Error: medals5Words.zh.invalid,
     medals5Stale: medals5Words.zh.stale,
+    unityTower5Error: tower5Words.zh.invalid,
+    unityTower5Stale: tower5Words.zh.stale,
     globalLink5Error: gl5Words.zh.invalid,
     globalLink5Stale: gl5Words.zh.stale,
     dlc5Error: dlc5Words.zh.invalid,
@@ -607,6 +610,8 @@ export const saveEditorResources = {
     misc5Stale: misc5Words.en.stale,
     medals5Error: medals5Words.en.invalid,
     medals5Stale: medals5Words.en.stale,
+    unityTower5Error: tower5Words.en.invalid,
+    unityTower5Stale: tower5Words.en.stale,
     globalLink5Error: gl5Words.en.invalid,
     globalLink5Stale: gl5Words.en.stale,
     dlc5Error: dlc5Words.en.invalid,
@@ -1231,6 +1236,8 @@ export const saveEditorResources = {
     misc5Stale: misc5Words.ja.stale,
     medals5Error: medals5Words.ja.invalid,
     medals5Stale: medals5Words.ja.stale,
+    unityTower5Error: tower5Words.ja.invalid,
+    unityTower5Stale: tower5Words.ja.stale,
     globalLink5Error: gl5Words.ja.invalid,
     globalLink5Stale: gl5Words.ja.stale,
     dlc5Error: dlc5Words.ja.invalid,
@@ -1888,6 +1895,8 @@ export function localizeSaveError(
   if (/Misc5/i.test(message)) return words.misc5Error;
   if (/Medals5.*stale/i.test(message)) return words.medals5Stale;
   if (/Medals5/i.test(message)) return words.medals5Error;
+  if (/UnityTower5.*stale/i.test(message)) return words.unityTower5Stale;
+  if (/UnityTower5/i.test(message)) return words.unityTower5Error;
   if (/GlobalLink5.*stale/i.test(message)) return words.globalLink5Stale;
   if (/GlobalLink5/i.test(message)) return words.globalLink5Error;
   if (/Dlc5.*stale/i.test(message)) return words.dlc5Stale;

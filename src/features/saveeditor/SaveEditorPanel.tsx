@@ -1,3 +1,5 @@
+import { UnityTower5Editor } from "./UnityTower5Editor";
+import { supportsUnityTower5, tower5Words } from "./unityTower5";
 import { Misc5Editor } from "./Misc5Editor";
 import { supportsMisc5 } from "./misc5";
 import { misc5Labels } from "./misc5Labels";
@@ -163,6 +165,7 @@ export function SaveEditorPanel(
     | "misc4"
     | "misc5"
     | "medals5"
+    | "unityTower5"
     | "globalLink5"
     | "dlc5"
     | "cgear5"
@@ -312,6 +315,8 @@ export function SaveEditorPanel(
         (previous === "misc4" && !supportsMisc4(result.report.format)) ||
         (previous === "misc5" && !supportsMisc5(result.report.format)) ||
         (previous === "medals5" && !supportsMedals5(result.report.format)) ||
+        (previous === "unityTower5" &&
+          !supportsUnityTower5(result.report.format)) ||
         (previous === "globalLink5" &&
           !supportsGlobalLink5(result.report.format)) ||
         (previous === "dlc5" && !supportsDlc5(result.report.format)) ||
@@ -1142,6 +1147,40 @@ export function SaveEditorPanel(
       }
     });
 
+  const readUnityTower5 = async () => {
+    let c: import("./unityTower5").Tower5Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "unityTower5",
+      );
+      if (id !== operation.current) return;
+      if (!result.unityTower5)
+        throw Error("No UnityTower5 catalog was returned.");
+      c = result.unityTower5;
+    });
+    return c;
+  };
+  const previewUnityTower5 = async (
+    edit: import("./unityTower5").Tower5Edit,
+  ) => {
+    let p: import("./unityTower5").Tower5Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "unityTower5Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.unityTower5Preview)
+        throw Error("No UnityTower5 preview was returned.");
+      p = result.unityTower5Preview;
+    });
+    return p;
+  };
   const readGlobalLink5 = async () => {
     let c: import("./globalLink5").Gl5Catalog | undefined;
     await perform(async (id) => {
@@ -1663,6 +1702,7 @@ export function SaveEditorPanel(
       | import("./misc4").Misc4Edit
       | import("./misc5").Misc5Edit
       | import("./medals5").Medals5Edit
+      | import("./unityTower5").Tower5Edit
       | import("./globalLink5").Gl5Edit
       | import("./dlc5").Dlc5Edit
       | import("./cgear5").CGear5Edit
@@ -1721,6 +1761,7 @@ export function SaveEditorPanel(
       | "misc4Edit"
       | "misc5Edit"
       | "medals5Edit"
+      | "unityTower5Edit"
       | "globalLink5Edit"
       | "dlc5Edit"
       | "cgear5Edit"
@@ -2236,6 +2277,15 @@ export function SaveEditorPanel(
                 {medals5Labels[batchLang].title}
               </button>
             )}
+            {supportsUnityTower5(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "unityTower5"}
+                onClick={() => setSection("unityTower5")}
+              >
+                {tower5Words[batchLang].title}
+              </button>
+            )}
             {supportsGlobalLink5(report.format) && (
               <button
                 type="button"
@@ -2676,6 +2726,17 @@ export function SaveEditorPanel(
               onPreview={previewMedals5}
               onExport={exportMedals5}
               onApply={(edit) => applyWorkingEdit(edit, "medals5Edit")}
+            />
+          ) : section === "unityTower5" &&
+            supportsUnityTower5(report.format) ? (
+            <UnityTower5Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readUnityTower5}
+              onPreview={previewUnityTower5}
+              onApply={(edit) => applyWorkingEdit(edit, "unityTower5Edit")}
             />
           ) : section === "globalLink5" &&
             supportsGlobalLink5(report.format) ? (

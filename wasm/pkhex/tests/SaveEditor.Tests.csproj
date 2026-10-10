@@ -31,6 +31,7 @@
     <Compile Include="../GlobalLink5Editing.cs" Link="GlobalLink5Editing.cs" />
     <Compile Include="../Medals5Editing.cs" Link="Medals5Editing.cs" />
     <Compile Include="../Misc5Editing.cs" Link="Misc5Editing.cs" />
+    <Compile Include="../UnityTower5Editing.cs" Link="UnityTower5Editing.cs" />
     <Compile Include="../Misc5Text.cs" Link="Misc5Text.cs" />
     <Compile Include="../Misc5Subway.cs" Link="Misc5Subway.cs" />
     <Compile Include="../Misc5Forest.cs" Link="Misc5Forest.cs" />
