@@ -173,6 +173,12 @@ public static partial class Program
     [JSExport]
     public static byte[] ExportAvenue5(byte[] data,string json) => SaveService.ExportAvenue5(data,json);
     [JSExport]
+    public static string ReadHall6(byte[] data) => SaveService.ReadHall6(data);
+    [JSExport]
+    public static string PreviewHall6(byte[] data,string json) => SaveService.PreviewHall6(data,json);
+    [JSExport]
+    public static byte[] EditHall6(byte[] data,string json) => SaveService.EditHall6(data,json);
+    [JSExport]
     public static string ReadUnityTower5(byte[] data) => SaveService.ReadUnityTower5(data);
     [JSExport]
     public static string PreviewUnityTower5(byte[] data,string json) => SaveService.PreviewUnityTower5(data,json);
@@ -326,7 +332,7 @@ public static partial class Program
 
 public static partial class SaveService
 {
-    public const int ApiVersion = 114;
+    public const int ApiVersion = 115;
     public const int MaximumSize = 32 * 1024 * 1024;
     public static string ReadPokedex9a(byte[] data) => JsonSerializer.Serialize(ZaPokedex.Read(Open(data)), SaveJsonContext.Default.Dex9aCatalog);
     public static byte[] EditPokedex9a(byte[] data, string json)
@@ -772,6 +778,9 @@ public sealed record SaveReport(
 [JsonSerializable(typeof(Misc5Catalog))]
 [JsonSerializable(typeof(Misc5Preview))]
 [JsonSerializable(typeof(Misc5Edit))]
+[JsonSerializable(typeof(Hall6Catalog))]
+[JsonSerializable(typeof(Hall6Preview))]
+[JsonSerializable(typeof(Hall6Edit))]
 [JsonSerializable(typeof(Berry6XYCatalog))]
 [JsonSerializable(typeof(Avenue5Catalog))]
 [JsonSerializable(typeof(Avenue5Preview))]

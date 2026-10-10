@@ -1,3 +1,6 @@
+import { Hall6Editor } from "./Hall6Editor";
+import { supportsHall6 } from "./hall6";
+import { hall6Words } from "./hall6Words";
 import { BerryField6XYViewer } from "./BerryField6XYViewer";
 import { supportsBerryField6XY, berry6xyWords } from "./berryField6xy";
 import { Avenue5Editor } from "./Avenue5Editor";
@@ -171,6 +174,7 @@ export function SaveEditorPanel(
     | "medals5"
     | "berryField6xy"
     | "avenue5"
+    | "hall6"
     | "unityTower5"
     | "globalLink5"
     | "dlc5"
@@ -324,6 +328,7 @@ export function SaveEditorPanel(
         (previous === "berryField6xy" &&
           !supportsBerryField6XY(result.report.format)) ||
         (previous === "avenue5" && !supportsAvenue5(result.report.format)) ||
+        (previous === "hall6" && !supportsHall6(result.report.format)) ||
         (previous === "unityTower5" &&
           !supportsUnityTower5(result.report.format)) ||
         (previous === "globalLink5" &&
@@ -1232,6 +1237,36 @@ export function SaveEditorPanel(
         setTimeout(() => URL.revokeObjectURL(url), 0);
       }
     });
+  const readHall6 = async () => {
+    let c: import("./hall6").Hall6Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "hall6",
+      );
+      if (id !== operation.current) return;
+      if (!result.hall6) throw Error("No Hall6 catalog was returned.");
+      c = result.hall6;
+    });
+    return c;
+  };
+  const previewHall6 = async (edit: import("./hall6").Hall6Edit) => {
+    let p: import("./hall6").Hall6Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "hall6Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.hall6Preview) throw Error("No Hall6 preview was returned.");
+      p = result.hall6Preview;
+    });
+    return p;
+  };
   const readUnityTower5 = async () => {
     let c: import("./unityTower5").Tower5Catalog | undefined;
     await perform(async (id) => {
@@ -1788,6 +1823,7 @@ export function SaveEditorPanel(
       | import("./misc5").Misc5Edit
       | import("./medals5").Medals5Edit
       | import("./avenue5").Avenue5Edit
+      | import("./hall6").Hall6Edit
       | import("./unityTower5").Tower5Edit
       | import("./globalLink5").Gl5Edit
       | import("./dlc5").Dlc5Edit
@@ -1848,6 +1884,7 @@ export function SaveEditorPanel(
       | "misc5Edit"
       | "medals5Edit"
       | "avenue5Edit"
+      | "hall6Edit"
       | "unityTower5Edit"
       | "globalLink5Edit"
       | "dlc5Edit"
@@ -2382,6 +2419,15 @@ export function SaveEditorPanel(
                 {avenue5Words[batchLang].title}
               </button>
             )}
+            {supportsHall6(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "hall6"}
+                onClick={() => setSection("hall6")}
+              >
+                {hall6Words[batchLang].title}
+              </button>
+            )}
             {supportsUnityTower5(report.format) && (
               <button
                 type="button"
@@ -2850,6 +2896,16 @@ export function SaveEditorPanel(
               onPreview={previewAvenue5}
               onApply={(edit) => applyWorkingEdit(edit, "avenue5Edit")}
               onExport={exportAvenue5}
+            />
+          ) : section === "hall6" && supportsHall6(report.format) ? (
+            <Hall6Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readHall6}
+              onPreview={previewHall6}
+              onApply={(edit) => applyWorkingEdit(edit, "hall6Edit")}
             />
           ) : section === "unityTower5" &&
             supportsUnityTower5(report.format) ? (

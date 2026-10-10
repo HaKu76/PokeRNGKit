@@ -1,3 +1,4 @@
+import { hall6Words } from "./hall6Words";
 import { berry6xyWords } from "./berryField6xy";
 import { avenue5Words } from "./avenue5";
 import { tower5Words } from "./unityTower5";
@@ -31,6 +32,8 @@ export const saveEditorResources = {
     berry6xyError: berry6xyWords.zh.invalid,
     avenue5Error: avenue5Words.zh.invalid,
     avenue5Stale: avenue5Words.zh.stale,
+    hall6Error: hall6Words.zh.invalid,
+    hall6Stale: hall6Words.zh.stale,
     unityTower5Error: tower5Words.zh.invalid,
     unityTower5Stale: tower5Words.zh.stale,
     globalLink5Error: gl5Words.zh.invalid,
@@ -618,6 +621,8 @@ export const saveEditorResources = {
     berry6xyError: berry6xyWords.en.invalid,
     avenue5Error: avenue5Words.en.invalid,
     avenue5Stale: avenue5Words.en.stale,
+    hall6Error: hall6Words.en.invalid,
+    hall6Stale: hall6Words.en.stale,
     unityTower5Error: tower5Words.en.invalid,
     unityTower5Stale: tower5Words.en.stale,
     globalLink5Error: gl5Words.en.invalid,
@@ -1247,6 +1252,8 @@ export const saveEditorResources = {
     berry6xyError: berry6xyWords.ja.invalid,
     avenue5Error: avenue5Words.ja.invalid,
     avenue5Stale: avenue5Words.ja.stale,
+    hall6Error: hall6Words.ja.invalid,
+    hall6Stale: hall6Words.ja.stale,
     unityTower5Error: tower5Words.ja.invalid,
     unityTower5Stale: tower5Words.ja.stale,
     globalLink5Error: gl5Words.ja.invalid,
@@ -1909,6 +1916,8 @@ export function localizeSaveError(
   if (/BerryField6XY/i.test(message)) return words.berry6xyError;
   if (/Avenue5.*stale/i.test(message)) return words.avenue5Stale;
   if (/Avenue5/i.test(message)) return words.avenue5Error;
+  if (/Hall6.*stale/i.test(message)) return words.hall6Stale;
+  if (/Hall6/i.test(message)) return words.hall6Error;
   if (/UnityTower5.*stale/i.test(message)) return words.unityTower5Stale;
   if (/UnityTower5/i.test(message)) return words.unityTower5Error;
   if (/GlobalLink5.*stale/i.test(message)) return words.globalLink5Stale;

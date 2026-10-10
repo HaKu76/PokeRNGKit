@@ -384,7 +384,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen5/SAV_UnityTower.cs`                                | API 112：地点、楼层、标记、来源批量与冻结预览三语接通；工程通过，界面待核验 |
 | `Subforms/Save Editors/Gen6/SAV_BerryFieldXY.cs`                              | API 114：来源只读 32 格／八 UInt16 三语工程通过；浏览器待核验               |
 | `Subforms/Save Editors/Gen6/SAV_BoxLayout.cs`                                 | API 59：箱名、壁纸、解锁数、标记、整箱交换；沿用当前编辑白名单              |
-| `Subforms/Save Editors/Gen6/SAV_HallOfFame.cs`                                | 待核对                                                                      |
+| `Subforms/Save Editors/Gen6/SAV_HallOfFame.cs`                                | API 115：全部字段／图像／删除／文本废字节工程通过；浏览器待核验             |
 | `Subforms/Save Editors/Gen6/SAV_Link6.cs`                                     | 待核对                                                                      |
 | `Subforms/Save Editors/Gen6/SAV_OPower.cs`                                    | API 77：状态／数值／批量／三语工程检查通过；浏览器待核验                    |
 | `Subforms/Save Editors/Gen6/SAV_PokeBlockORAS.cs`                             | API 74 数量／批量与树果田操作工程检查通过；浏览器待核验                     |

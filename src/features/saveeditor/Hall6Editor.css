@@ -1,0 +1,114 @@
+.save-hall6-body,
+.save-hall6-trash,
+.save-hall6-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-hall6-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-hall6-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-hall6-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-hall6-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+.save-hall6-roster {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+.save-hall6-roster button {
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+  padding: 8px;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 20px;
+}
+.save-hall6-roster img {
+  width: 68px;
+  max-width: 100%;
+  height: 56px;
+  object-fit: contain;
+}
+.save-hall6-roster span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.save-hall6-editor input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+}
+.save-hall6-editor label:has(input[type="checkbox"]) {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+}
+.save-hall6-editor summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.save-hall6-editor summary:hover {
+  background: var(--surface-hover);
+}
+.save-hall6-editor summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-hall6-preview {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+.save-hall6-preview h4 {
+  margin: 0;
+}
+.save-hall6-changes {
+  display: grid;
+  gap: 8px;
+  max-height: 22rem;
+  overflow: auto;
+}
+.save-hall6-raw {
+  max-height: 10rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.save-hall6-description {
+  max-height: 18rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  font-size: 14px;
+  line-height: 22px;
+}
+@media (max-width: 600px) {
+  .save-hall6-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .save-hall6-roster {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
