@@ -1,0 +1,76 @@
+.save-collectibles7-body {
+  display: grid;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 22px;
+  min-width: 0;
+}
+.save-collectibles7-body p,
+.save-collectibles7-body h3,
+.save-collectibles7-body h4 {
+  margin: 0;
+}
+.save-collectibles7-body label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-collectibles7-body label > span {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-collectibles7-counts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.save-collectibles7-list {
+  max-height: 480px;
+  overflow: auto;
+  min-height: 44px;
+  overscroll-behavior: contain;
+}
+.save-collectibles7-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 160px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+.save-collectibles7-row > span {
+  overflow-wrap: anywhere;
+}
+.save-collectibles7-index {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.save-collectibles7-note {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--muted);
+}
+.save-collectibles7-preview {
+  display: grid;
+  gap: 8px;
+}
+.save-collectibles7-preview ul {
+  max-height: 260px;
+  overflow: auto;
+  margin: 0;
+  padding-left: 20px;
+}
+@media (max-width: 520px) {
+  .save-collectibles7-row {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+  .save-collectibles7-row .haku-select {
+    grid-column: 2;
+  }
+  .save-collectibles7-counts {
+    grid-template-columns: 1fr;
+  }
+}

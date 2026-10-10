@@ -59,6 +59,35 @@ describe("save player context across Worker lifecycle", () => {
     expect(vi.getTimerCount()).toBe(0);
     client.dispose();
   });
+  it("transfers collectible read, frozen preview and apply requests while preserving input bytes", async () => {
+    const client = new SaveEditorClient(),
+      source = new Uint8Array([1, 2, 3]);
+    for (const kind of [
+      "zygarde7",
+      "zygarde7Preview",
+      "zygarde7Edit",
+    ] as const) {
+      const payload =
+        kind === "zygarde7"
+          ? undefined
+          : JSON.stringify({
+              action: "patch",
+              sourceHash: "A".repeat(64),
+              targetHash: kind === "zygarde7Edit" ? "B".repeat(64) : undefined,
+              entries: [{ index: 94, state: 2 }],
+            });
+      const pending = client.run(source, payload, kind),
+        worker = FakeWorker.instances[0],
+        message = worker.postMessage.mock.calls.at(-1)![0];
+      expect(message.kind).toBe(kind);
+      expect(message.edit).toBe(payload);
+      expect(message.bytes).not.toBe(source);
+      expect([...source]).toEqual([1, 2, 3]);
+      worker.onmessage?.({ data: { id: message.id, report: {} } });
+      await pending;
+    }
+    client.dispose();
+  });
   it("keeps the prior player after a rejected selection", async () => {
     const client = new SaveEditorClient();
     const start = client.run(new Uint8Array([1])),

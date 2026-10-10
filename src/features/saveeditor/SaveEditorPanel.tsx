@@ -39,6 +39,9 @@ import { Gen4PokedexEditor } from "./Gen4PokedexEditor";
 import { SimplePokedexEditor } from "./SimplePokedexEditor";
 import { Trainer6Editor } from "./Trainer6Editor";
 import { trainer6Words } from "./trainer6Words";
+import { Zygarde7Editor } from "./Zygarde7Editor";
+import { supportsZygarde7 } from "./zygarde7";
+import { zygarde7Words } from "./zygarde7Words";
 import { supportsTrainer6, tr6IdInput, tr6Tsv } from "./trainer6";
 import { TrainerAppearance6Fields } from "./TrainerAppearance6Fields";
 import { TrainerDateFields } from "./TrainerDateFields";
@@ -190,6 +193,7 @@ export function SaveEditorPanel(
     | "secretBase6"
     | "link6"
     | "hall6"
+    | "zygarde7"
     | "unityTower5"
     | "globalLink5"
     | "dlc5"
@@ -351,6 +355,7 @@ export function SaveEditorPanel(
           !supportsSecretBase6(result.report.format)) ||
         (previous === "link6" && !supportsLink6(result.report.format)) ||
         (previous === "hall6" && !supportsHall6(result.report.format)) ||
+        (previous === "zygarde7" && !supportsZygarde7(result.report.format)) ||
         (previous === "unityTower5" &&
           !supportsUnityTower5(result.report.format)) ||
         (previous === "globalLink5" &&
@@ -1290,6 +1295,37 @@ export function SaveEditorPanel(
     });
     return p;
   };
+  const readZygarde7 = async () => {
+    let c: import("./zygarde7").Zygarde7Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "zygarde7",
+      );
+      if (id !== operation.current) return;
+      if (!result.zygarde7) throw Error("No Zygarde7 catalog was returned.");
+      c = result.zygarde7;
+    });
+    return c;
+  };
+  const previewZygarde7 = async (edit: import("./zygarde7").Zygarde7Edit) => {
+    let p: import("./zygarde7").Zygarde7Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "zygarde7Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.zygarde7Preview)
+        throw Error("No Zygarde7 preview was returned.");
+      p = result.zygarde7Preview;
+    });
+    return p;
+  };
   const readTrainer6 = async () => {
     let c: import("./trainer6").Tr6Catalog | undefined;
     await perform(async (id) => {
@@ -2016,6 +2052,7 @@ export function SaveEditorPanel(
       | import("./medals5").Medals5Edit
       | import("./avenue5").Avenue5Edit
       | import("./trainer6").Tr6Edit
+      | import("./zygarde7").Zygarde7Edit
       | import("./superTrain6").St6Edit
       | import("./secretBase6").Sb6Edit
       | import("./link6").Link6Edit
@@ -2081,6 +2118,7 @@ export function SaveEditorPanel(
       | "medals5Edit"
       | "avenue5Edit"
       | "trainer6Edit"
+      | "zygarde7Edit"
       | "superTrain6Edit"
       | "secretBase6Edit"
       | "link6Edit"
@@ -2656,6 +2694,17 @@ export function SaveEditorPanel(
                 {hall6Words[batchLang].title}
               </button>
             )}
+            {supportsZygarde7(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "zygarde7"}
+                onClick={() => setSection("zygarde7")}
+              >
+                {report.format === "SAV7USUM"
+                  ? zygarde7Words[batchLang].stickers
+                  : zygarde7Words[batchLang].cells}
+              </button>
+            )}
             {supportsUnityTower5(report.format) && (
               <button
                 type="button"
@@ -3158,6 +3207,16 @@ export function SaveEditorPanel(
               onPreview={previewLink6}
               onApply={(edit) => applyWorkingEdit(edit, "link6Edit")}
               onExport={exportLink6}
+            />
+          ) : section === "zygarde7" && supportsZygarde7(report.format) ? (
+            <Zygarde7Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readZygarde7}
+              onPreview={previewZygarde7}
+              onApply={(edit) => applyWorkingEdit(edit, "zygarde7Edit")}
             />
           ) : section === "hall6" && supportsHall6(report.format) ? (
             <Hall6Editor

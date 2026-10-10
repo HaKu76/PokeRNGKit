@@ -403,7 +403,7 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen7/SAV_PokedexSM.cs`                                 | 已接入 API 52；形态、九语言及批量操作                                       |
 | `Subforms/Save Editors/Gen7/SAV_Trainer7.cs`                                  | 基础/性别/时间/语言/地区/对应点数已接入；其他字段待接入                     |
 | `Subforms/Save Editors/Gen7/SAV_Trainer7GG.cs`                                | 待核对                                                                      |
-| `Subforms/Save Editors/Gen7/SAV_ZygardeCell.cs`                               | 待核对                                                                      |
+| `Subforms/Save Editors/Gen7/SAV_ZygardeCell.cs`                               | API 121：95／100 格、三语、储存／收集及来源保存全量工程通过；浏览器待验收   |
 | `Subforms/Save Editors/Gen8/PokedexResearchTask8aPanel.cs`                    | 待核对                                                                      |
 | `Subforms/Save Editors/Gen8/SAV_BlockDump8.cs`                                | 待核对                                                                      |
 | `Subforms/Save Editors/Gen8/SAV_FlagWork8b.cs`                                | API 83：八布局普通／系统标记、Int32 数值及比较已接入，浏览器待核验          |

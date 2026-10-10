@@ -1,4 +1,5 @@
 import { trainer6Words } from "./trainer6Words";
+import { zygarde7Words } from "./zygarde7Words";
 import { st6Words } from "./superTrain6Words";
 import { sb6Words } from "./secretBase6Words";
 import { link6Words } from "./link6Words";
@@ -37,6 +38,8 @@ export const saveEditorResources = {
     avenue5Error: avenue5Words.zh.invalid,
     avenue5Stale: avenue5Words.zh.stale,
     trainer6Error: trainer6Words.zh.invalid,
+    zygarde7Error: zygarde7Words.zh.invalid,
+    zygarde7Stale: zygarde7Words.zh.stale,
     trainer6Stale: trainer6Words.zh.stale,
     superTrain6Error: st6Words.zh.invalid,
     superTrain6Stale: st6Words.zh.stale,
@@ -634,6 +637,8 @@ export const saveEditorResources = {
     avenue5Error: avenue5Words.en.invalid,
     avenue5Stale: avenue5Words.en.stale,
     trainer6Error: trainer6Words.en.invalid,
+    zygarde7Error: zygarde7Words.en.invalid,
+    zygarde7Stale: zygarde7Words.en.stale,
     trainer6Stale: trainer6Words.en.stale,
     superTrain6Error: st6Words.en.invalid,
     superTrain6Stale: st6Words.en.stale,
@@ -1273,6 +1278,8 @@ export const saveEditorResources = {
     avenue5Error: avenue5Words.ja.invalid,
     avenue5Stale: avenue5Words.ja.stale,
     trainer6Error: trainer6Words.ja.invalid,
+    zygarde7Error: zygarde7Words.ja.invalid,
+    zygarde7Stale: zygarde7Words.ja.stale,
     trainer6Stale: trainer6Words.ja.stale,
     superTrain6Error: st6Words.ja.invalid,
     superTrain6Stale: st6Words.ja.stale,
@@ -1944,6 +1951,9 @@ export function localizeSaveError(
   if (/BerryField6XY/i.test(message)) return words.berry6xyError;
   if (/Avenue5.*stale/i.test(message)) return words.avenue5Stale;
   if (/Avenue5/i.test(message)) return words.avenue5Error;
+  if (/(?:Collectibles7|Zygarde7).*stale/i.test(message))
+    return words.zygarde7Stale;
+  if (/Collectibles7|Zygarde7/i.test(message)) return words.zygarde7Error;
   if (/Trainer6.*stale/i.test(message)) return words.trainer6Stale;
   if (/Trainer6/i.test(message)) return words.trainer6Error;
   if (/SuperTrain6.*stale/i.test(message)) return words.superTrain6Stale;
