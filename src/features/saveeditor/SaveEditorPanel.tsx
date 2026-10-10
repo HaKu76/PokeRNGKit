@@ -1,3 +1,5 @@
+import { Avenue5Editor } from "./Avenue5Editor";
+import { supportsAvenue5, avenue5Words } from "./avenue5";
 import { UnityTower5Editor } from "./UnityTower5Editor";
 import { supportsUnityTower5, tower5Words } from "./unityTower5";
 import { Misc5Editor } from "./Misc5Editor";
@@ -165,6 +167,7 @@ export function SaveEditorPanel(
     | "misc4"
     | "misc5"
     | "medals5"
+    | "avenue5"
     | "unityTower5"
     | "globalLink5"
     | "dlc5"
@@ -315,6 +318,7 @@ export function SaveEditorPanel(
         (previous === "misc4" && !supportsMisc4(result.report.format)) ||
         (previous === "misc5" && !supportsMisc5(result.report.format)) ||
         (previous === "medals5" && !supportsMedals5(result.report.format)) ||
+        (previous === "avenue5" && !supportsAvenue5(result.report.format)) ||
         (previous === "unityTower5" &&
           !supportsUnityTower5(result.report.format)) ||
         (previous === "globalLink5" &&
@@ -1147,6 +1151,66 @@ export function SaveEditorPanel(
       }
     });
 
+  const readAvenue5 = async () => {
+    let c: import("./avenue5").Avenue5Catalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "avenue5",
+      );
+      if (id !== operation.current) return;
+      if (!result.avenue5) throw Error("No Avenue5 catalog was returned.");
+      c = result.avenue5;
+    });
+    return c;
+  };
+  const previewAvenue5 = async (edit: import("./avenue5").Avenue5Edit) => {
+    let p: import("./avenue5").Avenue5Preview | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "avenue5Preview",
+      );
+      if (id !== operation.current) return;
+      if (!result.avenue5Preview)
+        throw Error("No Avenue5 preview was returned.");
+      p = result.avenue5Preview;
+    });
+    return p;
+  };
+  const exportAvenue5 = (
+    edit: import("./avenue5").Avenue5Edit,
+    extension: string,
+  ) =>
+    perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        JSON.stringify(edit),
+        "avenue5Export",
+      );
+      if (id !== operation.current) return;
+      if (!result.avenue5File) throw Error("No Avenue5 file was returned.");
+      const url = URL.createObjectURL(new Blob([result.avenue5File]));
+      try {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download =
+          "join-avenue-" +
+          edit.group +
+          "-" +
+          (edit.index + 1) +
+          "." +
+          extension;
+        a.click();
+      } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 0);
+      }
+    });
   const readUnityTower5 = async () => {
     let c: import("./unityTower5").Tower5Catalog | undefined;
     await perform(async (id) => {
@@ -1702,6 +1766,7 @@ export function SaveEditorPanel(
       | import("./misc4").Misc4Edit
       | import("./misc5").Misc5Edit
       | import("./medals5").Medals5Edit
+      | import("./avenue5").Avenue5Edit
       | import("./unityTower5").Tower5Edit
       | import("./globalLink5").Gl5Edit
       | import("./dlc5").Dlc5Edit
@@ -1761,6 +1826,7 @@ export function SaveEditorPanel(
       | "misc4Edit"
       | "misc5Edit"
       | "medals5Edit"
+      | "avenue5Edit"
       | "unityTower5Edit"
       | "globalLink5Edit"
       | "dlc5Edit"
@@ -2277,6 +2343,15 @@ export function SaveEditorPanel(
                 {medals5Labels[batchLang].title}
               </button>
             )}
+            {supportsAvenue5(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "avenue5"}
+                onClick={() => setSection("avenue5")}
+              >
+                {avenue5Words[batchLang].title}
+              </button>
+            )}
             {supportsUnityTower5(report.format) && (
               <button
                 type="button"
@@ -2726,6 +2801,17 @@ export function SaveEditorPanel(
               onPreview={previewMedals5}
               onExport={exportMedals5}
               onApply={(edit) => applyWorkingEdit(edit, "medals5Edit")}
+            />
+          ) : section === "avenue5" && supportsAvenue5(report.format) ? (
+            <Avenue5Editor
+              key={report.format}
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readAvenue5}
+              onPreview={previewAvenue5}
+              onApply={(edit) => applyWorkingEdit(edit, "avenue5Edit")}
+              onExport={exportAvenue5}
             />
           ) : section === "unityTower5" &&
             supportsUnityTower5(report.format) ? (

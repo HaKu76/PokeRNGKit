@@ -368,21 +368,21 @@ API 9 已接入单只文件导入与解密导出，使用核心默认转换规�
 | `Subforms/Save Editors/Gen4/SAV_Trainer4BR.cs`                                | API 101：训练家、时间与四玩家工程通过；浏览器待核验                         |
 | `Subforms/Save Editors/Gen4/SAV_Underground.cs`                               | API 106：四类背包、十三成绩、球体与冻结预览接通；工程检查通过               |
 | `Subforms/Save Editors/Gen5/CGearImage.cs`                                    | API 107：图片转换、预览、PNG 导入导出工程通过；浏览器待核验                 |
-| `Subforms/Save Editors/Gen5/Join Avenue/IJoinAvenueSpecificEditor.cs`         | 待核对                                                                      |
-| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueAssistantSpecificEditor.cs` | 待核对                                                                      |
-| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueEntityGeneralEditor.cs`     | 待核对                                                                      |
-| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueFanSpecificEditor.cs`       | 待核对                                                                      |
-| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueListEditor.cs`              | 待核对                                                                      |
-| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueSettingsEditor.cs`          | 待核对                                                                      |
-| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueVisitorSpecificEditor.cs`   | 待核对                                                                      |
-| `Subforms/Save Editors/Gen5/Join Avenue/SAV_JoinAvenue.cs`                    | 待核对                                                                      |
+| `Subforms/Save Editors/Gen5/Join Avenue/IJoinAvenueSpecificEditor.cs`         | API 113：全部角色／设置、文件与冻结预览工程通过；浏览器待核验               |
+| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueAssistantSpecificEditor.cs` | API 113：全部角色／设置、文件与冻结预览工程通过；浏览器待核验               |
+| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueEntityGeneralEditor.cs`     | API 113：全部角色／设置、文件与冻结预览工程通过；浏览器待核验               |
+| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueFanSpecificEditor.cs`       | API 113：全部角色／设置、文件与冻结预览工程通过；浏览器待核验               |
+| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueListEditor.cs`              | API 113：全部角色／设置、文件与冻结预览工程通过；浏览器待核验               |
+| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueSettingsEditor.cs`          | API 113：全部角色／设置、文件与冻结预览工程通过；浏览器待核验               |
+| `Subforms/Save Editors/Gen5/Join Avenue/JoinAvenueVisitorSpecificEditor.cs`   | API 113：全部角色／设置、文件与冻结预览工程通过；浏览器待核验               |
+| `Subforms/Save Editors/Gen5/Join Avenue/SAV_JoinAvenue.cs`                    | API 113：全部角色／设置、文件与冻结预览工程通过；浏览器待核验               |
 | `Subforms/Save Editors/Gen5/SAV_DLC5.cs`                                      | API 108：七类文件、图像队伍、导入导出与预览工程通过；浏览器待核验           |
 | `Subforms/Save Editors/Gen5/SAV_GlobalLink5.cs`                               | API 109：常规、道具图片、家具、日期及冻结预览工程通过；浏览器待核验         |
 | `Subforms/Save Editors/Gen5/SAV_Medals5.cs`                                   | API 110：奖牌、栖息地、批量与 ml5 三语工程通过；浏览器待核验                |
 | `Subforms/Save Editors/Gen5/SAV_Misc5.cs`                                     | API 111：普通字段、森林图像、任务、记录与文件三语工程通过；浏览器待核验     |
 | `Subforms/Save Editors/Gen5/SAV_Pokedex5.cs`                                  | 已接入；两种布局工程检查通过，浏览器待核验                                  |
 | `Subforms/Save Editors/Gen5/SAV_UnityTower.cs`                                | API 112：地点、楼层、标记、来源批量与冻结预览三语接通；工程通过，界面待核验 |
-| `Subforms/Save Editors/Gen6/SAV_BerryFieldXY.cs`                              | 待核对                                                                      |
+| `Subforms/Save Editors/Gen6/SAV_BerryFieldXY.cs`                              | 来源只读及 GUI 36／Core 32 格差异已核对；产品待接入                         |
 | `Subforms/Save Editors/Gen6/SAV_BoxLayout.cs`                                 | API 59：箱名、壁纸、解锁数、标记、整箱交换；沿用当前编辑白名单              |
 | `Subforms/Save Editors/Gen6/SAV_HallOfFame.cs`                                | 待核对                                                                      |
 | `Subforms/Save Editors/Gen6/SAV_Link6.cs`                                     | 待核对                                                                      |

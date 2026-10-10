@@ -1,0 +1,115 @@
+.save-avenue5-body,
+.save-avenue5-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-avenue5-editor label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-avenue5-editor label > span {
+  font-size: 15px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-avenue5-editor p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-avenue5-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.save-avenue5-shop {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+  min-width: 0;
+}
+.save-avenue5-editor .save-avenue5-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.save-avenue5-check input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  flex: none;
+}
+.save-avenue5-editor textarea {
+  min-height: 88px;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px;
+}
+.save-avenue5-editor textarea:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-avenue5-draft {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 20px;
+}
+.save-avenue5-editor .save-avenue5-file {
+  flex: 1;
+  min-width: 180px;
+}
+.save-avenue5-preview {
+  border-block-start: 1px solid var(--line);
+  padding-block-start: 12px;
+}
+.save-avenue5-preview h4 {
+  margin: 0;
+}
+.save-avenue5-changes {
+  display: grid;
+  gap: 8px;
+  max-height: 22rem;
+  overflow: auto;
+}
+.save-avenue5-raw {
+  max-height: 10rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+.save-avenue5-preview summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.save-avenue5-preview summary:hover {
+  background: var(--surface-hover);
+}
+.save-avenue5-preview summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.save-avenue5-species {
+  width: 68px;
+  height: 56px;
+  object-fit: contain;
+}
+@media (max-width: 600px) {
+  .save-avenue5-grid,
+  .save-avenue5-shop {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

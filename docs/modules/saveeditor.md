@@ -437,7 +437,7 @@ UnityTower5Editing.cs 已接 API 112、Worker 和中／英／日界面；目录�
 
 B／W／B2／W2 核心专项已通过全部地点四编码、楼层两值、三语编号、保留位／异常标记、来源批量与整窗保存、未知安全／不安全自身位置、原件、冻结及完整文件对照。前端／客户端／领域 30 项专项通过；完整 verify 的 244 文件／941 项测试及网页／PWA、全套原生、API 112 核心构建、裁剪后 26 类型属性检查和新核心最终网页／PWA 打包均通过。外部 Chrome 入口仍不可用，浏览器／真实存档待核验。
 
-### 第五世代加盟大道（部分源码核对，尚未接入）
+### 第五世代汇合大道（API 113，工程检查通过）
 
 已读取 `SAV_JoinAvenue.cs`、ListEditor 的读写／导入导出流程、Core JoinAvenue5／IJoinAvenueEntity5／JoinAvenueDate5，初步核对 Settings5 和 Designer 显式限值。仅 B2W2；Core 固定访客 8、粉丝 12、店铺成员 8、助手 4，另有 Self。访客从块内 0x08、粉丝 0x62C、店铺成员 0xAAC、助手 0x10CC、Self 0x122C、ScriptFlag 位于 0x12F0 bit0、Settings 从 0x12F4 长 0xEC；访客／粉丝计数为独立 UInt32，不用它们决定可寻址格位数量。
 
@@ -447,7 +447,33 @@ Settings 名称／称号输入二十字符；源 General 姓名七字符，喊�
 
 三类大小与后缀已核对：Visitor 0xC4 jav5、Fan 0x60 jah5、Assistant 0x58 jaa5。General 的国家／地区 byte 0–255 为原数值输入，不能把 Trainer 地理候选范围强加到该控件；Unknown22 0–15 与性别共用半字节，游戏时间为小时 0–1023／分钟 0–63，TID／Sprite 0–65535，MetYear／Month／Day 各 0–255 原 byte，不能直接替换成日历日期控件并拒绝来源允许的 byte。版本来自目标游戏 FilteredSources，语言来自 Gen5 LanguageDataSource，性别控件自身的未知值与切换规则仍待读取。
 
-JoinAvenueDate5 为独立 UInt16 年／月／日格式，年 2000+七位，月四位、日五位，空值零；Date getter 对无效年月日返回 null，Date=null 清零。不可复用奖牌日期位布局。SaveBlockAccessor5B2W2 实际绑定块 67：0x23C00，长 0x16A8，块校验 0x252AA，目录校验 0x25F86。Fan 的今日互动 setter 将整个 0x4F 字节改为 0／1；Assistant 读取 0x33 bit0，但 setter 也重写整个字节，须区分普通保留与明确规范化。其他访客／粉丝／助手全部字段、字符串编码、日期 UI、资源与夹具仍待完成，本记录不代表接入实现。
+JoinAvenueDate5 为独立 UInt16 年／月／日格式，年 2000+七位，月四位、日五位，空值零；Date getter 对无效年月日返回 null，Date=null 清零。不可复用奖牌日期位布局。SaveBlockAccessor5B2W2 实际绑定块 67：0x23C00，长 0x16A8，块校验 0x252AA，目录校验 0x25F86。Fan 的今日互动 setter 将整个 0x4F 字节改为 0／1；Assistant 读取 0x33 bit0，但 setter 也重写整个字节，须区分普通保留与明确规范化。
+
+已通读 General、Visitor、Fan、Assistant、Settings、ListEditor 与主窗口保存流程，核对全部 Designer 显式上下界、三种实体及 StringConverter5。新增 Avenue5Editing／Fields／Parsing／Text，读取 35 个对象（大道、设置及 33 个角色），明确字段补丁、当前对象来源重新保存、三类文件同／跨类型导入导出和完整文件冻结预览；API 113 接 JSExport、独立 Worker、三语浮动面板。界面中文标题沿用来源“汇合大道编辑器”，不保留此前文档中的非来源译名。控件翻译在来源资源实际挂在 SAV_JoinAvenue 名下，不能误按子控件类名读取而回退英语。
+
+| 范围       | 核对的输入／保存行为                                                                                                                                                            | 上游依据                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 共有资料   | 姓名 7，喊话／问候／告别 8 个 UTF16 字符；国家／地区和三个原始日期 byte 均 0–255；Unknown22 0–15；TID／Sprite 0–65535；时间 1023／63；Seed UInt32                               | EntityGeneralEditor.cs／Designer、三种实体与 StringConverter5                               |
+| 性别／候选 | GenderToggle 读取大于 2 的值显示 2，只能切换 0／1；普通未指定旧性别保留，明确重新保存才截到 2。版本为目标存档 FilteredSources.Games，语言为 Gen5 候选，宝可梦为目标存档过滤列表 | GeneralEditor、Controls/PKM Editor/GenderToggle.cs、FilteredGameDataSource                  |
+| 访客／店铺 | AvenueLevel 127、DexSeen 1023、ShopRank 10；八未知 byte／计数为 255；经验／工作 UInt16；库存／UnusedB8 UInt32；packed 未知段 511／7／255／127／15 与独立 bit9                   | VisitorSpecificEditor.cs／Designer、JoinAvenueVisitor5                                      |
+| 访客列表   | 八店铺计数截到 15，八记录 UInt32，十六 Trivia 和四活动截到 255。逗号／分号／竖线／换行分隔，去空白和空项，缺少或无效项补零、多余项忽略，允许 0x HEX                             | VisitorSpecificEditor.ParseByteList／ParseUIntList／Split／TryParseUInt                     |
+| 日期文本   | 空或无效文本取零，先尝试 UInt32 十进制／HEX 并截到 UInt16，再尝试 invariant 日期；三日期及四活动日期沿用原解析。日期列表空项被忽略，普通未指定日期保留                          | VisitorSpecificEditor.FormatDate／ParseDate／ParseDateList、JoinAvenueDate5                 |
+| 店铺元组   | 类型 None 或八种，等级编号 0–9，版本编号 0–3。EncodeShop 与 DecodeShop 的乘数不对称，直接使用 Core 原 setter，并预览实际结果，不另写假定可逆编码                                | VisitorSpecificEditor.GetShopTuple／SetShopTuple、JoinAvenueVisitor5.EncodeShop／DecodeShop |
+| 粉丝／助手 | 粉丝七个 byte／气泡目标 0–255、Unknown52／5A UInt16，种类来源候选；助手四位置 byte。今日互动显式写入按各 Core setter 规范化整个相关 byte                                        | 两份 SpecificEditor／Designer、Fan5／Assistant5                                             |
+| 大道／设置 | 两角色计数 UInt32，ScriptFlag 保留邻位；名称／称号 20，等级 9999，经验／Flags／Seed UInt32，宣传天数 UInt16，ID 数据库数量 32／插入位置 31、32 组 TID／SID                      | SAV_JoinAvenue／SettingsEditor.cs 与 Designer、JoinAvenueSettings5                          |
+| 数据库文本 | 两 ID 列无显式输入字符数，保留 WinForms 文本默认 32767 限制；UInt16.TryParse 空／失败取零，单列修改保护另一半 ID32；不调用 AddPlayerVisitor                                     | SettingsEditor.cs／Designer、DataGridViewTextBoxColumn 默认行为                             |
+
+共有资料修改按来源保存顺序执行：Name／Shout 使用旧语言，之后更新语言，Greeting／Farewell 使用更新后的语言；请求字段顺序不影响此顺序。普通补丁只写指定字段，跨类型导入先写字符串再复制来源语言，直接沿用 CopyFrom。导出提供存储实体的精确字节；来源窗口导出前隐式保存的规范化改为独立“按窗口规则重新保存”预览，禁止带未应用草稿直接导出。Self 不提供来源没有的导入／导出按钮。原件保持、工作副本、撤销及完整存档导出沿用现有链路。
+
+请求上限 300000 字符，角色文件精确 196／96／88 bytes、Base64 最多 264 字符；拒绝重复字段、未知字段、越界格位、混用请求和陈旧完整文件摘要。确认重新执行后核对冻结目标，输出验证格式、版本、长度、全部校验和完整汇合大道块。全部 NUD 未设置 Hexadecimal／DecimalPlaces／Increment，沿用十进制整数与步长 1；空数字编辑结束恢复已读取值，文本／列表／日期空值按各来源解析，不统一视作数值零。
+
+B2／W2 核心专项通过全部 35 对象、33 角色地址、所有导入类型组合／精确导出、语言保存顺序、packed 位／旧数据、列表／日期解析、360 种店铺元组、各类来源重保存、原件及完整文件冻结／原子性对照。前端／客户端／领域专项 32 项通过，完整 verify 的 245 文件／950 项测试及网页／PWA、全套原生、API 113 核心构建、裁剪后 26 类型属性检查和新核心最终网页／PWA 打包均通过。外部 Chrome 尚未恢复，浏览器／真实存档待核验，不把工程检查当作所有者验收。
+
+### 第六世代 X／Y 树果田（已核对来源，尚未接入）
+
+已通读 SAV_BerryFieldXY.cs、Designer 和 BerryField6XY.cs，核对 SaveBlockAccessor6XY。来源窗口仅在选中格位时读取八个 UInt16 并显示，没有保存回调；B_Save.Enabled=false，明确显示 Unfinished - Needs More Research。Designer 列表包含 36 项，Core.Count 为 32，GetPlot 对编号 32 及以上抛出异常，不能因 GUI 多列四项就放宽可访问范围。
+
+实际绑定块 40，基址 0x1B800，长 0x390；格位从块内 0xC 起，每格 16 bytes，Core 可读 32 格。每格八个 UInt16 little-endian，第一项来源标为 Berry，其余 1–7 未知。后续按来源接入只读格位／原始数值展示，保护剩余块数据；不把可分配字节、ORAS 类的相似布局或窗口中的文本框推断成 X／Y 已确认的编辑功能。工程夹具与产品接线待完成。
 
 ## HGSS 宝可全能竞技（API 98）
 
