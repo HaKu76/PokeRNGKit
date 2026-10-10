@@ -1,0 +1,63 @@
+.save-berry6xy-viewer {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.save-berry6xy-viewer label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-berry6xy-viewer label > span,
+.save-berry6xy-values dt {
+  font-size: 15px;
+  line-height: 22px;
+}
+.save-berry6xy-viewer p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.save-berry6xy-values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.save-berry6xy-values > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.save-berry6xy-values dd {
+  margin: 0;
+  min-height: 44px;
+  padding: 11px 12px;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 15px;
+  line-height: 22px;
+  font-variant-numeric: tabular-nums;
+}
+.save-berry6xy-viewer summary {
+  min-height: 44px;
+  padding-block: 11px;
+  box-sizing: border-box;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.save-berry6xy-viewer summary:hover {
+  background: var(--surface-hover);
+}
+.save-berry6xy-viewer summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+@media (max-width: 600px) {
+  .save-berry6xy-values {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

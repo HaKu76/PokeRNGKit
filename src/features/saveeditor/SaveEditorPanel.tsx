@@ -1,3 +1,5 @@
+import { BerryField6XYViewer } from "./BerryField6XYViewer";
+import { supportsBerryField6XY, berry6xyWords } from "./berryField6xy";
 import { Avenue5Editor } from "./Avenue5Editor";
 import { supportsAvenue5, avenue5Words } from "./avenue5";
 import { UnityTower5Editor } from "./UnityTower5Editor";
@@ -167,6 +169,7 @@ export function SaveEditorPanel(
     | "misc4"
     | "misc5"
     | "medals5"
+    | "berryField6xy"
     | "avenue5"
     | "unityTower5"
     | "globalLink5"
@@ -318,6 +321,8 @@ export function SaveEditorPanel(
         (previous === "misc4" && !supportsMisc4(result.report.format)) ||
         (previous === "misc5" && !supportsMisc5(result.report.format)) ||
         (previous === "medals5" && !supportsMedals5(result.report.format)) ||
+        (previous === "berryField6xy" &&
+          !supportsBerryField6XY(result.report.format)) ||
         (previous === "avenue5" && !supportsAvenue5(result.report.format)) ||
         (previous === "unityTower5" &&
           !supportsUnityTower5(result.report.format)) ||
@@ -1151,6 +1156,22 @@ export function SaveEditorPanel(
       }
     });
 
+  const readBerryField6XY = async () => {
+    let c: import("./berryField6xy").Berry6XYCatalog | undefined;
+    await perform(async (id) => {
+      if (!working.current) return;
+      const result = await client.current.run(
+        working.current,
+        undefined,
+        "berryField6xy",
+      );
+      if (id !== operation.current) return;
+      if (!result.berryField6xy)
+        throw Error("No BerryField6XY catalog was returned.");
+      c = result.berryField6xy;
+    });
+    return c;
+  };
   const readAvenue5 = async () => {
     let c: import("./avenue5").Avenue5Catalog | undefined;
     await perform(async (id) => {
@@ -2343,6 +2364,15 @@ export function SaveEditorPanel(
                 {medals5Labels[batchLang].title}
               </button>
             )}
+            {supportsBerryField6XY(report.format) && (
+              <button
+                type="button"
+                aria-pressed={section === "berryField6xy"}
+                onClick={() => setSection("berryField6xy")}
+              >
+                {berry6xyWords[batchLang].title}
+              </button>
+            )}
             {supportsAvenue5(report.format) && (
               <button
                 type="button"
@@ -2801,6 +2831,14 @@ export function SaveEditorPanel(
               onPreview={previewMedals5}
               onExport={exportMedals5}
               onApply={(edit) => applyWorkingEdit(edit, "medals5Edit")}
+            />
+          ) : section === "berryField6xy" &&
+            supportsBerryField6XY(report.format) ? (
+            <BerryField6XYViewer
+              revision={workingRevision}
+              busy={busy}
+              lang={batchLang}
+              onRead={readBerryField6XY}
             />
           ) : section === "avenue5" && supportsAvenue5(report.format) ? (
             <Avenue5Editor

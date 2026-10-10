@@ -103,6 +103,7 @@ export class SaveEditorClient {
       | "medals5Preview"
       | "medals5Edit"
       | "medals5Export"
+      | "berryField6xy"
       | "avenue5"
       | "avenue5Preview"
       | "avenue5Edit"

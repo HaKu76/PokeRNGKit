@@ -1,3 +1,4 @@
+import { berry6xyWords } from "./berryField6xy";
 import { avenue5Words } from "./avenue5";
 import { tower5Words } from "./unityTower5";
 import { misc5Words } from "./misc5Words";
@@ -27,6 +28,7 @@ export const saveEditorResources = {
     misc5Stale: misc5Words.zh.stale,
     medals5Error: medals5Words.zh.invalid,
     medals5Stale: medals5Words.zh.stale,
+    berry6xyError: berry6xyWords.zh.invalid,
     avenue5Error: avenue5Words.zh.invalid,
     avenue5Stale: avenue5Words.zh.stale,
     unityTower5Error: tower5Words.zh.invalid,
@@ -613,6 +615,7 @@ export const saveEditorResources = {
     misc5Stale: misc5Words.en.stale,
     medals5Error: medals5Words.en.invalid,
     medals5Stale: medals5Words.en.stale,
+    berry6xyError: berry6xyWords.en.invalid,
     avenue5Error: avenue5Words.en.invalid,
     avenue5Stale: avenue5Words.en.stale,
     unityTower5Error: tower5Words.en.invalid,
@@ -1241,6 +1244,7 @@ export const saveEditorResources = {
     misc5Stale: misc5Words.ja.stale,
     medals5Error: medals5Words.ja.invalid,
     medals5Stale: medals5Words.ja.stale,
+    berry6xyError: berry6xyWords.ja.invalid,
     avenue5Error: avenue5Words.ja.invalid,
     avenue5Stale: avenue5Words.ja.stale,
     unityTower5Error: tower5Words.ja.invalid,
@@ -1902,6 +1906,7 @@ export function localizeSaveError(
   if (/Misc5/i.test(message)) return words.misc5Error;
   if (/Medals5.*stale/i.test(message)) return words.medals5Stale;
   if (/Medals5/i.test(message)) return words.medals5Error;
+  if (/BerryField6XY/i.test(message)) return words.berry6xyError;
   if (/Avenue5.*stale/i.test(message)) return words.avenue5Stale;
   if (/Avenue5/i.test(message)) return words.avenue5Error;
   if (/UnityTower5.*stale/i.test(message)) return words.unityTower5Stale;
