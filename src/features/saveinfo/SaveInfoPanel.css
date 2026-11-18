@@ -1,0 +1,30 @@
+.floating-tool-panel.save-info-panel {
+  width: min(480px, calc(100vw - 24px));
+}
+
+.save-info-body {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 16px;
+}
+
+.save-info-body :is(p, dl, dd) {
+  margin: 0;
+}
+
+.save-info-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 8px 16px;
+  font-size: 15px;
+}
+
+.save-info-fields > div {
+  display: contents;
+}
+
+.save-info-fields dd {
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}

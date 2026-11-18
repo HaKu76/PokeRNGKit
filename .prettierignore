@@ -18,10 +18,6 @@ third_party/pkhex/PKHeX.Core/
 third_party/pkhex/Directory.Build.props
 third_party/pkhex/LICENSE
 third_party/pkhex/dotnet-notices/
-public/pkhex/
-wasm/pkhex/bin/
-wasm/pkhex/obj/
-wasm/pkhex/tests/bin/
-wasm/pkhex/tests/obj/
-
-third_party/pkhex/drawing/
+public/save-info/
+wasm/modules/saveinfo/bin/
+wasm/modules/saveinfo/obj/

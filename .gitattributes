@@ -3,7 +3,3 @@ third_party/pkhex/PKHeX.Core/** -text -whitespace
 third_party/pkhex/Directory.Build.props -text -whitespace
 third_party/pkhex/LICENSE -text -whitespace
 third_party/pkhex/dotnet-notices/** -text -whitespace
-
-third_party/pkhex/drawing/** -text -whitespace
-
-third_party/pkhex/legality-fixtures/*.pk3 -text -whitespace

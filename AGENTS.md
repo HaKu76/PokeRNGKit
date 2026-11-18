@@ -4,6 +4,7 @@
 
 - PokeRNGKit is the confirmed English project name. Do not add a Chinese project name unless the owner makes a separate final decision.
 - Implement every PokeFinder 4.3.2 product module. Generation III, Generation IV, and Generation V are complete; finish the remaining Generation VIII modules before moving to the 3DSRNGTool scope.
+- Keep a read-only local save information tool for trainer name, IDs and basic metadata. Use PKHeX.Core for format recognition and parsing.
 - Implement every 3DSRNGTool module in `docs/module-inventory.md` except `NTR Helper`. `NTR Helper` is explicitly excluded because raw NTR/TCP access is outside the static-browser architecture.
 - Keep the application fully static and local-first. Do not add a backend, account system, telemetry, runtime CDN, or cloud profile storage.
 - Use npm for dependency installation and scripts. Do not introduce pnpm, Yarn, or Bun metadata.
@@ -15,7 +16,6 @@
 - Name product modules after their corresponding PokeFinder modules.
 - For every control label, use the exact Simplified Chinese translation from `Form/i18n/PokeFinder_zh.ts` when it exists.
 - If PokeFinder has no Simplified Chinese translation for a control, keep the exact English source label. Do not create an independent Chinese translation.
-- Owner clarification (2026-09-26): PKHeX save tools and their entry points must use the active UI language (Chinese/English/Japanese). Use descriptive labels such as 训练家姓名 rather than OT in Chinese; localize operation labels, game names and messages instead of retaining English-only Save Editor labels.
 - Before implementing or changing a module, inspect its Qt input setup and Core parameter types. Match upstream radix, empty-value behavior, minimum, maximum, width, and cross-field range constraints in both HTML controls and domain validation.
 - Record the verified input limits and their upstream source files in `docs/modules/<module>.md`. Do not infer limits from placeholders or old documentation.
 - Preserve PokeFinder copyright notices, GPL-3.0-or-later headers, upstream attribution, source-distribution obligations, and trademark disclaimers.

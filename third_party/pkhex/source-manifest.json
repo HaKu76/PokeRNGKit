@@ -3552,10 +3552,6 @@
     "PKHeX.Core/Util/Util.cs": "ef00382d47cb045d072b8617c884ad19ef904127956a7d1e3f047925a508abfc",
     "PKHeX.Core/Util/ValueTypeTypeConverter.cs": "f8d614c56254d2a8ff5e4e1052479600433fdd45fef67ae34aeae917f09fce71",
     "Directory.Build.props": "5111d2ba5acc77e5dc4f000fce7556c830244b3271a010ec7edb7cbcef72dff8",
-    "LICENSE": "ccb349b4132ed7737f25e5adebfe61f3d52dca33708df1e50352320438d1d4c2",
-    "drawing/SpriteName.cs": "195d91ee1553bb6b435550eb37eddf81d93619ded17180afe4417ab1d23deb51",
-    "legality-fixtures/legal-shedinja.pk3": "344271b7e02182cdedcab65037f50ab3eddc1b9373ffb5f97245160d2d600fdf",
-    "legality-fixtures/illegal-shedinja.pk3": "59694354a1540b650d0f7e0b1f3d121d9a95a751d34c85a6433792b882492a8d",
-    "legality-fixtures/legal-castform.pk6": "c49705a72c44a472681bac0db75dd4238ce72d61c011ce8a644009582e5fa1cb"
+    "LICENSE": "ccb349b4132ed7737f25e5adebfe61f3d52dca33708df1e50352320438d1d4c2"
   }
 }

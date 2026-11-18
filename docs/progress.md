@@ -1,5 +1,11 @@
 # PokeRNGKit 项目进度与交接
 
+## 2026-11-18 移除存档编辑并保留只读入口
+
+基于干净的 `main` / `23528d34` 移除存档编辑工作区、写回与导出、宝可梦与配信资料库、编辑器设置及专属素材。右下角保留“读取存档”，本地文件交由独立 Worker 识别，结果显示游戏、训练家姓名、TID、SID、适用时的六位游戏内 ID、游戏时间与校验和。PKHeX.Core 仅用于读取，保留固定来源、许可证和浏览器解析所需依赖。
+
+旧存档编辑进度为历史记录。移出的目录暂存于忽略的 `.tmp/pkhex-removed-2026-11-18/`。本轮按所有者要求直接提交并推送 `main`，本机执行格式与差异检查。浏览器、构建、测试与验收未运行，后续通过 Actions 查看工程结果。
+
 ## 2026-10-28 设置工作区会话保留（API190 前端，已发布，页面待核验）
 
 76690ac1d419819c32cbe0286b65cf6ac0b2bc4a 已推送并成功发布。[Actions 40638638189](https://github.com/HaKu76/PokeRNGKit/actions/runs/40638638189) 的 build 122651351761、Windows 包 122660712244、Cloudflare 122660712246 和 GitHub Pages 122660712239 均 completed／success；已按精确提交核对 PKHeX 往返、完整前端、原生 Core 与 Wasm／网页四项门禁。原始与归纳终态为 `.tmp/pkhex-settings-session-release-proof-raw.json`／`.tmp/pkhex-settings-session-release-proof.json`。观察进程 79701 因 TLS 握手超时退出 1，连接器与独立 gh 查询随后确认实际成功，未重新推送或重跑流水线。网页启动修订为 0.190.6.0，Core／Worker／API190 不变；页面及所有者验收仍待核验。
@@ -176,7 +182,7 @@ BOX14 空箱在跳过空格时拒绝导出，中文／英文／日文错误均�
 
 8313428e设置说明的[流水线40447227473](https://github.com/HaKu76/PokeRNGKit/actions/runs/40447227473)已completed／success，build、GitHub Pages、Cloudflare及Windows桌面包四任务均成功。期间有查询网络错误，续查同一运行确认终态，未重新触发构建。
 
-新增完整鼠标手势消费点并接入单箱、全箱、双箱：完整Int32阈值、严格L1位移、源快照、真实目标命中、精确修饰键反馈、取消及拖后点击抑制；保留原生文件拖入和触控／笔路径。来源及CSS坐标单位见[存档模块](modules/saveeditor.md)，设置已开放。十文件76项专项与本批全部TypeScript定向Lint退出0，证据为`.tmp/pkhex-pointer-integration-tests-final.log`和`.tmp/pkhex-pointer-integration-lint-final.log`。捕获点击边界追加后，控制器10项与四文件Lint通过，完整`npm run verify`退出0：377文件／2292项前端、类型、Lint及网页／PWA打包通过，见`.tmp/pkhex-pointer-integration-verify.log`和`.tmp/pkhex-pointer-integration-verify-result.json`。保留既有Hook、包体与插件耗时提示；Core／Worker／API189未改，不重跑本机原生核心。
+新增完整鼠标手势消费点并接入单箱、全箱、双箱：完整Int32阈值、严格L1位移、源快照、真实目标命中、精确修饰键反馈、取消及拖后点击抑制；保留原生文件拖入和触控／笔路径。来源及CSS坐标单位见[存档模块](https://github.com/HaKu76/PokeRNGKit/blob/23528d34ec6663514265a5c7f48bc2df905b72e4/docs/modules/saveeditor.md)，设置已开放。十文件76项专项与本批全部TypeScript定向Lint退出0，证据为`.tmp/pkhex-pointer-integration-tests-final.log`和`.tmp/pkhex-pointer-integration-lint-final.log`。捕获点击边界追加后，控制器10项与四文件Lint通过，完整`npm run verify`退出0：377文件／2292项前端、类型、Lint及网页／PWA打包通过，见`.tmp/pkhex-pointer-integration-verify.log`和`.tmp/pkhex-pointer-integration-verify-result.json`。保留既有Hook、包体与插件耗时提示；Core／Worker／API189未改，不重跑本机原生核心。
 
 首轮点击监听清理和React ref规则失败已修正，原日志保留。原始E.sav与工作副本SHA-256再次保持7DA8AD6A95CB58076705118947C41BD0131A622CA95336D3F617C091FDD30442。外部Chrome绑定5173仍报nodeRepl.fetch失败，正式手势、焦点、混合输入与布局未核验，完整接入目标保持进行中。另查明官方离线应用包为26.1021.3705.0，高于本机26.1007.2314.0；包名、发布者和声明能力一致，更新包准备中，尚未安装，不宣称通道恢复。
 
@@ -194,7 +200,7 @@ BOX14 空箱在跳过空格时拒绝导出，中文／英文／日文错误均�
 
 素材只读核验覆盖art-manifest.json的7236项引用，全部文件存在；7236项PNG头部／非零尺寸通过，文件哈希均能对应已记录的上游素材哈希。其中5230个精灵键、213个壁纸键；结果见.tmp/pkhex-drop-feedback-art-integrity.json。这证明文件与记录一致，不证明页面加载、格位匹配、完整图像解码或显示效果。原始E.sav及检查副本的SHA-256仍为7DA8AD6A95CB58076705118947C41BD0131A622CA95336D3F617C091FDD30442。
 
-外部Chrome旧连接3不可用；刷新清单发现连接4并绑定后，控制请求仍报nodeRepl.fetch失败，未取得页面。该阻塞在本次恢复后的连续目标轮次中重复；真实格位操作、导入／下载、三语／焦点／布局及可配置起拖阈值仍待完成。更新[完整接入审计](pkhex-completion-audit.md)，保留129项来源范围和全部未核验要求。完整目标未完成；本批仅补文档，不重跑已完成的产品构建，也不把资源检查或部署成功写作所有者验收。
+外部Chrome旧连接3不可用；刷新清单发现连接4并绑定后，控制请求仍报nodeRepl.fetch失败，未取得页面。该阻塞在本次恢复后的连续目标轮次中重复；真实格位操作、导入／下载、三语／焦点／布局及可配置起拖阈值仍待完成。更新[完整接入审计](https://github.com/HaKu76/PokeRNGKit/blob/23528d34ec6663514265a5c7f48bc2df905b72e4/docs/pkhex-completion-audit.md)，保留129项来源范围和全部未核验要求。完整目标未完成；本批仅补文档，不重跑已完成的产品构建，也不把资源检查或部署成功写作所有者验收。
 
 ## 2026-10-27 箱子拖放效果一致性（API189，页面待核验）
 
@@ -212,7 +218,7 @@ BOX14 空箱在跳过空格时拒绝导出，中文／英文／日文错误均�
 
 ## 2026-10-17 完整接入证据与平台边界（文档审计）
 
-产品代码基线d426c7603bf9f1a9d3c2c4a5b603560eb78706dc，API189。重新读取Actions39019277406，build、GitHub Pages、Cloudflare Pages和Windows桌面包四任务均success。工作区在本轮开始时干净。新增[完整接入证据与平台边界](pkhex-completion-audit.md)，逐项区分代码／工程证据、缺失的页面证据及平台行为；129行来源路径唯一，均能对应当前上游文件，但不据此推导完整功能覆盖。
+产品代码基线d426c7603bf9f1a9d3c2c4a5b603560eb78706dc，API189。重新读取Actions39019277406，build、GitHub Pages、Cloudflare Pages和Windows桌面包四任务均success。工作区在本轮开始时干净。新增[完整接入证据与平台边界](https://github.com/HaKu76/PokeRNGKit/blob/23528d34ec6663514265a5c7f48bc2df905b72e4/docs/pkhex-completion-audit.md)，逐项区分代码／工程证据、缺失的页面证据及平台行为；129行来源路径唯一，均能对应当前上游文件，但不据此推导完整功能覆盖。
 
 补记已核对的平台来源：额外存档扩展名只扩展桌面选择器，网页文件入口本来不限制扩展名；BAKPrompt是首次创建备份目录的询问记账，不是逐次备份开关；最近磁盘文件初值、Windows箱子临时文件／OLE拖出、覆盖／另存及WinForms焦点绘图分别记录，不伪装成同等网页功能。DragStartThreshold仍是待验证交互：当前原生浏览器拖放没有该配置，不能仅取消dragstart就宣称已适配，也不能未经浏览器验证直接排除。
 
@@ -312,7 +318,7 @@ API185模式／相遇专项与默认完整原生检查均退出0，包含真实E
 
 浏览器核心构建通过；359文件／2187项完整前端测试通过。共享按钮样式收口后，定向Lint、完整类型、网页／PWA构建及全仓格式、`git diff --check`再次通过。完整Lint保留第三世代定点既有的一条Hook警告，构建保留既有裁剪、包体及插件耗时提示。证据见 `.tmp/pkhex-api184-native-full.log`、`.tmp/pkhex-api184-core.log`、`.tmp/pkhex-api184-tests-full.log` 与 `.tmp/pkhex-api184-controls-*.log`。
 
-原件与副本SHA-256均为 `7DA8AD6A95CB58076705118947C41BD0131A622CA95336D3F617C091FDD30442`。外部Chrome本次仍连接超时，正式页面、连续操作和实际下载未核验；工程通过不作所有者验收。上一轮94524a94的Actions 38967292999已完成（success）。下一组继续按 [HaX范围](pkhex-hax.md) 对齐字段可见性、手动特性、自动提示与背包全局关联，完整目标保持未完成。
+原件与副本SHA-256均为 `7DA8AD6A95CB58076705118947C41BD0131A622CA95336D3F617C091FDD30442`。外部Chrome本次仍连接超时，正式页面、连续操作和实际下载未核验；工程通过不作所有者验收。上一轮94524a94的Actions 38967292999已完成（success）。下一组继续按 [HaX范围](https://github.com/HaKu76/PokeRNGKit/blob/23528d34ec6663514265a5c7f48bc2df905b72e4/docs/pkhex-hax.md) 对齐字段可见性、手动特性、自动提示与背包全局关联，完整目标保持未完成。
 
 ## 2026-10-17 编辑目录过滤（API183）
 
@@ -616,7 +622,7 @@ LocalResources.TemplatePath 对应本机库分类，按末级目录名及实体�
 
 前端三文件最终 13 项（生命周期、开关消费、三语控件及叫声回归）、定向代码检查、最终类型、网页打包、全仓格式及 diff 检查均通过。没有核心代码变化，不重复核心构建；实际音频与听感待外部 Chrome 核验。本批未提交，完整目标继续。
 
-后续 Other 提示音已从只读来源提取 164 个直接调用位置，记录在 [其他提示音清单](pkhex-sound-coverage.md)。其中 5 处接线见上节，其余 159 处以及通用 Alert／Error／Prompt 内部路径仍待处理，不算接入完成。
+后续 Other 提示音已从只读来源提取 164 个直接调用位置，记录在 [其他提示音清单](https://github.com/HaKu76/PokeRNGKit/blob/23528d34ec6663514265a5c7f48bc2df905b72e4/docs/pkhex-sound-coverage.md)。其中 5 处接线见上节，其余 159 处以及通用 Alert／Error／Prompt 内部路径仍待处理，不算接入完成。
 
 ## 2026-10-15 性别显示共享规则
 
@@ -688,9 +694,7 @@ Chrome 本轮识别为 id4，但标签读取仍报 `nodeRepl.fetch request faile
 
 前端六文件 143 项、定向 Lint、类型与全仓格式通过；原生共享表／相遇／合法性、目录识别和配信数据库回归通过。初稿修正重复文件预期与测试中的来源字段名后通过，产品沿用原始 Core。真实 E.sav 工作副本的识别、箱子读取、编辑／导出／重读、其他格位及输入保护通过。日志为 `.tmp/pkhex-external-gifts-{front-final,lint-final,types,native-final,real-save,format-final}.log`；最新浏览器核心与顺序网页打包均通过，框架已更新，日志为 `.tmp/pkhex-external-gifts-{core,build-final}.log`。Chrome 仍识别为 id3，但标签列表为空并返回 `nodeRepl.fetch request failed`；实际页面、浏览器虚拟文件系统和跨标签交互未核验。原件 `Desktop/200/battery/E.sav` 为 131072 字节，SHA-256 仍为 `7DA8AD6A95CB58076705118947C41BD0131A622CA95336D3F617C091FDD30442`。完整 PKHeX 目标与 SettingsEditor 模块保持进行中，本批尚未提交。
 
-## 当前目标
-
-- 唯一下一步：完成存储关联合法性检查的公开 JSExport／Worker 与正式三语入口，更新握手并验证来源／取消／空报告／复制；再继续 20 处通用编辑器直接调用及 Alert／Error／Prompt 路径、第六世代箱子移动边界和其他设置。Unicode 字体平台对应仍待解决。Chrome 恢复后补核页面、剪贴板、声音与既有视觉交互；全部适用 PKHeX 功能仍在完整目标内。
+## 2026-10-15 存档编辑阶段记录
 
 - 2026-10-15 MGDatabasePath 接配信资料库分类与子分类，旧记录只读归属 mgdb；存储版本 2 保留旧仓库／快照，CAS／撤销覆盖完整集合，移除保护其他分类。目录导入保留相对路径，新增只读 Core 批量识别入口，按来源识别跳过无关文件，不在 JS 实现格式识别；验证后再写入本机库。前端五文件 17 项、定向 Lint 通过，修订测试 Span 访问后原生识别与配信数据库回归通过；类型、最新核心与顺序构建后的前端产物通过。日志为 `.tmp/pkhex-gift-directory-{front,lint,native-final,types,core,build-final,format-final}.log`。全局自定义配信刷新仍待接，页面／真实 IndexedDB 升级未核验，未提交，完整目标继续。
 
@@ -2551,7 +2555,7 @@ Chrome 本轮识别为 id4，但标签读取仍报 `nodeRepl.fetch request faile
   仍未完成全部 PKHeX 范围，也尚未新增提交或推送。
 
 - 2026-09-26 新目标：完整接入静态浏览器可适用的 PKHeX 功能，按
-  [功能清单](pkhex-inventory.md)逐项推进，不把训练家基础读写称为完整接入。
+  [功能清单](https://github.com/HaKu76/PokeRNGKit/blob/23528d34ec6663514265a5c7f48bc2df905b72e4/docs/pkhex-inventory.md)逐项推进，不把训练家基础读写称为完整接入。
   起点为已提交的 `6b9ce80`，工作区干净。首批开发可视化盒子：本地上游图像/壁纸、
   实际盒子名称、空格位与真实位置。可视化 API 3 批次通过 11 种原生夹具、
   核心构建与完整 verify（184 文件 / 641 测试）；Chrome 仍显示旧缓存，已请所有者刷新。
@@ -2585,7 +2589,7 @@ Chrome 本轮识别为 id4，但标签读取仍报 `nodeRepl.fetch request faile
   修正坏校验提示及测试参考字节被上游读取修改的问题。首次使用核心按需加载，约 33 MiB
   未压缩资源；初始预缓存 252 项 / 22722.61 KiB。桌面截图及手机边界/控件尺寸已检查。
   限制：手机加载后截图超时、跨核心版本缓存更新未实测，剑盾/GameCube/真实存档覆盖不足；
-  不等于完整桌面 PKHeX 或所有者验收。具体证据与范围见 [存档模块](modules/saveeditor.md)。
+  不等于完整桌面 PKHeX 或所有者验收。具体证据与范围见 [存档模块](https://github.com/HaKu76/PokeRNGKit/blob/23528d34ec6663514265a5c7f48bc2df905b72e4/docs/modules/saveeditor.md)。
   任务起点为干净的 main/ec8bd68；工作区尚未提交、推送或发布。预览已恢复在 5173。
   后续由所有者评审基础功能，再决定真实存档覆盖与更多编辑字段。
 

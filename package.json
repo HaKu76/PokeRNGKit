@@ -11,12 +11,11 @@
   },
   "packageManager": "npm@12.0.2",
   "scripts": {
-    "pkhex:build": "node scripts/pkhex.mjs build",
-    "pkhex:test": "node scripts/pkhex.mjs test",
+    "saveinfo:build": "node scripts/save-info.mjs",
     "dev": "npm run wasm:build && vite",
     "dev:ui": "vite --mode ui --host 127.0.0.1 --port 5173 --strictPort",
     "dev:web": "vite",
-    "build": "npm run pkhex:build && npm run wasm:build && npm run build:web",
+    "build": "npm run saveinfo:build && npm run wasm:build && npm run build:web",
     "build:ui": "tsc -b && vite build --mode ui",
     "build:web": "tsc -b && vite build",
     "build:web:bundle": "vite build",
@@ -43,9 +42,7 @@
     "@noble/hashes": "2.4.0",
     "@tanstack/react-virtual": "^3.14.9",
     "i18next": "^26.3.6",
-    "jsqr": "1.4.0",
     "lucide-react": "^1.31.0",
-    "qrcode": "1.5.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-i18next": "^17.0.11"
@@ -53,7 +50,6 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.3",
-    "@types/qrcode": "1.5.6",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",

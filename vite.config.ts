@@ -16,26 +16,6 @@ export default defineConfig(({ mode }) => ({
         await mkdir(`${outputDirectory}/legal`, { recursive: true });
         await Promise.all([
           copyFile(
-            "node_modules/qrcode/license",
-            `${outputDirectory}/legal/QRCode-LICENSE.txt`,
-          ),
-          copyFile(
-            "node_modules/jsqr/LICENSE",
-            `${outputDirectory}/legal/jsQR-LICENSE.txt`,
-          ),
-          copyFile(
-            "node_modules/dijkstrajs/LICENSE.md",
-            `${outputDirectory}/legal/DijkstraJS-LICENSE.txt`,
-          ),
-          copyFile(
-            "third_party/pkhex/drawing/README.upstream.md",
-            `${outputDirectory}/legal/PKHeX-Drawing-Credits.md`,
-          ),
-          copyFile(
-            "third_party/pkhex/art-manifest.json",
-            `${outputDirectory}/legal/PKHeX-Art-Manifest.json`,
-          ),
-          copyFile(
             "node_modules/@noble/ciphers/LICENSE",
             `${outputDirectory}/legal/Noble-Ciphers-LICENSE.txt`,
           ),
@@ -111,26 +91,16 @@ export default defineConfig(({ mode }) => ({
               clientsClaim: true,
               navigateFallback: "index.html",
               globPatterns: ["**/*.{js,css,html,ico,mjs,wasm,txt,md,png,jpg}"],
-              globIgnores: ["pkhex/**", "save-art/**"],
+              globIgnores: ["save-info/**"],
               maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
               runtimeCaching: [
                 {
                   urlPattern: ({ url, sameOrigin }) =>
-                    sameOrigin && url.pathname.includes("/save-art/26.08.26/"),
-                  handler: "CacheFirst",
-                  options: {
-                    cacheName: "pokerngkit-save-art-26-08-26",
-                    cacheableResponse: { statuses: [200] },
-                    expiration: { maxEntries: 1600 },
-                  },
-                },
-                {
-                  urlPattern: ({ url, sameOrigin }) =>
                     sameOrigin &&
-                    url.pathname.endsWith("/pkhex/_framework/dotnet.js"),
+                    url.pathname.endsWith("/save-info/_framework/dotnet.js"),
                   handler: "NetworkFirst",
                   options: {
-                    cacheName: "pokerngkit-pkhex-launcher-v1",
+                    cacheName: "pokerngkit-save-info-launcher-v1",
                     networkTimeoutSeconds: 3,
                     cacheableResponse: { statuses: [200] },
                   },
@@ -138,12 +108,12 @@ export default defineConfig(({ mode }) => ({
                 {
                   urlPattern: ({ url, sameOrigin }) =>
                     sameOrigin &&
-                    /\/pkhex\/_framework\/[^/]+\.(?:js|wasm|dat|dll|json)$/.test(
+                    /\/save-info\/_framework\/[^/]+\.(?:js|wasm|dat|dll|json)$/.test(
                       url.pathname,
                     ),
                   handler: "CacheFirst",
                   options: {
-                    cacheName: "pokerngkit-pkhex-assets-v1",
+                    cacheName: "pokerngkit-save-info-assets-v1",
                     cacheableResponse: { statuses: [200] },
                     expiration: { maxEntries: 128 },
                   },
@@ -158,8 +128,8 @@ export default defineConfig(({ mode }) => ({
       ignored: [
         "**/third_party/pkhex/**/bin/**",
         "**/third_party/pkhex/**/obj/**",
-        "**/wasm/pkhex/**/bin/**",
-        "**/wasm/pkhex/**/obj/**",
+        "**/wasm/modules/saveinfo/**/bin/**",
+        "**/wasm/modules/saveinfo/**/obj/**",
         "**/.tools/**",
         "**/.tmp/**",
       ],

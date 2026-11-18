@@ -542,18 +542,15 @@ npm run verify
 
 前端依赖的兼容范围与精确锁定规则记录在 [docs/tech-stack.md](docs/tech-stack.md#4-当前版本与锁定策略)。
 
+## 读取存档
+
+从右下角工具菜单打开“读取存档”，选择本地文件后可查看游戏、训练家姓名、TID、SID、游戏时间与校验和。采用六位训练家编号的游戏另显示游戏内的训练家 ID。读取在本机完成，关闭面板即清除结果。详见[存档读取](docs/modules/saveinfo.md)。
+
 ## 构建与测试
 
-主导航“存档编辑”提供独立本地工作区，使用 PKHeX.Core 在本机处理存档。顶部保留文件操作，
-左侧按用途组织功能，箱子与详情显示本地壁纸、宝可梦图像和乱数档案联动；支持训练家与
-宝可梦编辑、工作副本撤销和新文件导出。切换乱数工作区保留已打开文件与编辑状态。完整接入仍按
-[功能清单](docs/pkhex-inventory.md)推进，当前范围不等于桌面 PKHeX 全部功能。
+存档读取器使用 .NET SDK 10.0.401 和 `wasm-tools` 工作负载（`dotnet workload install wasm-tools --skip-manifest-update`）。`npm run saveinfo:build` 单独生成读取器。
 
-PKHeX 存档工具另需 .NET SDK 10.0.401 和 `wasm-tools` 工作负载（`dotnet workload install wasm-tools --skip-manifest-update`）。
-`npm run pkhex:build` 生成同源浏览器核心，`npm run pkhex:test` 检查合成存档读写；范围和未验证项见
-[存档编辑模块](docs/modules/saveeditor.md)。完整 `npm run build` 会先生成 PKHeX 核心，再执行下述 RNG 和前端构建。
-
-`npm run build` 先生成 release 模式的 60 个独立 MJS/Wasm 模块，包括 `gen3id`、`gen4static`、`gen5event`、`gen6mainseed`、`gen6tinytimeline`、`gen7festivalplaza`、`gen8id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground`、`pokerusfinder` 与 `researcher`，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。完整默认清单以 `wasm/CMakeLists.txt` 为准；这些目录都是生成物，不提交到 Git。
+`npm run build` 先生成存档读取器，再生成 release 模式的 60 个独立 MJS/Wasm 模块，包括 `gen3id`、`gen4static`、`gen5event`、`gen6mainseed`、`gen6tinytimeline`、`gen7festivalplaza`、`gen8id`、`gen8egg`、`gen8event`、`gen8raids`、`gen8static`、`gen8underground`、`pokerusfinder` 与 `researcher`，再由 Vite 将带内容哈希的 JS、CSS、Worker、PWA 和 Wasm 资源输出到 `dist/`。完整默认清单以 `wasm/CMakeLists.txt` 为准；这些目录都是生成物，不提交到 Git。
 
 测试规划分为五层：
 
@@ -586,8 +583,7 @@ CI/CD 使用 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)：
 本地编译保留为开发和应急能力。如果 Actions 暂时不可用，可在符合锁定版本的 Windows PowerShell 环境中运行：
 
 ```powershell
-npm run pkhex:test
-npm run pkhex:build
+npm run saveinfo:build
 npm run verify:full
 $env:BASE_PATH = "./"
 npm run build:web
@@ -658,5 +654,4 @@ PokeFinder 源码头声明可按 **GNU GPL v3 或更高版本**使用。PokeRNGK
 PokeRNGKit 是非官方、由社区开发的研究工具，与 Nintendo、Creatures Inc.、GAME FREAK inc.、The Pokemon Company 或其关联方没有隶属、授权或背书关系。
 
 Pokemon、宝可梦及相关名称、角色和素材是其各自权利人的商标或版权作品。项目名称中的相关指代仅用于说明工具用途。
-存档工具使用 PKHeX 仓库随附的宝可梦图像与盒子壁纸，保留原文件及来源记录；上游许可证、
-素材署名与逐文件清单见 [PKHeX 来源](third_party/pkhex/UPSTREAM.md)。项目不主张这些角色或素材的所有权。
+只读存档解析使用 PKHeX.Core。版本与许可证见 [PKHeX Core 来源](third_party/pkhex/UPSTREAM.md)。

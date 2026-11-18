@@ -35,16 +35,13 @@ jobs:
       - name: Install npm dependencies
         run: npm ci --engine-strict
 
-      - name: Setup .NET for PKHeX
+      - name: Setup .NET for the save reader
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.401
 
       - name: Install .NET WebAssembly tools
         run: dotnet workload install wasm-tools --skip-manifest-update
-
-      - name: Verify PKHeX save roundtrips
-        run: npm run pkhex:test
 
       - name: Verify TypeScript application
         run: npm run verify

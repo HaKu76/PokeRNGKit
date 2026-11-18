@@ -1,5 +1,4 @@
 import i18n from "i18next";
-import { saveEditorResources } from "./features/saveeditor/locales";
 
 const resources = {
   en: {
@@ -9,7 +8,23 @@ const resources = {
       appUpdateApplying: "Updating…",
       appUpdateConfirm:
         "Reload this page to use the new version? Export any edited saves first. Unsaved edits and current results in this window will be lost. Other windows will not reload automatically.",
-      saveEditor: saveEditorResources.en,
+      saveInfo: {
+        title: "Read Save",
+        open: "Open Save",
+        reading: "Reading save…",
+        size: "Select a save file between 1 byte and 32 MiB.",
+        unsupported:
+          "Could not read the save. Select an extracted, decrypted save file.",
+        runtime: "The save reader could not start. Try opening the file again.",
+        file: "File",
+        game: "Game",
+        trainer: "Trainer Name",
+        displayTid: "Displayed Trainer ID",
+        playTime: "Play Time",
+        checksum: "Checksum",
+        valid: "Valid",
+        invalid: "Invalid",
+      },
       // Shared labels used by multiple module workspaces.
       form: "Form",
       gen6StationaryFrames: "Frames",
@@ -2026,7 +2041,24 @@ const resources = {
       appUpdateApplying: "更新中…",
       appUpdateConfirm:
         "新しいバージョンを使うために、このページを再読み込みしますか？先に編集したセーブデータをエクスポートしてください。このウィンドウの未保存の編集と現在の結果は失われます。他のウィンドウは自動的に再読み込みされません。",
-      saveEditor: saveEditorResources.ja,
+      saveInfo: {
+        title: "セーブ読込",
+        open: "セーブを開く",
+        reading: "セーブを読み込んでいます…",
+        size: "1 バイトから 32 MiB までのセーブファイルを選択してください。",
+        unsupported:
+          "セーブを読み込めませんでした。展開・復号済みのファイルを選択してください。",
+        runtime:
+          "セーブ読込機能を起動できませんでした。ファイルを開き直してください。",
+        file: "ファイル",
+        game: "ゲーム",
+        trainer: "トレーナー名",
+        displayTid: "ゲーム内のトレーナーID",
+        playTime: "プレイ時間",
+        checksum: "チェックサム",
+        valid: "有効",
+        invalid: "無効",
+      },
       // Shared labels used by multiple module workspaces.
       form: "Form",
       gen6StationaryFrames: "Frames",
@@ -3978,7 +4010,22 @@ const resources = {
       appUpdateApplying: "正在更新…",
       appUpdateConfirm:
         "重新加载此页面以使用新版？请先导出编辑后的存档；当前窗口未保存的修改和结果将丢失。其他窗口不会自动刷新。",
-      saveEditor: saveEditorResources.zh,
+      saveInfo: {
+        title: "读取存档",
+        open: "打开存档",
+        reading: "正在读取存档…",
+        size: "请选择大小为 1 字节至 32 MiB 的存档。",
+        unsupported: "无法读取存档。请选择已解包、已解密的存档文件。",
+        runtime: "无法启动存档读取工具，请重新打开文件。",
+        file: "文件",
+        game: "游戏",
+        trainer: "训练家姓名",
+        displayTid: "游戏内训练家 ID",
+        playTime: "游戏时间",
+        checksum: "校验和",
+        valid: "有效",
+        invalid: "无效",
+      },
       // Shared labels used by multiple module workspaces.
       form: "Form",
       gen6StationaryFrames: "Frames",

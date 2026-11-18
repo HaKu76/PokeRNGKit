@@ -1,7 +1,3 @@
-import {
-  saveWorkspaceWords,
-  type PrimaryWorkspace,
-} from "./features/saveeditor/saveWorkspace";
 import { RESULT_TABLE_HEADER_HEIGHT } from "./features/shared/tableLayout";
 import { AppUpdateButton } from "./AppUpdateButton";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -25,7 +21,7 @@ import {
   ChevronDown,
   Dices,
   FlaskConical,
-  FilePenLine,
+  FileSearch,
   KeyRound,
   ListChecks,
   Menu,
@@ -152,7 +148,7 @@ import { MiscRngPanel } from "./features/miscrng/MiscRngPanel";
 import { TsvListPanel } from "./features/tsvlist/TsvListPanel";
 import { IvToolsPanel } from "./features/ivtools/IvToolsPanel";
 import { FloatingToolPanel } from "./features/shared/FloatingToolPanel";
-import { SaveToolsPanel } from "./features/saveeditor/SaveToolsPanel";
+import { SaveInfoPanel } from "./features/saveinfo/SaveInfoPanel";
 import { Select } from "./features/shared/Select";
 import { Gen3WorkflowTipsPanel } from "./features/gen3workflow/Gen3WorkflowTipsPanel";
 import { ProfileSelector } from "./features/shared/ProfileSelector";
@@ -631,8 +627,7 @@ function App() {
   const [ivToolsExpanded, setIvToolsExpanded] = useState(false);
   const [gen3WorkflowExpanded, setGen3WorkflowExpanded] = useState(false);
   const [floatingToolsExpanded, setFloatingToolsExpanded] = useState(false);
-  const [primaryWorkspace, setPrimaryWorkspace] =
-    useState<PrimaryWorkspace>("rng");
+  const [saveInfoExpanded, setSaveInfoExpanded] = useState(false);
   const [gen5AdjacentSeedsContext, setGen5AdjacentSeedsContext] =
     useState<Gen5AdjacentSeedsInitialContext>();
   const gen5AdjacentSeedsRequestId = useRef(0);
@@ -826,6 +821,7 @@ function App() {
 
   const openIvCalculator = () => {
     setModuleRailOpen(false);
+    setSaveInfoExpanded(false);
     setIvCalculatorExpanded(true);
     setEncounterLookupExpanded(false);
     setContributionsExpanded(false);
@@ -1130,31 +1126,34 @@ function App() {
       setSponsorshipExpanded(false);
     }
   };
-  const activeFloatingTool = sponsorshipExpanded
-    ? "sponsorship"
-    : contributionsExpanded
-      ? "contributions"
-      : ivCalculatorExpanded
-        ? "iv"
-        : encounterLookupExpanded
-          ? "encounter"
-          : researcherExpanded
-            ? "researcher"
-            : keyBvExpanded
-              ? "keybv"
-              : miscRngExpanded
-                ? "miscRng"
-                : tsvListExpanded
-                  ? "tsvList"
-                  : ivToolsExpanded
-                    ? "ivTools"
-                    : gen3WorkflowExpanded
-                      ? "gen3Workflow"
-                      : profileTools && unifiedProfileExpanded
-                        ? "profile"
-                        : undefined;
+  const activeFloatingTool = saveInfoExpanded
+    ? "saveInfo"
+    : sponsorshipExpanded
+      ? "sponsorship"
+      : contributionsExpanded
+        ? "contributions"
+        : ivCalculatorExpanded
+          ? "iv"
+          : encounterLookupExpanded
+            ? "encounter"
+            : researcherExpanded
+              ? "researcher"
+              : keyBvExpanded
+                ? "keybv"
+                : miscRngExpanded
+                  ? "miscRng"
+                  : tsvListExpanded
+                    ? "tsvList"
+                    : ivToolsExpanded
+                      ? "ivTools"
+                      : gen3WorkflowExpanded
+                        ? "gen3Workflow"
+                        : profileTools && unifiedProfileExpanded
+                          ? "profile"
+                          : undefined;
 
   const closeFloatingTools = () => {
+    setSaveInfoExpanded(false);
     setEncounterLookupExpanded(false);
     setIvCalculatorExpanded(false);
     setContributionsExpanded(false);
@@ -1167,19 +1166,6 @@ function App() {
     setIvToolsExpanded(false);
     setGen3WorkflowExpanded(false);
     closeProfilePanels();
-  };
-
-  const workspaceWords = saveWorkspaceWords[language];
-  const changeWorkspace = (next: PrimaryWorkspace) => {
-    closeFloatingTools();
-    setModuleRailOpen(false);
-    setFloatingToolsExpanded(false);
-    setPrimaryWorkspace(next);
-    requestAnimationFrame(() =>
-      document
-        .getElementById(next === "save" ? "save-workspace" : "rng-workspace")
-        ?.focus(),
-    );
   };
 
   const toolRailUsesHover = () =>
@@ -1210,7 +1196,7 @@ function App() {
 
   const toggleFloatingTool = (
     tool:
-      | "saveEditor"
+      | "saveInfo"
       | "contributions"
       | "encounter"
       | "iv"
@@ -1227,7 +1213,7 @@ function App() {
     setModuleRailOpen(false);
     closeFloatingTools();
     if (!expanded) return;
-    if (tool === "saveEditor") changeWorkspace("save");
+    if (tool === "saveInfo") setSaveInfoExpanded(true);
     else if (tool === "sponsorship") setSponsorshipExpanded(true);
     else if (tool === "contributions") setContributionsExpanded(true);
     else if (tool === "encounter") setEncounterLookupExpanded(true);
@@ -1247,7 +1233,7 @@ function App() {
   };
 
   return (
-    <div className="app-shell" data-primary-workspace={primaryWorkspace}>
+    <div className="app-shell">
       <header className="topbar">
         <div className="topbar-leading">
           <button
@@ -1263,7 +1249,6 @@ function App() {
                   : "openModules",
             )}
             className="module-menu-button"
-            hidden={primaryWorkspace === "save"}
             onClick={() => {
               if (wideViewport) {
                 setModuleRailCollapsed((current) => !current);
@@ -1306,27 +1291,6 @@ function App() {
             </div>
           </div>
         </div>
-        <nav
-          className="primary-workspace-tabs"
-          aria-label={workspaceWords.primary}
-        >
-          <button
-            type="button"
-            aria-pressed={primaryWorkspace === "rng"}
-            aria-controls="rng-workspace"
-            onClick={() => changeWorkspace("rng")}
-          >
-            {workspaceWords.rng}
-          </button>
-          <button
-            type="button"
-            aria-pressed={primaryWorkspace === "save"}
-            aria-controls="save-workspace"
-            onClick={() => changeWorkspace("save")}
-          >
-            {workspaceWords.save}
-          </button>
-        </nav>
         <div className="topbar-meta">
           <AppUpdateButton>
             <span className="app-status">
@@ -1387,29 +1351,7 @@ function App() {
         </div>
       </header>
 
-      <main
-        className="save-primary-workspace"
-        id="save-workspace"
-        tabIndex={-1}
-        aria-label={workspaceWords.save}
-        hidden={primaryWorkspace !== "save"}
-        inert={primaryWorkspace !== "save" ? true : undefined}
-      >
-        <SaveToolsPanel
-          active={primaryWorkspace === "save"}
-          gen3={profiles}
-          gen4={gen4Profiles}
-          gen8={gen8Profiles}
-          threeDs={threeDsProfiles}
-        />
-      </main>
-      <div
-        className="workspace"
-        id="rng-workspace"
-        tabIndex={-1}
-        hidden={primaryWorkspace !== "rng"}
-        inert={primaryWorkspace !== "rng" ? true : undefined}
-      >
+      <div className="workspace">
         {moduleRailOpen && !wideViewport && (
           <button
             aria-label={t("closeModules")}
@@ -4146,6 +4088,11 @@ function App() {
             }
           }}
         />
+        <SaveInfoPanel
+          expanded={activeFloatingTool === "saveInfo"}
+          language={language}
+          onExpandedChange={setSaveInfoExpanded}
+        />
         <FloatingToolPanel
           className="researcher-float-panel"
           closeLabel={t("collapse")}
@@ -4253,22 +4200,24 @@ function App() {
             id="floating-tool-actions"
           >
             <button
-              aria-controls="save-workspace"
-              aria-pressed={primaryWorkspace === "save"}
-              aria-label={t("saveEditor.title")}
-              className={primaryWorkspace === "save" ? "active" : undefined}
-              id="save-editor-trigger"
+              aria-controls="save-info-panel"
+              aria-expanded={activeFloatingTool === "saveInfo"}
+              aria-haspopup="dialog"
+              aria-label={t("saveInfo.title")}
+              className={
+                activeFloatingTool === "saveInfo" ? "active" : undefined
+              }
+              data-tone="teal"
+              id="save-info-trigger"
               onClick={() => {
                 if (!toolRailUsesHover()) setFloatingToolsExpanded(true);
-                toggleFloatingTool("saveEditor");
+                toggleFloatingTool("saveInfo");
               }}
-              title={t("saveEditor.title")}
+              title={t("saveInfo.title")}
               type="button"
             >
-              <FilePenLine aria-hidden="true" size={20} />
-              <span className="floating-tool-label">
-                {t("saveEditor.shortTitle")}
-              </span>
+              <FileSearch aria-hidden="true" size={20} />
+              <span className="floating-tool-label">{t("saveInfo.title")}</span>
             </button>
             <button
               aria-controls="gen3-workflow-tips-panel"

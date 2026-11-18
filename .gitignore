@@ -27,11 +27,9 @@ compile_commands.json
 wasm/build*/
 wasm/generated/
 public/wasm/
-public/pkhex/
-wasm/pkhex/bin/
-wasm/pkhex/obj/
-wasm/pkhex/tests/bin/
-wasm/pkhex/tests/obj/
+public/save-info/
+wasm/modules/saveinfo/bin/
+wasm/modules/saveinfo/obj/
 third_party/pkhex/PKHeX.Core/bin/
 third_party/pkhex/PKHeX.Core/obj/
 

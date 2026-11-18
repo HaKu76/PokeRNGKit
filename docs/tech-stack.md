@@ -9,18 +9,10 @@
 
 ## 1. 技术结论
 
-2026-09-22 存档 I/O 扩展采用原版 `PKHeX.Core` C# 库，通过 .NET 10 WebAssembly 在独立
-Worker 中运行。它与原有 C++ RNG Worker 并存，不替换 RNG 实现。运行时由静态站点同源提供，
-不使用 CDN、服务端文件处理或共享内存。源码锁定与构建入口见
-[存档编辑模块](modules/saveeditor.md)和 [PKHeX 来源](../third_party/pkhex/UPSTREAM.md)。
-
-2026-10-12 存档 UI 迁入独立主工作区。SaveToolsPanel 保持唯一挂载，非活动工作区使用
-hidden／inert，乱数模块继续使用 WorkspaceCache；切换不重新创建工作副本或 Worker。
-现有功能按原能力条件分组导航，箱子详情复用乱数档案联动，写入协议仍为 API 137。
-
 PokeRNGKit 使用 TypeScript 构建产品层，使用 WebAssembly 承载 RNG Core：
 
 - React + TypeScript 负责界面、输入校验、任务状态、结果展示、CSV 和国际化。
+- [存档读取](modules/saveinfo.md)使用 .NET 10 WebAssembly 在独立 Worker 中调用 PKHeX.Core，只返回训练家与存档摘要。
 - PokeFinder 第三世代 C++ Core 通过 Emscripten 编译为独立 Wasm 模块。
 - Wasm 只在 Dedicated Web Worker 内运行。
 - Worker Pool 用多个独立 Wasm 实例利用多核 CPU，不依赖 `SharedArrayBuffer`。
