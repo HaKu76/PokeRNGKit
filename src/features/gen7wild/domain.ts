@@ -1,3 +1,4 @@
+import { normalizeDecimalInput } from "../../input";
 import {
   GEN7_WILD_AREAS,
   GEN7_WILD_LOCATIONS,
@@ -18,6 +19,7 @@ export const GEN7_WILD_MAX_FRAME = 10_000_000;
 export const GEN7_WILD_MAX_RESULTS = 100_000;
 export const GEN7_WILD_STEP_SIZE = 16_384;
 export const GEN7_WILD_SLOT_COUNT = 11;
+export const GEN7_MAX_TSV = 4095;
 
 export type Gen7WildLanguage = "en" | "ja" | "zh";
 export type Gen7WildLead =
@@ -392,7 +394,7 @@ export function validateGen7WildRequest(request: Gen7WildRequest) {
     request.minFrame,
     GEN7_WILD_MAX_FRAME,
   );
-  assertInteger(request.tsv, "TSV", 0, 4095);
+  assertInteger(request.tsv, "TSV", 0, GEN7_MAX_TSV);
   assertInteger(request.trv, "TRV", 0, 15);
   assertFlag(request.shinyCharm, "Shiny Charm");
   assertFlag(request.considerDelay, "Consider Delay");
@@ -718,6 +720,10 @@ export function validateGen7WildResult(
     );
   }
   return result;
+}
+
+export function normalizeGen7TsvInput(value: string) {
+  return normalizeDecimalInput(value, GEN7_MAX_TSV);
 }
 
 export function parseGen7WildDecimal(value: string) {

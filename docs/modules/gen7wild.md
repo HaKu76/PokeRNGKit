@@ -25,7 +25,7 @@ Poke Pelago 特殊遭遇已归入 `Stationary RNG`，不在 Wild 中重复实现
 | Seed                         | 十六进制，8 位，`0..0xFFFFFFFF`     | 空值为 `0`                                                                    | `MainForm.Designer.cs` 的 `Seed.Mask = "AAAAAAAA"`；`RNG/SFMT.cs`             |
 | Initial Frame                | 十进制，版本起始帧到 `1000000000`   | 选择版本时重置到对应起始帧                                                    | `MainForm_Load()`、`FuncUtil.MAXFRAME`                                        |
 | Max Frame                    | 十进制，`Initial Frame..1000000000` | 闭区间；当前浏览器绝对帧保护上限为 `10000000`                                 | `MainForm_Load()`、`Search7_Normal()`；PokeRNGKit 浏览器预算                  |
-| TSV                          | 十进制，`0..4095`                   | 用于 PID 异色判定                                                             | `MainForm.Designer.cs` 的 `TSV.Maximum`；`Wild7.Generate()`                   |
+| TSV                          | 十进制，最多 4 位，`0..4095`        | 空值为 `0`，用于 PID 异色判定                                                 | `MainForm.Designer.cs` 的 `TSV.Maximum`                                       |
 | TRV                          | 十六进制，1 位，`0..F`              | 用于区分方块异色                                                              | `MainForm.Designer.cs` 的 `TRV.Mask = "A"`；`Wild7.Generate()`                |
 | Category                     | 6 类                                | Normal Wild、UB、Island Scan、Fishing、Ambush Encounters、Berry Tree          | `MainForm.Designer.cs`、`MainForm.cs::getWildSettings()`                      |
 | Pokemon / Location           | 上游版本限定清单                    | UB / Island Scan 先选择特殊宝可梦，再收窄地点；其他分类直接选择地点           | `Gen7/Gen7Encounter/*`、`MainForm.cs::SetWildArea()`                          |
@@ -51,6 +51,8 @@ Poke Pelago 特殊遭遇已归入 `Stationary RNG`，不在 Wild 中重复实现
 | Result Limit                 | `1..100000`                         | 当前 UI 固定为 `100000`                                                       | `MainForm.cs::MAX_RESULTS_NUM`；PokeRNGKit Worker/Wasm 边界                   |
 
 上游实际帧上限是 `1000000000`。当前实现为了限制浏览器初始化和连续 SFMT 推进成本，将绝对最大帧暂时限制为 `10000000`；该保护限制不改写上游输入记录。
+
+`MainForm.cs::getWildSetting()` 将 TSV 控件值读入 `Core/WildRNG.cs` 的 `int TSV`。
 
 ## 遭遇数据
 

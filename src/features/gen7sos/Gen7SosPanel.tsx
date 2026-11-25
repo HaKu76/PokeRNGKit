@@ -40,6 +40,7 @@ import {
 } from "./domain";
 import {
   gen7WildStartingFrame,
+  normalizeGen7TsvInput,
   type Gen7WildLanguage,
 } from "../gen7wild/domain";
 import { Gen7SosUiPreviewEngine } from "./preview/Gen7SosUiPreviewEngine";
@@ -801,9 +802,10 @@ export function Gen7SosPanel({
                     <span>TSV</span>
                     <input
                       inputMode="numeric"
+                      maxLength={4}
                       value={tsv}
                       onChange={(event) =>
-                        setTsv(normalizeDecimalInput(event.target.value, 4))
+                        setTsv(normalizeGen7TsvInput(event.target.value))
                       }
                     />
                   </label>

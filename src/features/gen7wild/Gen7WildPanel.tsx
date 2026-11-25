@@ -39,6 +39,7 @@ import {
   gen7WildSpeciesName,
   gen7WildSpecials,
   gen7WildStartingFrame,
+  normalizeGen7TsvInput,
   parseGen7WildDecimal,
   parseGen7WildHex,
   validateGen7WildRequest,
@@ -688,9 +689,10 @@ export function Gen7WildPanel({
                 <span>TSV</span>
                 <input
                   inputMode="numeric"
+                  maxLength={4}
                   value={tsv}
                   onChange={(event) =>
-                    setTsv(normalizeDecimalInput(event.target.value, 4))
+                    setTsv(normalizeGen7TsvInput(event.target.value))
                   }
                 />
               </label>

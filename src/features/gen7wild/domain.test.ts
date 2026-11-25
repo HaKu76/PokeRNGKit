@@ -10,6 +10,8 @@ import {
   gen7WildAreas,
   gen7WildEncounterFromArea,
   gen7WildStartingFrame,
+  normalizeGen7TsvInput,
+  parseGen7WildDecimal,
   type Gen7WildRequest,
 } from "./domain";
 
@@ -54,6 +56,18 @@ const request: Gen7WildRequest = {
 };
 
 describe("Gen 7 Wild domain", () => {
+  it.each<[string, string, number]>([
+    ["", "", 0],
+    ["0", "0", 0],
+    ["1234", "1234", 1234],
+    ["4095", "4095", 4095],
+    ["4096", "4095", 4095],
+  ])("preserves the Gen 7 TSV input range for %j", (input, text, tsv) => {
+    const normalized = normalizeGen7TsvInput(input);
+    expect(normalized).toBe(text);
+    expect(parseGen7WildDecimal(normalized)).toBe(tsv);
+  });
+
   it("keeps the upstream starting frames and encounter inventory", () => {
     expect(gen7WildStartingFrame("sun")).toBe(418);
     expect(gen7WildStartingFrame("ultra-moon")).toBe(478);

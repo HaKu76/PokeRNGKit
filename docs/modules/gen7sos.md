@@ -30,7 +30,7 @@ The following limits match the upstream controls and Core parameter types. Empty
 | Main Initial Frame   | decimal text        | SM starts at `418`; USUM starts at `478`; max `10,000,000`          |
 | Calls Initial Frame  | decimal text        | `0..10,000,000`                                                     |
 | Max Frame            | decimal text        | at least Initial Frame, max `10,000,000`                            |
-| TSV                  | decimal text        | `0..4095`                                                           |
+| TSV                  | decimal text        | `0..4095`, up to four digits, empty parses as `0`                   |
 | TRV                  | decimal text        | `0..15`                                                             |
 | SOS Frame            | decimal text        | `0..1,000,000`                                                      |
 | Chain Length         | decimal text        | `0..255`                                                            |
@@ -43,6 +43,8 @@ The following limits match the upstream controls and Core parameter types. Empty
 | Existing Perfect IVs | six checkboxes      | bit mask for HP, Atk, Def, SpA, SpD, Spe                            |
 | Weather              | select / checkbox   | None, Rain, Hail, Sand; Calls uses the upstream boolean             |
 | Filters              | select / checkboxes | empty masks mean any; disabled filters preserve every result        |
+
+The Pokémon Generation TSV uses `MainForm.Designer.cs` (`TSV.Maximum = 4095`). `MainForm.cs::getWildSetting()` reads that control into `Core/WildRNG.cs` (`int TSV`) before applying the SOS settings.
 
 `Rate 2` uses the upstream `.NET Math.Round` banker rounding. The source `MiscRNGTool` hides the `Super Effective` input and comments out its multiplier; this implementation exposes the recorded control and applies the `SOSCall.md` x2 multiplier. This source difference is intentionally documented here.
 

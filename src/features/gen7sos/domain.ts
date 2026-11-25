@@ -5,6 +5,7 @@ import {
   type Gen7WildSlot,
 } from "../gen7wild/data";
 import {
+  GEN7_MAX_TSV,
   gen7WildLocationName,
   gen7WildSpeciesName,
   gen7WildStartingFrame,
@@ -556,7 +557,7 @@ export function validateGen7SosRequest(request: Gen7SosRequest) {
       request.minFrame,
       GEN7_SOS_MAX_FRAME,
     );
-    assertInteger(request.tsv, "TSV", 0, 4095);
+    assertInteger(request.tsv, "TSV", 0, GEN7_MAX_TSV);
     assertInteger(request.trv, "TRV", 0, 15);
     assertFlag(request.shinyCharm, "Shiny Charm");
     if (!(request.lead in LEAD_CODE)) throw new RangeError("Unsupported Lead.");
