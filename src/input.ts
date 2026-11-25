@@ -5,6 +5,7 @@ export function normalizeHexInput(value: string, maxDigits: number) {
   return limited.replace(/^0+(?=.)/, "");
 }
 
+/** Bounds the numeric value separately from the number of decimal digits. */
 export function normalizeDecimalInput(
   value: string,
   maximum: number,

@@ -8,15 +8,15 @@
 
 ## 输入限制
 
-| 输入                      | 进制与范围                                   | 默认/行为                                  | 上游依据                                                       |
-| ------------------------- | -------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------- |
-| Tiny Seed                 | 十六进制，最多 8 位，`0..0xFFFFFFFF`         | 空值为 `0`                                 | `RNG/TinyMT.cs`                                                |
-| Initial Frame / Max Frame | 十进制，`0..1000000000`；浏览器 `0..5000000` | Initial 必须小于等于 Max                   | `Util/FuncUtil.cs::MAXFRAME`、Gen VI Web 预算                  |
-| Tiny Frame                | 十进制，`0..1000000000`                      | 每个结果推进 `Tiny Frame + Frame`          | `Gen6/TinyTimeline.cs`、`PokeRadar.cs`                         |
-| Party Size                | 十进制，`0..6`                               | 生成前消耗 `3 * Party Size` 个 TinyMT 状态 | `PokeRadar.cs::PKMNUM`                                         |
-| Chain Length              | 十进制，`0..100`                             | `>=40` 时好草块必定按 1/100 阈值检查闪光   | `PokeRadar.cs::Chainlength`、WinForms `NumericUpDown` 默认范围 |
-| Boost                     | 布尔                                         | 仅音乐值 `>=50` 时实际生效                 | `PokeRadar.cs::Boost`                                          |
-| Result Limit              | 十进制，`1..100000`                          | 达到上限后停止 Worker 任务                 | Web Worker 任务保护                                            |
+| 输入                      | 进制与范围                                   | 默认/行为                                | 上游依据                                                                      |
+| ------------------------- | -------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------- |
+| Tiny Seed                 | 十六进制，最多 8 位，`0..0xFFFFFFFF`         | 空值为 `0`                               | `RNG/TinyMT.cs`                                                               |
+| Initial Frame / Max Frame | 十进制，`0..1000000000`；浏览器 `0..5000000` | Initial 必须小于等于 Max                 | `Util/FuncUtil.cs::MAXFRAME`、Gen VI Web 预算                                 |
+| Tiny Frame                | 十进制，`0..1000000000`                      | 每个结果推进 `Tiny Frame + Frame`        | `Gen6/TinyTimeline.cs`、`PokeRadar.cs`                                        |
+| Party Size                | 十进制，1 位，1..6                           | 生成前消耗 3 × Party Size 个 TinyMT 状态 | TinyTimelineTool.cs::L_PartySize_VisibleChanged、PokeRadar.cs 的 int PKMNUM   |
+| Chain Length              | 十进制，最多 3 位，0..255                    | ≥40 时好草块按 1/100 阈值检查闪光        | TinyTimelineTool.cs::L_Length_VisibleChanged、PokeRadar.cs 的 int Chainlength |
+| Boost                     | 布尔                                         | 仅音乐值 `>=50` 时实际生效               | `PokeRadar.cs::Boost`                                                         |
+| Result Limit              | 十进制，`1..100000`                          | 达到上限后停止 Worker 任务               | Web Worker 任务保护                                                           |
 
 ## 算法与结果
 
@@ -24,11 +24,13 @@ TinyMT 先消耗 `3 * Party Size`。音乐为 `Rand(100)`：`0..1` 显示 `A`，
 
 四个宝可梦块依次使用 Ring `0..3`，各消耗 Direction、Location 和 GoodRate 检查；GoodRate 固定为 `23/43/63/83`。好块额外消耗一次占位状态，然后按 Boost/40 连锁的 `100` 阈值或 `8100 - 200 * ChainLength` 判定 Shiny/Good。最后生成 Ring `0..2` 的一个 Empty 块。坐标严格使用上游 `Patch.X/Y` 映射，9×9 中心为 `C`，状态字符为 `B/G/S/X`。
 
+Tiny Frame 使用上游 `TinyTimelineTool.cs` 设置的 `FuncUtil.MAXFRAME`（十进制 10 位），生成帧范围与结果上限沿用 Web 请求上限，分别为 5,000,000（7 位）与 100,000（6 位）。API 2 同步校验队伍大小和连锁长度。
+
 ## Worker 与 Wasm 契约
 
 - Module id：`gen6pokeradar`
 - Contract version：`1`
-- Wasm API version：`1`
+- Wasm API version：`2`
 - Operation：`generator`
 - 请求：8 个 `uint32_t` 字
 - 结果：16 个 `uint32_t` 字；5 个摇草块分别打包 Ring、Direction、Location、State、X 与 Y
@@ -36,7 +38,7 @@ TinyMT 先消耗 `3 * Party Size`。音乐为 `Rand(100)`：`0..1` 显示 `A`，
 
 固定夹具位于 `wasm/modules/gen6pokeradar/tests/gen6pokeradar_native_test.cpp`，覆盖 API、32 帧连续生成和全部坐标落入 9×9。TypeScript 夹具覆盖 8-word 编码、块解码、音乐/Boost/闪光位、概览和输入边界。
 
-## 已验证
+## API 1 历史验证
 
 - `npm test -- src/features/gen6pokeradar`：2 个文件、4 项测试通过
 - `npm run verify`：143 个测试文件、522 项测试、Vite 转换 2218 个模块、PWA 预缓存 200 项

@@ -11,6 +11,7 @@ import {
 import { MultiCheckSelect } from "../shared/MultiCheckSelect";
 import { GEN7_WILD_NATURES, type Gen7WildGameVersion } from "../gen7wild/data";
 import {
+  GEN7_SOS_MAX_FRAME,
   formatGen7SosHex32,
   formatGen7SosHex64,
   gen7SosAreas,
@@ -400,7 +401,7 @@ export function Gen7SosPanel({
       minFrame: parseGen7SosDecimal(minFrame),
       maxFrame: parseGen7SosDecimal(maxFrame),
       tsv: parseGen7SosDecimal(tsv),
-      trv: parseGen7SosDecimal(trv),
+      trv: parseGen7SosHex(trv),
       shinyCharm,
       syncNature:
         lead === "synchronize" ? parseGen7SosDecimal(syncNature) : null,
@@ -765,20 +766,34 @@ export function Gen7SosPanel({
               <label className="field">
                 <span>{t("gen7SosFrame")}</span>
                 <input
+                  maxLength={8}
                   inputMode="numeric"
                   value={minFrame}
                   onChange={(event) =>
-                    setMinFrame(normalizeDecimalInput(event.target.value, 8))
+                    setMinFrame(
+                      normalizeDecimalInput(
+                        event.target.value,
+                        GEN7_SOS_MAX_FRAME,
+                        8,
+                      ),
+                    )
                   }
                 />
               </label>
               <label className="field">
                 <span>{t("gen7StationaryMaxFrame")}</span>
                 <input
+                  maxLength={8}
                   inputMode="numeric"
                   value={maxFrame}
                   onChange={(event) =>
-                    setMaxFrame(normalizeDecimalInput(event.target.value, 8))
+                    setMaxFrame(
+                      normalizeDecimalInput(
+                        event.target.value,
+                        GEN7_SOS_MAX_FRAME,
+                        8,
+                      ),
+                    )
                   }
                 />
               </label>
@@ -786,11 +801,12 @@ export function Gen7SosPanel({
                 <label className="field">
                   <span>{t("delay")}</span>
                   <input
+                    maxLength={5}
                     inputMode="numeric"
                     value={callsDelay}
                     onChange={(event) =>
                       setCallsDelay(
-                        normalizeDecimalInput(event.target.value, 5),
+                        normalizeDecimalInput(event.target.value, 10_000, 5),
                       )
                     }
                   />
@@ -812,10 +828,11 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>TRV</span>
                     <input
-                      inputMode="numeric"
+                      maxLength={1}
+                      inputMode="text"
                       value={trv}
                       onChange={(event) =>
-                        setTrv(normalizeDecimalInput(event.target.value, 2))
+                        setTrv(normalizeHexInput(event.target.value, 1))
                       }
                     />
                   </label>
@@ -907,11 +924,16 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>{t("gen7SosFrame")}</span>
                     <input
+                      maxLength={7}
                       inputMode="numeric"
                       value={sosFrame}
                       onChange={(event) =>
                         setSosFrame(
-                          normalizeDecimalInput(event.target.value, 7),
+                          normalizeDecimalInput(
+                            event.target.value,
+                            1_000_000,
+                            7,
+                          ),
                         )
                       }
                     />
@@ -937,11 +959,12 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>{t("gen7SosChain")}</span>
                     <input
+                      maxLength={3}
                       inputMode="numeric"
                       value={chainLength}
                       onChange={(event) =>
                         setChainLength(
-                          normalizeDecimalInput(event.target.value, 3),
+                          normalizeDecimalInput(event.target.value, 255, 3),
                         )
                       }
                     />
@@ -949,11 +972,12 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>{t("gen7WildLevelMin")}</span>
                     <input
+                      maxLength={3}
                       inputMode="numeric"
                       value={levelMin}
                       onChange={(event) =>
                         setLevelMin(
-                          normalizeDecimalInput(event.target.value, 3),
+                          normalizeDecimalInput(event.target.value, 100, 3),
                         )
                       }
                     />
@@ -961,11 +985,12 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>{t("gen7WildLevelMax")}</span>
                     <input
+                      maxLength={3}
                       inputMode="numeric"
                       value={levelMax}
                       onChange={(event) =>
                         setLevelMax(
-                          normalizeDecimalInput(event.target.value, 3),
+                          normalizeDecimalInput(event.target.value, 100, 3),
                         )
                       }
                     />
@@ -1004,21 +1029,25 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>{t("gen7WildNpc")}</span>
                     <input
+                      maxLength={3}
                       inputMode="numeric"
                       value={npc}
                       onChange={(event) =>
-                        setNpc(normalizeDecimalInput(event.target.value, 3))
+                        setNpc(
+                          normalizeDecimalInput(event.target.value, 100, 3),
+                        )
                       }
                     />
                   </label>
                   <label className="field">
                     <span>{t("gen7SosMainDelay")}</span>
                     <input
+                      maxLength={4}
                       inputMode="numeric"
                       value={delayTime}
                       onChange={(event) =>
                         setDelayTime(
-                          normalizeDecimalInput(event.target.value, 4),
+                          normalizeDecimalInput(event.target.value, 4_000, 4),
                         )
                       }
                     />
@@ -1124,11 +1153,12 @@ export function Gen7SosPanel({
                 <label className="field">
                   <span>{t("gen7SosChain")}</span>
                   <input
+                    maxLength={3}
                     inputMode="numeric"
                     value={chainLength}
                     onChange={(event) =>
                       setChainLength(
-                        normalizeDecimalInput(event.target.value, 3),
+                        normalizeDecimalInput(event.target.value, 255, 3),
                       )
                     }
                   />
@@ -1136,20 +1166,26 @@ export function Gen7SosPanel({
                 <label className="field">
                   <span>{t("gen7WildLevelMin")}</span>
                   <input
+                    maxLength={3}
                     inputMode="numeric"
                     value={levelMin}
                     onChange={(event) =>
-                      setLevelMin(normalizeDecimalInput(event.target.value, 3))
+                      setLevelMin(
+                        normalizeDecimalInput(event.target.value, 100, 3),
+                      )
                     }
                   />
                 </label>
                 <label className="field">
                   <span>{t("gen7WildLevelMax")}</span>
                   <input
+                    maxLength={3}
                     inputMode="numeric"
                     value={levelMax}
                     onChange={(event) =>
-                      setLevelMax(normalizeDecimalInput(event.target.value, 3))
+                      setLevelMax(
+                        normalizeDecimalInput(event.target.value, 100, 3),
+                      )
                     }
                   />
                 </label>
@@ -1347,11 +1383,12 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>{t("level")}</span>
                     <input
+                      maxLength={3}
                       inputMode="numeric"
                       value={levelFilter}
                       onChange={(event) =>
                         setLevelFilter(
-                          normalizeDecimalInput(event.target.value, 3),
+                          normalizeDecimalInput(event.target.value, 100, 3),
                         )
                       }
                     />
@@ -1478,10 +1515,12 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>{t("level")}</span>
                     <input
+                      inputMode="numeric"
+                      maxLength={3}
                       value={levelFilter}
                       onChange={(event) =>
                         setLevelFilter(
-                          normalizeDecimalInput(event.target.value, 3),
+                          normalizeDecimalInput(event.target.value, 100, 3),
                         )
                       }
                     />

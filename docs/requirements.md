@@ -886,7 +886,7 @@ PokeRNGKit 是面向宝可梦 RNG 研究与检索的本地优先 Web 工具集�
 
 - **FR-G6RADAR-01** 提供独立的 3DSRNGTool Gen VI `Poke Radar RNG` 工作区，支持 Tiny Seed/Frame、帧范围、Party Size、Chain Length、Boost 和结果上限。
 - **FR-G6RADAR-02** 按上游 `PokeRadar.cs` 复现音乐状态、四个宝可梦块、GoodRate、一个空块、连锁/Boost 闪光阈值和 `Patch.X/Y` 坐标；提供 9×9 `B/G/S/X/C` 概览。
-- **FR-G6RADAR-03** 算法只在独立 `gen6pokeradar` Wasm API v1 中执行；模块使用 8-word 请求、16-word 结果和单 Dedicated Worker，支持进度、取消、100000 行结果上限、固定高度虚拟结果表、CSV、清空、错误和空结果状态。
+- **FR-G6RADAR-03** 算法只在独立 `gen6pokeradar` Wasm API v2 中执行；模块使用 8-word 请求、16-word 结果和单 Dedicated Worker，支持进度、取消、100000 行结果上限、固定高度虚拟结果表、CSV、清空、错误和空结果状态。
 
 完整输入限制、GoodRate、坐标映射、8/16-word ABI、固定夹具和上游文件见 [Gen 6 Poke Radar](modules/gen6pokeradar.md)。
 

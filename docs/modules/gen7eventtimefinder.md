@@ -20,7 +20,7 @@ TF4 对应 `3DSTimeFinder` 的 Gen VII `EventSearcher7`：按 Citra 时间范围
 | PID Type                       | Random、Nonshiny、Shiny、Specified                                                                       | `Event7.cpp` 的 `PIDType` 映射                                                 |
 | Ability / Nature / Gender Lock | Ability 为 `1/2/H` 或 `1/2/H` 随机模式；Nature 为 25 项；Gender 为 `-`、♂、♀；未锁定时按上游消耗随机值   | `Event7.cpp` 的三个锁定控件、`EventSearcher7.cpp`                              |
 | Fixed IV                       | 每项未锁定为 `-1`，锁定值 `0..31`                                                                        | `Event7.cpp` 的六个 IV 复选框和 SpinBox                                        |
-| Random perfect IVs             | `0..6`，且不得超过未锁定 IV 槽位数；浏览器拒绝会导致上游循环无法结束的组合                               | `Event7.cpp` 的 `spinBoxRandomIVs`、`EventSearcher7.cpp` 的随机 31 IV 循环     |
+| Random perfect IVs             | 十进制 1 位，`0..6`，且不得超过未锁定 IV 槽位数；浏览器拒绝会导致上游循环无法结束的组合                  | `Event7.cpp` 的 `spinBoxRandomIVs`、`EventSearcher7.cpp` 的随机 31 IV 循环     |
 | Filters                        | Shiny、Gender、Ability、25 Nature、16 Hidden Power、六项 IV 范围；每项 IV `0..31` 且最小值不得大于最大值 | `EventFilter.cpp`、`ResultFilter`                                              |
 | Result Limit                   | `1..100000`；跨全部时间点累计                                                                            | PokeRNGKit Worker/Wasm 保护边界                                                |
 

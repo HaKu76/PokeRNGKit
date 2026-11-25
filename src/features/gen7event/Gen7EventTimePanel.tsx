@@ -854,11 +854,13 @@ export function Gen7EventTimePanel({
                 <label className="field compact-field">
                   <span>{t("gen7EventRandomPerfectIvs")}</span>
                   <input
+                    inputMode="numeric"
+                    maxLength={1}
                     disabled={eventDisabled}
                     max={6}
                     onChange={(e) =>
                       setRandomPerfectIvCount(
-                        normalizeDecimalInput(e.target.value, 99, 2),
+                        normalizeDecimalInput(e.target.value, 6, 1),
                       )
                     }
                     value={randomPerfectIvCount}

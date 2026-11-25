@@ -878,6 +878,7 @@ export function Gen7WildPanel({
               <label className="field">
                 <span>{t("gen7WildCorrection")}</span>
                 <input
+                  maxLength={2}
                   disabled={
                     category === "fishing" ||
                     category === "misc" ||
@@ -886,27 +887,35 @@ export function Gen7WildPanel({
                   inputMode="numeric"
                   value={correction}
                   onChange={(event) =>
-                    setCorrection(normalizeDecimalInput(event.target.value, 2))
+                    setCorrection(
+                      normalizeDecimalInput(event.target.value, 50, 2),
+                    )
                   }
                 />
               </label>
               <label className="field">
                 <span>{t("gen7WildLevelMin")}</span>
                 <input
+                  maxLength={3}
                   inputMode="numeric"
                   value={levelMin}
                   onChange={(event) =>
-                    setLevelMin(normalizeDecimalInput(event.target.value, 3))
+                    setLevelMin(
+                      normalizeDecimalInput(event.target.value, 100, 3),
+                    )
                   }
                 />
               </label>
               <label className="field">
                 <span>{t("gen7WildLevelMax")}</span>
                 <input
+                  maxLength={3}
                   inputMode="numeric"
                   value={levelMax}
                   onChange={(event) =>
-                    setLevelMax(normalizeDecimalInput(event.target.value, 3))
+                    setLevelMax(
+                      normalizeDecimalInput(event.target.value, 100, 3),
+                    )
                   }
                 />
               </label>
@@ -914,11 +923,12 @@ export function Gen7WildPanel({
                 <label className="field">
                   <span>{t("gen7WildRate")}</span>
                   <input
+                    maxLength={3}
                     inputMode="numeric"
                     value={specialRate}
                     onChange={(event) =>
                       setSpecialRate(
-                        normalizeDecimalInput(event.target.value, 3),
+                        normalizeDecimalInput(event.target.value, 100, 3),
                       )
                     }
                   />
@@ -928,10 +938,13 @@ export function Gen7WildPanel({
                 <label className="field">
                   <span>{t("gen7WildBiteDelay")}</span>
                   <input
+                    maxLength={3}
                     inputMode="numeric"
                     value={biteDelay}
                     onChange={(event) =>
-                      setBiteDelay(normalizeDecimalInput(event.target.value, 3))
+                      setBiteDelay(
+                        normalizeDecimalInput(event.target.value, 100, 3),
+                      )
                     }
                   />
                 </label>
@@ -940,10 +953,13 @@ export function Gen7WildPanel({
                 <label className="field">
                   <span>{t("gen7WildDelay2")}</span>
                   <input
+                    maxLength={5}
                     inputMode="numeric"
                     value={delay2}
                     onChange={(event) =>
-                      setDelay2(normalizeDecimalInput(event.target.value, 5))
+                      setDelay2(
+                        normalizeDecimalInput(event.target.value, 10_000, 5),
+                      )
                     }
                   />
                 </label>
@@ -1082,11 +1098,12 @@ export function Gen7WildPanel({
                 <label className="field">
                   <span>{t("level")}</span>
                   <input
+                    maxLength={3}
                     inputMode="numeric"
                     value={levelFilter}
                     onChange={(event) =>
                       setLevelFilter(
-                        normalizeDecimalInput(event.target.value, 3),
+                        normalizeDecimalInput(event.target.value, 100, 3),
                       )
                     }
                   />

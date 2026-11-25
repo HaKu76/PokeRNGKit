@@ -28,7 +28,8 @@
 | Location / Den         | Wild Area `0..99`（跳过索引 `16`）、Isle of Armor `100..189`、Crown Tundra `190..275`、Event `1..69` | Event 禁用 Rarity                                   | `Raids.cpp::locationIndexChanged()`、`Encounters8.cpp::denInfo[276]` |
 | Level                  | `1..100`                                                                                             | 普通巢穴默认 `1` 且可编辑；Event 使用模板 Level     | `Raids.ui`、事件表 `Level`                                           |
 | Template               | Species `1..898`、Form `0..31`、IV Count `1..6`                                                      | 从巢穴表选择                                        | `Raid.hpp`、`embed_gen8.py`、`personal_swsh.bin`                     |
-| Height / Weight        | 两组闭区间，端点 `0..255`                                                                            | 每组最小值不得大于最大值                            | `StateFilter::compareState(State8)`                                  |
+| IV 范围                | 六组闭区间，各端 0..31、最多两位                                                                     | 每组最小值不得大于最大值                            | Form/Controls/Filter.ui、Core/Parents/Filters/StateFilter.hpp        |
+| Height / Weight        | 两组闭区间，端点 `0..255`、最多三位                                                                  | 每组最小值不得大于最大值                            | Form/Controls/Filter.ui、`StateFilter::compareState(State8)`         |
 | Nature / Hidden Power  | 25 / 16 项位掩码                                                                                     | 至少选择一项；上游 Raid UI 禁用 Hidden Power 控件   | `Filter.ui`、`StateFilter.cpp`、`Raids.cpp`                          |
 | Result Limit           | `1..100000`                                                                                          | Worker 与 Wasm 同时限制                             | PokeRNGKit Worker/Wasm 边界                                          |
 

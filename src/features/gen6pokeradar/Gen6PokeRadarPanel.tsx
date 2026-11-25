@@ -4,6 +4,10 @@ import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { normalizeDecimalInput, normalizeHexInput } from "../../input";
 import {
+  GEN6_POKERADAR_BROWSER_MAX_FRAME,
+  GEN6_POKERADAR_MAX_CHAIN_LENGTH,
+  GEN6_POKERADAR_MAX_FRAME,
+  GEN6_POKERADAR_MAX_RESULTS,
   formatGen6PokeRadarPatch,
   gen6PokeRadarOverview,
   validateGen6PokeRadarRequest,
@@ -169,30 +173,51 @@ export function Gen6PokeRadarPanel({
             <label className="field">
               <span>{t("gen6WildTinyFrame")}</span>
               <input
+                maxLength={10}
                 inputMode="numeric"
                 value={tinyFrame}
                 onChange={(event) =>
-                  setTinyFrame(normalizeDecimalInput(event.target.value, 10))
+                  setTinyFrame(
+                    normalizeDecimalInput(
+                      event.target.value,
+                      GEN6_POKERADAR_MAX_FRAME,
+                      10,
+                    ),
+                  )
                 }
               />
             </label>
             <label className="field">
               <span>{t("gen6StationaryFrameRange")}</span>
               <input
+                maxLength={7}
                 inputMode="numeric"
                 value={minFrame}
                 onChange={(event) =>
-                  setMinFrame(normalizeDecimalInput(event.target.value, 10))
+                  setMinFrame(
+                    normalizeDecimalInput(
+                      event.target.value,
+                      GEN6_POKERADAR_BROWSER_MAX_FRAME,
+                      7,
+                    ),
+                  )
                 }
               />
             </label>
             <label className="field">
               <span>{t("gen6WildMaxFrame")}</span>
               <input
+                maxLength={7}
                 inputMode="numeric"
                 value={maxFrame}
                 onChange={(event) =>
-                  setMaxFrame(normalizeDecimalInput(event.target.value, 10))
+                  setMaxFrame(
+                    normalizeDecimalInput(
+                      event.target.value,
+                      GEN6_POKERADAR_BROWSER_MAX_FRAME,
+                      7,
+                    ),
+                  )
                 }
               />
             </label>
@@ -200,29 +225,46 @@ export function Gen6PokeRadarPanel({
               <span>{t("gen6PokeRadarPartySize")}</span>
               <input
                 inputMode="numeric"
+                min={1}
+                max={6}
+                type="number"
                 value={partySize}
                 onChange={(event) =>
-                  setPartySize(normalizeDecimalInput(event.target.value, 1))
+                  setPartySize(normalizeDecimalInput(event.target.value, 6, 1))
                 }
               />
             </label>
             <label className="field">
               <span>{t("gen6PokeRadarChainLength")}</span>
               <input
+                maxLength={3}
                 inputMode="numeric"
                 value={chainLength}
                 onChange={(event) =>
-                  setChainLength(normalizeDecimalInput(event.target.value, 3))
+                  setChainLength(
+                    normalizeDecimalInput(
+                      event.target.value,
+                      GEN6_POKERADAR_MAX_CHAIN_LENGTH,
+                      3,
+                    ),
+                  )
                 }
               />
             </label>
             <label className="field">
               <span>{t("gen6PokeRadarResultLimit")}</span>
               <input
+                maxLength={6}
                 inputMode="numeric"
                 value={resultLimit}
                 onChange={(event) =>
-                  setResultLimit(normalizeDecimalInput(event.target.value, 6))
+                  setResultLimit(
+                    normalizeDecimalInput(
+                      event.target.value,
+                      GEN6_POKERADAR_MAX_RESULTS,
+                      6,
+                    ),
+                  )
                 }
               />
             </label>

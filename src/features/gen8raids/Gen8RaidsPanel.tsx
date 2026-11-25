@@ -692,7 +692,7 @@ export function Gen8RaidsPanel({
                   location === 3 && template?.level ? template.level : level
                 }
                 onChange={(event) =>
-                  setLevel(normalizeDecimalInput(event.target.value, 3))
+                  setLevel(normalizeDecimalInput(event.target.value, 100, 3))
                 }
                 inputMode="numeric"
                 maxLength={3}
@@ -800,7 +800,9 @@ export function Gen8RaidsPanel({
                 disabled={filtersDisabled}
                 value={heightMin}
                 onChange={(event) =>
-                  setHeightMin(normalizeDecimalInput(event.target.value, 3))
+                  setHeightMin(
+                    normalizeDecimalInput(event.target.value, 255, 3),
+                  )
                 }
                 inputMode="numeric"
                 maxLength={3}
@@ -809,7 +811,9 @@ export function Gen8RaidsPanel({
                 disabled={filtersDisabled}
                 value={heightMax}
                 onChange={(event) =>
-                  setHeightMax(normalizeDecimalInput(event.target.value, 3))
+                  setHeightMax(
+                    normalizeDecimalInput(event.target.value, 255, 3),
+                  )
                 }
                 inputMode="numeric"
                 maxLength={3}
@@ -821,7 +825,9 @@ export function Gen8RaidsPanel({
                 disabled={filtersDisabled}
                 value={weightMin}
                 onChange={(event) =>
-                  setWeightMin(normalizeDecimalInput(event.target.value, 3))
+                  setWeightMin(
+                    normalizeDecimalInput(event.target.value, 255, 3),
+                  )
                 }
                 inputMode="numeric"
                 maxLength={3}
@@ -830,7 +836,9 @@ export function Gen8RaidsPanel({
                 disabled={filtersDisabled}
                 value={weightMax}
                 onChange={(event) =>
-                  setWeightMax(normalizeDecimalInput(event.target.value, 3))
+                  setWeightMax(
+                    normalizeDecimalInput(event.target.value, 255, 3),
+                  )
                 }
                 inputMode="numeric"
                 maxLength={3}
@@ -849,7 +857,7 @@ export function Gen8RaidsPanel({
                       (current) =>
                         current.map((value, currentIndex) =>
                           currentIndex === index
-                            ? normalizeDecimalInput(event.target.value, 2)
+                            ? normalizeDecimalInput(event.target.value, 31, 2)
                             : value,
                         ) as IvText,
                     )
@@ -865,7 +873,7 @@ export function Gen8RaidsPanel({
                       (current) =>
                         current.map((value, currentIndex) =>
                           currentIndex === index
-                            ? normalizeDecimalInput(event.target.value, 2)
+                            ? normalizeDecimalInput(event.target.value, 31, 2)
                             : value,
                         ) as IvText,
                     )

@@ -186,10 +186,8 @@ export function validateGen7EventTimeRequest(request: Gen7EventTimeRequest) {
   for (const iv of event.fixedIvs)
     if (!integerIn(iv, -1, 31))
       throw new TypeError("Fixed IVs must use -1 or values from 0 to 31.");
-  if (!integerIn(event.randomPerfectIvCount, 0, 99))
-    throw new TypeError("Random perfect IV count must be between 0 and 99.");
   const freeIvs = event.fixedIvs.filter((iv) => iv < 0).length;
-  if (event.randomPerfectIvCount > freeIvs || event.randomPerfectIvCount > 6)
+  if (!integerIn(event.randomPerfectIvCount, 0, freeIvs))
     throw new TypeError(
       "Random perfect IV count exceeds the available IV slots.",
     );

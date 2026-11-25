@@ -12,7 +12,7 @@
 
 namespace
 {
-constexpr std::uint32_t apiVersion = 1;
+constexpr std::uint32_t apiVersion = 2;
 constexpr std::uint32_t maxFrame = 1000000000;
 constexpr std::uint32_t maxResults = 100000;
 thread_local std::vector<Gen6PokeRadarResult> results;
@@ -164,7 +164,8 @@ bool valid(const Gen6PokeRadarRequest *request)
     return request != nullptr && request->frameCount > 0 && request->minFrame <= maxFrame
         && static_cast<std::uint64_t>(request->minFrame) + request->frameCount
             <= static_cast<std::uint64_t>(maxFrame) + 1
-        && request->tinyFrame <= maxFrame && request->partySize <= 6 && request->chainLength <= 100
+        && request->tinyFrame <= maxFrame && request->partySize >= 1 && request->partySize <= 6
+        && request->chainLength <= 255
         && request->boost <= 1 && request->resultLimit > 0 && request->resultLimit <= maxResults;
 }
 }

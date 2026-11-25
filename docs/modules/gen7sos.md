@@ -31,7 +31,7 @@ The following limits match the upstream controls and Core parameter types. Empty
 | Calls Initial Frame          | decimal text        | `0..10,000,000`                                                        |
 | Max Frame                    | decimal text        | at least Initial Frame, max `10,000,000`                               |
 | TSV                          | decimal text        | `0..4095`, up to four digits, empty parses as `0`                      |
-| TRV                          | decimal text        | `0..15`                                                                |
+| TRV                          | hexadecimal text    | `0..F`, one digit                                                      |
 | SOS Frame                    | decimal text        | `0..1,000,000`                                                         |
 | Chain Length                 | decimal text        | `0..255`                                                               |
 | NPC                          | decimal text        | `0..100`                                                               |
@@ -49,6 +49,8 @@ The following limits match the upstream controls and Core parameter types. Empty
 The Pokémon Generation TSV uses `MainForm.Designer.cs` (`TSV.Maximum = 4095`). `MainForm.cs::getWildSetting()` reads that control into `Core/WildRNG.cs` (`int TSV`) before applying the SOS settings. Pokémon IV filters use `Subforms/IVRange.cs` and `Core/RNGFilters.cs`. The threshold and count follow `Perfect_IV_Value` and `PerfectIVs` in `MainForm.Designer.cs`.
 
 `Rate 2` uses the upstream `.NET Math.Round` banker rounding. The source `MiscRNGTool` hides the `Super Effective` input and comments out its multiplier; this implementation exposes the recorded control and applies the `SOSCall.md` x2 multiplier. This source difference is intentionally documented here.
+
+The frame, delay, level, chain length and NPC fields use the existing request bounds. The core inputs come from `MainForm.Designer.cs`, `MainForm.cs::getWildSetting()` and `Subforms/MiscRNGTool.Designer.cs`. The browser frame ceiling is 10,000,000. The TRV control follows `TRV.Mask = "A"` in `MainForm.Designer.cs`; the Core receives the resulting byte value.
 
 ## Encounter Data
 

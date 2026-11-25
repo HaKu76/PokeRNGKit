@@ -31,6 +31,8 @@
 | Perfect IV                | 数值 `0..31`，数量 `0..6`                    | 结果中达到数值的 IV 数量必须达到 Count；筛选数量不改变遭遇本身的保底 IV 或 RNG 推进 | `Core/RNGFilters.cs`                          |
 | Result Limit              | 十进制，`1..100000`                          | 结果达到上限后结束 Worker 任务                                                      | Web Worker 任务保护                           |
 
+TSV、参与遇敌的队伍数量、遇敌率、PID 抽取次数与 Tiny Frame 均使用十进制。表单使用 `TSV.Maximum`、`MainForm.cs::getWildSetting()`、`Gen6/Wild6.cs` 及 `FuncUtil.MAXFRAME` 对应的现有请求上限，分别允许 4、1、3、2、10 位。结果上限允许 6 位。
+
 ## 算法与结果
 
 普通、Rock Smash 和 Fishing 每帧先按上游准备 TinyMT，再推进主 MT `60` 次后生成 EC、PID、保底 IV、随机 IV、Ability、Nature 和 Gender。Fishing 额外执行 `3 * PartyPokemon`、`132` 主 RNG 消耗和 `TinyRand(7) * 30 + 60` 的动态延时；Rock Smash 使用 `TinyRand(3) == 0` 的宝可梦判定。Horde 每帧只准备一次 TinyMT，主 MT 先 `Advance(60)`，随后连续生成五只结果，五只共享同一帧的主 RNG 游标。

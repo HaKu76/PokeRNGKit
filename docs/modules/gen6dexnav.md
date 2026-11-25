@@ -33,6 +33,8 @@
 | Slot Species / Level      | Species `0..721`；Level `0..100`             | Grass/Tall Grass 至少 12 槽，Surf 至少 5 槽                   | `MainForm.cs::setting6.SpecForm`、`SlotLevel`         |
 | Result Limit              | 十进制，`1..100000`                          | 达到上限后停止 Worker 任务                                    | Web Worker 任务保护                                   |
 
+十进制控件的宽度随数值范围设置：Tiny Frame 10 位，生成帧 7 位，TSV 4 位，Search Level 和 Chain Length 各 3 位，Potential 1 位，结果上限 6 位。TSV 与 Potential 对应 `MainForm.Designer.cs` 的 `TSV.Maximum` 与 `Potential.Maximum`，Search Level 和 Chain Length 使用 `Gen6/DexNav.cs` 的 `int` 参数及本模块的请求范围。
+
 ## 算法
 
 每个帧从 `TinyMT(tinySeed)` 推进 `tinyFrame + frame`。非主动搜索先消耗同步与遇敌率状态，再按 50% 触发；触发后按上游 `FindPatch()` 选择上下左右摇晃坐标。生成顺序为槽位类型、Boost、Lead、槽位、占位消耗、Grade、等级 Boost、Flute Boost、HA、潜力、蛋招式、持有物和闪光检查，最后执行 `PostCheck()` 的两次占位消耗。

@@ -40,8 +40,22 @@ describe("Gen VI Poke Radar domain", () => {
     });
     expect(gen6PokeRadarOverview(result)[4][4]).toBe("C");
   });
-  it("rejects party sizes over six", () =>
+  it("uses the upstream party size and chain length ranges", () => {
+    expect(
+      encodeGen6PokeRadarRequest({
+        ...request,
+        partySize: 1,
+        chainLength: 255,
+      }).slice(4, 6),
+    ).toEqual(new Uint32Array([1, 255]));
+    expect(() =>
+      validateGen6PokeRadarRequest({ ...request, partySize: 0 }),
+    ).toThrow(/settings/);
     expect(() =>
       validateGen6PokeRadarRequest({ ...request, partySize: 7 }),
-    ).toThrow(/settings/));
+    ).toThrow(/settings/);
+    expect(() =>
+      validateGen6PokeRadarRequest({ ...request, chainLength: 256 }),
+    ).toThrow(/settings/);
+  });
 });

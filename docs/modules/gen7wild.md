@@ -54,6 +54,8 @@ Poke Pelago 特殊遭遇已归入 `Stationary RNG`，不在 Wild 中重复实现
 
 `MainForm.cs::getWildSetting()` 将 TSV 控件值读入 `Core/WildRNG.cs` 的 `int TSV`。个体值范围对应 `Subforms/IVRange.cs` 与 `Core/RNGFilters.cs`，完美个体值和数量分别对应 `MainForm.Designer.cs` 的 `Perfect_IV_Value` 和 `PerfectIVs`。
 
+Correction、等级、Rate、Bite Delay 和 Delay2 的输入宽度按本表数值范围计算，Delay2 仍按 `MainForm.cs::getWildSetting()` 除以 2 后提交。等级筛选保留 `Filter_Lv` 的 `0..100`。
+
 ## 遭遇数据
 
 生成脚本 `scripts/generate_gen7_wild_data.mjs` 分别读取 `EncounterArea7.SlotType` 的物种槽位映射、`WildRNG.SlotDistribution` 的概率分布、`Gen7/Gen7Encounter`、`PKMW7` 和关联数据文件，输出 `src/features/gen7wild/data.ts`：

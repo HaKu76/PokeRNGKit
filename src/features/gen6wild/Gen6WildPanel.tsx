@@ -12,6 +12,8 @@ import {
   type ThreeDsRngInfoMode,
 } from "../shared/ThreeDsRngInfoCard";
 import {
+  GEN6_WILD_MAX_FRAME,
+  GEN6_WILD_MAX_RESULTS,
   GEN6_WILD_BROWSER_MAX_FRAME,
   GEN6_WILD_SLOT_COUNT,
   gen6WildAreas,
@@ -504,10 +506,11 @@ export function Gen6WildPanel({
               <label className="field">
                 <span>TSV</span>
                 <input
+                  maxLength={4}
                   inputMode="numeric"
                   value={tsv}
                   onChange={(event) =>
-                    setTsv(normalizeDecimalInput(event.target.value, 5))
+                    setTsv(normalizeDecimalInput(event.target.value, 4095, 4))
                   }
                 />
               </label>
@@ -524,10 +527,17 @@ export function Gen6WildPanel({
               <label className="field">
                 <span>{t("gen6WildResultLimit")}</span>
                 <input
+                  maxLength={6}
                   inputMode="numeric"
                   value={resultLimit}
                   onChange={(event) =>
-                    setResultLimit(normalizeDecimalInput(event.target.value, 6))
+                    setResultLimit(
+                      normalizeDecimalInput(
+                        event.target.value,
+                        GEN6_WILD_MAX_RESULTS,
+                        6,
+                      ),
+                    )
                   }
                 />
               </label>
@@ -646,11 +656,12 @@ export function Gen6WildPanel({
               <label className="field">
                 <span>{t("gen6WildEncounterRate")}</span>
                 <input
+                  maxLength={3}
                   inputMode="numeric"
                   value={encounterRate}
                   onChange={(event) =>
                     setEncounterRate(
-                      normalizeDecimalInput(event.target.value, 3),
+                      normalizeDecimalInput(event.target.value, 100, 3),
                     )
                   }
                 />
@@ -658,11 +669,12 @@ export function Gen6WildPanel({
               <label className="field">
                 <span>{t("gen6WildPartyPokemon")}</span>
                 <input
+                  maxLength={1}
                   inputMode="numeric"
                   value={partyPokemon}
                   onChange={(event) =>
                     setPartyPokemon(
-                      normalizeDecimalInput(event.target.value, 1),
+                      normalizeDecimalInput(event.target.value, 5, 1),
                     )
                   }
                 />
@@ -670,10 +682,13 @@ export function Gen6WildPanel({
               <label className="field">
                 <span>{t("gen6WildPidRolls")}</span>
                 <input
+                  maxLength={2}
                   inputMode="numeric"
                   value={pidRolls}
                   onChange={(event) =>
-                    setPidRolls(normalizeDecimalInput(event.target.value, 2))
+                    setPidRolls(
+                      normalizeDecimalInput(event.target.value, 40, 2),
+                    )
                   }
                 />
               </label>
@@ -721,10 +736,17 @@ export function Gen6WildPanel({
               <label className="field">
                 <span>{t("gen6WildTinyFrame")}</span>
                 <input
+                  maxLength={10}
                   inputMode="numeric"
                   value={tinyFrame}
                   onChange={(event) =>
-                    setTinyFrame(normalizeDecimalInput(event.target.value, 10))
+                    setTinyFrame(
+                      normalizeDecimalInput(
+                        event.target.value,
+                        GEN6_WILD_MAX_FRAME,
+                        10,
+                      ),
+                    )
                   }
                 />
               </label>

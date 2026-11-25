@@ -1,9 +1,10 @@
-export const GEN6_POKERADAR_API_VERSION = 1,
+export const GEN6_POKERADAR_API_VERSION = 2,
   GEN6_POKERADAR_REQUEST_WORDS = 8,
   GEN6_POKERADAR_RESULT_WORDS = 16,
   GEN6_POKERADAR_MAX_RESULTS = 100_000,
   GEN6_POKERADAR_MAX_FRAME = 1_000_000_000,
-  GEN6_POKERADAR_BROWSER_MAX_FRAME = 5_000_000;
+  GEN6_POKERADAR_BROWSER_MAX_FRAME = 5_000_000,
+  GEN6_POKERADAR_MAX_CHAIN_LENGTH = 255;
 export type Gen6PokeRadarPatchState = "bad" | "good" | "shiny" | "empty";
 export interface Gen6PokeRadarPatch {
   ring: number;
@@ -60,8 +61,8 @@ export function validateGen6PokeRadarRequest(request: Gen6PokeRadarRequest) {
     );
   if (
     !integerIn(request.tinyFrame, 0, GEN6_POKERADAR_MAX_FRAME) ||
-    !integerIn(request.partySize, 0, 6) ||
-    !integerIn(request.chainLength, 0, 100) ||
+    !integerIn(request.partySize, 1, 6) ||
+    !integerIn(request.chainLength, 0, GEN6_POKERADAR_MAX_CHAIN_LENGTH) ||
     typeof request.boost !== "boolean"
   )
     throw new TypeError("Poke Radar settings are invalid.");
