@@ -459,7 +459,7 @@ export function Gen7WildPanel({
   ) {
     setter((current) => {
       const next = [...current] as IvText;
-      next[index] = normalizeDecimalInput(value, 2);
+      next[index] = normalizeDecimalInput(value, 31, 2);
       return next;
     });
   }
@@ -1113,6 +1113,7 @@ export function Gen7WildPanel({
                     <span>{label}</span>
                     <input
                       inputMode="numeric"
+                      maxLength={2}
                       value={ivMin[index]}
                       onChange={(event) =>
                         updateIv(setIvMin, index, event.target.value)
@@ -1120,6 +1121,7 @@ export function Gen7WildPanel({
                     />
                     <input
                       inputMode="numeric"
+                      maxLength={2}
                       value={ivMax[index]}
                       onChange={(event) =>
                         updateIv(setIvMax, index, event.target.value)
@@ -1133,10 +1135,11 @@ export function Gen7WildPanel({
                   <span>{t("gen7WildPerfectValue")}</span>
                   <input
                     inputMode="numeric"
+                    maxLength={2}
                     value={perfectIvValue}
                     onChange={(event) =>
                       setPerfectIvValue(
-                        normalizeDecimalInput(event.target.value, 2),
+                        normalizeDecimalInput(event.target.value, 31, 2),
                       )
                     }
                   />
@@ -1145,10 +1148,11 @@ export function Gen7WildPanel({
                   <span>{t("gen7WildPerfectCount")}</span>
                   <input
                     inputMode="numeric"
+                    maxLength={1}
                     value={perfectIvCount}
                     onChange={(event) =>
                       setPerfectIvCount(
-                        normalizeDecimalInput(event.target.value, 1),
+                        normalizeDecimalInput(event.target.value, 6, 1),
                       )
                     }
                   />

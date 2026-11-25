@@ -1367,26 +1367,38 @@ export function Gen7SosPanel({
                     <label key={label}>
                       <span>{label}</span>
                       <input
+                        inputMode="numeric"
+                        maxLength={2}
                         value={ivMin[index]}
                         onChange={(event) =>
                           setIvMin(
                             (current) =>
                               current.map((value, currentIndex) =>
                                 currentIndex === index
-                                  ? normalizeDecimalInput(event.target.value, 2)
+                                  ? normalizeDecimalInput(
+                                      event.target.value,
+                                      31,
+                                      2,
+                                    )
                                   : value,
                               ) as IvText,
                           )
                         }
                       />
                       <input
+                        inputMode="numeric"
+                        maxLength={2}
                         value={ivMax[index]}
                         onChange={(event) =>
                           setIvMax(
                             (current) =>
                               current.map((value, currentIndex) =>
                                 currentIndex === index
-                                  ? normalizeDecimalInput(event.target.value, 2)
+                                  ? normalizeDecimalInput(
+                                      event.target.value,
+                                      31,
+                                      2,
+                                    )
                                   : value,
                               ) as IvText,
                           )
@@ -1399,10 +1411,12 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>{t("gen7SosPerfectValue")}</span>
                     <input
+                      inputMode="numeric"
+                      maxLength={2}
                       value={perfectIvValue}
                       onChange={(event) =>
                         setPerfectIvValue(
-                          normalizeDecimalInput(event.target.value, 2),
+                          normalizeDecimalInput(event.target.value, 31, 2),
                         )
                       }
                     />
@@ -1410,10 +1424,12 @@ export function Gen7SosPanel({
                   <label className="field">
                     <span>{t("gen7SosPerfectCount")}</span>
                     <input
+                      inputMode="numeric"
+                      maxLength={1}
                       value={perfectIvCount}
                       onChange={(event) =>
                         setPerfectIvCount(
-                          normalizeDecimalInput(event.target.value, 1),
+                          normalizeDecimalInput(event.target.value, 6, 1),
                         )
                       }
                     />

@@ -23,28 +23,30 @@ Upstream reference:
 
 The following limits match the upstream controls and Core parameter types. Empty numeric text is normalized to zero before validation.
 
-| Input                | Control             | Range / behavior                                                    |
-| -------------------- | ------------------- | ------------------------------------------------------------------- |
-| Main Seed / SOS Seed | hexadecimal text    | `0x00000000..0xFFFFFFFF`, eight hexadecimal digits                  |
-| Version              | select              | Sun, Moon, Ultra Sun, Ultra Moon                                    |
-| Main Initial Frame   | decimal text        | SM starts at `418`; USUM starts at `478`; max `10,000,000`          |
-| Calls Initial Frame  | decimal text        | `0..10,000,000`                                                     |
-| Max Frame            | decimal text        | at least Initial Frame, max `10,000,000`                            |
-| TSV                  | decimal text        | `0..4095`, up to four digits, empty parses as `0`                   |
-| TRV                  | decimal text        | `0..15`                                                             |
-| SOS Frame            | decimal text        | `0..1,000,000`                                                      |
-| Chain Length         | decimal text        | `0..255`                                                            |
-| NPC                  | decimal text        | `0..100`                                                            |
-| Main Delay           | decimal text        | `0..4000`, upstream two-frame increment; ABI stores `delay / 2 + 2` |
-| Calls Delay          | decimal text        | `0..10000`                                                          |
-| Level                | decimal text        | `1..100`, minimum must not exceed maximum                           |
-| Call Rate            | select              | `0`, `3`, `6`, `9`, `15`                                            |
-| HP Bar Color         | select              | Green `1`, Yellow `3`, Red `5`                                      |
-| Existing Perfect IVs | six checkboxes      | bit mask for HP, Atk, Def, SpA, SpD, Spe                            |
-| Weather              | select / checkbox   | None, Rain, Hail, Sand; Calls uses the upstream boolean             |
-| Filters              | select / checkboxes | empty masks mean any; disabled filters preserve every result        |
+| Input                        | Control             | Range / behavior                                                       |
+| ---------------------------- | ------------------- | ---------------------------------------------------------------------- |
+| Main Seed / SOS Seed         | hexadecimal text    | `0x00000000..0xFFFFFFFF`, eight hexadecimal digits                     |
+| Version                      | select              | Sun, Moon, Ultra Sun, Ultra Moon                                       |
+| Main Initial Frame           | decimal text        | SM starts at `418`; USUM starts at `478`; max `10,000,000`             |
+| Calls Initial Frame          | decimal text        | `0..10,000,000`                                                        |
+| Max Frame                    | decimal text        | at least Initial Frame, max `10,000,000`                               |
+| TSV                          | decimal text        | `0..4095`, up to four digits, empty parses as `0`                      |
+| TRV                          | decimal text        | `0..15`                                                                |
+| SOS Frame                    | decimal text        | `0..1,000,000`                                                         |
+| Chain Length                 | decimal text        | `0..255`                                                               |
+| NPC                          | decimal text        | `0..100`                                                               |
+| Main Delay                   | decimal text        | `0..4000`, upstream two-frame increment; ABI stores `delay / 2 + 2`    |
+| Calls Delay                  | decimal text        | `0..10000`                                                             |
+| Level                        | decimal text        | `1..100`, minimum must not exceed maximum                              |
+| Call Rate                    | select              | `0`, `3`, `6`, `9`, `15`                                               |
+| HP Bar Color                 | select              | Green `1`, Yellow `3`, Red `5`                                         |
+| Pokémon IV range             | decimal text        | Six ranges, each endpoint `0..31`, up to two digits, minimum ≤ maximum |
+| Perfect IV threshold / count | decimal text        | `0..31` / `0..6`, up to two / one digits                               |
+| Existing Perfect IVs         | six checkboxes      | bit mask for HP, Atk, Def, SpA, SpD, Spe                               |
+| Weather                      | select / checkbox   | None, Rain, Hail, Sand; Calls uses the upstream boolean                |
+| Filters                      | select / checkboxes | empty masks mean any; disabled filters preserve every result           |
 
-The Pokémon Generation TSV uses `MainForm.Designer.cs` (`TSV.Maximum = 4095`). `MainForm.cs::getWildSetting()` reads that control into `Core/WildRNG.cs` (`int TSV`) before applying the SOS settings.
+The Pokémon Generation TSV uses `MainForm.Designer.cs` (`TSV.Maximum = 4095`). `MainForm.cs::getWildSetting()` reads that control into `Core/WildRNG.cs` (`int TSV`) before applying the SOS settings. Pokémon IV filters use `Subforms/IVRange.cs` and `Core/RNGFilters.cs`. The threshold and count follow `Perfect_IV_Value` and `PerfectIVs` in `MainForm.Designer.cs`.
 
 `Rate 2` uses the upstream `.NET Math.Round` banker rounding. The source `MiscRNGTool` hides the `Super Effective` input and comments out its multiplier; this implementation exposes the recorded control and applies the `SOSCall.md` x2 multiplier. This source difference is intentionally documented here.
 

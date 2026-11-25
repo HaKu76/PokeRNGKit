@@ -41,7 +41,7 @@ Poke Pelago 特殊遭遇已归入 `Stationary RNG`，不在 Wild 中重复实现
 | Delay2                       | 十进制，`0..10000`，步长 2          | 只对 Ambush 开放；进入算法前截断除以 2                                        | `MainForm.Designer.cs` 的 `Delay2.Maximum` / `Increment`；`getWildSettings()` |
 | Lead                         | 11 项                               | Synchronize 才允许选择 25 种同步性格                                          | `MainForm.Designer.cs`、`Core/WildRNG.cs`                                     |
 | Shiny Charm / Consider Delay | 布尔值                              | Shiny Charm 在未锁闪分支增加 PID 抽取；关闭 Consider Delay 跳过遭遇延时       | `Wild7.Generate()`、`RNGPool.WildDelay()`                                     |
-| IV range                     | 六组闭区间，各端 `0..31`            | 每组最小值不得大于最大值                                                      | `MainForm.Designer.cs`、`Core/RNGFilters.cs`                                  |
+| IV range                     | 六组闭区间，各端最多两位，`0..31`   | 每组最小值不得大于最大值                                                      | `MainForm.Designer.cs`、`Core/RNGFilters.cs`                                  |
 | Perfect IV Value / Count     | `0..31` / `0..6`                    | 结果中大于等于指定值的 IV 数量必须达到 Count                                  | `MainForm.Designer.cs`、`Core/RNGFilters.cs`                                  |
 | Nature / Hidden Power        | 25 / 16 项位掩码                    | 空掩码与全选都表示不缩小结果                                                  | `MainForm.cs::FilterSettings`、`Core/RNGFilters.cs`                           |
 | Gender / Ability             | Any、Male、Female / Any、1、2、H    | 使用生成结果内部值筛选                                                        | `MainForm.cs::FilterSettings`、`Core/RNGFilters.cs`                           |
@@ -52,7 +52,7 @@ Poke Pelago 特殊遭遇已归入 `Stationary RNG`，不在 Wild 中重复实现
 
 上游实际帧上限是 `1000000000`。当前实现为了限制浏览器初始化和连续 SFMT 推进成本，将绝对最大帧暂时限制为 `10000000`；该保护限制不改写上游输入记录。
 
-`MainForm.cs::getWildSetting()` 将 TSV 控件值读入 `Core/WildRNG.cs` 的 `int TSV`。
+`MainForm.cs::getWildSetting()` 将 TSV 控件值读入 `Core/WildRNG.cs` 的 `int TSV`。个体值范围对应 `Subforms/IVRange.cs` 与 `Core/RNGFilters.cs`，完美个体值和数量分别对应 `MainForm.Designer.cs` 的 `Perfect_IV_Value` 和 `PerfectIVs`。
 
 ## 遭遇数据
 
